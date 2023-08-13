@@ -1,0 +1,2071 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="ko" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.115.2">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>데이터 중심 애플리케이션 설계 | 11장. 스트림 처리 | devkuma</title>
+<meta name="description" content="발표자 : 김경철, 김민규
+스트림 : 시간 흐름에 따라 점진적으로 생산된 데이터
+스트림 처리 : 일괄 처리와 다르게, 단순히 이벤트가 발생할 때마다 처리한다.
+이벤트 스트림 : 점진적인 처리, 시간별로 정렬된 일련의 비즈니스 이벤트
+이벤트 스트림 전송 이벤트
+특정 시점에 일어난 사건에 대한 세부 사항을 포함 일반적으로 일기준 시계를 따르는 이벤트 발생 타임스탬프 포함 이벤트 예제
+웹페이지를 보거나 상품을 구입하는 일 같은 사용자가 취한 행동 온도 센서 주기적으로 측정한 값이나 CPU 사용률 지표와 같이 같이 장비에서 발생한 것 웹 서버 로그의 각줄을 이벤트 하나로 취급 이벤트의 부호화, 저장, 전송">
+<meta property="og:title" content="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리" />
+<meta property="og:description" content="발표자 : 김경철, 김민규
+스트림 : 시간 흐름에 따라 점진적으로 생산된 데이터
+스트림 처리 : 일괄 처리와 다르게, 단순히 이벤트가 발생할 때마다 처리한다.
+이벤트 스트림 : 점진적인 처리, 시간별로 정렬된 일련의 비즈니스 이벤트
+이벤트 스트림 전송 이벤트
+특정 시점에 일어난 사건에 대한 세부 사항을 포함 일반적으로 일기준 시계를 따르는 이벤트 발생 타임스탬프 포함 이벤트 예제
+웹페이지를 보거나 상품을 구입하는 일 같은 사용자가 취한 행동 온도 센서 주기적으로 측정한 값이나 CPU 사용률 지표와 같이 같이 장비에서 발생한 것 웹 서버 로그의 각줄을 이벤트 하나로 취급 이벤트의 부호화, 저장, 전송" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.devkuma.com/docs/data-intensive-application/11/" /><meta property="article:section" content="210_Data-Science_BigData" />
+<meta property="article:published_time" content="2022-04-29T00:00:00+09:00" />
+<meta property="article:modified_time" content="2022-04-29T00:00:00+09:00" />
+<meta itemprop="name" content="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리">
+<meta itemprop="description" content="발표자 : 김경철, 김민규
+스트림 : 시간 흐름에 따라 점진적으로 생산된 데이터
+스트림 처리 : 일괄 처리와 다르게, 단순히 이벤트가 발생할 때마다 처리한다.
+이벤트 스트림 : 점진적인 처리, 시간별로 정렬된 일련의 비즈니스 이벤트
+이벤트 스트림 전송 이벤트
+특정 시점에 일어난 사건에 대한 세부 사항을 포함 일반적으로 일기준 시계를 따르는 이벤트 발생 타임스탬프 포함 이벤트 예제
+웹페이지를 보거나 상품을 구입하는 일 같은 사용자가 취한 행동 온도 센서 주기적으로 측정한 값이나 CPU 사용률 지표와 같이 같이 장비에서 발생한 것 웹 서버 로그의 각줄을 이벤트 하나로 취급 이벤트의 부호화, 저장, 전송"><meta itemprop="datePublished" content="2022-04-29T00:00:00+09:00" />
+<meta itemprop="dateModified" content="2022-04-29T00:00:00+09:00" />
+<meta itemprop="wordCount" content="4837">
+<meta itemprop="keywords" content="Database,NoSQL,Data,RDB," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리"/>
+<meta name="twitter:description" content="발표자 : 김경철, 김민규
+스트림 : 시간 흐름에 따라 점진적으로 생산된 데이터
+스트림 처리 : 일괄 처리와 다르게, 단순히 이벤트가 발생할 때마다 처리한다.
+이벤트 스트림 : 점진적인 처리, 시간별로 정렬된 일련의 비즈니스 이벤트
+이벤트 스트림 전송 이벤트
+특정 시점에 일어난 사건에 대한 세부 사항을 포함 일반적으로 일기준 시계를 따르는 이벤트 발생 타임스탬프 포함 이벤트 예제
+웹페이지를 보거나 상품을 구입하는 일 같은 사용자가 취한 행동 온도 센서 주기적으로 측정한 값이나 CPU 사용률 지표와 같이 같이 장비에서 발생한 것 웹 서버 로그의 각줄을 이벤트 하나로 취급 이벤트의 부호화, 저장, 전송"/>
+
+
+
+
+<link rel="preload" href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" as="style">
+<link href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/docs/data-intensive-application/11/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-FW3TZ3QLYR');
+}
+</script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+<a class="navbar-brand" href="/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none"><path d="M775 4993c-268-38-509-215-618-453-71-155-67-24-67-1986 0-1958-5-1818 65-1971 43-94 86-155 162-230 117-115 283-198 448-223 48-7 618-10 1840-8l1770 3 75 23c231 70 408 216 505 417 81 168 75 7 75 1995 0 1969 5 1824-67 1980-96 211-277 360-528 436-57 18-150 19-1845 20-982 1-1798-1-1815-3zm543-584c53-11 123-30 154-44 144-61 319-213 379-328 19-36 22-37 57-31 20 4 44 10 52 14 20 10 119 30 250 50 228 35 454 36 695 4 91-12 256-47 299-63 16-7 29-10 30-9 1 2 18 28 38 58 115 178 309 304 533 348 39 8 272 8 310 0 103-21 141-34 233-80 157-77 285-206 357-356 54-113 72-195 73-329 1-103-5-142-44-273-25-87-148-259-223-315-40-29-50-51-32-71 5-5 21-38 36-74 61-145 96-253 110-340 3-19 11-60 17-90 13-62 17-434 5-520-16-123-37-209-76-325-56-165-174-395-246-477-11-13-35-43-54-68-44-58-254-267-306-305-22-17-42-32-45-35-18-18-235-161-275-181-16-9-54-28-83-44-29-15-55-26-57-23-2 2 6 16 18 30 12 15 30 35 39 47 37 44 109 161 134 217 42 92 69 194 81 304 46 396-119 758-455 996-261 186-532 256-862 225-205-19-372-77-540-185-142-92-289-241-378-382-110-175-166-481-127-699 37-203 125-383 260-533 31-34 51-62 44-62-22 0-198 89-304 153-55 34-140 93-190 131-92 70-307 279-360 350-17 22-39 51-50 65-19 25-38 52-97 146-66 106-175 374-191 472-3 16-8 39-11 53-40 177-41 522-2 725 3 17 8 44 11 60 16 86 81 266 130 359 15 27 14 30-7 44-77 53-208 204-252 291-97 188-96 485 2 677 33 66 129 191 183 238 192 171 465 239 737 185zm1414-2174c55-12 137-48 168-72 62-48 81-69 1e2-108 36-74 28-162-19-224-31-42-138-121-162-121-10 0-20-4-23-9-23-36-255-49-366-20-283 72-386 274-224 436 55 55 149 107 215 118 19 3 35 8 37 9 9 10 225 3 274-9z"/><path d="M3885 4013c-85-13-182-63-243-126l-33-34 40-26c22-15 43-27 45-27 9 0 225-150 252-175 6-5 36-30 65-55 66-55 172-159 222-219 23-26 42-41 51-38 23 9 91 108 112 162 13 35 19 76 18 135 0 76-3 92-34 155-57 119-168 210-289 238-58 14-152 18-206 10z"/><path d="M985 3976c-92-29-162-80-221-161-62-86-79-149-72-275 6-98 31-158 1e2-234l37-41 48 55c154 179 350 348 548 472 28 18 52 33 54 35 9 6-64 75-105 99-77 45-145 62-251 62-54 0-116-6-138-12z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+<div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+	<ul class="navbar-nav">
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-keyboard'></i><span>Programming</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/design/" >Design and Development</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/jvm/" >JVM Based Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/spring/" >Spring framework</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/web/" >Web Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/etc/" >그밖에 Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/tools/" >Programming Tools</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-database'></i><span>Data Science</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/big-data/" >Big Data</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/rdb/" >Relational Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/nosql/" >NoSQL Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/graph-db/" >Graph Databse</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-desktop'></i><span>Computer</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/computer/basic/" >컴퓨터 기본 지식</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/operating-system/" >Operating System</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/network/" >Network</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+		</li>
+		
+		</ul>
+</div>
+<div class="d-none d-lg-block">
+	<div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+</div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-docsdata-intensive-application11").addClass("active"); 
+    $("#td-section-nav #m-docsdata-intensive-application11-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docsdata-intensive-application11").parents("li").addClass("active-path"); 
+    $("#td-section-nav li.active-path").addClass("show"); 
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-docsdata-intensive-application11-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docsdata-intensive-application11-li").children("ul").children("li").addClass("show");  
+    $("#td-sidebar-menu").toggleClass("d-none"); 
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="collapse td-sidebar-nav foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docscategorydata-sciencebig-data-li">
+  <a href="/docs/category/data-science/big-data/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-docscategorydata-sciencebig-data"><span class="">Big Data</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsbig-data-li">
+  <input type="checkbox" id="m-docsbig-data-check"/>
+  <label for="m-docsbig-data-check"><a href="/docs/big-data/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsbig-data"><span class="">Big Data</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-dataterm-li">
+  <input type="checkbox" id="m-docsbig-dataterm-check"/>
+  <label for="m-docsbig-dataterm-check"><a href="/docs/big-data/term/" title="빅데이터 분석 기반이란? 데이터 파이프라인 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-dataterm"><span class="">빅데이터, 파이프라인 구축</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmqttintro-li">
+  <input type="checkbox" id="m-docsmqttintro-check"/>
+  <label for="m-docsmqttintro-check"><a href="/docs/mqtt/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmqttintro"><span class="">MQTT</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-datastream-processing-li">
+  <input type="checkbox" id="m-docsbig-datastream-processing-check"/>
+  <label for="m-docsbig-datastream-processing-check"><a href="/docs/big-data/stream-processing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-datastream-processing"><span class="">스트림 처리란? OSS 엔진 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-hadoop-li">
+  <input type="checkbox" id="m-docsapache-hadoop-check"/>
+  <label for="m-docsapache-hadoop-check"><a href="/docs/apache-hadoop/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-hadoop"><span class="">Apache Hadoop</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-spark-li">
+  <input type="checkbox" id="m-docsapache-spark-check"/>
+  <label for="m-docsapache-spark-check"><a href="/docs/apache-spark/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-spark"><span class="">Apache Spark</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docspyspark-li">
+  <input type="checkbox" id="m-docspyspark-check"/>
+  <label for="m-docspyspark-check"><a href="/docs/pyspark/" title="PySpark 개념 및 주요 기능" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docspyspark"><span class="">PySpark</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsdata-intensive-application-li">
+  <input type="checkbox" id="m-docsdata-intensive-application-check"/>
+  <label for="m-docsdata-intensive-application-check"><a href="/docs/data-intensive-application/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsdata-intensive-application"><span class="">데이터 중심 애플리케이션 설계</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application02-li">
+  <input type="checkbox" id="m-docsdata-intensive-application02-check"/>
+  <label for="m-docsdata-intensive-application02-check"><a href="/docs/data-intensive-application/02/" title="데이터 중심 애플리케이션 설계 | 02장. 데이터 모델과 질의 언어" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application02"><span class="">02장. 데이터 모델과 질의 언어</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application03-li">
+  <input type="checkbox" id="m-docsdata-intensive-application03-check"/>
+  <label for="m-docsdata-intensive-application03-check"><a href="/docs/data-intensive-application/03/" title="데이터 중심 애플리케이션 설계 | 03장. 저장소와 검색" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application03"><span class="">03장. 저장소와 검색</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application04-li">
+  <input type="checkbox" id="m-docsdata-intensive-application04-check"/>
+  <label for="m-docsdata-intensive-application04-check"><a href="/docs/data-intensive-application/04/" title="데이터 중심 애플리케이션 설계 | 04장. 부호화 발전" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application04"><span class="">04장. 부호화 발전</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application05-li">
+  <input type="checkbox" id="m-docsdata-intensive-application05-check"/>
+  <label for="m-docsdata-intensive-application05-check"><a href="/docs/data-intensive-application/05/" title="데이터 중심 애플리케이션 설계 | 05장. 복제" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application05"><span class="">05장. 복제</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application06-li">
+  <input type="checkbox" id="m-docsdata-intensive-application06-check"/>
+  <label for="m-docsdata-intensive-application06-check"><a href="/docs/data-intensive-application/06/" title="데이터 중심 애플리케이션 설계 | 06장. 파티셔닝" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application06"><span class="">06장. 파티셔닝</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application7-li">
+  <input type="checkbox" id="m-docsdata-intensive-application7-check"/>
+  <label for="m-docsdata-intensive-application7-check"><a href="/docs/data-intensive-application/7/" title="데이터 중심 애플리케이션 설계 | 07장. 트랜잭션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application7"><span class="">07장. 트랜잭션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application8-li">
+  <input type="checkbox" id="m-docsdata-intensive-application8-check"/>
+  <label for="m-docsdata-intensive-application8-check"><a href="/docs/data-intensive-application/8/" title="데이터 중심 애플리케이션 설계 | 08장. 분산 시스템의 골치거리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application8"><span class="">08장. 분산 시스템의 골치거리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application9-li">
+  <input type="checkbox" id="m-docsdata-intensive-application9-check"/>
+  <label for="m-docsdata-intensive-application9-check"><a href="/docs/data-intensive-application/9/" title="데이터 중심 애플리케이션 설계 | 09장. 일관성과 합의" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application9"><span class="">09장. 일관성과 합의</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application10-li">
+  <input type="checkbox" id="m-docsdata-intensive-application10-check"/>
+  <label for="m-docsdata-intensive-application10-check"><a href="/docs/data-intensive-application/10/" title="데이터 중심 애플리케이션 설계 | 10장. 일괄 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application10"><span class="">10장. 일괄 처리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application11-li">
+  <input type="checkbox" id="m-docsdata-intensive-application11-check"/>
+  <label for="m-docsdata-intensive-application11-check"><a href="/docs/data-intensive-application/11/" title="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application11"><span class="">11장. 스트림 처리</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-kafka-li">
+  <input type="checkbox" id="m-docsapache-kafka-check"/>
+  <label for="m-docsapache-kafka-check"><a href="/docs/apache-kafka/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-kafka"><span class="">Apache Kafka</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaintro-li">
+  <input type="checkbox" id="m-docsapache-kafkaintro-check"/>
+  <label for="m-docsapache-kafkaintro-check"><a href="/docs/apache-kafka/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaintro"><span class="">Apache Kafka 개념 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkainstall-li">
+  <input type="checkbox" id="m-docsapache-kafkainstall-check"/>
+  <label for="m-docsapache-kafkainstall-check"><a href="/docs/apache-kafka/install/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkainstall"><span class="">Apache Kafka 설치 및 확인</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaclient-li">
+  <input type="checkbox" id="m-docsapache-kafkaclient-check"/>
+  <label for="m-docsapache-kafkaclient-check"><a href="/docs/apache-kafka/client/" title="Java로 간단한 Apache Kafka Producer/Consumer 클라이언트 만들기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaclient"><span class="">Producer/Consumer 클라이언트</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkawhat-li">
+  <input type="checkbox" id="m-docsapache-kafkawhat-check"/>
+  <label for="m-docsapache-kafkawhat-check"><a href="/docs/apache-kafka/what/" title="Kafka 상세 개념 | 원래 Kafka란?" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkawhat"><span class="">Kafka 상세 개념</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkastrems-li">
+  <input type="checkbox" id="m-docsapache-kafkastrems-check"/>
+  <label for="m-docsapache-kafkastrems-check"><a href="/docs/apache-kafka/strems/" title="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkastrems"><span class="">Kafka Streams</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-phoenix-li">
+  <input type="checkbox" id="m-docsapache-phoenix-check"/>
+  <label for="m-docsapache-phoenix-check"><a href="/docs/apache-phoenix/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-phoenix"><span class="">Apache Phoenix</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-zookeeper-li">
+  <input type="checkbox" id="m-docsapache-zookeeper-check"/>
+  <label for="m-docsapache-zookeeper-check"><a href="/docs/apache-zookeeper/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-zookeeper"><span class="">Apache ZooKeeper</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperoverview-li">
+  <input type="checkbox" id="m-docsapache-zookeeperoverview-check"/>
+  <label for="m-docsapache-zookeeperoverview-check"><a href="/docs/apache-zookeeper/overview/" title="ZooKeeper 오픈 소스의 운용 관리·운용 자동화" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperoverview"><span class="">ZooKeeper 개요</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperinstall-li">
+  <input type="checkbox" id="m-docsapache-zookeeperinstall-check"/>
+  <label for="m-docsapache-zookeeperinstall-check"><a href="/docs/apache-zookeeper/install/" title="ZooKeeper 설치 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperinstall"><span class="">ZooKeeper 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperdocker-install-li">
+  <input type="checkbox" id="m-docsapache-zookeeperdocker-install-check"/>
+  <label for="m-docsapache-zookeeperdocker-install-check"><a href="/docs/apache-zookeeper/docker-install/" title="ZooKeeper Docker로 설치하여 개발환경으로 구축하기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperdocker-install"><span class="">ZooKeeper Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperjava-api-li">
+  <input type="checkbox" id="m-docsapache-zookeeperjava-api-check"/>
+  <label for="m-docsapache-zookeeperjava-api-check"><a href="/docs/apache-zookeeper/java-api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperjava-api"><span class="">ZooKeeper API</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidb-li">
+  <input type="checkbox" id="m-docstidb-check"/>
+  <label for="m-docstidb-check"><a href="/docs/tidb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidb"><span class="">TiDB</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbabout-li">
+  <input type="checkbox" id="m-docstidbabout-check"/>
+  <label for="m-docstidbabout-check"><a href="/docs/tidb/about/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbabout"><span class="">TiDB에 대해서</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboverview-li">
+  <input type="checkbox" id="m-docstidboverview-check"/>
+  <label for="m-docstidboverview-check"><a href="/docs/tidb/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboverview"><span class="">TiDB 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexperimental-features-li">
+  <input type="checkbox" id="m-docstidbexperimental-features-check"/>
+  <label for="m-docstidbexperimental-features-check"><a href="/docs/tidb/experimental-features/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexperimental-features"><span class="">TiDB의 실험 기능</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbmysql-compatibility-li">
+  <input type="checkbox" id="m-docstidbmysql-compatibility-check"/>
+  <label for="m-docstidbmysql-compatibility-check"><a href="/docs/tidb/mysql-compatibility/" title="TiDB - MySQL과의 호환성" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbmysql-compatibility"><span class="">MySQL 호환성</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbtidb-limitations-li">
+  <input type="checkbox" id="m-docstidbtidb-limitations-check"/>
+  <label for="m-docstidbtidb-limitations-check"><a href="/docs/tidb/tidb-limitations/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbtidb-limitations"><span class="">TiDB 제한 사항</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbtutorial-li">
+  <input type="checkbox" id="m-docstidbtutorial-check"/>
+  <label for="m-docstidbtutorial-check"><a href="/docs/tidb/tutorial/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbtutorial"><span class="">TiDB 설치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbhardware-and-software-requirements-li">
+  <input type="checkbox" id="m-docstidbhardware-and-software-requirements-check"/>
+  <label for="m-docstidbhardware-and-software-requirements-check"><a href="/docs/tidb/hardware-and-software-requirements/" title="TiDB 소프트웨어 및 하드웨어 권장 사항" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbhardware-and-software-requirements"><span class="">소프트웨어 및 하드웨어 권장 사항</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalltiup-li">
+  <input type="checkbox" id="m-docstidbinstalltiup-check"/>
+  <label for="m-docstidbinstalltiup-check"><a href="/docs/tidb/install/tiup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalltiup"><span class="">TiUP 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalllinux-li">
+  <input type="checkbox" id="m-docstidbinstalllinux-check"/>
+  <label for="m-docstidbinstalllinux-check"><a href="/docs/tidb/install/linux/" title="TiDB 로컬 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalllinux"><span class="">TiDB 로컬 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalldocker-compose-li">
+  <input type="checkbox" id="m-docstidbinstalldocker-compose-check"/>
+  <label for="m-docstidbinstalldocker-compose-check"><a href="/docs/tidb/install/docker-compose/" title="TiDB Docker 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalldocker-compose"><span class="">TiDB Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-tidb-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-tidb-check"/>
+  <label for="m-docstidbquick-start-with-tidb-check"><a href="/docs/tidb/quick-start-with-tidb/" title="TiDB 단일 컴퓨터에서 운영 환경 클러스터 배포 시뮬레이션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-tidb"><span class="">TiDB 배포 시뮬레이션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbproduction-deployment-using-tiup-li">
+  <input type="checkbox" id="m-docstidbproduction-deployment-using-tiup-check"/>
+  <label for="m-docstidbproduction-deployment-using-tiup-check"><a href="/docs/tidb/production-deployment-using-tiup/" title="TiUP를 사용하여 TiDB 클러스터 배포" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbproduction-deployment-using-tiup"><span class="">TiDB 클러스터 배포</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbquick-start-li">
+  <input type="checkbox" id="m-docstidbquick-start-check"/>
+  <label for="m-docstidbquick-start-check"><a href="/docs/tidb/quick-start/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbquick-start"><span class="">퀵 스타트</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-htap-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-htap-check"/>
+  <label for="m-docstidbquick-start-with-htap-check"><a href="/docs/tidb/quick-start-with-htap/" title="TiDB HTAP 퀵 스타트 가이드" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-htap"><span class="">HTAP 사용하기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbbasic-sql-operations-li">
+  <input type="checkbox" id="m-docstidbbasic-sql-operations-check"/>
+  <label for="m-docstidbbasic-sql-operations-check"><a href="/docs/tidb/basic-sql-operations/" title="TiDB의 SQL 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbbasic-sql-operations"><span class="">TiDB로 SQL 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexplore-htap-li">
+  <input type="checkbox" id="m-docstidbexplore-htap-check"/>
+  <label for="m-docstidbexplore-htap-check"><a href="/docs/tidb/explore-htap/" title="TiDB HTAP 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexplore-htap"><span class="">HTAP 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbimport-example-data-li">
+  <input type="checkbox" id="m-docstidbimport-example-data-check"/>
+  <label for="m-docstidbimport-example-data-check"><a href="/docs/tidb/import-example-data/" title="TiDB 샘플 데이터베이스 가져오기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbimport-example-data"><span class="">샘플 데이터베이스 가져오기</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbcluster-architecture-li">
+  <input type="checkbox" id="m-docstidbcluster-architecture-check"/>
+  <label for="m-docstidbcluster-architecture-check"><a href="/docs/tidb/cluster-architecture/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbcluster-architecture"><span class="">클러스터 아키텍처</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbarchitecture-li">
+  <input type="checkbox" id="m-docstidbarchitecture-check"/>
+  <label for="m-docstidbarchitecture-check"><a href="/docs/tidb/architecture/" title="TiDB 아키텍처 - 프로덕트 구성 이해" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbarchitecture"><span class="">아키텍처</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbstorege-li">
+  <input type="checkbox" id="m-docstidbstorege-check"/>
+  <label for="m-docstidbstorege-check"><a href="/docs/tidb/storege/" title="TiDB 스토리지" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbstorege"><span class="">스토리지</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbcomputing-li">
+  <input type="checkbox" id="m-docstidbcomputing-check"/>
+  <label for="m-docstidbcomputing-check"><a href="/docs/tidb/computing/" title="TiDB 컴퓨팅" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbcomputing"><span class="">컴퓨팅</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbscheduling-li">
+  <input type="checkbox" id="m-docstidbscheduling-check"/>
+  <label for="m-docstidbscheduling-check"><a href="/docs/tidb/scheduling/" title="TiDB 스케줄링" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbscheduling"><span class="">스케줄링</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbfailover-li">
+  <input type="checkbox" id="m-docstidbfailover-check"/>
+  <label for="m-docstidbfailover-check"><a href="/docs/tidb/failover/" title="TiDB 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbfailover"><span class="">자동 장애 조치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboperator-li">
+  <input type="checkbox" id="m-docstidboperator-check"/>
+  <label for="m-docstidboperator-check"><a href="/docs/tidb/operator/" title="TiDB Operator - 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboperator"><span class="">TiDB Operator</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsinfluxdb-li">
+  <input type="checkbox" id="m-docsinfluxdb-check"/>
+  <label for="m-docsinfluxdb-check"><a href="/docs/influxdb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsinfluxdb"><span class="">InfluxDB</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#이벤트-스트림-전송">이벤트 스트림 전송</a>
+      <ul>
+        <li><a href="#메시징-시스템">메시징 시스템</a></li>
+        <li><a href="#파티션닝된-로그">파티션닝된 로그</a></li>
+        <li><a href="#오래된-메시지-재생">오래된 메시지 재생</a></li>
+      </ul>
+    </li>
+    <li><a href="#데이터베이스와-스트림">데이터베이스와 스트림</a>
+      <ul>
+        <li><a href="#시스템-동기화-유지하기">시스템 동기화 유지하기</a></li>
+        <li><a href="#변경-데이터-캡처">변경 데이터 캡처</a></li>
+        <li><a href="#이벤트-소싱">이벤트 소싱</a></li>
+        <li><a href="#상태와-스트림-그리고-불변성">상태와 스트림 그리고 불변성</a></li>
+        <li><a href="#동일한-이벤트-로그로-여러-가지-뷰-만들기">동일한 이벤트 로그로 여러 가지 뷰 만들기</a></li>
+      </ul>
+    </li>
+    <li><a href="#스트림-처리">스트림 처리</a>
+      <ul>
+        <li><a href="#스트림-처리의-사용">스트림 처리의 사용</a></li>
+        <li><a href="#시간에-관한-추론">시간에 관한 추론</a></li>
+        <li><a href="#윈도우-유형">윈도우 유형</a></li>
+        <li><a href="#스트림-조인">스트림 조인</a></li>
+        <li><a href="#내결함성">내결함성</a></li>
+      </ul>
+    </li>
+    <li><a href="#참조-자료">참조 자료</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">297</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">e-Book</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gremlin/" data-taxonomy-term="gremlin"><span class="taxonomy-label">Gremlin</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">435</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">jQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">macOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/oauth/" data-taxonomy-term="oauth"><span class="taxonomy-label">OAuth</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">60</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/secure-coding-guide/" data-taxonomy-term="secure-coding-guide"><span class="taxonomy-label">Secure Coding Guide</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spock/" data-taxonomy-term="spock"><span class="taxonomy-label">Spock</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">111</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">40</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">108</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">WEB</span><span class="taxonomy-count">388</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/category/data-science/big-data/">Big Data</a></li>
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/data-intensive-application/">데이터 중심 애플리케이션 설계</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    11장. 스트림 처리</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>데이터 중심 애플리케이션 설계 | 11장. 스트림 처리</h1>
+	
+	<header class="article-meta">
+		
+		
+			
+				<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span></a></li>
+    </ul>
+</div>
+
+			
+		
+		
+	</header>
+	
+	<p><em>발표자 : 김경철, 김민규</em></p>
+<p>스트림 : 시간 흐름에 따라 점진적으로 생산된 데이터<br>
+스트림 처리 : 일괄 처리와 다르게, 단순히 이벤트가 발생할 때마다 처리한다.<br>
+이벤트 스트림 : 점진적인 처리, 시간별로 정렬된 일련의 비즈니스 이벤트</p>
+<h2 id="이벤트-스트림-전송">이벤트 스트림 전송</h2>
+<p>이벤트</p>
+<ul>
+<li>특정 시점에 일어난 사건에 대한 세부 사항을 포함</li>
+<li>일반적으로 일기준 시계를 따르는 이벤트 발생 타임스탬프 포함</li>
+</ul>
+<p>이벤트 예제</p>
+<ul>
+<li>웹페이지를 보거나 상품을 구입하는 일 같은 사용자가 취한 행동</li>
+<li>온도 센서 주기적으로 측정한 값이나 CPU 사용률 지표와 같이 같이 장비에서 발생한 것</li>
+<li>웹 서버 로그의 각줄을 이벤트 하나로 취급</li>
+</ul>
+<p>이벤트의 부호화, 저장, 전송</p>
+<ul>
+<li>텍스트 문자열이나 JSON 또는 이진 형태 등으로 부호화 가능</li>
+<li>파일 및 관계형 테이블에 삽입 및 문서 데이터베이스로 기록하거나 저장 가능</li>
+<li>다른 노드에서 처리하게끔 네트워트를 통해 전송 가능</li>
+</ul>
+<p>생산자와 소비자</p>
+<ul>
+<li>생산자(producer), 발생자(pubisher), 발송자(sender)는 <strong>이벤트를 만든다.</strong></li>
+<li>소비자(consumer), 구독자(subscriber), 수신자(recipient)는 <strong>이벤트를 처리한다.</strong></li>
+<li>스트림 시스템에서는 토픽(topic)이나 스트림으로 관련 <strong>이벤트를 묶는다.</strong></li>
+</ul>
+<p>스트림 처리와 일괄 처리 비교</p>
+<ul>
+<li>스트림 처리
+<ul>
+<li>생산자는 만들어낸 모든 이벤트를 데이터스토어 기록한다.</li>
+<li>각 소비자는 주기적으로 데이터스토어에 폴링해 마지막에 처리한 이후에 새로 발생한 이벤트가 있는지 확인하고 처리한다.</li>
+</ul>
+</li>
+<li>일괄 처리
+<ul>
+<li>매일 마지막에 그날 데이터 분량을 처리한다.</li>
+</ul>
+</li>
+<li>차이점
+<ul>
+<li>스트림 처리 발생할 때마다 확인하고 처리한다.</li>
+<li>일괄 처리 모와서 처리한다.</li>
+</ul>
+</li>
+<li>공통점
+<ul>
+<li>마지막 처리된 이후로 이어서 처리한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="메시징-시스템">메시징 시스템</h3>
+<p>메시징 시스템(messaging system) 역할</p>
+<ul>
+<li>새로운 이벤트에 대해 소비자에게 알려주려고 쓰이는 일방적인 방법으로 <strong>메시징 시스템</strong>을 사용한다.</li>
+<li>생산자는 이벤트를 포함한 메시지 전송한다.</li>
+<li>소비자는 그 메시지를 전달 받는다.</li>
+</ul>
+<p>생산자와 소비자 연결</p>
+<ul>
+<li>유닉스 파이프, TCP 연결
+<ul>
+<li>생산자와 소비자 사이를 직접 통신 채널을 사용하는 방법
+<ul>
+<li>메시지 시스템을 구축하는 가장 간단한 방법</li>
+</ul>
+</li>
+<li>전송자 하나를 정확히 수신자 하나에 연결</li>
+</ul>
+</li>
+<li>메시징 시스템
+<ul>
+<li>다수의 생산자 노드가 같은 토픽(topic)으로 메시지를 전송한다.</li>
+<li>다수의 소비자 노드가 토픽(topic) 하나에서 메시지를 받아 간다.</li>
+</ul>
+</li>
+</ul>
+<p>발생/구독(publish/subscribe, pub/sub) 모델에서의 시스템들의 다양한 접근법</p>
+<ul>
+<li>생산자가 소비자가 메시지를 처리하는 속도보다 빠르게 메시지를 전송한다면 어떻게 될까?
+<ul>
+<li>3가지 선택지
+<ul>
+<li>시스템 메시지를 버린다.</li>
+<li>큐에 메시지를 버퍼링한다.</li>
+<li>배압(backpressure)을 적용한다.
+<ul>
+<li>흐름 제어(flow control)이라고 한다.</li>
+<li>생산자가 메시지를 더 보내지 못하게 막는다.</li>
+<li>유닉스 파이프와 TCP을 배압을 사용한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>메시지가 큐에 버퍼링될 때, 큐 크기가 증가하게 된다면?
+<ul>
+<li>큐 크기가 메모리 크리보다 더 커지면 시스템이 중단되는가?</li>
+<li>메시지를 디스크에 쓰는가?
+<ul>
+<li>쓴다면 메시징 시스템의 성능에 어떤 영향을 주는가?</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>노드가 죽거나 일시적으로 오프라인이 된다면 어떻게 될까? 손실되는 메시지가 있을까?
+<ul>
+<li>지속성을 갖추려면? 비용 발생
+<ul>
+<li>디스크에 기록</li>
+<li>복제본 생성</li>
+<li>둘 다 필요</li>
+</ul>
+</li>
+<li>메시지를 읽어도 된다면? 비용 절약
+<ul>
+<li>하드웨어 처리량을 높일 수 있다.</li>
+<li>지연 시간을 낮출 수 있다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>메시지의 유실</p>
+<ul>
+<li>메시지가 유실된다면, 애플리케이션에 따라 다르다.
+<ul>
+<li>주기적으로 전송되는 데이터(센서 판단값, 지표)
+<ul>
+<li>가끔 누락되면 문제가 없다.</li>
+<li>단, 많이 누락되면 정확성이 떨어지고 인식하기 어렵다.</li>
+</ul>
+</li>
+<li>이벤트 수가 데이터인 경우
+<ul>
+<li>누락으로 인해 카운터가 잘못되었다는 것을 의미하기에 신뢰성이 떨어진다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="생산자에서-소비자로-메시지를-직접-전달하기">생산자에서 소비자로 메시지를 직접 전달하기</h4>
+<p>중간 노드를 통하지 않고, 생산자와 소비자를 네트워크로 직접 통신</p>
+<ul>
+<li>UDP 멀티캐스트
+<ul>
+<li>낮은 지연이 필수인 주식 시장과 같은 금융 산업에서 널리 사용된다.</li>
+<li>UDP 자체는 신뢰성이 낮아도 애플리케이션 단의 프로토콜은 읽어버린 패킷을 복구 할 수 있다.
+<ul>
+<li>생성자는 필요할 때 패킷을 재전송할 수 있게 전송한 패킷을 기억해야 한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ZeroMQ, 나노메시지(nanomsg)
+<ul>
+<li>유사한 접근법 사용한다.
+<ul>
+<li>TCP 또는 IP 멀티캐스트 상에서 발행/구독 메시징을 구현한다.</li>
+</ul>
+</li>
+<li><a href="https://zeromq.org/" target="_blank" rel="noopener">ZeroMQ<i class="fas fa-external-link-alt"></i></a>
+<ul>
+<li>분산/동시성 애플리케이션에 사용하도록 개발된 고성능 비동기 메시지 라이브러리이다.</li>
+<li>메시지 큐를 제공하지만 메시지 지향 미들웨어와 달리 메시지 브로커 없이 동작 가능하다.</li>
+</ul>
+</li>
+<li><a href="https://nanomsg.org/" target="_blank" rel="noopener">나노메시지(nanomsg)<i class="fas fa-external-link-alt"></i></a>
+<ul>
+<li>일반적인 통신 패턴을 제공하는 소켓 라이브러리이다.</li>
+<li>네트워크 계층에 빠르고 확장 가능하며 사용하기 쉽게 만드는 것을 목표로 한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>StatsD, BruBeck
+<ul>
+<li>네트워크 상의 모든 장비로부터 지표를 수집하고 모니터링하는데 UDP 메시징을 사용한다.</li>
+</ul>
+</li>
+<li>소비자가 네트워크 서비스를 노출하면 생산자는 직접 HTTP나 RPC 요청</li>
+</ul>
+<p>직접 메시징 시스템의 한계</p>
+<ul>
+<li>메시지가 유실 될 수 있는 가능성을 고려하여 애플리케이션 코드를 작성해야 한다.</li>
+<li>소비자가 오프라인이라면 메시지를 전달하지 못하는 상태에서 있는 동안 전송된 메시지는 잃어 버릴 수 있다.</li>
+</ul>
+<h4 id="메시지-브로커">메시지 브로커</h4>
+<p>메시지 브로커(메시지 큐)</p>
+<ul>
+<li>직접 메시징 시스템의 대안으로 메시지 브로커를 통해 메시지를 보내는 방법이 있다.</li>
+<li>메시지 스트림을 처리하는데 최적화된 데이터베이스의 일종이다.</li>
+<li>메시지 브로커는 서버로 구동되고, 생성자와 서비자는 서버의 클라이언트로 접속한다.
+<ul>
+<li>생성자는 브로커로 메세지 전송한다.</li>
+<li>소비자는 브로커에서 메세지를 읽어 전송받는다.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11_message-broker.png" alt="Message broker"></p>
+<p>메세지 브로커의 이점</p>
+<ul>
+<li>클라이언트의 상태 변경(접속, 접속 해제, 장애)에 쉽게 대처할 수 있다.</li>
+<li>브로커가 장애로 중단됐을 때도 메시지를 디스크에 기록하게 되면 유실되지 않는다.
+<ul>
+<li>메모리에만 메시지를 보관하는 브로커는 유실될 수 있다.</li>
+</ul>
+</li>
+<li>소비 속도가 느리면 브러커는 큐에 제한 없이 계속 늘어나게 한다.
+<ul>
+<li>메시지를 버리거나 배압을 하지 않는다. 다만, 이는 설정으로 변경할 수도 있다.</li>
+</ul>
+</li>
+</ul>
+<p>큐에 대기하게 되면 소비자는 비동기로 동작</p>
+<ul>
+<li>생산자는 메시지를 브로커에 보내면 해당 메시지는 버퍼에 쌓이게 되고, 소비가 될 때까지 기다리지 않는다.</li>
+<li>소비자는 메시지를 바로 소비할도 있지만, 늦게 소비할 수도 있게 된다.</li>
+</ul>
+<h4 id="메시지-브로커와-데이터베이스-비교">메시지 브로커와 데이터베이스 비교</h4>
+<ul>
+<li>데이터 보관
+<ul>
+<li>데이터베이스 : 데이터가 삭제될 때까지 보관</li>
+<li>메시지 브로커 : 소비자에게 데이터가 전달되면 자동으로 삭제</li>
+</ul>
+</li>
+<li>데이터 크기
+<ul>
+<li>메시지 브로커: 대부분의 메시지 빨리 지우기 때문에 작업 집합이 상당히 작다고 가정한다.
+<ul>
+<li>소비자가 많은 메시지를 버퍼링해야 한다면 처리량이 저하된다.</li>
+<li>작업 집합이란? 현재 실제 메모리에 상주하는 프로세스의 가상 주소 공간을 있는 페이지 집합이다.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>데이터 검색
+<ul>
+<li>데이터베이스 : 색인 등 다양한 검색 방법을 지원</li>
+<li>메시지 브로커 : 특정 패턴과 부합하는 토픽의 부분 집합을 구독하는 방식 지원</li>
+<li>메커니즘을 다르지만 둘 다 본질적으로 클라이언트가 데이터에서 필요한 부분만 선택하는 방법이다.</li>
+</ul>
+</li>
+<li>데이터 질의
+<ul>
+<li>데이터베이스 : 질의할 때 그 결과는 질의 시점의 데이터 스냅숏을 기준으로 한다.
+<ul>
+<li>데이터 변경되면 다시 질의하거나 풀링하지 않으면 변경되었다는 것을 알 수가 없다.</li>
+</ul>
+</li>
+<li>메시지 브로커 : 임의 질의를 지원하지 않지만, 변경되면 클라이언트에게 알려 준다.</li>
+</ul>
+</li>
+</ul>
+<p>이것은 메시지 브로커의 전통적인 관점으로 JMS, AMQP 같은 표준으로 캡슐화 되어 다음과 같은 소프트웨어로 구현되었다.</p>
+<ul>
+<li>RabitMQ, ActivceMQ, 큐피드(Qpid), 호빗Q(HornetQ), TIBCO Enterprice Message Service, IBM MQ, Azure Service Bus, 구글 클라우드 Pub/Sub</li>
+</ul>
+<p>JMS(Java Message Service)</p>
+<ul>
+<li>Java EE에서 기반한 애플리케이션 구성요서에서 메시지를 작성, 전송, 수신하고 읽을 수 있도록 하는 API이다.</li>
+<li>서버 구성을 통해 큐, 주제, 연결, 기타 자원을 작성 및 관리하는 관리 모드로 실행할 수 있다.</li>
+</ul>
+<p>AMQP(Advanced Message Queuing Protocal)</p>
+<ul>
+<li>메시지지향 미들웨어를 위한 개방형 표준 응용 계층 프로토콜이다.</li>
+<li>메시지지향, 큐잉, 라우팅(P2P 및 발행-구독), 신뢰성, 보안 기능이 있다.</li>
+</ul>
+<h4 id="복수-소비자">복수 소비자</h4>
+<p>여러 소비자가 같은 토픽에서 메시지를 읽을 때 사용하는 주요 패턴 2가지</p>
+<ul>
+<li>로드 밸런싱
+<ul>
+<li>각 메시지는 소비자 중 하나로 전달된다.</li>
+<li>브로커는 메시지를 전달할 소비자를 임의로 지정한다.</li>
+</ul>
+</li>
+<li>팬 아웃(fan-out)
+<ul>
+<li>각 메시지는 모든 소비자에게 전달된다.</li>
+<li>여러 독립적인 소비자가 브로드캐스팅된 동일한 메시지를 서로 간섭 없이 전달 받을 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11-1.png" alt="그림 11-1"><br>
+<em>그림 11-1. (a) 로드 밸런싱: 여러 소비자가 하나의 토픽을 소비하는 작업을 공유 (b) 팬 아웃: 각 메시지를 복수 개의 소비자로 전달</em></p>
+
+
+<div class="alert alert-primary" role="alert">
+<h4 class="alert-heading">Fan In, Fan Out</h4>
+
+    <p>팬 아웃(영어: fan out)은 논리 회로에서 하나의 논리 게이트의 출력이 얼마나 많은 논리 게이트의 입력으로 사용되는지에 대해 서술할 때에 쓰인다. (출처: 위키 백과)</p>
+<p>Fan In : 자신을 사용하는 모듈의 수 (A:0, B:1, C:1, D:1, E: 1, F:2, G:1, H:2, I:1, J:1)<br>
+Fan Out: 자신이 호출하는 모듈의 수(A:3, B:2, C:2, D:1, E:1, F:1, G:1, H:0, I:0, J:0)</p>
+<p><img src="/docs/data-intensive-application/11_hierarchical.png" alt="프로그램의 계층적 구조"><br>
+<em>프로그램의 계층적 구조</em></p>
+<p>출처: <a href="https://ehclub.co.kr/1851" target="_blank" rel="noopener">https://ehclub.co.kr/1851<i class="fas fa-external-link-alt"></i></a> [언제나 휴일]</p>
+
+
+</div>
+
+<p>이 두가지 패턴을 함께 사용 가능</p>
+<ul>
+<li>두 개의 소비자 그룹에서 하나의 토픽을 구독한다.</li>
+<li>각 그룹은 모든 메시지를 받지만, 그룹 내에서는 각 메시지를 하나의 노드만 받게 하는 식이다.</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11_publisher-subscriber.png" alt="발행과 구독"></p>
+<h4 id="확인-응답과-재전송">확인 응답과 재전송</h4>
+<p>소비자 장애</p>
+<ul>
+<li>브로커가 메시지를 소비자에게 전달을 했지만, 처리하지 못하거나 부분적으로만 처리 후에 장애가 발생할 수 있다.</li>
+<li>이럴 때는 메시지가 유실 될 수 있기 때문에 브로커는 확인 응답을 사용한다.</li>
+<li>클라이언트는 메시지 처리가 끝났을 때, 브로커에게 명시적으로 알려주고 브로커는 해당 메시지를 제거한다.</li>
+</ul>
+<p>확인 응답이 안되면</p>
+<ul>
+<li>확인 응답을 받지 전에 클라이언트가 연결이 되지 않거나, 타임아웃이 발생하면 브로커는 처리가 되지 않았다고 간주하고 다른 소비자에게 다시 전송한다.</li>
+<li>메시지 처리가 되었는데도 불가하고 확인 응답 되지 않았다면, 원자적 커밋 프로세스가 필요하다.</li>
+</ul>
+
+
+<div class="alert alert-primary" role="alert">
+<h4 class="alert-heading">원자적 커밋(atomic commit)이란?</h4>
+
+    원자적 커밋(atomic commit)은 구별되는 여러 변경사항들을 하나의 운용 단위로 적용하는 것이다. 변경사항이 적용되면 원자적 커밋은 성공하였다고 이야기된다. 원자적 커밋이 끝나기 전에 실패한 것이 하나라도 있다면 원자적 커밋에서 완수되는 모든 변경사항들이 되돌려진다.
+
+</div>
+
+<p>부하 균형 분산과 결합할 때 이런 재전송 행위는 메시지 순서에 영향을 미친다.</p>
+<ul>
+<li>소비자1이 m4를 처리하고 있을 때, 소비자2가 m3를 처리할 시에 장애 발생한다.</li>
+<li>m3의 확인 응답을 받지 못해 소비자1로 재전송하게 된다.</li>
+<li>소비자1은 m4, m3, m5순으로 메시지를 처리하게 된다.</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11-2.png" alt="그림 11-2"><br>
+<em>그림 11-2. 소비자 2가 m2을 처리하던 도중 장애가 발생해서 이후 m3을 소비자 1로 재전송한다</em></p>
+<p>메시지 브로커는 순서를 유지하려고 노력하더라도 이렇게 변경될 수도 있다.<br>
+부하 균형 분산 기능을 사용하지 않는다면 이 문제를 피할할 수 잇다.<br>
+메시지 간에 인관성이 있다면 순서는 중요하다. (이 문제는 후반부에서 다룬다.)</p>
+<h3 id="파티션닝된-로그">파티션닝된 로그</h3>
+<p>기록을 남지지 않는 메시지 브로커</p>
+<ul>
+<li>패킷을 전송하거나 서비스에 요청하는 작업은 보통 영구적 추적을 남기지 않는 일시적 연산이다.</li>
+<li>메시지 브로커도 디스크에 지속성 있기 기록을 하지만, <strong>소비자가 전달될 후 즉시 삭제한다.</strong></li>
+<li>메시지 브로커는 일시적 보관 개념으로 만들어 졌다.</li>
+<li>메시지 브로커는 메시지가 전달을 하게 되면, 확인 응답을 받고 삭제한다. 이는 <strong>복구되지 않는다.</strong></li>
+</ul>
+<p>기록하는 데이터 베이스</p>
+<ul>
+<li>데이터베이스나 파일에 저장하는 모든 데이터는 누군가 삭제하지 않으면 영구적으로 보관된다.</li>
+</ul>
+<p>데이터베이스의 지속성 있는 저장 방법과 메시징 시스템 지연 시간이 짧은 알림 기능의 조합이 <strong>로그 기반 메시지 브로커(log-based message broker)</strong> 이다.</p>
+<h4 id="로그를-사용한-메시지-저장소">로그를 사용한 메시지 저장소</h4>
+<p>로그란?</p>
+<ul>
+<li>단순히 디스크에 저장된 추가 전용 레코드의 연속이다.</li>
+<li>로그 구조화 저장 엔진과 쓰기 전 로그, 복제본의 로그와 같은 맥락</li>
+</ul>
+<p>브로커에서 로그는?</p>
+<ul>
+<li>생산자가 보낸 메시지는 로그 끝에 추가한다.</li>
+<li>소비자는 로그를 순차적으로 읽어 메시지를 받는다. 로그 끝에 도달하면 새 메시지가 추가됐다는 알림을 기다린다.</li>
+</ul>
+<p>로그 파티셔닝</p>
+<ul>
+<li>디스크 하나를 쓸 때보다 로그 처리량을 높이기 위해 파티셔닝을 하는 방법이다.</li>
+<li>다른 피티션은 다른 장비에서 서비스할 수 있다.
+<ul>
+<li>각 파티션은 다른 파티션과 독립적으로 읽고 쓰기가 가능한 로그가 된다.</li>
+</ul>
+</li>
+</ul>
+<p>오프셋(offset)</p>
+<ul>
+<li>각 파티션 내에서 브로커는 모든 메시지에 단순히 증가하는 순번인 오프셋을 부여한다.</li>
+<li>다른 파티션 간 메시지의 순서는 보장하지 않는다.</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11-3.png" alt="그림 11-3"><br>
+<em>그림 11-3. 생산자가 메시지를 전송하면 메시지는 토픽 파티션 파일에 추가된다. 그러면 소비자는 순서대로 파티션 파일을 읽는다.</em></p>
+<p>이 방식은</p>
+<ul>
+<li>아파치 카프카, 아마존 키네스티 시스템, 트위터의 분산 로그가 이런 방식으로 동작하는 로그 기반 메시지 브로커이다.</li>
+<li>구글 클라우드 Pub/Sub은 비슷하지만, 다른 방식이다. (JMS 형식)</li>
+</ul>
+<p>로그 기반 메시지 브로커의 이점</p>
+<ul>
+<li>초당 수백만 개의 메시지를 처리할 수 있다.</li>
+<li>메시지를 복제함으로써 장애에 대비할 수 있다.</li>
+</ul>
+<h4 id="로그-방식과-전통적인-메시지-방식의-비교">로그 방식과 전통적인 메시지 방식의 비교</h4>
+<p>로그 기반 접근법</p>
+<ul>
+<li>팬 아웃 메시징 방식을 제공한다.</li>
+<li>소비자가 서로 영향 없이 독립적으로 로그를 읽을 수 있고, 메시지를 읽어도 로그에서 삭제되지 않는다.</li>
+<li>개별 메시지를 소비자 클라이언트에 할당하지 않고, 소비자 그룹 간 로드 밸런싱한다.
+<ul>
+<li>브로커는 소비자 그룹의 노드들에 전체 파티션을 할당할 수 있다.</li>
+</ul>
+</li>
+</ul>
+<p>로그 기반 접근법의 장단점</p>
+<ul>
+<li>장점
+<ul>
+<li>메시지 처리 속도가 빠르다.</li>
+<li>메시지 순서가 중요하다면 효과적이다.</li>
+</ul>
+</li>
+<li>단점
+<ul>
+<li>메시지 처리 비용이 비싸다.</li>
+<li>메시지 순서가 중요하지 않다면 JMS/AMQP 방식의 메시지 브로커가 더 적합하다.</li>
+</ul>
+</li>
+</ul>
+<h4 id="소비자-오프셋">소비자 오프셋</h4>
+<p>오프셋의 이점</p>
+<ul>
+<li>파티션 하나를 순서대로 처리하면 메시지를 어디까지 처리했는지 알기 쉽다.</li>
+<li>메시지마다 보내는 확인 응답을 추적할 필요가 없다.</li>
+<li>추척 오버헤드가 감소하고 일괄 처리와 파이프라이닝을 수행 할 수 있는 기회를 제공하여 처리량을 늘리는데 도움을 준다.</li>
+</ul>
+<p>데이터베이스와 유사점</p>
+<ul>
+<li>단일 리더 데이터베이스 복제에서 널리 쓰이는 로그 순차 번호와 상당히 유사하다.</li>
+<li>데이터베이스 복제에서 팔로워가 리더와 연결이 끊어졌다가 다시 접속할 때, 로그 순자 번호를 사용한다.</li>
+<li>로그 순차 번호를 사용하면 기록을 누락하지 않고 복제를 재개할 수 있다.</li>
+<li>메시지 브로커는 데이터베이스의 리더처럼 동작하고, 소비자는 팔로워처럼 동작한다.</li>
+</ul>
+<p>소비자 노드 장애 발생시 문제점</p>
+<ul>
+<li>소비자 노드가 장애가 발생하면 그룹내 다른 노드가 오프셋부터 메시지를 처리한다.</li>
+<li>장애가 발생한 소비자가 처리하였지만, 오프셋이 기록되지 않았다면 두번 처리하게 된다. (이 문제는 후반부에서 다룬다.)</li>
+</ul>
+<h4 id="디스크-공간-사용">디스크 공간 사용</h4>
+<p>로그가 점차 쌓이게 되면, 결국 디스크를 전부 사용하게 된다.<br>
+디스크를 재사용하기 위해서는 로그를 여러 조각으로 나누고 오래된 조각은 삭제하거나 보관 저장소로 이동한다.</p>
+<p>소비자 처리 속도가 느려 생산되는 속도를 따라 잡지 못하면 소비자의 오프셋은 이미 삭제한 조각을 가리킬 수 있다. 즉, 메시지 일부를 잃어버릴 가능성 있다는 뜻이다.<br>
+로그는 크기가 제한 된 버퍼로 구현하고 오래된 메시지는 순서대로 버린다. 이를 원형 버퍼(circuler buffer), 링 버퍼(ring buffer)라고 한다.</p>
+<h4 id="소비자가-생성자를-따라갈-수-없을-때">소비자가 생성자를 따라갈 수 없을 때</h4>
+<p>소비자가 로그의 헤드로부터 얼마나 떨어졌는지 모니터링하면 눈에 띄게 뒤쳐지는 경우에는 이를 경고를 한다.<br>
+운영자는 소비자 처리가 느린 문제를 고쳐 메시지를 잃기 전에 따라 잡을 시간을 충분히 벌 수 있다.</p>
+<p>어떤 소비자가 너무 뒤쳐져서 메시지를 읽기 시작해도 해당 소비자만 영향을 받고 다른 소비들의 서비스를 망치지는 않는다.</p>
+<h3 id="오래된-메시지-재생">오래된 메시지 재생</h3>
+<p>메시지 브로커 비교</p>
+<ul>
+<li>AMQP, JMS 유형의 메시지 브로커
+<ul>
+<li>메시지를 처리하고 확인 응답하는 작업은 브로커에서 메시지를 제거하기 때문에 파괴 연산을 한다.</li>
+</ul>
+</li>
+<li>로그 기반 메시지 브로커
+<ul>
+<li>메시지를 소비하는게 오히려 파일을 읽는 작업과 더 유사한데 로그를 변화시키지 않는 읽기 전용 연산을 한다.</li>
+</ul>
+</li>
+</ul>
+<p>로그 기반의 이점<br>
+메시지 재처리는 몇번이든지 처리 코드를 변경해 재처리가 가능하다.</p>
+<h2 id="데이터베이스와-스트림">데이터베이스와 스트림</h2>
+<p>메시지 브로커 데이터베이스의 관계</p>
+<ul>
+<li>로그 기반 브로커는 데이터베이스에서 아이디어를 얻어, 메시징에 적용하는데 성공</li>
+<li>로그 기반 브로커의 메시징 스트림에서 아이디어를 얻어 데이터베이스에 적용</li>
+</ul>
+<h3 id="시스템-동기화-유지하기">시스템 동기화 유지하기</h3>
+<p>이중 기록(dual write)</p>
+<ul>
+<li>주기적으로 데이터베이스 전체를 덤프하는 작업이 너무 느리면 대안으로 사용하는 방법</li>
+<li>이중 기록을 사용하면 데이터가 변할 때마다 애플리케이션 코드에서 명시적으로 각 시스템에 기록
+<ul>
+<li>데이터베이스에 기록</li>
+<li>검색 색인을 갱신</li>
+<li>캐시 엔트리 무효화</li>
+</ul>
+</li>
+</ul>
+<p>이중 기록의 심각한 문제<br>
+각 클라이언트가 동시에 아이템 X를 업데이트하려고 할때, 타이밍 문제로 데이터가 맞지 않게 될 수 있다.</p>
+<p><img src="/docs/data-intensive-application/11-4.png" alt="그림 11-4"><br>
+<em>그림 11-4. 데이터베이스에서 X를 먼저 A로 설정했다가 B로 바꿨다. 반면 색인에는 쓰기 요청이 반대 순서로 도착했다.</em></p>
+<ul>
+<li>동시성 문제
+<ul>
+<li>&ldquo;동시 쓰기 감지&quot;에서 설명한 버전 벡터와 같은 동시성 감지 매커니즘을 따로 사용하지 않으면 동시에 쓰기 발생해도 알아 차리지 못한다.</li>
+</ul>
+</li>
+<li>내결함성 문제
+<ul>
+<li>한쪽 쓰기가 성공할 때 다른 쪽 쓰기는 실패할 수 있다.</li>
+<li>두 시스템 간에 불일치가 발생하는 현상이 발생한다.</li>
+<li>동시성 또는 동시 실패 보장하는 방식은 원자적 커밋 문제다.
+11- 이 문제를 해결하는 데는 비용이 많이 든다.</li>
+</ul>
+</li>
+</ul>
+<p>각 시스템의 단일 리더</p>
+<ul>
+<li>단일 리더 복제 데이터베이스 하나를 사용한다면 리더가 쓰기 순서를 결정한다.</li>
+<li>각각 데이터베이스, 검색 색인에 리더를 만들어도 충돌 발생이 여지가 있다.</li>
+</ul>
+<p>시스템의 통합 리더</p>
+<ul>
+<li>색인용 인덱스를 데이터베이스의 팔로워로 만들어 실제 리더를 하나만 존재하게 하면 훨씬 낫다.</li>
+</ul>
+<h3 id="변경-데이터-캡처">변경 데이터 캡처</h3>
+<p>예전 데이터베이스</p>
+<ul>
+<li>데이터베이스에서 복제 내용을 가져오려면 데이터 모델과 질의 언어를 통해서 데이터베이스에 직접 질의한다.
+<ul>
+<li>데이터 내부 상세 구현으로 생각되어 공개 API 자체를 제공하지 않았다.</li>
+<li>복제 로그를 파싱해서 데이터를 추출하는 방식을 사용하지 못하였다.</li>
+</ul>
+</li>
+<li>데이터 베이스에서 발생하는 데이터 변화를 감지해서 변경된 내용을 다른 저장소에 복제하는데 어려움이 있었다.
+<ul>
+<li>저장소) 검색 색인, 캐시, 데이터 웨어하우스</li>
+</ul>
+</li>
+</ul>
+<p>변경 데이터 캡처(change data capture, CDC)</p>
+<ul>
+<li>데이터베이스에 기록하는 모든 데이터의 변화를 관찰해 다른 시스템으로 데이터를 복제할 수 있다는 추출 과정이다.
+<ul>
+<li>데이터가 기록되자마자 변경 내용을 스트림으로 제공에 유용</li>
+</ul>
+</li>
+<li>데이터베이스의 변경 사항을 캡처해 같은 변경 사항을 검색 색인에 꾸준히 반영할 수 있다.
+<ul>
+<li>같은 순서로 로그 변경이 반영된다면 데이터베이스의 데이터와 색인이 일치할 것이다.</li>
+</ul>
+</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11-5.png" alt="그림 11-5"><br>
+<em>그림 11-5. 데이터베이스에 쓰여진 순서대로 데이터를 가져와 다른 시스템에 변경 사항을 같은 순서로 적용한다.</em></p>
+<h4 id="변경-데이터-캡처의-구현">변경 데이터 캡처의 구현</h4>
+<p>파생 테이터 시스템</p>
+<ul>
+<li>검색 색인과 데이터 웨어하우스에 저장된 데이터는 레코드 시스템에 저장된 데이터의 또 다른 뷰일 뿐이므로 로그 소비자이다.</li>
+</ul>
+<p>변경 데이터 캡처</p>
+<ul>
+<li>파생 데이터 시스템이 레코드 시스템의 정확한 데이터 복제본을 가지게 하기 위해 레코드 시스템에 발생하는 모든 변경 사항을 파생 데이터 시스템에 반영하는 것을 보장하는 메커니즘이다.</li>
+<li>본질적으로 변경 사항을 캡처할 데이터베이스 하나를 리더로 하고 나머지를 팔로워로 한다.</li>
+<li>로그 기반 메시지 브로커는 원본 데이터베이스에서 변경 이벤트를 전송하기에 적합하다.
+<ul>
+<li>메시지를 순서를 유자하기 때문이다.</li>
+</ul>
+</li>
+</ul>
+<p>변경 데이터 캡처의 구현</p>
+<ul>
+<li>데이터베이스 트리거를 사용하는 방식
+<ul>
+<li>데이터 테이블의 모든 변화를 관찰하는 트리거를 등록하고 변경 로그 테이블에 해당 항목 추가하는 방식이다.</li>
+<li>단점으로, 고장 나기 쉽고 선능 오버헤드가 상당하다.</li>
+</ul>
+</li>
+<li>복제 로그를 방식하는 방식
+<ul>
+<li>단점으로 스키마 변경 대응 등 해결해야 할 문제 있다.</li>
+<li>트리거 방식보다 견고한 방법이다.</li>
+</ul>
+</li>
+</ul>
+<p>변경 데이터 캡처의 종류</p>
+<ul>
+<li>PostgreSQL용 CDC
+<ul>
+<li>보틀드 워터(Bottled Water)는 쓰기 전 로그를 복호화하는 API를 사용한다.</li>
+</ul>
+</li>
+<li>MySQL용 CDC
+<ul>
+<li>맥스웰(Maxwell), 디비지움(Debezium)은 binlog를 파싱 방식으로 구현한다.</li>
+</ul>
+</li>
+<li>MongoDB용 CDC
+<ul>
+<li>몽고리버(Mongoriver)는 oplog를 읽는다.</li>
+</ul>
+</li>
+<li>오라클용 CDC
+<ul>
+<li>골드게이트(GoldenGate)도 oplog를 읽는것과 비슷하다.</li>
+</ul>
+</li>
+</ul>
+<p>변경 데이터 캡처의 동작</p>
+<ul>
+<li>비동기 방식으로 동작한다.</li>
+<li>장점
+<ul>
+<li>데이터베이스는 변경 사항을 커밋하기 전에 변경 사항이 소비자에게 적용될 때가지 기다리지 않는다.</li>
+<li>느린 소비자가 추가되어도 시스템에 미치는 영향이 적다.</li>
+</ul>
+</li>
+<li>단점
+<ul>
+<li>복제 지연의 모든 문제가 발생한다.</li>
+</ul>
+</li>
+</ul>
+<h4 id="초기-스냅숏">초기 스냅숏</h4>
+<p>데이터베이스 변경 로그</p>
+<ul>
+<li>데이터베이스에서 발생한 모든 변경 로그가 있다면 로그를 재현해서 데이터베이스의 전체 상태를 재구축할 수 있다.</li>
+<li>모든 변경 사항을 영구적으로 보관하기에는 디스크 공간이 많이 필요하다.</li>
+<li>모든 로그를 재생하는 작업도 너무 오래 걸린다.</li>
+<li>그래서 로그를 적당히 잘아야 한다.</li>
+</ul>
+<p>스냅숏의 필요성</p>
+<ul>
+<li>전문 색인을 새로 구축할 때를 예로 들면 전체 데이터베이스 복사본이 필요하다.</li>
+<li>최근한 갱신하지 않은 항목은 로그에 없기 땜누에 최근 변경 사항만 반영하는 것으로는 충분하지 않다.</li>
+<li>이때 일관성 있는 스냅숏을 사용해야 한다.</li>
+</ul>
+<p>스냅숏의 기능</p>
+<ul>
+<li>변경 로그의 위치나 오프셋에 대응돼야 한다.</li>
+<li>그래야 스냅숏 이후에 변경 사항을 적용할 시점을 알 수 있다.</li>
+</ul>
+<h4 id="로그-컴팩션">로그 컴팩션</h4>
+<p>로그 히스토리의 양을 제한한다면 새로운 파생 데이터 시스템을 추가할 때마다 스냅숏을 만들어야 한다.</p>
+<p>로그 컴팩션 동작 원리</p>
+<ul>
+<li>저장 엔진은 주기적으로 같은 키의 로그 레코드를 찾아 중복 제거한다.</li>
+<li>각 키에 대한 가장 최근에 갱신된 내용만 유지한다.</li>
+<li>컴팩션 병합 과정은 백그라운드로 실행한다.</li>
+</ul>
+<p>톰스톰(tombstone, 묘비)</p>
+<ul>
+<li>키의 삭제를 의미하고, 컴팩션을 수행할 때 실제로 값을 제거한다.</li>
+<li>키를 덮어쓰거나 삭제하지 않는 한 영구적으로 유지한다.</li>
+<li>현재 데이터베이스에 있는 최신 값이 필요하다.</li>
+</ul>
+<p>로그 기반 메시지 브로커</p>
+<ul>
+<li>CDC 시스템에서 모든 변경에 기본키가 포함되게 하고</li>
+<li>키의 모든 갱신이 해당 키의 이전 값을 교체한다면 특정 키에 대한 최신 쓰기만 유지하면 충분하다.</li>
+</ul>
+<h4 id="변경-스트림용-api-지원">변경 스트림용 API 지원</h4>
+<p>변경 스트림 인터페이스 제공하기 시작&hellip;.리버스 엔지니어링 이런거 안함</p>
+<ul>
+<li>리싱크DB(RethinkDB)
+<ul>
+<li>질의 결과에 변경이 있을 때 알림을 받을 수 있게 구독이 가능한 절의를 지원한다.</li>
+</ul>
+</li>
+<li>파이어베이스(FireBase)와 카우치DB(CouchDB)
+<ul>
+<li>애플리케이션에도 사용 가능한 변경 피드 기반의 데이터 동기화를 지원한다.</li>
+</ul>
+</li>
+<li>미티어(Meteor)
+<ul>
+<li>몽고DB의 oplog를 사용해 데이터 변경사항을 구독하거나 사용자 인터페이스를 갱신</li>
+</ul>
+</li>
+</ul>
+<p>볼트DB(VoltDB)</p>
+<ul>
+<li>스트림 형태로 데이터베이스에세 데이터를 지속적으로 내보내는 트랜잭션을 제공한다.</li>
+</ul>
+<p>카프카 커넥트(Kafka Connect)</p>
+<ul>
+<li>카프카를 광범위한 데이터 시스템용 변경 데이터 캡처 도구로 활용하기 위한 노력의 일환이다.</li>
+<li>변경 이벤트를 스트림하는데 카프카를 사용하면 검색 색인과 같은 파생 데이터 시스템을 갱신하는데 사용 가능하다.</li>
+</ul>
+<h3 id="이벤트-소싱">이벤트 소싱</h3>
+<p>이벤트 소싱(event sourcing)</p>
+<ul>
+<li>도메인 주도 설계(domain-driven design, DDD) 커뮤니티에서 개발한 기법이다.</li>
+<li>애플리케이션 상태 변화를 모두 변경 이벤트 로그로 저장한다.
+<ul>
+<li>변경 데이터 캡처와 유사하다.</li>
+</ul>
+</li>
+<li>변경 데이터 캡처와 큰 차이점은 추상화 레벨이 다르다.
+<ul>
+<li>추상화 레벨이란?</li>
+</ul>
+</li>
+</ul>
+<p>이벤트 데이터 캡처와 이벤트 소싱 차이점</p>
+<ul>
+<li>이벤트 데이터 캡처
+<ul>
+<li>애플리케이션은 데이터베이스를 변경 가능한 방식으로 사용해 레코드를 자유롭게 갱신하고 삭제한다.
+<ul>
+<li>추가(O) 갱신(O), 삭제(O)</li>
+</ul>
+</li>
+<li>변경 로그는 데이터베이스에서 추출한 쓰기 순서가 실제로 데이터를 기록한 순서와 일치한다.</li>
+<li>데이터베이스에 기록한 애플리케이션은 CDC가 실행 중인지 알 필요가 없다.</li>
+</ul>
+</li>
+<li>이벤트 소싱
+<ul>
+<li>애플리케이션 로직은 이벤트 로그에 기록된 불변 이벤트를 기반으로 명시적으로 구축한다.이는 단지 추가만 가능하고 갱신이나 삭제는 권장하지 않거나 금지한다는 것의 의미한다.
+<ul>
+<li>추가(O) 갱신(X), 삭제(X)</li>
+</ul>
+</li>
+<li>이벤트는 저수준에서 상태 변경을 반영하는 것이 아니라 애플리케이션 수준에서 발생한 일을 반영하게끔 설계 됐다.</li>
+</ul>
+</li>
+</ul>
+<p>이벤트 소싱의 이점</p>
+<ul>
+<li>데이터 모델링에 쓸 수 있는 강력한 기법이다.</li>
+<li>애플리케이션 관점에서 사용자의 행동을 불변 이벤트로 기록하는 방식</li>
+<li>애플리케이션을 지속해서 개선하기가 매우 유리하다.</li>
+<li>디버깅에 도움이 되고, 애플리케이션 버그를 방지한다.</li>
+<li>이벤트 소싱 접근법을 사용하며 새로 발생한 부수 효과를 기존 이벤트에서 쉽게 분리할 수 있다.</li>
+</ul>
+<h4 id="이벤트-로그에서-현재-상태-파생하기">이벤트 로그에서 현재 상태 파생하기</h4>
+<p>유용하지 않은 이벤트 로그<br>
+사용자 시스템의 현재 상태를 보기 원하지, 수정 히스토리를 모두 보고 싶어하지는 않는다.<br>
+예를 들면, 쇼핑 사용자는 장바구니의 모든 변경 사항이 아닌 현재 상태만 보고 싶어 한다.</p>
+<p>이벤트 로그 변환 작업<br>
+따라서, 시스템에 기록한 데이터를 표현한 이벤트 로그를 가져와 사용자에서 보여주기 <strong>적당히 변화해야 한다.</strong>
+변화 과정은 로직을 자유롭게 사용할 수 있지만, 다시 수행하더라도 이벤트 로그로부터 동일한 애플리케이션 상태를 만들 수 있어야 한다.</p>
+<p>이벤트 로그 컴팩션 불가능</p>
+<ul>
+<li>CDC 이벤트
+<ul>
+<li>기본키의 현재 값은 전적으로 기본키의 가장 최신 이벤트로 결정된다.</li>
+<li>같은 키의 이벤트는 이전 이벤트로 덮어 쓰는것이 가능하기에 로그 캠팩션이 가능하다.</li>
+</ul>
+</li>
+<li>이벤트 소싱
+<ul>
+<li>마지막 상태를 재구축하기 위해서는 이벤트 전체 히스토리가 필요하다.
+<ul>
+<li>이벤트는 사용자 행동의 결과로 발생한, 상태 메커니즘이 아닌 사용자 행동 의도를 표현하기 때문이다.</li>
+</ul>
+</li>
+<li>그래서, 로그 컴팩션 불가능 하다.</li>
+</ul>
+</li>
+</ul>
+<p>이벤트 소싱 한계점<br>
+이벤트 로그 기반의 현재 상태의 스냅숏을 저장하는 매커니즘이 있기에, 매번 전체 로그를 재처리할 필요는 없다.<br>
+그러나, 이는 장애 발생 시 읽고 복구하는 선능을 높여주는 최적화가 불과하다.<br>
+이벤트 소싱 시스템은 모든 원시 이벤트를 영원히 저장하고 필요할 때마다 모든 이벤트를 재처리 할 수 있어야 한다.</p>
+<h4 id="명령과-이벤트">명령과 이벤트</h4>
+<p>명령(command)이란?<br>
+사용자 요청이 처음 도착했을 때 이 요청은 명령이다. 특정 무결성 조건을 위반하면 실패한다.<br>
+무결성이 검증되고 명령이 승인 되면 지속성 있는 불변 이벤트가 된다.</p>
+<p>이벤트 불변
+이벤트가 한번 생성되면 사실(fact)가 된다.<br>
+다시 변경 및 취소가 되었더라고 기존 정보는 여전히 사실로 남아 있으며, 다시 변경 및 취소는 나중에 추가된 독립적인 이벤트가 된다.</p>
+<p>이벤트 스트림 소비자
+소비자는 이벤트를 거절 못한다. 이벤트를 받은 시점에는 이벤트는 이미 불변 로그의 일부분이다.
+명령 유효성은 이벤트가 되기 전에 동식으로 검증해야 한다.
+이를테면 직렬성 트랜잭션을 사용해 원자적으로 명령을 검증하고 이벤트를 발행 할 수 있다.</p>
+<p>사용자 요청 이벤트 두개로 분할하면 비동기 처리를 유효성 검사를 할 수 있다.</p>
+<ul>
+<li>예를 들면,
+<ul>
+<li>사전 예약(가예약)</li>
+<li>예약 확정(유효한 예약)</li>
+</ul>
+</li>
+</ul>
+<h3 id="상태와-스트림-그리고-불변성">상태와 스트림 그리고 불변성</h3>
+<p>입력 파일의 불변성이 주는 이점</p>
+<ul>
+<li>입력 파일에 손상을 주지 않고 기존 입력 파일에 얼마든지 실험적 처리 작업을 수행할 수 있다.</li>
+<li>불변성 원리가 이벤트 소싱과 변경 데이터 캡처를 매우 강력하게 만든다.</li>
+</ul>
+<h4 id="불변-이벤트의-장점">불변 이벤트의 장점</h4>
+<p>회계 장부</p>
+<ul>
+<li>거래(트랜잭션)가 발생하면 거래 정보를 원장(ledger)에 추가만 하는 방식으로 기록한다.
+<ul>
+<li>원장은 본질적으로 돈, 상품, 서비스를 교환 정보를 설명한 이벤트 로그다.</li>
+</ul>
+</li>
+<li>실수가 발생해도 원장의 잘못된 거래 내역을 지우거나 고치지 않고, 영원이 남는다.
+<ul>
+<li>틀린 원장으로부터 만든 수치가 이미 발표됐다면, 다음 회계 기간에 수정한다.</li>
+</ul>
+</li>
+<li>이는 회계 감사에 중요한 사유가 될 수 있다.</li>
+</ul>
+<p>버그로 인해 잘못된 데이터가 발생했을 때,</p>
+<ul>
+<li>데이터베이스 : 잘못된 데이터를 기록되었다면, 복구가 매무 어렵다.</li>
+<li>불변 이벤트 로그 : 추가만 하는 로그를 썼다면 문제 상황 진단과 복구가 훨씬 쉽다.</li>
+</ul>
+<p>불변 이벤트를 통한 유용한 정보<br>
+쇼핑 웹사이트에서 고객이 장바구니에 항목 하나를 넣었다가 제거 했을 때</p>
+<ul>
+<li>주문 이행 관점
+<ul>
+<li>단순 두번째 이벤트(제거)는 단지 첫번 이벤트(추가)를 취소했을 뿐이다.</li>
+</ul>
+</li>
+<li>분석가의 관점
+<ul>
+<li>고객이 나중에 구매하려고 했거나, 대체제를 찾았을 것을 뜻한다.</li>
+</ul>
+</li>
+</ul>
+<p>이런 유용한 정보는 이벤트 로그에는 기록되지만, 데이터베이스에서는 장바구니에서 항목을 제거 했을 잃어버리는 정보가 된다.</p>
+<h3 id="동일한-이벤트-로그로-여러-가지-뷰-만들기">동일한 이벤트 로그로 여러 가지 뷰 만들기</h3>
+<p>불변 이벤트 로그에서 가변 상태로 분리하면, 동일한 이벤트 로그로 여러 읽기 전용 뷰를 만들 수 있다.</p>
+<ul>
+<li>분석 데이터베이스 드루이드(Druid) : 카프카로부터 직접 데이터를 읽어 처리</li>
+<li>피스타치오(Pistachio) : 분산 키-값 저장소로 카프카를 커밋 로그처럼 사용</li>
+<li>카프카 커넥트 싱크(Kafka Connect Sink): 카프카에서 여러 데이터베이스와 색인에 데이터를 내보낼 수 있다.</li>
+</ul>
+<p>기존 데이터를 새로운 방식으로 표현하는 새 기능을 추가하려면 이벤트 로그를 사용해 신규 기능용으로 분리한 읽기 최적화된 뷰를 구축할 수 있다.</p>
+<ul>
+<li>기존 시스템을 수정할 필요가 없고 기존 시스템과 함께 운용이 가능하다.</li>
+<li>신구 시스템을 나란히 구동하는 것은 기존 시스템에서 복잡한 스키마 이전을 수행하는 것보다 쉽다.</li>
+</ul>
+<p>명령 질의 책임의 분리(command query responsibility segregation, CQRS)</p>
+<ul>
+<li>데이터를 어떻게 질의하고 접근하는지 신경 쓰지 않는다면, 데이터 저장은 상당히 직관적인 작업이다.</li>
+<li>데이터를 쓰는 형식, 읽는 형식을 분리해 다양한 읽기 뷰를 혀용한다면 상당한 유연성을 얻을 수 있다.</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11_cqrs" alt="CQRS"></p>
+<p>기존 아키텍쳐에서 점차 CQRS 패턴이 구현되는 모습. 마지막 단계에서 RDBMS와 NoSQL 간 데이터 이동은 Kafka와 같은 메시지 큐가 적용될 수 있다.</p>
+<p>읽기 최적화된 뷰의 비정규화</p>
+<ul>
+<li>데이터베이스와 스키마 설계의 전통적인 접근법은 데이터를 질의 받게 될 형식과 같은 형식으로 데이터를 기록해야 한다는 잘못된 생각에 기초한다.</li>
+<li>데이터를 쓰기 최적화된 이벤트 로그에서 읽기 최적화된 애플리케이션 상태로 전환 가능하면 정규화와 비정규화에 관한 논쟁은 의미 없다.</li>
+<li>읽기 최적화된 뷰는 데이터를 비정규화하는 것이 전적으로 합리적이다.</li>
+</ul>
+<h4 id="동시성-제어">동시성 제어</h4>
+<p>이벤트 소싱과 변경 데이터 캡처의 가장 큰 단점은 이벤트 로그의 소비가 대개 비동기로 이뤄진다는 점이다.</p>
+<ul>
+<li>사용자가 로그에 이벤트를 기록하고, 이어서 파생된 뷰를 읽어도 기록한 이벤트가 뷰에 반영되지 않았을 가능성이 있다.</li>
+</ul>
+<p>해결책으로 하나는 읽기 뷰의 갱신과 로그에 이벤트를 추가하는 작업을 동기식으로 수행하는 방법이다.</p>
+<ul>
+<li>이 방법을 쓰려면 트랜잭션에서 여러 쓰기를 원자적 단위로 결합해야 하므로 이벤트 로그와 읽기 뷰를 같은 저장 시스템에 담아야 한다.</li>
+</ul>
+<p>반면 이벤트 로그를 현재 상태로 만들면 동시성 제어 측면이 단순해진다.</p>
+<ul>
+<li>다중 객체 트랜잭션은 단일 사용자 동작이 여러 다른 장소의 데이터를 변경해야 할 때 필요하다.</li>
+<li>그러면 사용자 동작은 한 장소에서 한 번 쓰기만 필요하다. 즉, 이벤트를 로그에 추가만 하면 되며 원자적으로 만들기 쉽다.</li>
+</ul>
+<p>이벤트 로그와 상태를 같은 방식으로 파티셔닝하면, 간단한 단일 스레드 로그 소비자는 쓰기용 동시성 제어는 필요하지 않다.</p>
+<h4 id="불변성의-한계">불변성의 한계</h4>
+<p>데이터 유지는 어디 정도까지 가능할까?</p>
+<ul>
+<li>데이터 셋이 뒤틀리는 양에 따라 다르다.</li>
+<li>매우 비번히 갱신과 삭제를 하는 작업부하는 불변 히스토리가 감당하기 힘들 정도로 커지거나 파편화 문제가 발생할 수도 있다.</li>
+<li>컴팩션과 가비지 컬렉션의 선능 문제가 견고한 운영을 하는데 큰 골치거리가 되기도 한다.</li>
+</ul>
+<p>데이터 삭제해야 할 경우가 있다.</p>
+<ul>
+<li>선능적인 이유로 데이터를 삭제해야 하는 경우가 있다.</li>
+<li>개인 정보 및 민감한 정보를 삭제해야 하는 경우도 있다.</li>
+</ul>
+<p>데이터를 진짜로 삭제하는 작업은 어렵다.</p>
+<ul>
+<li>많은 곳에 복제본이 남아 있기 때문이다.</li>
+<li>삭제는 해당 데티러를 &ldquo;찾기 불가능하게끔&quot;하는 문제라기보다는 &ldquo;찾기 어렵게&quot;하는 문제이다.</li>
+</ul>
+<h2 id="스트림-처리">스트림 처리</h2>
+<ul>
+<li>스트림을 처리하는 방법
+<ol>
+<li>이벤트에서 데이터를 꺼내 <strong>데이터베이스나 캐시,검색 색인 또는 유사한 저장소 시스템</strong>에 기록하고, 다른 클라이언트가 이 시스템에 해당 데이터를 질의한다.
+<img src="/docs/data-intensive-application/11-5.png" alt="그림 11-5"><br>
+<em>그림 11-5. 데이터베이스에 쓰여진 순서대로 데이터를 가져와 다른 시스템에 변경 사항을 같은 순서로 적용한다.</em></li>
+<li>이벤트를 사용자에게 직접 보낸다.
+<ul>
+<li>이메일 경고, 푸시 알림, 실시간 대시보드</li>
+</ul>
+</li>
+<li>하나 이상의 입력 스트림을 처리해 하나 이상의 출력 스트림을 생산한다.
+<ul>
+<li>스트림 처리자가 입력 스트림을 소비해 추가 전용 방식으로 다른 곳에 출력을 쓴다.</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>스트림을 처리하는 코드 조각을 연산자(operator)나 작업(job)이라 부른다.</li>
+</ul>
+<h3 id="스트림-처리의-사용">스트림 처리의 사용</h3>
+<h4 id="모니터링-시스템">모니터링 시스템</h4>
+<ul>
+<li>특정 상황이 발생하면 경고를 해주는 모니터링 목적으로 사용돼 왔다.
+<ul>
+<li>사기 감시 시스템의 신용카드 사용 패턴</li>
+<li>금융 시장의 가격 변화 감지</li>
+<li>공장의 기계 상태 모니터링: 오작동 감지</li>
+<li>군사 첩보 시스템의 잠재적 침략자의 활동 추적</li>
+</ul>
+</li>
+</ul>
+<h4 id="복잡한-이벤트-처리">복잡한 이벤트 처리</h4>
+<p><img src="/docs/data-intensive-application/11_event-processor.png" alt="Event Processor"></p>
+<ul>
+<li>복잡한 이벤트 처리(complex event processing, CEP)
+<ul>
+<li>특정 이벤트 패턴 검색에 적합</li>
+<li>정규 표현식으로 문자열에서 특정 문자 패턴을 찾는 방식과 유사함</li>
+</ul>
+</li>
+<li>질의는 처리 엔진에 제출하고 처리 엔진은 입력 스트림을 소비해 필요한 매칭을 수행하는 상태 기계를 내부적으로 유지한다.</li>
+<li>해당 매치를 발견하면 엔진은 감지한 이벤트 패턴의 세부 사항을 포함하는, 글자 그대로 복잡한 이벤트(complex event)를 방출한다.</li>
+</ul>
+<p>데이터베이스와 비교</p>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>데이터베이스</th>
+<th>CEP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>데이터 저장 형태</td>
+<td>영구 저장</td>
+<td>흘러가면서 이벤트 패턴에 매칭되는 질의를 찾음</td>
+</tr>
+<tr>
+<td>질의 형태</td>
+<td>일시적</td>
+<td>오랜 기간 저장</td>
+</tr>
+</tbody>
+</table>
+<h4 id="스트림-분석">스트림 분석</h4>
+<ul>
+<li>스트림 분석은 대량의 이벤트를 집계하고 통계적 지표를 뽑는다.</li>
+<li>특정 유형의 이벤트 빈도 측정</li>
+<li>특정 기간에 걸친 값의 이동 평균(rolling average) 계산</li>
+<li>이전 시간 간격과 현재 통계값의 비교</li>
+<li>통계는 고정된 시간 간격 기준으로 계산한다. 집계 시간 간격을 윈도우(window)라 한다.
+<ul>
+<li>ex)
+<ul>
+<li>지난 5분간 서비스에 들어온 초당 질의 수의 평균을 구하거나</li>
+<li>같은 기간 동안의 99분위 응답 시간을 구한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="구체화-뷰-유지하기">구체화 뷰 유지하기</h4>
+<ul>
+<li>데이터베이스 변경에 대한 스트림은 파생 데이터 시스템이 원본 데이터베이스의 최신 내용 동기화.
+<ul>
+<li>파상 데이터 시스템: 캐시, 검색 색인, 데이터 웨어하우스</li>
+</ul>
+</li>
+<li>어떤 데이터셋에 대한 또 다른 뷰를 만들어 효율적으로 질의할 수 있게 하고 기반이 되는 데이터가 변경될 때마다 뷰를 갱신한다.</li>
+<li>이벤트 소싱에서 애플리케이션 상태는 이벤트 로그를 적용함으로써 유지된다.
+<ul>
+<li>애플리케이션 상태는 일종의 구체화 뷰</li>
+</ul>
+</li>
+</ul>
+<h4 id="스트림-상에서-검색하기">스트림 상에서 검색하기</h4>
+<p>복잡한 기준을 기반으로 개별 이벤트를 검색해야 하는 경우</p>
+<ul>
+<li>부동산 웹사이트의 사용자는 부동산 시장에 사용자가 설정한 검색 기준과 매칭되는 새 부동산이 나오면 알려달라고 요청할 수 있다</li>
+<li>스트림 검색: 질의를 먼저 저장하고 문서는 질의를 지나가면서 실행된다. (CEP)
+<ul>
+<li>전통적인 검색 엔진: 문서를 색인하고 색인을 통해 질의</li>
+</ul>
+</li>
+</ul>
+<h4 id="메시지-전달과-rpc">메시지 전달과 RPC</h4>
+<ul>
+<li>메시지 전달 시스템을 RPC 대안으로 사용할 수 있다.</li>
+<li>아파치 스톰: DRPC(Distributed RPC)</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11_drpc.png" alt="DRPC"></p>
+<h3 id="시간에-관한-추론">시간에 관한 추론</h3>
+<ul>
+<li>분석 목적으로 스트림을 처리하는 경우 시간을 다뤄야 할 때가 있다.
+<ul>
+<li>ex) 지난 5분 동안 평균(윈도우)</li>
+</ul>
+</li>
+<li>스트림 처리 프레임워크는 윈도우 시간을 결정할 때 처리하는 장비의 시스템 시계(처리 시간)를 이용한다.
+<ul>
+<li>이벤트 생성과 처리 사이의 간격을 확인하여 문제 발생을 예측할 수 있다.</li>
+</ul>
+</li>
+<li>일괄 처리는 이벤트에 내장된 타임스탬프 이용</li>
+</ul>
+<h4 id="이벤트-시간-vs-처리-시간">이벤트 시간 vs 처리 시간</h4>
+<ul>
+<li>처리가 지연되는 이유</li>
+<li>큐 대기</li>
+<li>네트워크 결함</li>
+<li>메시지 브로커나 처리자에서 경쟁을 유발하는 성능 문제</li>
+<li>스트림 소비자의 재시작</li>
+<li>결함에서 복구하는 도중이나 코드 상의 버그를 고친 후 과거 이벤트의 재처리</li>
+<li>이벤트 발생 시간과 처리 시간을 혼동하면 잘못된 데이터가 생길 수 있다.</li>
+<li>스트림 처리자가 재시작한 상황: 1분간 스트림 처리가 셧다운됐다가 복구되어 백로그 이벤트를 처리</li>
+</ul>
+<p><img src="/docs/data-intensive-application/11-7.png" alt="그림 11-7"><br>
+<em>그림 11-7. 처리 시간 기준으로 윈도우를 만들면 처리율의 변동 때문에 생기는 허상을 남긴다.</em></p>
+<h4 id="준비-여부-인식">준비 여부 인식</h4>
+<ul>
+<li>이벤트 시간 기준으로 윈도우를 정의할 때 낙오자(straggler)가 발생할 수 있다.</li>
+<li>낙오자 이벤트를 처리하는 방법
+<ol>
+<li>낙오자 이벤트는 무시한다. 적은 비율일 때 무시하지만, 비율이 높아지면 알림을 보내는 방법으로 처리</li>
+<li>수정 값을 발행한다. 이벤트가 포함된 윈도우를 기준으로 새로 갱신한 값</li>
+</ol>
+</li>
+</ul>
+<h4 id="어떤-시계를-사용할-것인가">어떤 시계를 사용할 것인가?</h4>
+<p>이벤트가 발생한 머신과 이벤트를 처리하는 서버의 시간을 통해서 이벤트 발생 시간을 추정하는 방법(잘못된 장치 시계를 조정하는 방법)</p>
+<p>세 가지 타임스탬프를 로그로 남긴다</p>
+<ul>
+<li>이벤트가 발생한 시간(장치 시계)</li>
+<li>이벤트를 서버로 보낸 시간(장치 시계)</li>
+<li>서버에서 이벤트를 받은 시간(서버 시계)
+두 번째와 세 번째의 차이를 구하면 장치 시계와 서버 시계 간의 오프셋을 추정할 수 있다.</li>
+</ul>
+<p>필요한 타임스탬프 정확도에 비해 네트워크 지연은 무시할 만하고 계산한 오프셋을 이벤트 타임스탬프에 적용해 이벤트가 실제로 발생 시간을 추정할 수 있다</p>
+<h3 id="윈도우-유형">윈도우 유형</h3>
+<p>이벤트 타임스탬프를 어떻게 결정할지 안다면 다음 단계는 윈도우 기간을 어떻게 정의해야 하는지 결정하는 일이다.<br>
+이벤트 수를 세거나 윈도우 내 평균값을 구하는 등 집계할 때 사용한다.</p>
+<p><img src="/docs/data-intensive-application/11_window.png" alt="윈도우"></p>
+<ul>
+<li>텀블링 윈도우(Tumbling window)</li>
+<li>고정 길이</li>
+<li>겹치는 부분 없음</li>
+<li>홉핑 윈도우(Hopping window)</li>
+<li>고정 길이</li>
+<li>겹치는 부분 있음</li>
+<li>슬라이딩 윈도우(Sliding window)</li>
+<li>고정 길이</li>
+<li>이벤트 timestamps 에 따라 겹칠 수도 있고, 겹치지 않을 수도 있음</li>
+<li>세션 윈도우(Session window)</li>
+<li>동적 변동 길이</li>
+<li>데이터 기반 윈도</li>
+</ul>
+<h3 id="스트림-조인">스트림 조인</h3>
+<p>일괄 처리 작업과 비슷하다.<br>
+하지만, 스트림 상에서 <strong>새로운 이벤트가 언제든 나타날 수 있다는 사실</strong>은 스트림 상에서 수행하는 조인을 일괄 처리 작업에서 수행하는 조인보다 어렵게 만든다.</p>
+<h4 id="스트림-스트림-조인윈도우-조인">스트림 스트림 조인(윈도우 조인)</h4>
+<p>그림. 윈도우 크기: 10초</p>
+<p><img src="/docs/data-intensive-application/11_stream-stream-join.jpg" alt="스트림 조인"></p>
+<ul>
+<li>ex) 웹사이트에 검색 기능이 있고 검색된 URL의 최신 경향을 파악하고 싶다.</li>
+<li>검색 질의 타이핑할 때마다 질의와 반환된 결과가 있는 이벤트를 로깅한다.</li>
+<li>같은 세션 ID로 서로 연관된 검색 활동 이벤트와 클릭 활동 이벤트를 함께 모은다. (F)</li>
+<li>검색은 했지만 클릭이 발생하지 않을 수 있다. (D)</li>
+<li>네트워크 지연도 가변적이기 때문에 클릭 이벤트가 먼저 도착할 수 있다. (E)</li>
+<li>조인을 위한 적절한 윈도우 선택이 필요하다.</li>
+<li>스트림 처리자가 상태(state)를 유지해야 한다.</li>
+<li>ex) 지난 시간에 발생한 모든 이벤트를 세션 ID로 색인한다.</li>
+<li>검색, 클릭 이벤트가 발생할 때마다 해당 색인에 추가하고 스트림 처리자는 같은 세션ID로 이미 도착한 다른 이벤트가 있는지 다른 색인을 확인해야 한다.</li>
+<li>이벤트가 매칭되면 검색한 결과를 클릭했다고 말해주는 이벤트를 방출한다.</li>
+</ul>
+<h4 id="스트림-테이블-조인스트림-강화">스트림 테이블 조인(스트림 강화)</h4>
+<p>리스팅개발팀 &gt; 11. 스트림 처리 &gt; stream-table-join.jpg</p>
+<p><img src="/docs/data-intensive-application/11_stream-table-join.jpg" alt="스트림 테이블 조인"></p>
+<ul>
+<li>데이터베이스로부터 데이터를 가져와서 이벤트 스트림과 조인</li>
+<li>네트워크 왕복 없이 스트림 처리자 내부에 데이터베이스 사본을 적재한다.</li>
+<li>사본 용량에 따라 메모리 내 해시테이블 또는 로컬 디스크에 넣을 수도 있다.</li>
+<li>복사본을 최신 상태로 유지: 변경 데이터 캡처(change data capture, CDC)</li>
+<li>스트림 스트림 조인과 비슷하지만, 테이블 변경 로그 스트림쪽은 &ldquo;시작 시간&quot;까지 이어지는 윈도우를 사용하며 레코드의 새 버전으로 오래된 것을 덮어쓴다 (G1, G2)</li>
+</ul>
+<h4 id="테이블-테이블-조인구체화-뷰-유지">테이블 테이블 조인(구체화 뷰 유지)</h4>
+<p><img src="/docs/data-intensive-application/11_inner-table-table-join.jpg" alt="테이블 테이블 조인"></p>
+<ul>
+<li>양쪽 입력 스트림이 모두 데이터베이스의 변경 로그다. 한 쪽의 모든 변경을 다른 쪽의 최신 상태와 조인한다.</li>
+<li>결과를 두 테이블을 조인한 구체화 뷰의 변경 스트림이 된다.</li>
+</ul>
+<h4 id="조인의-시간-의존성">조인의 시간 의존성</h4>
+<ul>
+<li>하나의 조인 입력을 기반으로 한 특정 상태 유지
+<ul>
+<li>다른 조인 입력에서 온 메시지에 그 상태를 질의한다.</li>
+<li>상태를 유지하는 이벤트의 순서는 매우 중요하다.</li>
+</ul>
+</li>
+<li>시간에 따라 변하는 상태를 조인해야 한다면 어느 시점을 조인에 사용해야 할까?
+<ul>
+<li>ex) 물건 판매: 세율</li>
+<li>복수 개의 스트림에 걸친 이벤트 순서가 결정되지 않으면 조인도 비결정적이다.</li>
+<li>천천히 변하는 차원(slowly changing dimension, SCD)
+<ul>
+<li>조인되는 레코드의 특정 버전을 가리키는 데 유일한 식별자(unique identifier)를 사용해 해결한다.</li>
+<li>세율이 바뀔 때마다 새 식별자를 부여하고 송장에는 판매 시점의 세율을 표시하는 식별자를 포함해야 한다.</li>
+<li>이렇게 변경한 조인은 결정적이지만 테이블에 있는 레코드의 모든 버전을 보유해야 하기 때문에 로그 컴팩션이 불가능하다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="내결함성">내결함성</h3>
+<p>일괄 처리(10장)는 일부 태스크가 실패할지라도 재처리가 가능하다.<br>
+스트림 처리는 무한하다. 그래서 처리를 절대 완료할 수 없다.</p>
+<h4 id="마이크로-일괄-처리와-체크-포인트">마이크로 일괄 처리와 체크 포인트</h4>
+<ul>
+<li>마이크로 일괄처리(microbatching): 스트림을 작은 블록으로 나누고 각 블록을 소형 일괄 처리와 같이 다루는 방법이다.
+<ul>
+<li>스파크 스트리밍에서 사용</li>
+<li>처리 크기는 약 1초 정도
+<ul>
+<li>처리 크기가 작을수록 스케줄링과 코디네이션 비용이 커진다</li>
+<li>처리 크기가 클수록 스트림 처리의 결과를 보기까지 지연시간이 길어진다</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>체크포인트(checkpoint): 주기적으로 상태의 롤링 체크포인트를 생성하고 지속성 있는 저장소에 저장한다.
+<ul>
+<li>아파치 플링크</li>
+<li>스트림 연산자에 장애가 발생하면 스트림 연산자는 가장 최근 체크포인트에서 재시작하고 해당 체크포인트와 장애 발생 사이의 출력은 버린다.</li>
+</ul>
+</li>
+<li>두 가지 접근법만으로는 이 문제를 방지하기에 충분하지 않다.</li>
+</ul>
+<h5 id="원자적-커밋-재검토">원자적 커밋 재검토</h5>
+<ul>
+<li>장애가 발생했을 때 정확히 한 번 처리되는 것처럼 보일려면 처리가 성공했을 때만 모든 출력과 이벤트 처리의 부수 효과가 발생하게 해야 한다.
+<ul>
+<li>원자적이거나 동기화되어야함</li>
+</ul>
+</li>
+</ul>
+<h4 id="멱등성idempotence">멱등성(idempotence)</h4>
+<ul>
+<li>결국 목표는 처리 효과가 두 번 나타나는 일 없이 안전하게 재처리하기 위해 실패한 태스크의 부분 출력을 버리는 것</li>
+<li>멱등 연산: 여러 번 수행하더라도 오직 한 번 수행한 것과 같은 효과를 내는 연산</li>
+<li>연산 자체가 멱등적이지 않아도 약간의 여분 메타데이터로 연산을 멱등적으로 만들 수 있다.</li>
+<li>모든 메시지에는 영속적이고 단조 증가하는 오프셋이 있다.</li>
+<li>트리거한 메시지의 오프셋을 함께 포함한다면 이미 갱신이 적용됐는지 확인할 수 있기 때문에 반복해서 같은 갱신이 수행되는 것을 막을 수 있다.</li>
+</ul>
+<h4 id="실패-후에-상태-재구축하기">실패 후에 상태 재구축하기</h4>
+<ul>
+<li>원격 데이터 저장소에 상태를 유지하고 복제하는 것</li>
+<li>스트림 처리자의 로컬에 상태를 유지하고 주기적으로 복제하는 것</li>
+</ul>
+<p>모든 트레이드오프는 기반 인프라스트럭처의 성능 특성에 달려있다.</p>
+<h2 id="참조-자료">참조 자료</h2>
+<ul>
+<li><a href="https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html#windowing" target="_blank" rel="noopener">윈도우 : CONFLUENT | Streams DSL | Confluent Documentation<i class="fas fa-external-link-alt"></i></a></li>
+<li><a href="https://www.confluent.io/ko-kr/blog/crossing-streams-joins-apache-kafka/" target="_blank" rel="noopener">스트림 조인 : CONFLUENT | Crossing the Streams – Joins in Apache Kafka<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+	
+	
+<div class="text-muted mt-5 pt-3 border-top">
+    최종 수정 : 2022-04-29</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a target="_blank" rel="noopener" href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/devkuma" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a target="_blank" rel="noopener" href="https://blog.devkuma.com" aria-label="Blog">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a target="_blank" rel="noopener" href="https://www.facebook.com/redfreek2c" aria-label="Facebook">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2023 The devkuma All Rights Reserved</span>
+        
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+        
+    
+  <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+      integrity="sha512-mQwom8Ns4op+H29oDkD/LXO/OsXPvCFfkgZkFAVrhhePzRLU8NUI3Nkm43NhWUSmj3p5Cca2HTEkMQmXQRwDQQ==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/mhchem.min.js"
+        integrity="sha512-V1hl0fnOXW6Cdqe5ZVqtw8TBpJVpu3XRDRQti96j/04+tMarPrCdXEUE3UdfvfKYTpOn9DV4zEZBVr0HhDiuiQ=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+       integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js" integrity="sha512-ku2nmBrzAXY5YwohzTqLYH1/lvyMrpTVxgQKrvTabd/b/uesqltLORdmpVapYv6QhZVCLUX6wkvFaKOAY4xpUA==" crossorigin="anonymous"></script>
+<script src="/js/main.min.adcd5a71d01a294f35ddb01a28ea5f91f6ddf8ca2edf2bd09dfa22f6a676ad96.js" integrity="sha256-rc1acdAaKU813bAaKOpfkfbd&#43;Mou3yvQnfoi9qZ2rZY=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

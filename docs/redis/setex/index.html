@@ -1,0 +1,873 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="ko" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.115.2">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Redis Command SETEX key Seconds value | devkuma</title>
+<meta name="description" content="SETEX SETEX 명령은 문자열 값을 키(key), 초(second)를 지정한다. 지정한 초(second) 이후에 데이터가 지워진다.
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰인다.
+사용 가능한 버전 : version 2.0.0 이후 버전 논리적 처리 소요 시간 복잡도: O(1)이다. 아래 두개의 명령과 동일하게 동작한다.
+SET mykey value EXPIRE mykey seconds SETEX 사용법 사용 법은 아래와 같다
+SETEX [key] [seconds] [value] 문자열 값을 저장할 key를 만들 때, 타임아웃(timeout)도 설정 할 수 있다. 키sms 타임아웃 시간이 지난뒤에 삭제된다.">
+<meta property="og:title" content="Redis Command SETEX key Seconds value" />
+<meta property="og:description" content="SETEX SETEX 명령은 문자열 값을 키(key), 초(second)를 지정한다. 지정한 초(second) 이후에 데이터가 지워진다.
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰인다.
+사용 가능한 버전 : version 2.0.0 이후 버전 논리적 처리 소요 시간 복잡도: O(1)이다. 아래 두개의 명령과 동일하게 동작한다.
+SET mykey value EXPIRE mykey seconds SETEX 사용법 사용 법은 아래와 같다
+SETEX [key] [seconds] [value] 문자열 값을 저장할 key를 만들 때, 타임아웃(timeout)도 설정 할 수 있다. 키sms 타임아웃 시간이 지난뒤에 삭제된다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.devkuma.com/docs/redis/setex/" /><meta property="article:section" content="230_Data-Science_NoSQL" />
+<meta property="article:published_time" content="2023-03-31T17:46:26+09:00" />
+<meta property="article:modified_time" content="2023-08-13T11:59:53+09:00" />
+<meta itemprop="name" content="Redis Command SETEX key Seconds value">
+<meta itemprop="description" content="SETEX SETEX 명령은 문자열 값을 키(key), 초(second)를 지정한다. 지정한 초(second) 이후에 데이터가 지워진다.
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰인다.
+사용 가능한 버전 : version 2.0.0 이후 버전 논리적 처리 소요 시간 복잡도: O(1)이다. 아래 두개의 명령과 동일하게 동작한다.
+SET mykey value EXPIRE mykey seconds SETEX 사용법 사용 법은 아래와 같다
+SETEX [key] [seconds] [value] 문자열 값을 저장할 key를 만들 때, 타임아웃(timeout)도 설정 할 수 있다. 키sms 타임아웃 시간이 지난뒤에 삭제된다."><meta itemprop="datePublished" content="2023-03-31T17:46:26+09:00" />
+<meta itemprop="dateModified" content="2023-08-13T11:59:53+09:00" />
+<meta itemprop="wordCount" content="139">
+<meta itemprop="keywords" content="Redis,NoSQL," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Redis Command SETEX key Seconds value"/>
+<meta name="twitter:description" content="SETEX SETEX 명령은 문자열 값을 키(key), 초(second)를 지정한다. 지정한 초(second) 이후에 데이터가 지워진다.
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰인다.
+사용 가능한 버전 : version 2.0.0 이후 버전 논리적 처리 소요 시간 복잡도: O(1)이다. 아래 두개의 명령과 동일하게 동작한다.
+SET mykey value EXPIRE mykey seconds SETEX 사용법 사용 법은 아래와 같다
+SETEX [key] [seconds] [value] 문자열 값을 저장할 key를 만들 때, 타임아웃(timeout)도 설정 할 수 있다. 키sms 타임아웃 시간이 지난뒤에 삭제된다."/>
+
+
+
+
+<link rel="preload" href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" as="style">
+<link href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/docs/redis/setex/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-FW3TZ3QLYR');
+}
+</script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+<a class="navbar-brand" href="/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none"><path d="M775 4993c-268-38-509-215-618-453-71-155-67-24-67-1986 0-1958-5-1818 65-1971 43-94 86-155 162-230 117-115 283-198 448-223 48-7 618-10 1840-8l1770 3 75 23c231 70 408 216 505 417 81 168 75 7 75 1995 0 1969 5 1824-67 1980-96 211-277 360-528 436-57 18-150 19-1845 20-982 1-1798-1-1815-3zm543-584c53-11 123-30 154-44 144-61 319-213 379-328 19-36 22-37 57-31 20 4 44 10 52 14 20 10 119 30 250 50 228 35 454 36 695 4 91-12 256-47 299-63 16-7 29-10 30-9 1 2 18 28 38 58 115 178 309 304 533 348 39 8 272 8 310 0 103-21 141-34 233-80 157-77 285-206 357-356 54-113 72-195 73-329 1-103-5-142-44-273-25-87-148-259-223-315-40-29-50-51-32-71 5-5 21-38 36-74 61-145 96-253 110-340 3-19 11-60 17-90 13-62 17-434 5-520-16-123-37-209-76-325-56-165-174-395-246-477-11-13-35-43-54-68-44-58-254-267-306-305-22-17-42-32-45-35-18-18-235-161-275-181-16-9-54-28-83-44-29-15-55-26-57-23-2 2 6 16 18 30 12 15 30 35 39 47 37 44 109 161 134 217 42 92 69 194 81 304 46 396-119 758-455 996-261 186-532 256-862 225-205-19-372-77-540-185-142-92-289-241-378-382-110-175-166-481-127-699 37-203 125-383 260-533 31-34 51-62 44-62-22 0-198 89-304 153-55 34-140 93-190 131-92 70-307 279-360 350-17 22-39 51-50 65-19 25-38 52-97 146-66 106-175 374-191 472-3 16-8 39-11 53-40 177-41 522-2 725 3 17 8 44 11 60 16 86 81 266 130 359 15 27 14 30-7 44-77 53-208 204-252 291-97 188-96 485 2 677 33 66 129 191 183 238 192 171 465 239 737 185zm1414-2174c55-12 137-48 168-72 62-48 81-69 1e2-108 36-74 28-162-19-224-31-42-138-121-162-121-10 0-20-4-23-9-23-36-255-49-366-20-283 72-386 274-224 436 55 55 149 107 215 118 19 3 35 8 37 9 9 10 225 3 274-9z"/><path d="M3885 4013c-85-13-182-63-243-126l-33-34 40-26c22-15 43-27 45-27 9 0 225-150 252-175 6-5 36-30 65-55 66-55 172-159 222-219 23-26 42-41 51-38 23 9 91 108 112 162 13 35 19 76 18 135 0 76-3 92-34 155-57 119-168 210-289 238-58 14-152 18-206 10z"/><path d="M985 3976c-92-29-162-80-221-161-62-86-79-149-72-275 6-98 31-158 1e2-234l37-41 48 55c154 179 350 348 548 472 28 18 52 33 54 35 9 6-64 75-105 99-77 45-145 62-251 62-54 0-116-6-138-12z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+<div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+	<ul class="navbar-nav">
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-keyboard'></i><span>Programming</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/design/" >Design and Development</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/jvm/" >JVM Based Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/spring/" >Spring framework</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/web/" >Web Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/etc/" >그밖에 Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/tools/" >Programming Tools</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-database'></i><span>Data Science</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/big-data/" >Big Data</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/rdb/" >Relational Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/nosql/" >NoSQL Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/graph-db/" >Graph Databse</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-desktop'></i><span>Computer</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/computer/basic/" >컴퓨터 기본 지식</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/operating-system/" >Operating System</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/network/" >Network</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+		</li>
+		
+		</ul>
+</div>
+<div class="d-none d-lg-block">
+	<div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+</div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-docsredissetex").addClass("active"); 
+    $("#td-section-nav #m-docsredissetex-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docsredissetex").parents("li").addClass("active-path"); 
+    $("#td-section-nav li.active-path").addClass("show"); 
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-docsredissetex-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docsredissetex-li").children("ul").children("li").addClass("show");  
+    $("#td-sidebar-menu").toggleClass("d-none"); 
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="collapse td-sidebar-nav foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docscategorydata-sciencenosql-li">
+  <a href="/docs/category/data-science/nosql/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-docscategorydata-sciencenosql"><span class="">NoSQL</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsnosql-li">
+  <input type="checkbox" id="m-docsnosql-check"/>
+  <label for="m-docsnosql-check"><a href="/docs/nosql/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsnosql"><span class="">NoSQL 이란?</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docselasticsearch-li">
+  <input type="checkbox" id="m-docselasticsearch-check"/>
+  <label for="m-docselasticsearch-check"><a href="/docs/elasticsearch/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docselasticsearch"><span class="">Elasticsearch</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchintro-li">
+  <input type="checkbox" id="m-docselasticsearchintro-check"/>
+  <label for="m-docselasticsearchintro-check"><a href="/docs/elasticsearch/intro/" title="Elasticsearch 기본 개념" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchintro"><span class="">기본 개념</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchinstall-li">
+  <input type="checkbox" id="m-docselasticsearchinstall-check"/>
+  <label for="m-docselasticsearchinstall-check"><a href="/docs/elasticsearch/install/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchinstall"><span class="">Elasticsearch, Kibana, Cerebro 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchcrud-li">
+  <input type="checkbox" id="m-docselasticsearchcrud-check"/>
+  <label for="m-docselasticsearchcrud-check"><a href="/docs/elasticsearch/crud/" title="Elasticsearch CRUD 작업 &#43; Bulk API" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchcrud"><span class="">CRUD 작업 &#43; Bulk API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchmapping-li">
+  <input type="checkbox" id="m-docselasticsearchmapping-check"/>
+  <label for="m-docselasticsearchmapping-check"><a href="/docs/elasticsearch/mapping/" title="Elasticsearch 매핑 관리 &#43; 템플릿" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchmapping"><span class="">매핑 관리 &#43; 템플릿</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchsearch-api-li">
+  <input type="checkbox" id="m-docselasticsearchsearch-api-check"/>
+  <label for="m-docselasticsearchsearch-api-check"><a href="/docs/elasticsearch/search-api/" title="Elasticsearch 검색 API" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchsearch-api"><span class="">검색 API</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchanalyzer-li">
+  <input type="checkbox" id="m-docselasticsearchanalyzer-check"/>
+  <label for="m-docselasticsearchanalyzer-check"><a href="/docs/elasticsearch/analyzer/" title="Elasticsearch Analyzer(문장 분석)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchanalyzer"><span class="">Analyzer(문장 분석)</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docselasticsearchaggrigation-li">
+  <input type="checkbox" id="m-docselasticsearchaggrigation-check"/>
+  <label for="m-docselasticsearchaggrigation-check"><a href="/docs/elasticsearch/aggrigation/" title="Elasticsearch Aggrigation(집계, 분류)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docselasticsearchaggrigation"><span class="">Aggrigation(집계, 분류)</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodb-li">
+  <input type="checkbox" id="m-docsmongodb-check"/>
+  <label for="m-docsmongodb-check"><a href="/docs/mongodb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodb"><span class="">MongoDB</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodbintro-li">
+  <input type="checkbox" id="m-docsmongodbintro-check"/>
+  <label for="m-docsmongodbintro-check"><a href="/docs/mongodb/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodbintro"><span class="">MongoDB 개요</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbfeatures-li">
+  <input type="checkbox" id="m-docsmongodbfeatures-check"/>
+  <label for="m-docsmongodbfeatures-check"><a href="/docs/mongodb/features/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbfeatures"><span class="">MongoDB 특징</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbinstalls-li">
+  <input type="checkbox" id="m-docsmongodbinstalls-check"/>
+  <label for="m-docsmongodbinstalls-check"><a href="/docs/mongodb/installs/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbinstalls"><span class="">MongoDB Docker 설치</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodbec9e85ebacb8-li">
+  <input type="checkbox" id="m-docsmongodbec9e85ebacb8-check"/>
+  <label for="m-docsmongodbec9e85ebacb8-check"><a href="/docs/mongodb/%EC%9E%85%EB%AC%B8/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodbec9e85ebacb8"><span class="">MongoDB 입문</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbhow-to-use-li">
+  <input type="checkbox" id="m-docsmongodbhow-to-use-check"/>
+  <label for="m-docsmongodbhow-to-use-check"><a href="/docs/mongodb/how-to-use/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbhow-to-use"><span class="">MongoDB 기본 사용법</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbhow-to-use-mongo-li">
+  <input type="checkbox" id="m-docsmongodbhow-to-use-mongo-check"/>
+  <label for="m-docsmongodbhow-to-use-mongo-check"><a href="/docs/mongodb/how-to-use-mongo/" title="MongoDB mongo 명령어 사용법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbhow-to-use-mongo"><span class="">mongo 명령어 사용법</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbcreate-index-li">
+  <input type="checkbox" id="m-docsmongodbcreate-index-check"/>
+  <label for="m-docsmongodbcreate-index-check"><a href="/docs/mongodb/create-index/" title="MongoDB에서 인덱스를 적용하는 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbcreate-index"><span class="">인덱스를 적용하는 방법</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbunique-constraint-li">
+  <input type="checkbox" id="m-docsmongodbunique-constraint-check"/>
+  <label for="m-docsmongodbunique-constraint-check"><a href="/docs/mongodb/unique-constraint/" title="MongoDB에서 고유(unique) 제약 조건을 적용하는 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbunique-constraint"><span class="">고유(unique) 제약 조건을 적용하는 방법</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbdelete-duplicate-data-li">
+  <input type="checkbox" id="m-docsmongodbdelete-duplicate-data-check"/>
+  <label for="m-docsmongodbdelete-duplicate-data-check"><a href="/docs/mongodb/delete-duplicate-data/" title="MongoDB에서 중복 데이터를 추출/삭제하는 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbdelete-duplicate-data"><span class="">중복 데이터 추출/삭제</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbcollection-restriction-li">
+  <input type="checkbox" id="m-docsmongodbcollection-restriction-check"/>
+  <label for="m-docsmongodbcollection-restriction-check"><a href="/docs/mongodb/collection-restriction/" title="MongoDB에서 자동 증가 시퀀스를 만드는 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbcollection-restriction"><span class="">자동 증가 시퀀스를 만드는 방법</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodbserver-li">
+  <input type="checkbox" id="m-docsmongodbserver-check"/>
+  <label for="m-docsmongodbserver-check"><a href="/docs/mongodb/server/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodbserver"><span class="">MongoDB 서버운영</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbhow-use-mongod-li">
+  <input type="checkbox" id="m-docsmongodbhow-use-mongod-check"/>
+  <label for="m-docsmongodbhow-use-mongod-check"><a href="/docs/mongodb/how-use-mongod/" title="MongoDB mongod 명령어 사용법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbhow-use-mongod"><span class="">mongod 명령어 사용법</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbenable-auth-control-li">
+  <input type="checkbox" id="m-docsmongodbenable-auth-control-check"/>
+  <label for="m-docsmongodbenable-auth-control-check"><a href="/docs/mongodb/enable-auth-control/" title="MongoDB의 접근 제어(사용자 인증)를 활성화하는 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbenable-auth-control"><span class="">접근 제어(사용자 인증)</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodbreplication-li">
+  <input type="checkbox" id="m-docsmongodbreplication-check"/>
+  <label for="m-docsmongodbreplication-check"><a href="/docs/mongodb/replication/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodbreplication"><span class="">MongoDB Replication</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbreplicationintro-li">
+  <input type="checkbox" id="m-docsmongodbreplicationintro-check"/>
+  <label for="m-docsmongodbreplicationintro-check"><a href="/docs/mongodb/replication/intro/" title="MongoDB 레플리케이션 개요" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbreplicationintro"><span class="">레플리케이션 개요</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsmongodbsharding-li">
+  <input type="checkbox" id="m-docsmongodbsharding-check"/>
+  <label for="m-docsmongodbsharding-check"><a href="/docs/mongodb/sharding/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsmongodbsharding"><span class="">MongoDB Sharding</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmongodbshardingintro-li">
+  <input type="checkbox" id="m-docsmongodbshardingintro-check"/>
+  <label for="m-docsmongodbshardingintro-check"><a href="/docs/mongodb/sharding/intro/" title="MongoDB 샤딩 개요" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmongodbshardingintro"><span class="">샤딩 개요</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsredis-li">
+  <input type="checkbox" id="m-docsredis-check"/>
+  <label for="m-docsredis-check"><a href="/docs/redis/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsredis"><span class="">Redis</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsredisoverview-li">
+  <input type="checkbox" id="m-docsredisoverview-check"/>
+  <label for="m-docsredisoverview-check"><a href="/docs/redis/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsredisoverview"><span class="">Redis 개요</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsredisredis-cli-li">
+  <input type="checkbox" id="m-docsredisredis-cli-check"/>
+  <label for="m-docsredisredis-cli-check"><a href="/docs/redis/redis-cli/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsredisredis-cli"><span class="">Redis redis-cli</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsredisdata-structure-li">
+  <input type="checkbox" id="m-docsredisdata-structure-check"/>
+  <label for="m-docsredisdata-structure-check"><a href="/docs/redis/data-structure/" title="Redis 데이터 구조(Structure) 조회 및 저장" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsredisdata-structure"><span class="">Redis 데이터 구조</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsredissetex-li">
+  <input type="checkbox" id="m-docsredissetex-check"/>
+  <label for="m-docsredissetex-check"><a href="/docs/redis/setex/" title="Redis Command SETEX key Seconds value" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsredissetex"><span class="">Redis SETEX</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsredisinstall-li">
+  <input type="checkbox" id="m-docsredisinstall-check"/>
+  <label for="m-docsredisinstall-check"><a href="/docs/redis/install/" title="Redis를 docker로 설치" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsredisinstall"><span class="">Redis 설치</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docshbase-li">
+  <input type="checkbox" id="m-docshbase-check"/>
+  <label for="m-docshbase-check"><a href="/docs/hbase/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docshbase"><span class="">Apache HBase</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbaseoverview-li">
+  <input type="checkbox" id="m-docshbaseoverview-check"/>
+  <label for="m-docshbaseoverview-check"><a href="/docs/hbase/overview/" title="Apache HBase 개요" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbaseoverview"><span class="">HBase 개요</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasearchitecture-li">
+  <input type="checkbox" id="m-docshbasearchitecture-check"/>
+  <label for="m-docshbasearchitecture-check"><a href="/docs/hbase/architecture/" title="Apache HBase 아키텍처" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasearchitecture"><span class="">HBase 아키텍처</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbaseregions-li">
+  <input type="checkbox" id="m-docshbaseregions-check"/>
+  <label for="m-docshbaseregions-check"><a href="/docs/hbase/regions/" title="Apache HBase 리전(Regions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbaseregions"><span class="">HBase Regions</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasedata-model-li">
+  <input type="checkbox" id="m-docshbasedata-model-check"/>
+  <label for="m-docshbasedata-model-check"><a href="/docs/hbase/data-model/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasedata-model"><span class="">HBase 데이터 모델</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasedocker-install-li">
+  <input type="checkbox" id="m-docshbasedocker-install-check"/>
+  <label for="m-docshbasedocker-install-check"><a href="/docs/hbase/docker-install/" title="HBase 로컬에서 연습을 위한 docker 설치" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasedocker-install"><span class="">HBase 로컬 docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasegeneral-shell-commands-li">
+  <input type="checkbox" id="m-docshbasegeneral-shell-commands-check"/>
+  <label for="m-docshbasegeneral-shell-commands-check"><a href="/docs/hbase/general-shell-commands/" title="HBase 일반 Shell 명령 - status, version, whoami" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasegeneral-shell-commands"><span class="">HBase 일반 Shell 명령</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasetable-management-commands-li">
+  <input type="checkbox" id="m-docshbasetable-management-commands-check"/>
+  <label for="m-docshbasetable-management-commands-check"><a href="/docs/hbase/table-management-commands/" title="HBase 테이블 관리 명령 - create, list, exists, disable/enable, descibe, alter, drop" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasetable-management-commands"><span class="">HBase 테이블 관리 명령</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasedata-manipulation-commands-li">
+  <input type="checkbox" id="m-docshbasedata-manipulation-commands-check"/>
+  <label for="m-docshbasedata-manipulation-commands-check"><a href="/docs/hbase/data-manipulation-commands/" title="HBase 데이터 조작 명령 - put, get, delete, deleteall, scan, count, truncate" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasedata-manipulation-commands"><span class="">HBase 데이터 조작 명령</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasesecurity-tools-li">
+  <input type="checkbox" id="m-docshbasesecurity-tools-check"/>
+  <label for="m-docshbasesecurity-tools-check"><a href="/docs/hbase/security-tools/" title="HBase 보안 명령(Security tools) - grant, revoke, user_permission" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasesecurity-tools"><span class="">HBase 보안 명령</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasecompression-li">
+  <input type="checkbox" id="m-docshbasecompression-check"/>
+  <label for="m-docshbasecompression-check"><a href="/docs/hbase/compression/" title="HBase 압축 (컴팩션,Compaction) 및 데이터 블록 인코딩" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasecompression"><span class="">HBase 압축 및 데이터 블록 인코딩</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasedata-versioning-li">
+  <input type="checkbox" id="m-docshbasedata-versioning-check"/>
+  <label for="m-docshbasedata-versioning-check"><a href="/docs/hbase/data-versioning/" title="HBase 데이터 버저닝(Data Versioning)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasedata-versioning"><span class="">HBase 데이터 버저닝</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docshbasebloom-filter-li">
+  <input type="checkbox" id="m-docshbasebloom-filter-check"/>
+  <label for="m-docshbasebloom-filter-check"><a href="/docs/hbase/bloom-filter/" title="HBase 블룸 필터 (BloomFilter)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docshbasebloom-filter"><span class="">HBase BloomFilter</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docscassandra-li">
+  <input type="checkbox" id="m-docscassandra-check"/>
+  <label for="m-docscassandra-check"><a href="/docs/cassandra/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docscassandra"><span class="">Cassandra</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#setex">SETEX</a></li>
+    <li><a href="#setex-사용법">SETEX 사용법</a></li>
+    <li><a href="#heading"></a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">297</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">e-Book</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gremlin/" data-taxonomy-term="gremlin"><span class="taxonomy-label">Gremlin</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">435</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">jQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">macOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/oauth/" data-taxonomy-term="oauth"><span class="taxonomy-label">OAuth</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">60</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/secure-coding-guide/" data-taxonomy-term="secure-coding-guide"><span class="taxonomy-label">Secure Coding Guide</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spock/" data-taxonomy-term="spock"><span class="taxonomy-label">Spock</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">111</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">40</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">108</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">WEB</span><span class="taxonomy-count">388</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/category/data-science/nosql/">NoSQL</a></li>
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/redis/">Redis</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Redis SETEX</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>Redis Command SETEX key Seconds value</h1>
+	
+	<header class="article-meta">
+		
+		
+			
+				<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span></a></li>
+    </ul>
+</div>
+
+			
+		
+		
+	</header>
+	
+	<h2 id="setex">SETEX</h2>
+<p><code>SETEX</code> 명령은 문자열 값을 키(key), 초(second)를 지정한다. 지정한 초(second) 이후에 데이터가 지워진다.<br>
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰인다.</p>
+<ul>
+<li>사용 가능한 버전 : version 2.0.0 이후 버전</li>
+<li>논리적 처리 소요 시간 복잡도: O(1)이다.</li>
+</ul>
+<p>아래 두개의 명령과 동일하게 동작한다.</p>
+<pre tabindex="0"><code>SET mykey value
+EXPIRE mykey seconds
+</code></pre><h2 id="setex-사용법">SETEX 사용법</h2>
+<p>사용 법은 아래와 같다</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>SETEX [key] [seconds] [value]
+</span></span></code></pre></div><h2 id="heading"></h2>
+<p>문자열 값을 저장할 key를 만들 때, 타임아웃(timeout)도 설정 할 수 있다. 키sms 타임아웃 시간이 지난뒤에 삭제된다. 아래 두 개의 명령과 동일한 효과다.</p>
+<p>지정한 시간 이후에 데이터 지워짐: 초 단위 지정
+지정한 초(second) 이후에 데이터가 지워집니다.
+만료 시간을 갖는 데이터를 저장할 때 유용하게 쓰입니다.
+사용법은 SETEX key seconds value 입니다.</p>
+<p>Example
+명령&gt;	setex key 5 value
+결과&gt;	OK
+명령&gt;	ttl key
+결과&gt;	2   남은 시간을 초(second)로 알려줌
+명령&gt;	get key
+결과&gt;	(nil)   5초가 지나서 데이터가 지워짐
+애니메이션 보기</p>
+<p>TTL 명령은 남은 시간을 초(second)로 알려줍니다.</p>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+	
+	
+<div class="text-muted mt-5 pt-3 border-top">
+    최종 수정 : 2023-08-13</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a target="_blank" rel="noopener" href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/devkuma" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a target="_blank" rel="noopener" href="https://blog.devkuma.com" aria-label="Blog">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a target="_blank" rel="noopener" href="https://www.facebook.com/redfreek2c" aria-label="Facebook">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2023 The devkuma All Rights Reserved</span>
+        
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+        
+    
+  <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+      integrity="sha512-mQwom8Ns4op+H29oDkD/LXO/OsXPvCFfkgZkFAVrhhePzRLU8NUI3Nkm43NhWUSmj3p5Cca2HTEkMQmXQRwDQQ==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/mhchem.min.js"
+        integrity="sha512-V1hl0fnOXW6Cdqe5ZVqtw8TBpJVpu3XRDRQti96j/04+tMarPrCdXEUE3UdfvfKYTpOn9DV4zEZBVr0HhDiuiQ=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+       integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js" integrity="sha512-ku2nmBrzAXY5YwohzTqLYH1/lvyMrpTVxgQKrvTabd/b/uesqltLORdmpVapYv6QhZVCLUX6wkvFaKOAY4xpUA==" crossorigin="anonymous"></script>
+<script src="/js/main.min.adcd5a71d01a294f35ddb01a28ea5f91f6ddf8ca2edf2bd09dfa22f6a676ad96.js" integrity="sha256-rc1acdAaKU813bAaKOpfkfbd&#43;Mou3yvQnfoi9qZ2rZY=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

@@ -1,0 +1,331 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Garbage collection</title>
+    <link>https://www.devkuma.com/tags/garbage-collection/</link>
+    <image>
+      <url>https://www.devkuma.com/tags/garbage-collection/logo/180x180.jpg</url>
+      <title>Garbage collection</title>
+      <link>https://www.devkuma.com/tags/garbage-collection/</link>
+    </image>
+    <description>Recent content in Garbage collection on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ko</language>
+    <managingEditor>redfreek2c@gmail.com (kimkc)</managingEditor>
+    <webMaster>redfreek2c@gmail.com (kimkc)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/tags/garbage-collection/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>JVM Garbage Collection</title>
+      <link>https://www.devkuma.com/docs/jvm/garbage-collection/</link>
+      <pubDate>Thu, 20 Jan 2022 07:48:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/jvm/garbage-collection/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;가비지-컬렉션garbage-collection이란&#34;&gt;가비지 컬렉션(Garbage Collection)이란?&lt;/h2&gt;
+&lt;p&gt;가비지 컬렉션(GC, Garbage Collection)는 Java 프로세스에서 더 이상 사용하지 않는 메모리를 자동으로 해제 해주는 JVM의 작업이다.&lt;/p&gt;
+&lt;p&gt;Java Runtime시 Heap 영역에 저장되는 객체들은 따로 정리하지 않으면 계속헤서 쌓이게되어 &lt;code&gt;OutOfMemmory Exception&lt;/code&gt;(OOME)이 발생할 수 있다. 이를 방지하기 위하여 JVM에서는 주기적으로 사용하지 않는 객체를 수집하여 정리하는 GC를 진행한다.&lt;/p&gt;
+&lt;p&gt;C언어 같은 경우는 &lt;code&gt;malloc()&lt;/code&gt;, &lt;code&gt;free()&lt;/code&gt; 등을 이용해 메모리를 할당하고, 수동으로 메모리를 해제해야 한다. 이런 불편함은 Java에서는 GC 기술을 이용해 자동으로 메모리를 해제하여 개발자에게 메모리 관리로부터 자유롭게 해 주었다.&lt;/p&gt;
+&lt;p&gt;Java는 프로그램 코드에서 메모비를 명시적으로 지정하여 해제하지 않는다. 객체를 &lt;code&gt;null&lt;/code&gt;로 지정하거나 &lt;code&gt;System.gc()&lt;/code&gt; 메서드를 호출하는 개발자가 있다. &lt;code&gt;null&lt;/code&gt;로 지정하는 것은 큰 문제가 안 되지만, &lt;code&gt;System.gc()&lt;/code&gt; 메서드를 호출하는 것은 시스템의 성능에 매우 큰 영향을 끼치므로 &lt;code&gt;System.gc()&lt;/code&gt; 메서드는 절대로 사용하면 안 된다.&lt;/p&gt;
+&lt;p&gt;JVM의 GC에 대해서 알기 위해서는 우선 JVM 메모리 구조에 대해서 알아야 한다. &lt;a href=&#34;https://www.devkuma.com/docs/java/jvm/&#34;&gt;JVM 메모리 구조&lt;/a&gt;에 대해서는 여기를 참고 하길 바란다.&lt;/p&gt;
+&lt;h2 id=&#34;불필요한-메모리-영역&#34;&gt;불필요한 메모리 영역&lt;/h2&gt;
+&lt;p&gt;메모리의 사용 상황을 의식하지 않고 어플리케이션을 만들게 되면, 사용되지 않게 된 쓰레기 데이터(가비지)가 발생하게 된다.&lt;/p&gt;
+&lt;p&gt;예를 들면, 아래와 같은 클래스가 있다고 가정하자.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;d&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;data&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;d&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;setLeft&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;l&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;setRight&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;r&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;아래의 처리에 의해 &lt;code&gt;TreeNode&lt;/code&gt;를 작성한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;13&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;19&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;root&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;left&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;right&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;17&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이렇게 하게 되면 루트 노드가 left 노드와 right 노드를 참조하게 된다.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_treeNode_1.png&#34; alt=&#34;TreeNode&#34;&gt;&lt;/p&gt;
+&lt;p&gt;여기서 right 노드를 바꾸는 처리를 추가했다고 가정한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;root&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;setRight&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TreeNode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;21&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;));&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그러면 원래 right 노드에 들어 있던 19번 노드는 누구로부터도 참조되지 않게 되어, 아래 그림과 같은 상태가 된다.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_treeNode_2.png&#34; alt=&#34;TreeNode&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이 상태라면 &lt;code&gt;data=19&lt;/code&gt;의 &lt;code&gt;TreeNode&lt;/code&gt;의 인스턴스는 어디에서도 참조되지 않는 객체. 즉, 접근 불가능 상태의 객체(Unreachable object) 되기 때문에 가바지가 된다.&lt;/p&gt;
+&lt;p&gt;더 이상 사용되지 않는 데이터가 계속 발생하개 되면, 쓸데없는 메모리가 계속 쌓여 가게 되어 용량의 한계가 오게 된다. 이를 미연에 방지하기 위해 힙 영역의 쓸데없는 메모리를 자동으로 해제하는 구조로 GC(가비지 컬렉션)가 필요하게 되었다.&lt;/p&gt;
+&lt;h2 id=&#34;gc-및-힙-영역의-역할&#34;&gt;GC 및 힙 영역의 역할&lt;/h2&gt;
+&lt;p&gt;앞서 언급했듯이 GC는 더 이상 필요하지 않은 메모리를 해제하는 메커니즘이다.&lt;br&gt;
+메모리내의 데이터를 조사하여 참조가 있으면 유효한 데이터로서 남게 되고, 참조가 없으면 불필요하다고 판단해 해제하게 된다. 그러나 단순히 모든 메모리 공간을 조사하게 되면 효율이 나쁘기 때문에 데이터의 존재 기간에 따라 내부적으로 나누어 관리된다.&lt;/p&gt;
+&lt;p&gt;최신 데이터는 &lt;strong&gt;Young Generation&lt;/strong&gt;, 오래된 데이터는 &lt;strong&gt;Old Generation&lt;/strong&gt;, 사전에 변경되기 어려운 것으로 판단되는 데이터를 &lt;strong&gt;Permanent Generation&lt;/strong&gt;이라고 부른다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_heap.png&#34; alt=&#34;Heap Memory&#34;&gt;&lt;/p&gt;
+&lt;p&gt;기본적으로 메모리에의 할당은 자주 발생하지만 대부분은 참조되지 않는다고 가정하여 얼마 안되는 데이터(Young Generation)와 오래 동안 참조되는 데이터(Old Generation)로 나누고 있다.
+이를 통해 Young Generation에 포함된 데이터만 GC 대상으로 효율적으로 확인할 수 있다.&lt;/p&gt;
+&lt;p&gt;그리고 Permanent Generation이라는 영역도 존재하며, 여기에는 로드된 클래스의 정보 등 변하지 않을 것이라고 어느 정도 보증되는 데이터가 저장된다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Permanent Generation 메모리 영역은 Java 8가 나오면서 없어지고 Metaspace 영역이 생겼다. Metaspace 영역에 대해서는 자세한 내용은 &lt;a href=&#34;https://www.devkuma.com/docs/jvm/heap-memory/#java-8-hotspot-jvm/&#34;&gt;여기&lt;/a&gt;를 참고하길 바란다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;참고: &lt;a href=&#34;http://openjdk.java.net/groups/hotspot/docs/StorageManagement.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Open JDK 문서&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;gc-사이클&#34;&gt;GC 사이클&lt;/h2&gt;
+&lt;p&gt;애플리케이션에서 사용하는 영역인 힙 영역은 GC 수행 영역별로 크게 Young(Eden, Survivor1, Survivor2) 영역과 Old(Tenured) 영역으로 구분된다.&lt;/p&gt;
+&lt;p&gt;힙 영역의 Yonng 영역은 아래 그림과 같이 Eden과 Survivor로 나뉘어져 있으며, 각각의 영역을 잘 사용하여 GC가 이루어진다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_heap_1.png&#34; alt=&#34;heap memory&#34;&gt;&lt;/p&gt;
+&lt;p&gt;각 영역은 아래의 역할을 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eden
+&lt;ul&gt;
+&lt;li&gt;자바 객체가 생성되자마자 할당되는 메모리 영역이다.&lt;/li&gt;
+&lt;li&gt;정기적인 가비지 컬렉션에 의해 살아남은 객체들은 Survivor로 이동한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Survivor1, Survivor2
+&lt;ul&gt;
+&lt;li&gt;GC 후에 해제되지 않고 Old에는 가지 않는 데이터 (편의상 2가지 있고, 1, 2를 붙이고 있을 뿐이다)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Tenured
+&lt;ul&gt;
+&lt;li&gt;지정된 횟수 GC를 걸쳐서 살아남은 데이터로 Old로 이동된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;GC가 수행되는 영역에 따라 Minor GC와 Major GC(Full GC)로 구분한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Young 영역의 GC를 &lt;strong&gt;Minor GC&lt;/strong&gt;라고 한다.&lt;/li&gt;
+&lt;li&gt;Old 영역의 GC는 &lt;strong&gt;Full GC&lt;/strong&gt;(혹은 Major GC)라고 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Full GC가 발생하면 순간적으로 Java 애플리케이션의 동작이 중단이 되는 stop-the-world가 발생하게 되기 때문에 속도가 비교적 느리고, 성능과 안정성에 큰 영향을 끼칠 수 있다.&lt;/p&gt;
+
+
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
+&lt;h4 class=&#34;alert-heading&#34;&gt;STW(Stop the world)&lt;/h4&gt;
+
+    Stop the world란? GC가 더이상 필요 없는 객체를 찾아 지우는 작업을 하기위해 GC를 실행하는 쓰레드를 제외한 나머지 쓰레드가 멈추는 것을 의미한다. stop-the-world가 발생하면 GC를 실행하는 쓰레드를 제외한 나머지 쓰레드는 모두 작업을 멈춘다. 그리고 GC작업을 완료한 이후에 작업을 다시 시작한다.  STW가 발생하는 동안은 어플리케이션이 중지 되기 때문에 장애로 이어 질 수 있다.&lt;br&gt;
+대개 GC튜닝이라 하면 stop-the-world시간을 줄이는 것이다.
+
+&lt;/div&gt;
+
+&lt;h3 id=&#34;minor-gc&#34;&gt;Minor GC&lt;/h3&gt;
+&lt;p&gt;Young Generation만을 대상으로 한 GC를 Minor GC라고 한다. 다음과 같은 특징이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;처리 시간이 짧다&lt;/li&gt;
+&lt;li&gt;Eden이 가득 차면 발생한다.&lt;/li&gt;
+&lt;li&gt;특정 횟수 GC 대상이 되면 Old로 이동한다.&lt;/li&gt;
+&lt;li&gt;GC 동안 프로세스 처리가 중지(Stop the world)가 발생한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;글보다는 그림으로 설명하는 것이 더 쉬우므로, 그림으로 설명하겠다.&lt;/p&gt;
+&lt;p&gt;새롭게 메모리가 할당되어 Eden 영역이 가득 차게 되면, Minor GC가 발생한다.&lt;br&gt;
+참조가 없는 데이터는 삭제되지만 유효한 데이터는 Survivor 영역에 복사된다. 그리고, Eden 영역은 모두 비게 된다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_minor_gc_1.png&#34; alt=&#34;Minor GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;그러고, 이 상태에서 또 Eden 영역이 가득 차게 되면, 다시 마이너 GC가 발생하여 아래 그림과 같이 된다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_minor_gc_2.png&#34; alt=&#34;Minor GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이번은 GC 후에 모두 Survivor2 영역에 들어갔다. Survivor 영역은 어느 쪽이든 비어있는 쪽에 데이터를 복사되어 1과 2를 오가게 된다. 그래서 항상 Survivor1과 Survivor 2중 한 곳은 비어있는 상태가 유지된다.&lt;br&gt;
+또한, Eden 영역과 마찬가지로 Suvivor 영역에서 참조되지 않는 데이터는 삭제된다.&lt;/p&gt;
+&lt;p&gt;다음으로 Old 영역로의 승격이다. GC가 발생할 때마다 Young 영역의 데이터는 그 횟수가 기록되고 일정 횟수를 초과하면 Old로 이동한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_minor_gc_3.png&#34; alt=&#34;Minor GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이처럼 여러 번 GC를 반복하면 Young 영역에서 Old 영역으로의 이동이 발생한다. 이 횟수는 옵션으로 지정할 수 있는데, Old 영역으로 가는 빈도를 아래의 옵션으로 제어할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-XX:MaxTenuringThreshold=N
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;full-gc&#34;&gt;Full GC&lt;/h3&gt;
+&lt;p&gt;Young 영역에서 Old 영역으로 데이터가 옮겨지는 구조에 대해서는 알았다. 이것만 있다면 Old 영역의 용량은 항상 늘어나게 되어, 언젠가는 용량의 한계가 오게 될 것이다. 그래서 이때 Full GC가 발생한다. Old 영역에 할당이 실패한 시점에 Full GC가 발생하고 Old 영역과 Young 영역을 모두 포함하여 메모리를 청소하게 된다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_full_gc_1.png&#34; alt=&#34;Full GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이렇게 하면 Old 영역에서 더 이상 필요하지 않은 공간을 확보하게 되고, Survivor 영역에 있던 데이터를 복사 할 수 있게 된다.&lt;/p&gt;
+&lt;p&gt;Minor GC와 마찬가지로 Full GC 중에도 애플리케이션은 중지된다. 그리고 Old 영역에 들어가 있는 만큼 정지되는 시간도 길어지게 때문에 메모리는 최대한 Young 영역에서 해제되도록 하여 Full GC 발생을 최소화 하는 것이 중요하다.&lt;/p&gt;
+&lt;h3 id=&#34;gc-사이클-정리&#34;&gt;GC 사이클 정리&lt;/h3&gt;
+&lt;p&gt;GC 사이클 정리하자면 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eden 영역이 가득 차면 Minor GC가 발생한다.&lt;/li&gt;
+&lt;li&gt;Minor GC에 의해 Young 영역을 해제하고, 조건을 만족하면 올드로 승격된다.&lt;/li&gt;
+&lt;li&gt;Old 영역이 가득 차면 Full GC가 발생한다.&lt;/li&gt;
+&lt;li&gt;Full GC로 Old 영역을 해제하고 승격할 수 있는 공간 확보한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;automatic-garbage-collection&#34;&gt;Automatic Garbage Collection&lt;/h2&gt;
+&lt;p&gt;가비지 컬렉션의 과정에 대해 알아 보자.&lt;/p&gt;
+&lt;p&gt;Automatic Garbage Collection은 힙 메모리에서 어떤 객체가 사용 중이고 어떤 객체가 그렇지 않은지 알아내고, 사용되지 않는 객체를 제거하는 과정이다. 사용 중이거나 참조되는 객체는 프로그램의 어느 부분에서 여전히 그 객체에 대한 포인터를 유지하고 있다는 뜻이다.&lt;/p&gt;
+&lt;p&gt;C언어와 같은 프로그밍 언어에서는 메모리를 수동으로 할당허간 해제해야 하지만, Java에서는 Garbage Collector에 의해 자동으로 메모리가 해제된다. Automatic GC의 기본적인 과정에 대해 알아보자.&lt;/p&gt;
+&lt;h3 id=&#34;step-1-marking&#34;&gt;Step 1: Marking&lt;/h3&gt;
+&lt;p&gt;Marking은 메모리를 조각 단위로 식별하는 과정이다.&lt;/p&gt;
+&lt;p&gt;가비지 컬렉터는 메모리에서 참조 되고 있는 객체(rechable/live object)를 확인 하고, 참조되지 않는 객체(unrechable object)가 무엇인지 마킹하는 절차를 진행한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_step1.png&#34; alt=&#34;Step 1: Marking&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참조되는 객체들은 파란색이고, 나머지는 주황색으로 나타냈다. 모든 객체는 마킹 과정에서 결정을 위해 스캔된다. 이 과정은 시스템에서의 모든 객체를 스캔해야 하기 때문에 시간이 많이 소요된다.&lt;/p&gt;
+&lt;h3 id=&#34;step-2-normal-deletion&#34;&gt;Step 2: Normal Deletion&lt;/h3&gt;
+&lt;p&gt;Normal Deletion은 참조되지 않는 객체들를 삭제하는 과정이다.&lt;/p&gt;
+&lt;p&gt;가비지 컬렉터는 참조되지 않는 객체(unrechable object)를 삭제한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_step2.png&#34; alt=&#34;Step 2: Normal Deletion&#34;&gt;&lt;/p&gt;
+&lt;p&gt;참조되지 않는 객체를 삭제하고, 참조되는 객체와 free space에 대한 포인터 지점를 남긴다. Memory allocator에서 새로 할당될 객체를 위해 free space에 대한 참조를 가지고 있는다.&lt;/p&gt;
+&lt;h3 id=&#34;step-2a-deletion-with-compacting&#34;&gt;Step 2a: Deletion with Compacting&lt;/h3&gt;
+&lt;p&gt;Deletion의 퍼포먼스를 향상시키기 위해서 사참조되지 않는 객체들을 삭제하는 것 외에도 남은 공간들을 압축하는 과정이다.&lt;/p&gt;
+&lt;p&gt;가비지 컬렉터중 일부는 memory를 더욱 효과적으로 사용하기 위해 참조되지 않는 객체(unrechable object)를 삭제함과 동시에 압축을 진행하기도 한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_step3.png&#34; alt=&#34;Step 2a: Deletion with Compacting&#34;&gt;&lt;/p&gt;
+&lt;p&gt;객체를 한 곳에 모아둠으로써 새로운 메모리 할당을 더 쉽고 빠르게 할 수 있다. Memory Allocator는 free space의 시작 주소만 가지고 있으면 된다. 그 후 새로운 객체를 순차적으로 할당한다.&lt;/p&gt;
+&lt;p&gt;출처 :&lt;a href=&#34;https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Oracle 공식 문서 : Java Garbage Collection Basics&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;gc-알고리즘&#34;&gt;GC 알고리즘&lt;/h2&gt;
+&lt;p&gt;GC 알고리즘은 여러가지가 있는데, 대표적으로 아래 4가지에 대해서 일아 보겠다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Serial GC&lt;/li&gt;
+&lt;li&gt;Parallel GC&lt;/li&gt;
+&lt;li&gt;CMS (Concurrent Mark &amp;amp; Sweep) GC&lt;/li&gt;
+&lt;li&gt;가비지 퍼스트 GC(G1GC)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;GC 알고리즘은 공간(throughput, 처리량)과 응답 시간(Responsiveness: 민감도)을 고려하려 구분된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;어플리케이션 정지형
+&lt;ul&gt;
+&lt;li&gt;Serial GC, Parallel GC&lt;/li&gt;
+&lt;li&gt;싱글 코어, 멀티 코어의 기본 GC&lt;/li&gt;
+&lt;li&gt;처리량 중시 하지만 GC에서 멈추는 시간이 길어지기 때문에 응답 시간의 요건을 충족하지 못할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;응용 프로그램과 병렬로 동시 처리 유형
+&lt;ul&gt;
+&lt;li&gt;CMS, G1GC&lt;/li&gt;
+&lt;li&gt;멀티 코어 환경에서 병렬 GC는 응답 시간 요구 사항을 충족하지 못할 때 선택&lt;/li&gt;
+&lt;li&gt;처리량이 떨어질 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;GC를 두 단계로 나누고 최대 애플리케이션 정지를 억제하는 방법이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;애플리케이션과 동시에 GC를 실행하는 단계&lt;/li&gt;
+&lt;li&gt;애플리케이션을 중지하고 GC를 실행하는 단계&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;serial-gc&#34;&gt;Serial GC&lt;/h3&gt;
+&lt;p&gt;Serial GC는 &amp;lsquo;Serial&amp;rsquo;이란 단어로 알 수 있듯이 ‘순차적인’ GC 방식이다.&lt;br&gt;
+Java SE5, 6에서의 기본 가비지 컬렉트이었고, 주로 32비트 JVM에서 돌아가는 싱글 스레드로 돌아간다.&lt;br&gt;
+싱글 스레드로 마크＆스윕과 콤팩션(Mark-Sweep-Compaction)을 실행된다.&lt;br&gt;
+싱글 코어 환경에서 이용되었다.&lt;/p&gt;
+&lt;p&gt;아래 이미지에서 알 수 있듯이 GC Thread가 싱글 스레드로 GC를 수행하기 때문에 수행 시간이 길다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_1_serial.png&#34; alt=&#34;Serial GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;즉, GC Thread가 실행 중에 Stop-the-Wold(Pause)가 발생 시간이 길다는 것을 뜻한다.&lt;/p&gt;
+&lt;p&gt;Serial GC 관련 옵션은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-XX:+UseSerialGC&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
+&lt;h4 class=&#34;alert-heading&#34;&gt;Mark-Sweep-Compaction&lt;/h4&gt;
+
+    &lt;p&gt;마크＆스윕과 콤팩션(Mark-Sweep-Compaction)이란 서로 다른 다양한 GC에서 사용되는 알고리즘이다. 기본적인 GC 과정이라고 생각하면 좋을 것이다.&lt;/p&gt;
+&lt;p&gt;GC가 사용되지 않는 객체를 메모리에서 제거하는 과정인만큼, GC 대상객체를 식별하고 제거하며 객체가 제거되어 파편화된 메모리 영역을 앞에서부터 채워나가는 작업을 수행하게 된다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사용되지 않는 객체를 식별하는 작업 (Mark)&lt;/li&gt;
+&lt;li&gt;사용되지 않는 객체를 제거하는 작업 (Sweep)&lt;/li&gt;
+&lt;li&gt;파편화된 메모리 영역을 앞에서부터 채워나가는 작업 (Compaction)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Compaction 작업의 경우는 Windows의 디스크 조각 모음을 생각하면 이해하기 쉬울 것이다.&lt;/p&gt;
+
+
+&lt;/div&gt;
+
+&lt;h3 id=&#34;parallel-gc&#34;&gt;Parallel GC&lt;/h3&gt;
+&lt;p&gt;Parallel GC는 Serial GC와 동일한 원리로 동작하지만 Young 영역의 GC과정을 멀티 스레드로 수행한 다는 점이 차이가 있다.&lt;br&gt;
+그래서 GC Thread 수행이 Serial GC보다는 비교적 수행 시간이 짧고, Stop-the-Wold(Pause)이 짧게 발생한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_2_parallel.png&#34; alt=&#34;Parallel GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;스레드의 수를 지정하고, 여러 스레드를 동시에 이용해 GC를 수행하는 방법으로 빠르게 동작한다.&lt;br&gt;
+멀티 코어 환경에서는 디폴트이며, 멀티스레드로 마크＆스윕과 콤팩션을 실시한다.&lt;/p&gt;
+&lt;p&gt;Low-pause 방식과 Throughput 방식이 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Low-pause : GC를 빠르게 수행하기보다 순간적으로 애플리케이션의 동작이 중단되는 현상(pause)을 최소화하는데 초점을 맞춘 방식이다.&lt;/li&gt;
+&lt;li&gt;Throughput : Minor GC의 신속한 수행에 초점을 맞춘 방식으로 Full GC에서는 오직 Mark &amp;amp; Compact 알고리즘만 사용한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Parallel GC 관련 옵션은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-XX:+UseParallelGC&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;이 CLI 옵션을 사용하면 멀티 스레드 young generation collector와 싱클 스레드의 old generation collector를 사용할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-XX:ParallelGCThreads=&amp;lt;desired number&amp;gt;&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;기본적으로 N 개의 CPU를 사용하는 호스트에서는 parallel GC가 N개의 gc 스레드를 사용한다. 그리고 사용 스레드는 CLI로 컨트롤할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;parallel-old-gcparallel-compacting-gc&#34;&gt;Parallel Old GC(Parallel Compacting GC)&lt;/h4&gt;
+&lt;p&gt;Parallel Old GC는 Java 5 update 6부터 제공한 GC 방식이다. 앞서 설명한 Parallel GC와 비교하여 Old 영역의 GC 알고리즘만 다르다. 이 방식은 Mark-Summary-Compaction 단계를 거친다.&lt;br&gt;
+Summary 단계는 앞서 GC를 수행한 영역에 대해서 별도로 살아 있는 객체를 식별한다는 점에서 Mark-Sweep-Compaction 알고리즘의 Sweep 단계와 다르며, 약간 더 복잡한 단계를 거친다.&lt;/p&gt;
+&lt;p&gt;Parallel Old GC 관련 옵션은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-XX:+UseParallelOldGC&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;이 CLI 옵션을 사용하면 young generation과 old generation 모두에서 멀티 스레드 collector를 사용할 수 있다. 게다가 compacting collector도 멀티 스레드로 동작한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;cms-concurrent-mark--sweep-동시성-마크--스윕-gc&#34;&gt;CMS (Concurrent Mark &amp;amp; Sweep, 동시성 마크 &amp;amp; 스윕) GC&lt;/h3&gt;
+&lt;p&gt;CMS GC는 GC 작업을 어플리케이션의 스레드들과 동시에 수행하여, GC로 인한 어플리케이션 정지(stop-the-world)를 최소화 하는 것을 목표로 한다.
+단 Compacting 수행하지 않아서 memory를 더 많이 차지하게 된다.&lt;/p&gt;
+&lt;p&gt;쓰레드간에 협조 처리 등에 CPU 리소스를 사용하기 때문에, 어플리케이션의 처리량(throughput) 저하가 예상되지만, 어플리케이션 전체의 정지 시간이 짧아진다. 그 결과 GC가 응답 시간에 미치는 영향이 작아진다.&lt;/p&gt;
+&lt;p&gt;CPU 사용률이 높은 경우 성능이 떨어지는 경우가 있는데, 그 때는 Parallel GC를 사용한다.&lt;br&gt;
+단점으로는 CPU 리소스를 많이 사용하고 메모리 파편화가 발생할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_3_cms.png&#34; alt=&#34;CMS GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Initial Mark 단계에서 참조 상태인 객체를 짧은 시간에 Marking 후, 올스탑 없이 Concurrent Mark 단계에서 참조상태 객체를 확인한다.&lt;br&gt;
+Remark 단계에서 변경되거나 추가된 객체를 확인한다. Concurrent Sweep 단계에서 참조 되지 않는 객체를 정리한다.&lt;/p&gt;
+&lt;p&gt;CMS GC 관련 옵션은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-XX:+UseConcMarkSweepGC&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;g1garbage-first-gc&#34;&gt;G1(Garbage First) GC&lt;/h3&gt;
+&lt;p&gt;G1 GC는 CMS를 대체하기 위해 만들어졌다. 기존 Young, Old 이라는 영역으로 나누어 지지않았고, 힙을 &amp;ldquo;리전(Region)&amp;rdquo; 이라고 불리는 작은 영역으로 나누어 관리한다. 하나 이상의 Resion 에서 객체를 복사해 다른 Resion으로 이동 시키는 방식이다. CMS과 다르게 Compaction 단계를 통해 메모리 단편화를 없앴다. Java 7에서 정식으로 추가되었다.&lt;/p&gt;
+&lt;p&gt;여러 CPU와 아주 큰 memory에서 효과적인 GC를 활용하기 위함이다. Oracle 문서에 따르면 heap size가 6GB보다 클 경우, GC의 지연 시간(latency)을 &lt;code&gt;0.5sec&lt;/code&gt; 이하로 낮출수 있다고 한다. Oracle G1 GC문서에 의하면 Java9에서는 default GC로 설정되어 있다. (이전까지는 Parallel GC가 default)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_gc_4_g1.png&#34; alt=&#34;G1 GC&#34;&gt;&lt;/p&gt;
+&lt;p&gt;G1 GC는 Garbage만 있는 Region을 처음에 수거하기 때문에 Garbage First라는 이름이 붙여 졌다.&lt;/p&gt;
+&lt;p&gt;G1 GC 관련 옵션은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-XX:+UseG1GC&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;gc의-역사&#34;&gt;GC의 역사&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Java6 이전
+&lt;ul&gt;
+&lt;li&gt;Serial GC, Parallel GC, CMS GC&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Java 8
+&lt;ul&gt;
+&lt;li&gt;Serial GC, Parallel GC가 기본값&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Java 7
+&lt;ul&gt;
+&lt;li&gt;G1 GC가 추가&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Java 9
+&lt;ul&gt;
+&lt;li&gt;G1 GC이 기본값&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://openjdk.java.net/groups/hotspot/docs/StorageManagement.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Open JDK 문서&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://qiita.com/e_tyubo/items/48398391a8ef0f24c1be&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JavaのGCの仕組みを整理する&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://d2.naver.com/helloworld/1329&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Java Garbage Collection&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.programmersought.com/article/4905216600/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Garbage Collection Algorithm and JVM Memory Management&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://mirinae312.github.io/develop/2018/06/04/jvm_gc.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Java 의 GC는 어떻게 동작하나?&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://d2.naver.com/helloworld/1329&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Java Garbage Collection&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://imp51.tistory.com/entry/G1-GC-Garbage-First-Garbage-Collector-Tuning&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JVM 튜닝&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.oracle.com/technetwork/tutorials/tutorials-1876574.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Getting Started with the G1 Garbage Collector&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Java Garbage Collection Basics&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Java</category>
+      
+      <category>JVM</category>
+      
+      <category>Garbage collection</category>
+      
+    </item>
+    
+  </channel>
+</rss>

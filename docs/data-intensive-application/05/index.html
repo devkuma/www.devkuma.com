@@ -1,0 +1,1832 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="ko" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.115.2">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>데이터 중심 애플리케이션 설계 | 05장. 복제 | devkuma</title>
+<meta name="description" content="발표자 : 이호준, 조성직
+Part 2. 분산 데이터 1부에서는 단일 장비에서 데이터를 저장할 때 적용하는 데이터 시스템 측면을 살펴보았다.
+2부에서는 여러 장비가 관여하는 경우에 대해서 다룬다.
+그런데 여러 장비가 관여해야 하는 이유는 무엇일까? 그 이유는 다음과 같다.
+확장성
+데이터 볼륨, 읽기/쓰기 부하가 단일 장비에서 다룰 수 있는 양보다 커지는 경우 부하를 여러 장비로 분산한다.
+확장성(Scalability) : 시스템이 특정한 요구사항을(요구 처리량의 변화와 같은) 충족하기 위해 애플리케이션의 상당 부분을 변경하지 않고도 하드웨어 수준의 변경(추가/감소, 업그레이드/다운그레이드) 등을 통해 시스템을 확장 또는 축소할 수 있는 능력 또는 그 정도를 의미함">
+<meta property="og:title" content="데이터 중심 애플리케이션 설계 | 05장. 복제" />
+<meta property="og:description" content="발표자 : 이호준, 조성직
+Part 2. 분산 데이터 1부에서는 단일 장비에서 데이터를 저장할 때 적용하는 데이터 시스템 측면을 살펴보았다.
+2부에서는 여러 장비가 관여하는 경우에 대해서 다룬다.
+그런데 여러 장비가 관여해야 하는 이유는 무엇일까? 그 이유는 다음과 같다.
+확장성
+데이터 볼륨, 읽기/쓰기 부하가 단일 장비에서 다룰 수 있는 양보다 커지는 경우 부하를 여러 장비로 분산한다.
+확장성(Scalability) : 시스템이 특정한 요구사항을(요구 처리량의 변화와 같은) 충족하기 위해 애플리케이션의 상당 부분을 변경하지 않고도 하드웨어 수준의 변경(추가/감소, 업그레이드/다운그레이드) 등을 통해 시스템을 확장 또는 축소할 수 있는 능력 또는 그 정도를 의미함" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.devkuma.com/docs/data-intensive-application/05/" /><meta property="article:section" content="210_Data-Science_BigData" />
+<meta property="article:published_time" content="2022-02-17T00:00:00+09:00" />
+<meta property="article:modified_time" content="2022-02-17T00:00:00+09:00" />
+<meta itemprop="name" content="데이터 중심 애플리케이션 설계 | 05장. 복제">
+<meta itemprop="description" content="발표자 : 이호준, 조성직
+Part 2. 분산 데이터 1부에서는 단일 장비에서 데이터를 저장할 때 적용하는 데이터 시스템 측면을 살펴보았다.
+2부에서는 여러 장비가 관여하는 경우에 대해서 다룬다.
+그런데 여러 장비가 관여해야 하는 이유는 무엇일까? 그 이유는 다음과 같다.
+확장성
+데이터 볼륨, 읽기/쓰기 부하가 단일 장비에서 다룰 수 있는 양보다 커지는 경우 부하를 여러 장비로 분산한다.
+확장성(Scalability) : 시스템이 특정한 요구사항을(요구 처리량의 변화와 같은) 충족하기 위해 애플리케이션의 상당 부분을 변경하지 않고도 하드웨어 수준의 변경(추가/감소, 업그레이드/다운그레이드) 등을 통해 시스템을 확장 또는 축소할 수 있는 능력 또는 그 정도를 의미함"><meta itemprop="datePublished" content="2022-02-17T00:00:00+09:00" />
+<meta itemprop="dateModified" content="2022-02-17T00:00:00+09:00" />
+<meta itemprop="wordCount" content="4249">
+<meta itemprop="keywords" content="Database,NoSQL,Data,RDB," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="데이터 중심 애플리케이션 설계 | 05장. 복제"/>
+<meta name="twitter:description" content="발표자 : 이호준, 조성직
+Part 2. 분산 데이터 1부에서는 단일 장비에서 데이터를 저장할 때 적용하는 데이터 시스템 측면을 살펴보았다.
+2부에서는 여러 장비가 관여하는 경우에 대해서 다룬다.
+그런데 여러 장비가 관여해야 하는 이유는 무엇일까? 그 이유는 다음과 같다.
+확장성
+데이터 볼륨, 읽기/쓰기 부하가 단일 장비에서 다룰 수 있는 양보다 커지는 경우 부하를 여러 장비로 분산한다.
+확장성(Scalability) : 시스템이 특정한 요구사항을(요구 처리량의 변화와 같은) 충족하기 위해 애플리케이션의 상당 부분을 변경하지 않고도 하드웨어 수준의 변경(추가/감소, 업그레이드/다운그레이드) 등을 통해 시스템을 확장 또는 축소할 수 있는 능력 또는 그 정도를 의미함"/>
+
+
+
+
+<link rel="preload" href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" as="style">
+<link href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/docs/data-intensive-application/05/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-FW3TZ3QLYR');
+}
+</script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+<a class="navbar-brand" href="/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none"><path d="M775 4993c-268-38-509-215-618-453-71-155-67-24-67-1986 0-1958-5-1818 65-1971 43-94 86-155 162-230 117-115 283-198 448-223 48-7 618-10 1840-8l1770 3 75 23c231 70 408 216 505 417 81 168 75 7 75 1995 0 1969 5 1824-67 1980-96 211-277 360-528 436-57 18-150 19-1845 20-982 1-1798-1-1815-3zm543-584c53-11 123-30 154-44 144-61 319-213 379-328 19-36 22-37 57-31 20 4 44 10 52 14 20 10 119 30 250 50 228 35 454 36 695 4 91-12 256-47 299-63 16-7 29-10 30-9 1 2 18 28 38 58 115 178 309 304 533 348 39 8 272 8 310 0 103-21 141-34 233-80 157-77 285-206 357-356 54-113 72-195 73-329 1-103-5-142-44-273-25-87-148-259-223-315-40-29-50-51-32-71 5-5 21-38 36-74 61-145 96-253 110-340 3-19 11-60 17-90 13-62 17-434 5-520-16-123-37-209-76-325-56-165-174-395-246-477-11-13-35-43-54-68-44-58-254-267-306-305-22-17-42-32-45-35-18-18-235-161-275-181-16-9-54-28-83-44-29-15-55-26-57-23-2 2 6 16 18 30 12 15 30 35 39 47 37 44 109 161 134 217 42 92 69 194 81 304 46 396-119 758-455 996-261 186-532 256-862 225-205-19-372-77-540-185-142-92-289-241-378-382-110-175-166-481-127-699 37-203 125-383 260-533 31-34 51-62 44-62-22 0-198 89-304 153-55 34-140 93-190 131-92 70-307 279-360 350-17 22-39 51-50 65-19 25-38 52-97 146-66 106-175 374-191 472-3 16-8 39-11 53-40 177-41 522-2 725 3 17 8 44 11 60 16 86 81 266 130 359 15 27 14 30-7 44-77 53-208 204-252 291-97 188-96 485 2 677 33 66 129 191 183 238 192 171 465 239 737 185zm1414-2174c55-12 137-48 168-72 62-48 81-69 1e2-108 36-74 28-162-19-224-31-42-138-121-162-121-10 0-20-4-23-9-23-36-255-49-366-20-283 72-386 274-224 436 55 55 149 107 215 118 19 3 35 8 37 9 9 10 225 3 274-9z"/><path d="M3885 4013c-85-13-182-63-243-126l-33-34 40-26c22-15 43-27 45-27 9 0 225-150 252-175 6-5 36-30 65-55 66-55 172-159 222-219 23-26 42-41 51-38 23 9 91 108 112 162 13 35 19 76 18 135 0 76-3 92-34 155-57 119-168 210-289 238-58 14-152 18-206 10z"/><path d="M985 3976c-92-29-162-80-221-161-62-86-79-149-72-275 6-98 31-158 1e2-234l37-41 48 55c154 179 350 348 548 472 28 18 52 33 54 35 9 6-64 75-105 99-77 45-145 62-251 62-54 0-116-6-138-12z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+<div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+	<ul class="navbar-nav">
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-keyboard'></i><span>Programming</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/design/" >Design and Development</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/jvm/" >JVM Based Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/spring/" >Spring framework</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/web/" >Web Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/etc/" >그밖에 Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/tools/" >Programming Tools</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-database'></i><span>Data Science</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/big-data/" >Big Data</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/rdb/" >Relational Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/nosql/" >NoSQL Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/graph-db/" >Graph Databse</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-desktop'></i><span>Computer</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/computer/basic/" >컴퓨터 기본 지식</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/operating-system/" >Operating System</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/network/" >Network</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+		</li>
+		
+		</ul>
+</div>
+<div class="d-none d-lg-block">
+	<div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+</div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-docsdata-intensive-application05").addClass("active"); 
+    $("#td-section-nav #m-docsdata-intensive-application05-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docsdata-intensive-application05").parents("li").addClass("active-path"); 
+    $("#td-section-nav li.active-path").addClass("show"); 
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-docsdata-intensive-application05-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docsdata-intensive-application05-li").children("ul").children("li").addClass("show");  
+    $("#td-sidebar-menu").toggleClass("d-none"); 
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="collapse td-sidebar-nav foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docscategorydata-sciencebig-data-li">
+  <a href="/docs/category/data-science/big-data/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-docscategorydata-sciencebig-data"><span class="">Big Data</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsbig-data-li">
+  <input type="checkbox" id="m-docsbig-data-check"/>
+  <label for="m-docsbig-data-check"><a href="/docs/big-data/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsbig-data"><span class="">Big Data</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-dataterm-li">
+  <input type="checkbox" id="m-docsbig-dataterm-check"/>
+  <label for="m-docsbig-dataterm-check"><a href="/docs/big-data/term/" title="빅데이터 분석 기반이란? 데이터 파이프라인 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-dataterm"><span class="">빅데이터, 파이프라인 구축</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmqttintro-li">
+  <input type="checkbox" id="m-docsmqttintro-check"/>
+  <label for="m-docsmqttintro-check"><a href="/docs/mqtt/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmqttintro"><span class="">MQTT</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-datastream-processing-li">
+  <input type="checkbox" id="m-docsbig-datastream-processing-check"/>
+  <label for="m-docsbig-datastream-processing-check"><a href="/docs/big-data/stream-processing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-datastream-processing"><span class="">스트림 처리란? OSS 엔진 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-hadoop-li">
+  <input type="checkbox" id="m-docsapache-hadoop-check"/>
+  <label for="m-docsapache-hadoop-check"><a href="/docs/apache-hadoop/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-hadoop"><span class="">Apache Hadoop</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-spark-li">
+  <input type="checkbox" id="m-docsapache-spark-check"/>
+  <label for="m-docsapache-spark-check"><a href="/docs/apache-spark/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-spark"><span class="">Apache Spark</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docspyspark-li">
+  <input type="checkbox" id="m-docspyspark-check"/>
+  <label for="m-docspyspark-check"><a href="/docs/pyspark/" title="PySpark 개념 및 주요 기능" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docspyspark"><span class="">PySpark</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsdata-intensive-application-li">
+  <input type="checkbox" id="m-docsdata-intensive-application-check"/>
+  <label for="m-docsdata-intensive-application-check"><a href="/docs/data-intensive-application/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsdata-intensive-application"><span class="">데이터 중심 애플리케이션 설계</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application02-li">
+  <input type="checkbox" id="m-docsdata-intensive-application02-check"/>
+  <label for="m-docsdata-intensive-application02-check"><a href="/docs/data-intensive-application/02/" title="데이터 중심 애플리케이션 설계 | 02장. 데이터 모델과 질의 언어" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application02"><span class="">02장. 데이터 모델과 질의 언어</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application03-li">
+  <input type="checkbox" id="m-docsdata-intensive-application03-check"/>
+  <label for="m-docsdata-intensive-application03-check"><a href="/docs/data-intensive-application/03/" title="데이터 중심 애플리케이션 설계 | 03장. 저장소와 검색" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application03"><span class="">03장. 저장소와 검색</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application04-li">
+  <input type="checkbox" id="m-docsdata-intensive-application04-check"/>
+  <label for="m-docsdata-intensive-application04-check"><a href="/docs/data-intensive-application/04/" title="데이터 중심 애플리케이션 설계 | 04장. 부호화 발전" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application04"><span class="">04장. 부호화 발전</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application05-li">
+  <input type="checkbox" id="m-docsdata-intensive-application05-check"/>
+  <label for="m-docsdata-intensive-application05-check"><a href="/docs/data-intensive-application/05/" title="데이터 중심 애플리케이션 설계 | 05장. 복제" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application05"><span class="">05장. 복제</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application06-li">
+  <input type="checkbox" id="m-docsdata-intensive-application06-check"/>
+  <label for="m-docsdata-intensive-application06-check"><a href="/docs/data-intensive-application/06/" title="데이터 중심 애플리케이션 설계 | 06장. 파티셔닝" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application06"><span class="">06장. 파티셔닝</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application7-li">
+  <input type="checkbox" id="m-docsdata-intensive-application7-check"/>
+  <label for="m-docsdata-intensive-application7-check"><a href="/docs/data-intensive-application/7/" title="데이터 중심 애플리케이션 설계 | 07장. 트랜잭션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application7"><span class="">07장. 트랜잭션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application8-li">
+  <input type="checkbox" id="m-docsdata-intensive-application8-check"/>
+  <label for="m-docsdata-intensive-application8-check"><a href="/docs/data-intensive-application/8/" title="데이터 중심 애플리케이션 설계 | 08장. 분산 시스템의 골치거리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application8"><span class="">08장. 분산 시스템의 골치거리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application9-li">
+  <input type="checkbox" id="m-docsdata-intensive-application9-check"/>
+  <label for="m-docsdata-intensive-application9-check"><a href="/docs/data-intensive-application/9/" title="데이터 중심 애플리케이션 설계 | 09장. 일관성과 합의" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application9"><span class="">09장. 일관성과 합의</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application10-li">
+  <input type="checkbox" id="m-docsdata-intensive-application10-check"/>
+  <label for="m-docsdata-intensive-application10-check"><a href="/docs/data-intensive-application/10/" title="데이터 중심 애플리케이션 설계 | 10장. 일괄 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application10"><span class="">10장. 일괄 처리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application11-li">
+  <input type="checkbox" id="m-docsdata-intensive-application11-check"/>
+  <label for="m-docsdata-intensive-application11-check"><a href="/docs/data-intensive-application/11/" title="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application11"><span class="">11장. 스트림 처리</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-kafka-li">
+  <input type="checkbox" id="m-docsapache-kafka-check"/>
+  <label for="m-docsapache-kafka-check"><a href="/docs/apache-kafka/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-kafka"><span class="">Apache Kafka</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaintro-li">
+  <input type="checkbox" id="m-docsapache-kafkaintro-check"/>
+  <label for="m-docsapache-kafkaintro-check"><a href="/docs/apache-kafka/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaintro"><span class="">Apache Kafka 개념 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkainstall-li">
+  <input type="checkbox" id="m-docsapache-kafkainstall-check"/>
+  <label for="m-docsapache-kafkainstall-check"><a href="/docs/apache-kafka/install/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkainstall"><span class="">Apache Kafka 설치 및 확인</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaclient-li">
+  <input type="checkbox" id="m-docsapache-kafkaclient-check"/>
+  <label for="m-docsapache-kafkaclient-check"><a href="/docs/apache-kafka/client/" title="Java로 간단한 Apache Kafka Producer/Consumer 클라이언트 만들기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaclient"><span class="">Producer/Consumer 클라이언트</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkawhat-li">
+  <input type="checkbox" id="m-docsapache-kafkawhat-check"/>
+  <label for="m-docsapache-kafkawhat-check"><a href="/docs/apache-kafka/what/" title="Kafka 상세 개념 | 원래 Kafka란?" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkawhat"><span class="">Kafka 상세 개념</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkastrems-li">
+  <input type="checkbox" id="m-docsapache-kafkastrems-check"/>
+  <label for="m-docsapache-kafkastrems-check"><a href="/docs/apache-kafka/strems/" title="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkastrems"><span class="">Kafka Streams</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-phoenix-li">
+  <input type="checkbox" id="m-docsapache-phoenix-check"/>
+  <label for="m-docsapache-phoenix-check"><a href="/docs/apache-phoenix/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-phoenix"><span class="">Apache Phoenix</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-zookeeper-li">
+  <input type="checkbox" id="m-docsapache-zookeeper-check"/>
+  <label for="m-docsapache-zookeeper-check"><a href="/docs/apache-zookeeper/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-zookeeper"><span class="">Apache ZooKeeper</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperoverview-li">
+  <input type="checkbox" id="m-docsapache-zookeeperoverview-check"/>
+  <label for="m-docsapache-zookeeperoverview-check"><a href="/docs/apache-zookeeper/overview/" title="ZooKeeper 오픈 소스의 운용 관리·운용 자동화" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperoverview"><span class="">ZooKeeper 개요</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperinstall-li">
+  <input type="checkbox" id="m-docsapache-zookeeperinstall-check"/>
+  <label for="m-docsapache-zookeeperinstall-check"><a href="/docs/apache-zookeeper/install/" title="ZooKeeper 설치 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperinstall"><span class="">ZooKeeper 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperdocker-install-li">
+  <input type="checkbox" id="m-docsapache-zookeeperdocker-install-check"/>
+  <label for="m-docsapache-zookeeperdocker-install-check"><a href="/docs/apache-zookeeper/docker-install/" title="ZooKeeper Docker로 설치하여 개발환경으로 구축하기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperdocker-install"><span class="">ZooKeeper Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperjava-api-li">
+  <input type="checkbox" id="m-docsapache-zookeeperjava-api-check"/>
+  <label for="m-docsapache-zookeeperjava-api-check"><a href="/docs/apache-zookeeper/java-api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperjava-api"><span class="">ZooKeeper API</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidb-li">
+  <input type="checkbox" id="m-docstidb-check"/>
+  <label for="m-docstidb-check"><a href="/docs/tidb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidb"><span class="">TiDB</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbabout-li">
+  <input type="checkbox" id="m-docstidbabout-check"/>
+  <label for="m-docstidbabout-check"><a href="/docs/tidb/about/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbabout"><span class="">TiDB에 대해서</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboverview-li">
+  <input type="checkbox" id="m-docstidboverview-check"/>
+  <label for="m-docstidboverview-check"><a href="/docs/tidb/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboverview"><span class="">TiDB 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexperimental-features-li">
+  <input type="checkbox" id="m-docstidbexperimental-features-check"/>
+  <label for="m-docstidbexperimental-features-check"><a href="/docs/tidb/experimental-features/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexperimental-features"><span class="">TiDB의 실험 기능</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbmysql-compatibility-li">
+  <input type="checkbox" id="m-docstidbmysql-compatibility-check"/>
+  <label for="m-docstidbmysql-compatibility-check"><a href="/docs/tidb/mysql-compatibility/" title="TiDB - MySQL과의 호환성" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbmysql-compatibility"><span class="">MySQL 호환성</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbtidb-limitations-li">
+  <input type="checkbox" id="m-docstidbtidb-limitations-check"/>
+  <label for="m-docstidbtidb-limitations-check"><a href="/docs/tidb/tidb-limitations/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbtidb-limitations"><span class="">TiDB 제한 사항</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbtutorial-li">
+  <input type="checkbox" id="m-docstidbtutorial-check"/>
+  <label for="m-docstidbtutorial-check"><a href="/docs/tidb/tutorial/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbtutorial"><span class="">TiDB 설치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbhardware-and-software-requirements-li">
+  <input type="checkbox" id="m-docstidbhardware-and-software-requirements-check"/>
+  <label for="m-docstidbhardware-and-software-requirements-check"><a href="/docs/tidb/hardware-and-software-requirements/" title="TiDB 소프트웨어 및 하드웨어 권장 사항" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbhardware-and-software-requirements"><span class="">소프트웨어 및 하드웨어 권장 사항</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalltiup-li">
+  <input type="checkbox" id="m-docstidbinstalltiup-check"/>
+  <label for="m-docstidbinstalltiup-check"><a href="/docs/tidb/install/tiup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalltiup"><span class="">TiUP 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalllinux-li">
+  <input type="checkbox" id="m-docstidbinstalllinux-check"/>
+  <label for="m-docstidbinstalllinux-check"><a href="/docs/tidb/install/linux/" title="TiDB 로컬 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalllinux"><span class="">TiDB 로컬 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalldocker-compose-li">
+  <input type="checkbox" id="m-docstidbinstalldocker-compose-check"/>
+  <label for="m-docstidbinstalldocker-compose-check"><a href="/docs/tidb/install/docker-compose/" title="TiDB Docker 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalldocker-compose"><span class="">TiDB Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-tidb-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-tidb-check"/>
+  <label for="m-docstidbquick-start-with-tidb-check"><a href="/docs/tidb/quick-start-with-tidb/" title="TiDB 단일 컴퓨터에서 운영 환경 클러스터 배포 시뮬레이션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-tidb"><span class="">TiDB 배포 시뮬레이션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbproduction-deployment-using-tiup-li">
+  <input type="checkbox" id="m-docstidbproduction-deployment-using-tiup-check"/>
+  <label for="m-docstidbproduction-deployment-using-tiup-check"><a href="/docs/tidb/production-deployment-using-tiup/" title="TiUP를 사용하여 TiDB 클러스터 배포" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbproduction-deployment-using-tiup"><span class="">TiDB 클러스터 배포</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbquick-start-li">
+  <input type="checkbox" id="m-docstidbquick-start-check"/>
+  <label for="m-docstidbquick-start-check"><a href="/docs/tidb/quick-start/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbquick-start"><span class="">퀵 스타트</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-htap-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-htap-check"/>
+  <label for="m-docstidbquick-start-with-htap-check"><a href="/docs/tidb/quick-start-with-htap/" title="TiDB HTAP 퀵 스타트 가이드" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-htap"><span class="">HTAP 사용하기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbbasic-sql-operations-li">
+  <input type="checkbox" id="m-docstidbbasic-sql-operations-check"/>
+  <label for="m-docstidbbasic-sql-operations-check"><a href="/docs/tidb/basic-sql-operations/" title="TiDB의 SQL 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbbasic-sql-operations"><span class="">TiDB로 SQL 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexplore-htap-li">
+  <input type="checkbox" id="m-docstidbexplore-htap-check"/>
+  <label for="m-docstidbexplore-htap-check"><a href="/docs/tidb/explore-htap/" title="TiDB HTAP 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexplore-htap"><span class="">HTAP 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbimport-example-data-li">
+  <input type="checkbox" id="m-docstidbimport-example-data-check"/>
+  <label for="m-docstidbimport-example-data-check"><a href="/docs/tidb/import-example-data/" title="TiDB 샘플 데이터베이스 가져오기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbimport-example-data"><span class="">샘플 데이터베이스 가져오기</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbcluster-architecture-li">
+  <input type="checkbox" id="m-docstidbcluster-architecture-check"/>
+  <label for="m-docstidbcluster-architecture-check"><a href="/docs/tidb/cluster-architecture/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbcluster-architecture"><span class="">클러스터 아키텍처</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbarchitecture-li">
+  <input type="checkbox" id="m-docstidbarchitecture-check"/>
+  <label for="m-docstidbarchitecture-check"><a href="/docs/tidb/architecture/" title="TiDB 아키텍처 - 프로덕트 구성 이해" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbarchitecture"><span class="">아키텍처</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbstorege-li">
+  <input type="checkbox" id="m-docstidbstorege-check"/>
+  <label for="m-docstidbstorege-check"><a href="/docs/tidb/storege/" title="TiDB 스토리지" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbstorege"><span class="">스토리지</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbcomputing-li">
+  <input type="checkbox" id="m-docstidbcomputing-check"/>
+  <label for="m-docstidbcomputing-check"><a href="/docs/tidb/computing/" title="TiDB 컴퓨팅" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbcomputing"><span class="">컴퓨팅</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbscheduling-li">
+  <input type="checkbox" id="m-docstidbscheduling-check"/>
+  <label for="m-docstidbscheduling-check"><a href="/docs/tidb/scheduling/" title="TiDB 스케줄링" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbscheduling"><span class="">스케줄링</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbfailover-li">
+  <input type="checkbox" id="m-docstidbfailover-check"/>
+  <label for="m-docstidbfailover-check"><a href="/docs/tidb/failover/" title="TiDB 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbfailover"><span class="">자동 장애 조치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboperator-li">
+  <input type="checkbox" id="m-docstidboperator-check"/>
+  <label for="m-docstidboperator-check"><a href="/docs/tidb/operator/" title="TiDB Operator - 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboperator"><span class="">TiDB Operator</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsinfluxdb-li">
+  <input type="checkbox" id="m-docsinfluxdb-check"/>
+  <label for="m-docsinfluxdb-check"><a href="/docs/influxdb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsinfluxdb"><span class="">InfluxDB</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#part-2-분산-데이터">Part 2. 분산 데이터</a>
+      <ul>
+        <li><a href="#수직-확장과-수평-확장">수직 확장과 수평 확장</a></li>
+      </ul>
+    </li>
+    <li><a href="#수평-확장scale-out">수평 확장(scale out)</a></li>
+    <li><a href="#복제">복제</a></li>
+    <li><a href="#리더와-팔로워">리더와 팔로워</a>
+      <ul>
+        <li><a href="#동기식-대-비동기식-복제">동기식 대 비동기식 복제</a></li>
+        <li><a href="#새로운-팔로워-설정">새로운 팔로워 설정</a></li>
+        <li><a href="#노드-중단-처리">노드 중단 처리</a></li>
+        <li><a href="#복제-로그-구현">복제 로그 구현</a></li>
+      </ul>
+    </li>
+    <li><a href="#복제-지연-문제">복제 지연 문제</a>
+      <ul>
+        <li><a href="#자신이-쓴-내용-읽기">자신이 쓴 내용 읽기</a></li>
+        <li><a href="#단조-읽기">단조 읽기</a></li>
+        <li><a href="#일관된-순서로-읽기">일관된 순서로 읽기</a></li>
+        <li><a href="#복제-지연을-위한-해결책">복제 지연을 위한 해결책</a></li>
+      </ul>
+    </li>
+    <li><a href="#다중-리더-복제">다중 리더 복제</a>
+      <ul>
+        <li><a href="#다중-리더-복제의-사용-사례">다중 리더 복제의 사용 사례</a></li>
+        <li><a href="#쓰기-충돌-다루기">쓰기 충돌 다루기</a></li>
+        <li><a href="#다중-리더-복제-토폴로지">다중 리더 복제 토폴로지</a></li>
+      </ul>
+    </li>
+    <li><a href="#리더-없는-복제">리더 없는 복제</a>
+      <ul>
+        <li><a href="#노드가-다운됬을-때-데이터베이스에-쓰기">노드가 다운됬을 때 데이터베이스에 쓰기</a></li>
+        <li><a href="#정족수-일관성의-한계">정족수 일관성의 한계</a></li>
+        <li><a href="#느슨한-정족수와-암시된-핸드오프">느슨한 정족수와 암시된 핸드오프</a></li>
+        <li><a href="#동시-쓰기-감지">동시 쓰기 감지</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">297</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">e-Book</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gremlin/" data-taxonomy-term="gremlin"><span class="taxonomy-label">Gremlin</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">435</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">jQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">macOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/oauth/" data-taxonomy-term="oauth"><span class="taxonomy-label">OAuth</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">60</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/secure-coding-guide/" data-taxonomy-term="secure-coding-guide"><span class="taxonomy-label">Secure Coding Guide</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spock/" data-taxonomy-term="spock"><span class="taxonomy-label">Spock</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">111</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">40</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">108</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">WEB</span><span class="taxonomy-count">388</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/category/data-science/big-data/">Big Data</a></li>
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/data-intensive-application/">데이터 중심 애플리케이션 설계</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    05장. 복제</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>데이터 중심 애플리케이션 설계 | 05장. 복제</h1>
+	
+	<header class="article-meta">
+		
+		
+			
+				<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span></a></li>
+    </ul>
+</div>
+
+			
+		
+		
+	</header>
+	
+	<p><em>발표자 : 이호준, 조성직</em></p>
+<h2 id="part-2-분산-데이터">Part 2. 분산 데이터</h2>
+<p>1부에서는 단일 장비에서 데이터를 저장할 때 적용하는 데이터 시스템 측면을 살펴보았다.<br>
+2부에서는 여러 장비가 관여하는 경우에 대해서 다룬다.<br>
+그런데 여러 장비가 관여해야 하는 이유는 무엇일까? 그 이유는 다음과 같다.</p>
+<p><strong>확장성</strong><br>
+데이터 볼륨, 읽기/쓰기 부하가 단일 장비에서 다룰 수 있는 양보다 커지는 경우 부하를 여러 장비로 분산한다.</p>
+<p><em>확장성(Scalability)</em> : 시스템이 특정한 요구사항을(요구 처리량의 변화와 같은) 충족하기 위해 애플리케이션의 상당 부분을 변경하지 않고도 하드웨어 수준의 변경(추가/감소, 업그레이드/다운그레이드) 등을 통해 시스템을 확장 또는 축소할 수 있는 능력 또는 그 정도를 의미함</p>
+<p><strong>내결함성/고가용성</strong><br>
+장비 하나가 죽더라도 다른 장비가 존재하면 애플리케이션이 계속해서 동작할 수 있다.</p>
+<p><em>가용성(Availability)</em> : 서버, 네트워크와 같은 시스템이 정상적으로 사용가능한 정도</p>
+<p><img src="/docs/data-intensive-application/05_Availability.png" alt="가용성"></p>
+<p><em>고가용성(HA, High Availability)</em> : 위 가용성이 굉장히 높은 경우(&gt;= 99.9999..) 또는 이에 근접하다면 시스템이 고가용성을 지녔다고 표현한다.</p>
+<p><em>내결함성(FT, Fault Tolerance)</em> : 결함이 발생하더라도 시스템이 정상적으로 동작할 수 있는 경우 내결함성을 지녔다고 표현한다. 가용성의 관점에서 다운 타임이 0인 것을 의미.</p>
+<p><strong>지연 시간</strong>
+전 세계에 사용자가 있는 경우 사용자와 지리적으로 가까운 곳의 데이터센터에서 서비스를 제공하기 위해 전 세계 다양한 곳에 서버를 둘 필요가 있다. 이를 통해 서비스 지연 시간을 단축시킨다.</p>
+<h3 id="수직-확장과-수평-확장">수직 확장과 수평 확장</h3>
+<p><strong>수직 확장(scale up)</strong></p>
+<ul>
+<li>더 강력한 장비를 사용하는 것</li>
+<li>많은 CPU, 메모리 칩, 디스크를 하나의 운영체제로 결합한다.</li>
+<li>빠른 상호 연결로 모든 CPU가 메모리나 디스크의 모든 부분에 접근한다.</li>
+<li>공유 메모리 아키텍처
+<ul>
+<li>모든 구성 요소를 단일 장비로 다룬다.</li>
+<li>비용 대비 성능 측면에서 가성비가 좋지 않다.</li>
+<li>제한적인 내결함성 제공 : 하이엔드 장비는 핫 스왑이 가능한 구성요소가 있다.</li>
+</ul>
+</li>
+<li>공유 디스크 아키텍처
+<ul>
+<li>독립적인 CPU, RAM을 탑재한 여러 장비를 사용</li>
+<li>그러나 디스크는 공유한다.</li>
+<li>각 장비는 고속 네트워크로 연결된다.</li>
+<li>일부 데이터 웨어하우스 작업 부하에 사용된다.</li>
+<li>잠금 경합과 오버헤드 등으로 인해 확장성에 제한이 있다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="수평-확장scale-out">수평 확장(scale out)</h2>
+<ul>
+<li>노드
+<ul>
+<li>데이터베이스 소프트웨어를 수행하는 각 장비 혹은 가상 장비</li>
+<li>각 노드는 CPU, RAM, 디스크를 독립적으로 사용</li>
+<li>노드 간의 코디네이션은 네트워크를 사용하여 소프트웨어 수준에서 수행된다.</li>
+</ul>
+</li>
+<li>비공유 아키텍처
+<ul>
+<li>특별한 하드웨어를 필요로 하지 않음 → 가성비를 갖춘 시스템을 사용할 수 있다.</li>
+<li>여러 지리적인 영역에 데이터를 분산한다.
+<ul>
+<li>사용자 지연 시간을 줄일 수 있다.</li>
+<li>전체 데이터 센터의 손실을 줄일 수 있다.</li>
+</ul>
+</li>
+<li>주의할 점이 있다. → 이 장에서 다루는 이유
+<ul>
+<li>분산 시스템에서 발생하는 <strong>제약 조건</strong>과 <strong>트레이드오프</strong>가 존재</li>
+<li>부가적인 애플리케이션 복잡도를 야기</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="복제">복제</h2>
+<p><strong>복제와 필요한 이유</strong><br>
+복제란 네트워크로 연결된 여러 장비에 동일한 데이터의 복사본을 유지하는 것을 말한다.</p>
+<p>복제가 필요한 이유는 다음과 같다.</p>
+<ul>
+<li>지리적으로 사용자와 가깝게 데이터를 유지 → 지연시간을 줄인다.</li>
+<li>시스템 일부에 장애 발생해도 지속적으로 동작 → 내결함성, 고가용성 달성</li>
+<li>읽기 질의를 제공하는 장비의 수 확장 → 읽기 처리량 향상</li>
+</ul>
+<p>Q. 복제는 왜 어려운가?<br>
+A. 데이터가 변경되기 때문. 복제에서 오는 어려움은 복제된 데이터의 변경 처리와 관련이 있다.</p>
+<p><strong>복제 알고리즘</strong></p>
+<ul>
+<li>단일 리더(single-leader)</li>
+<li>다중 리더(multi-leader)</li>
+<li>리더가 없음(leaderless)</li>
+<li>각 알고리즘은 장단점이 있음</li>
+</ul>
+<hr>
+<h2 id="리더와-팔로워">리더와 팔로워</h2>
+<p><strong>복제 서버(replica)</strong>
+데이터 베이스의 복사본을 저장하는 각 노드</p>
+<p>Q. 모든 복제 서버에 모든 데이터가 있다는 사실을 어떻게 보장할까?<br>
+A. 일반적인 해결방법 : 리더 기반 복제(leader-based replication)</p>
+<p><img src="/docs/data-intensive-application/05-1.png" alt="그림 5-1"><br>
+<em>그림 5-1. 리더 기반(마스터 슬레이브) 복제</em></p>
+<p><strong>리더 기반 복제(leader-based replication)</strong></p>
+<ul>
+<li>= 마스터 슬레이브 복제(master slave replication), 능동/수동 복제(active/passive replication)</li>
+<li><strong>리더(leader)</strong>
+<ul>
+<li>= 마스터, 프라이머리(primary)</li>
+<li>클라이언트의 쓰기, 읽기 요청을 처리</li>
+<li>쓰기 기록 후 팔로워에게 이를 전달</li>
+</ul>
+</li>
+<li><strong>팔로워(follower)</strong>
+<ul>
+<li>= 읽기 복제 서버(read replica), 슬레이브, 2차(secondary), 핫 대기(hot standby)</li>
+<li>리더가 보낸 데이터 변경 로그, 변경 스트림을 전달 받아 데이터 복제본을 갱신</li>
+<li>클라이언트의 읽기 요청 만을 처리</li>
+</ul>
+</li>
+<li>RDBMS, NoSQL, 메시지 브로커 등에 사용</li>
+</ul>
+<h3 id="동기식-대-비동기식-복제">동기식 대 비동기식 복제</h3>
+<p>복제가 동기식으로 발생하는지, 비동기식으로 발생하는 지는 복제 시스템에서 중요한 세부사항이다.</p>
+<p><img src="/docs/data-intensive-application/05-2.png" alt="그림 5-2"><br>
+<em>그림 5-2. 한 팔로워는 동기식, 다른 팔로워는 비동기식인 리던 기반 복제</em></p>
+<p><strong>동기식 복제</strong></p>
+<ul>
+<li>(그림 5-2) 팔로워1의 경우</li>
+<li>리더가 팔로워의 쓰기 수신에 대한 응답을 확인하기 위해 대기한다.</li>
+<li>확인이 끝나면 사용자에게 성공을 보고 후 해당 쓰기를 보여준다.</li>
+</ul>
+<p>이 방식의 장단점은 다음과 같다.</p>
+<ul>
+<li>리더와 팔로워의 일관성(최신 데이터)을 보장한다.</li>
+<li>팔로워가 (죽거나 네트워크 등의 문제로)응답하지 않을 시 쓰기가 처리될 수 없다.
+<ul>
+<li>리더는 모든 쓰기를 차단(block)하고 팔로워가 사용가능할 때 까지 기다려야 한다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>비동기식 복제</strong></p>
+<ul>
+<li>(그림 5-2) 팔로워2의 경우</li>
+<li>리더가 팔로워의 쓰기 수신에 대한 응답을 기다리지 않는다.</li>
+<li>일관성은 떨어지지만, 사용자 응답 지연 시간이 적고 고가용성 제공</li>
+</ul>
+<p>동기식, 비동기식을 바탕으로 한 복제 구성 방식에는 다음과 같은 방식이 있다.</p>
+<p><strong>반동기식(semi-synchronous)</strong></p>
+<ul>
+<li>모든 팔로워가 동기식 복제 방식을 사용할 수는 없다. 하나의 노드만 고장나도 전체 시스템이 마비.</li>
+<li>팔로워 하나는 동기식, 나머지는 비동기 식으로 구성하는 것을 의미</li>
+<li>동기식 팔로워가 사용 불가 시 → 다른 비동기 팔로워가 동기식으로 동작</li>
+<li>적어도 두 노드(리더, 동기식 팔로워)에 데이터의 최신 복사본이 존재</li>
+</ul>
+<p><strong>완전한 비동기식</strong>
+리더 기반 복제 방식에서 일반적으로 선택</p>
+<p>이 방식의 장단점은 다음과 같다.</p>
+<ul>
+<li>리더가 잘못되고 복구 불가능한 경우 팔로워에 복제되지 않은 쓰기는 유실</li>
+<li>클라이언트가 어떤 쓰기를 확인했어도 해당 쓰기의 지속성을 보장할 수 없음</li>
+<li>모든 팔로워가 잘못되어도 리더가 쓰기 처리를 계속할 수 있다.</li>
+<li>내구성이 약하다는 단점에도 불구하고 다음과 같은 조건 하에 많이 사용된다.
+<ul>
+<li>많은 팔로워가 존재하는 경우</li>
+<li>노드가 지리적으로 분산된 경우</li>
+</ul>
+</li>
+</ul>
+<h3 id="새로운-팔로워-설정">새로운 팔로워 설정</h3>
+<p>새로운 팔로워 설정이 필요한 경우가 있다.</p>
+<ul>
+<li>복제 서버의 수를 늘려야 하는 경우</li>
+<li>장애 노드를 대체하는 경우</li>
+</ul>
+<p>Q. 새로운 팔로워의 추가 설정은 어떻게 진행해야 할까?<br>
+A1. 데이터 파일을 복사한다. <em>(X)</em></p>
+<ul>
+<li>복사하는 와중에도 클라이언트의 쓰기 요청은 계속 발생한다. 파일의 복사본은 유효하지 않은(out-of-date) 데이터를 포함한다.</li>
+</ul>
+<p>A2. 일관성을 보장하기 위해 데이터베이스를 잠가 잠시동안 쓰기를 막는다. <em>(X)</em></p>
+<ul>
+<li>고가용성 목표에 부합하지 않는다.</li>
+</ul>
+<p>A3. 다음과 같이 중단 없이 팔로워 설정을 수행한다. <em>(O)</em></p>
+<ul>
+<li>데이터베이스를 잠그지 않고 리더의 데이터베이스 스냅샷을 가져온다.</li>
+<li>스냅샷을 새로운 팔로워 노드에 복사한다.</li>
+<li>이후 팔로워는 리더에 연결해 스냅샷 이후 발생한 모든 데이터 변경 내역을 요청한다.</li>
+<li>요청한 데이터 변경 미처리분(backlog)을 모두 처리하면 팔로워가 리더를 따라잡았다고 말한다.</li>
+<li>이제 팔로워는 리더의 데이터 변경을 처리할 수 있다.</li>
+</ul>
+<h3 id="노드-중단-처리">노드 중단 처리</h3>
+<p>시스템의 모든 노드는 다음과 같은 사유로 중단될 수 있다.</p>
+<ul>
+<li>장애</li>
+<li>계획된 유지보수
+<ul>
+<li>ex. 커널 보안 패치를 위한 장비 리부팅</li>
+</ul>
+</li>
+</ul>
+<p>단일 노드는 중단 되더라도 전체 시스템은 중단되지 않고 서비스되어야 한다.<br>
+개별 노드의 장애애도 전체 시스템이 잘 동작하고 노드 중단의 영향을 최소화하는 것이 목표다.<br>
+리더 기반 복제에서 고가용성은 어떻게 달성할 수 있을까?</p>
+<p><strong>팔로워 장애: 따라잡기 복구</strong>
+팔로워에 장애가 나는 경우. → 팔로워가 리더를 따라잡음으로써 복구한다.</p>
+<ul>
+<li>팔로워는 리더로부터 수신한 데이터 변경 로그를 로컬 디스크에 보관</li>
+<li>팔로워가 죽거나, 네트워크 중단 등으로 복구하는 경우 로그를 이용하여 복구를 시작할 수 있다.
+<ul>
+<li>로그에서 마지막으로 처리된 트랜잭션을 찾는다.</li>
+<li>해당 트랜잭션 이후의 데이터 변경 내역을 리더에 요청</li>
+<li>요청한 변경 내역을 모두 적용하면 리더를 따라잡아 복구가 완료된다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>리더 장애: 장애 복구(failover)</strong>
+장애 복구 과정은 다음과 같이 진행한다.</p>
+<ul>
+<li>팔로워 중 하나를 새로운 리더로 승격</li>
+<li>클라이언트는 새로운 리더로 쓰기를 전송해야 함. → 재설정이 필요하다.</li>
+<li>다른 팔로워는 새로운 리더로부터 데이터 변경을 소비하기 시작</li>
+<li>수동 또는 자동으로 진행한다.</li>
+</ul>
+<p>수동으로 복구하는 경우 관리자가 리더의 장애 알림을 수신 후 새로운 리더를 만들기 위한 조치를 취한다.<br>
+자동으로 복구하는 경우는 이하에서 설명한다.</p>
+<p><strong>자동 장애 복구 과정</strong><br>
+자동 장애 복구는 다음과 같이 진행한다.</p>
+<ul>
+<li>리더가 장애인지 판단한다.
+<ul>
+<li>판단할 수 있는 확실한 방법은 없음 → 보통 타임아웃을 사용</li>
+<li>노드 간 메시지를 주고 받고 일정시간 응답하지 않는 노드는 죽은 것으로 간주
+<ul>
+<li>예외도 존재, 리더가 계획된 유지 보수를 위해 의도적으로 중단되는 경우</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>새로운 리더를 선택한다.
+<ul>
+<li>복제 노드들이 새로운 리더를 선출</li>
+<li>또는 제어 노드(controller node)가 새로운 리더를 임명</li>
+<li>최신 데이터 변경사항을 가진 복제 서버가 새로운 리더의 가장 적합한 후보로 지목된다.</li>
+</ul>
+</li>
+<li>새로운 리더 사용을 위해 시스템을 재설정한다.
+<ul>
+<li>클라이언트의 쓰기 요청, 팔로워의 데이터 변경 로그 재설정</li>
+<li>이전 리더가 복구되는 경우 이전 리더가 새로운 리더를 인식하고 자신은 팔로워가 된다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>자동 장애 복구 과정에서의 위험</strong><br>
+다양한 위험이 존재한다. 그래서 수동 장애 복구 방식을 선호하는 운영팀도 존재한다.</p>
+<ul>
+<li>내구성을 보장하지 않음
+<ul>
+<li>비동기식 복제 사용 시 새로운 리더는 이전 리더의 최신 쓰기 중 일부를 받지 못했을 수 있음</li>
+<li>이전 리더가 다시 클러스터에 추가되면 해당 최신 쓰기 내역은 어떻게 해야 하는가?</li>
+<li>새로운 리더가 이와 충돌하는 쓰기를 받았을 수 있음 → 해당 쓰기를 폐기하는 것이 일반적</li>
+<li>클라이언트 입장에서 내구성을 신뢰할 수 없음.</li>
+<li>쓰기를 폐기하는 방식의 경우 DB 외부의 다른 저장소 시스템에서 DB 내용에 맞춰 조정되는 경우 문제 발생</li>
+</ul>
+</li>
+<li>Github 실제 사례, MySQL과 Redis 간 데이터 불일치
+<ul>
+<li>MySQL의 팔로워가 리더로 승격. 이 팔로워가 이전 리더의 쓰기 내역을 완벽히 갱신하지 못함</li>
+<li>새로운 리더에는 없고, 이전 리더에만 존재하는 기본키를 레디스에서는 사용하고 있었음.</li>
+<li>새로운 팔로워는 이미 할당된 기본키를 재사용 → 레디스와 MySQL간의 데이터 불일치 발생</li>
+</ul>
+</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05_network-glitch.png" alt="Network Glitch"></p>
+<ul>
+<li>스플릿 브레인(Split Brain)
+<ul>
+<li>특정 결함 시나리오에서 두 노드가 자신이 리더라고 인식</li>
+<li>두 리더가 각자 쓰기 요청을 처리하기 때문에 쓰기 충돌이 발생</li>
+<li>쓰기 충돌을 해소하지 못하면 데이터가 유실 또는 오염된다.</li>
+<li>둘 이상의 리더가 감지되면 하나를 종료하는 메커니즘도 있으나 잘못 설계 시 둘 모두가 종료될 수 있음</li>
+</ul>
+</li>
+<li>죽었다고 판단하기에 적절한 타임아웃 값을 정하기가 어렵다.
+<ul>
+<li>타임아웃이 길면 → 복구에 너무 오랜 시간이 소요</li>
+<li>타임아웃이 짧으면 → 불필요한 장애복구 발생</li>
+<li>노드의 응답시간 조차 일시적인 부하 급증, 네트워크 문제 등으로 일정할 수 없다.</li>
+<li>시스템이 높은 부하, 네트워크 문제와 씨름 중인 경우 불필요한 장애 복구는 상황을 악화시킬 수 있음.</li>
+</ul>
+</li>
+</ul>
+<h3 id="복제-로그-구현">복제 로그 구현</h3>
+<p>리더 기반 복제는 내부적으로 어떻게 동작하는가? 다음과 같은 다양한 복제 방법을 사용한다.</p>
+<p><strong>구문(Statement) 기반 복제</strong></p>
+<ul>
+<li>요청받은 구문을 기록하고 쓰기를 실행한 다음 구문을 팔로워에게 전송
+<ul>
+<li>RDB : INSERT, UPDATE, DELETE &hellip;</li>
+</ul>
+</li>
+<li>비결정적인 요인에 의해 복제가 깨질 수 있다.
+<ul>
+<li>NOW(), RAND() 등은 복제 서버마다 다른 값을 생성할 가능성이 존재</li>
+<li>자동증가 컬럼을 사용하거나, 기존 데이터에 의존하는 경우(WHERE) 정확히 같은 순서로 실행되어야 함</li>
+<li>순서가 다르면 구문의 효과가 다를 수 있음 → 동시에 여러 트랜잭션이 수행되는 것을 제한한다.</li>
+<li>부수효과를 가진 구문의 경우 부수효과가 완벽히 결정적이어야 모든 팔로워에서 그 효과도 동일하다.</li>
+<li>트리거, 스토어드 프로시저, 사용자 정의 함수</li>
+</ul>
+</li>
+<li>대안은 리더가 구문 기록 시 비결정적 함수 호출을 고정 값을 반환하도록 대체하는 것
+<ul>
+<li>여러 에지 케이스가 있어 현재는 다른 방식을 선호</li>
+<li>MySQL은 비결정성 요인이 있으면 로우 기반 복제 방식으로 변경</li>
+</ul>
+</li>
+</ul>
+<p><strong>쓰기 전 로그(WAL, write-ahead log) 배송</strong></p>
+<ul>
+<li>일반적으로 데이터베이스의 모든 쓰기는 로그에 기록이 된다.</li>
+<li>리더가 로그를 팔로워에게 전송하고, 팔로워는 이 로그를 처리함으로써 복제한다.</li>
+<li>로그는 제일 저수준의 데이터를 기술함
+<ul>
+<li>디스크 블록에서 어떤 데이터를 변경했는 지와 같은 상세 정보 포함</li>
+<li>복제 프로세스가 저장소 엔진과 밀접하게 연관된다.</li>
+<li>리더와 팔로워가 동일한 소프트웨어 버전에서 실행되어야 한다.</li>
+<li>소프트웨어 업그레이드 시 중단 시간이 필요하다.</li>
+</ul>
+</li>
+<li>PostgresQL, Oracle</li>
+</ul>
+<p><strong>논리적(로우 기반) 로그 복제</strong></p>
+<ul>
+<li>로그를 저장소 엔진과 분리하기 위한 대안으로 복제와 저장소 엔진에 각기 다른 로그 형식을 사용한다.</li>
+<li><strong>논리적 로그(logical log)</strong>
+<ul>
+<li>이와 같이 복제에서 사용하는 로그를 저장소 엔진의 물리적 데이터 표현과 구별하여 부른다.</li>
+<li>RDBMS에서 논리적 로그는 대개 로우 단위이고, 테이블에 쓰기를 기술한 레코드 열이다.
+<ul>
+<li>삽입된 로우 : 모든 컬럼의 새로운 값을 포함</li>
+<li>삭제된 로우 : 로우를 식별하기 위한 정보(보통 기본 키)를 포함</li>
+<li>갱신된 로우 : 로우를 식별하기 위한 정보 + 모든 컬럼의 새로운 값 또는 변경된 컬럼의 새로운 값</li>
+</ul>
+</li>
+<li>여러 로우를 수정하는 트랜잭션은 여러 로그 레코드를 생성한 다음 트랜잭션 커밋을 레코드에 표시</li>
+</ul>
+</li>
+<li>논리적 로그와 저장소 엔진 내부를 분리
+<ul>
+<li>하위 호환성을 유지</li>
+<li>리더와 팔로워가 각기 다른 버전의 소프트웨어에서 실행 가능</li>
+<li>심지어 저장소 엔진이 다를 수도 있음</li>
+</ul>
+</li>
+<li>논리적 로그는 외부 애플리케이션이 파싱하기 쉽다.
+<ul>
+<li>데이터 웨어하우스와 같은 외부 시스템에 데이터베이스 내용 전송 시 유용하다.</li>
+<li><strong>변경 데이터 캡쳐(CDC, change data capture)</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>트리거 기반 복제</strong><br>
+지금까지 설명한 복제 방식은 애플리케이션의 관여 없이 DB 시스템에 의해 구현되었다.</p>
+<p>때로는 복제 방식에 유연성이 요구되며 애플리케이션이 관여할 필요가 있다.</p>
+<ul>
+<li>Oracle의 GoldenGate : 데이터베이스 로그를 읽어 애플리케이션이 데이터를 변경할 수 있도록 함</li>
+<li>많은 RDBMS : 트리거, 스토어드 프로시저 제공</li>
+<li>트리거(trigger)
+<ul>
+<li>사용자 정의 애플리케이션 코드를 등록할 수 있다.</li>
+<li>데이터 변경 시(쓰기 트랜잭션) 자동으로 실행된다.</li>
+<li>트리거를 통해 데이터 변경을 분리된 테이블에 로깅한다.</li>
+<li>이 테이블에 기록된 데이터 변경을 외부 프로세스가 읽고 처리한다.</li>
+<li>필요한 애플리케이션 로직 적용 후 다른 시스템에 데이터 변경을 복제한다.</li>
+<li>ex. Oracle의 Databus, PostgresQL의 Bucardo</li>
+</ul>
+</li>
+</ul>
+<p>트리거 방식의 장단점은 다음과 같다.</p>
+<ul>
+<li>트리거 기반 복제는 다른 복제 방식보다 많은 오버헤드가 있다.</li>
+<li>그리고 데이터베이스에 내장된 복제보다 버그나 제한 사항이 더 많이 발생한다.</li>
+<li>그럼에도 불구하고 유연성 때문에 매우 유용하다.</li>
+</ul>
+<h2 id="복제-지연-문제">복제 지연 문제</h2>
+<p><strong>읽기 확장(read-scaling) 아키텍처</strong></p>
+<ul>
+<li>하나의 리더와 여러 팔로워로 구성</li>
+<li>리더는 읽기 + 쓰기, 팔로워는 읽기 요청 처리</li>
+</ul>
+<p>이 아키텍처의 장점은 다음과 같다.</p>
+<ul>
+<li>웹 서비스의 경우 읽기 요청이 대부분, 쓰기 요청은 작은 비율로 구성</li>
+<li>리더의 부하를 경감하고 복제 서버에서 읽기 요청을 처리 → 웹 서비스에 적합</li>
+<li>복제의 목표 중 확장성, 지연시간 단축 달성</li>
+</ul>
+<p>단점은 다음과 같다.</p>
+<ul>
+<li>비동기식 복제 방식에서만 동작한다.</li>
+<li>동기식 복제는 단일 노드의 장애, 네트워크 중단이 전체 시스템의 쓰기를 마비시켜 적절하지 않음</li>
+<li>노드가 많아질 수록 다운될 가능성이 커져 동기식 설정과 적절하지 않다.</li>
+</ul>
+<p>일시적인 데이터 불일치와 최종적 일관성</p>
+<ul>
+<li>비동기 팔로워에서 데이터를 읽을 경우 지난 데이터를 읽을 수 있음 → 데이터 불일치 발생</li>
+<li>불일치는 일시적이다. 결국 팔로워는 리더를 따라잡게 된다. → 최종적 일관성</li>
+</ul>
+
+
+<div class="alert alert-primary" role="alert">
+<h4 class="alert-heading">Tip</h4>
+
+    <p><strong>최종적 일관성 (Eventual Consistency)</strong></p>
+<p>분산 컴퓨팅 환경에서 사용되는 일관성 모델 중 하나. 일시적으로는 데이터의 일관성이 깨지는 것을 허용한다.</p>
+<p>그러나 최종적으로는 (데이터의 변경사항이 없다면) 데이터 대한 모든 접근들에 대해 마지막으로 갱신된 값을 반환하는 것을 보장한다.</p>
+
+
+</div>
+
+<p><strong>복제 지연</strong></p>
+<ul>
+<li>정상적인 경우 복제 지연으로 인한 데이터 불일치는 찰나의 순간이고 크게 문제가 되지 않음</li>
+<li>시스템이 가용량 근처에서 동작하거나 네트워크 문제가 있다면 복제 지연으로 인한 불일치가 문제가 된다.</li>
+</ul>
+<p>복제 지연으로 인해 발생 가능한 사례는 다음과 같은 것들이 있다.</p>
+<h3 id="자신이-쓴-내용-읽기">자신이 쓴 내용 읽기</h3>
+<p>복제 지연으로 인해 사용자가 자신이 제출한 레코드를 읽지 못할 수 있다.</p>
+<p><img src="/docs/data-intensive-application/05-3.png" alt="그림 5-3"><br>
+<em>그림 5-3. 사용자 쓰기를 한 다음 새로운 내용이 반영되지 않은 복제 서버에서 데이터를 읽는다. 이런 이상 현상을 방지하려면 쓰기 후 읽기(read-after-write) 일괄성이 필요하다.</em></p>
+<p><strong>쓰기 후 읽기(read-after-write) 일관성</strong></p>
+<ul>
+<li>자신의 쓰기 읽기 일관성</li>
+<li>사용자가 페이지를 리로딩하면 자신이 제출한 모든 갱신을 볼수 있음을 보장한다.
+<ul>
+<li>다른 사용자가 제출한 것에 대해서는 보장하지 않는다.</li>
+</ul>
+</li>
+</ul>
+<p>그러면 어떻게 이를 구현할까?</p>
+<p><strong>리더 기반 복제 시스템에서 쓰기 후 읽기 일관성 구현하기</strong></p>
+<ul>
+<li>사용자가 수정한 내용을 읽을 때에는 리더에서 읽는다. 이 외의 경우는 팔로워에서 읽는다.
+<ul>
+<li>ex. SNS
+<ul>
+<li>사용자 프로필은 소유자 자신만 편집이 가능하다. → 자신의 프로필 조회는 리더에서 조회</li>
+<li>다른 사용자의 프로필은 팔로워에서 조회</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>시간을 기준으로 판단하기
+<ul>
+<li>애플리케이션 내 대부분의 내용에 대해 사용자 편집이 가능하면 첫 번째 방식은 적합하지 않다.</li>
+<li>다른 기준이 필요.</li>
+<li>레코드의 마지막 갱신 시각을 기준으로(ex. 1분 이내) 리더 읽기 여부를 구분하기</li>
+<li>팔로워에서 복제 지연을 모니터링 하여 1분 이상 늦은 팔로워에 대한 질의 금지</li>
+</ul>
+</li>
+<li>클라이언트가 기억하는 가장 최근 쓰기의 타임스탬프를 사용하기
+<ul>
+<li>시스템은 팔로워에게 타임스탬프까지 갱신을 반영하도록 할 수 있음</li>
+<li>복제서버에 아직 갱신이 반영되지 않았다면?
+<ul>
+<li>다른 복제 서버가 읽기 요청을 처리</li>
+<li>복제 서버에 갱신이 반영될 때 까지 질의를 대기</li>
+</ul>
+</li>
+<li>타임스탬프는 논리적 의미의 타임스탬프 또는 실제 시스템 시간일 수 있음</li>
+</ul>
+</li>
+<li>복제 서버가 여러 데이터센터에 분산된 경우
+<ul>
+<li>사용자에게 지리적 근접성, 가용성을 보장하기 위해 설계된 경우</li>
+<li>리더가 제공해야하는 요청은 전부 리더가 포함된 데이터센터로 라우팅되어야 한다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>또 다른 문제 : 디바이스 간(cross-device) 쓰기 후 읽기 일관성</strong></p>
+<ul>
+<li>동일한 사용자가 여러 디바이스(데스크톱 웹 브라우저, 모바일 앱)로 서비스에 접근하는 경우</li>
+<li>하나의 디바이스에서 방금 입력한 정보가 다른 디바이스에서도 조회되어야 한다.</li>
+<li>디바이스 간 쓰기 후 읽기 일관성이 보장되어야 한다.</li>
+</ul>
+<p>멀티 디바이스 사용자 환경에서는 다음과 같은 문제를 추가적으로 고려해야 한다.</p>
+<ul>
+<li>사용자의 마지막 갱신 타임스탬프의 경우 다른 디바이스에서는 알 수가 없다.
+<ul>
+<li>이러한 메타데이터를 중앙집중식으로 관리해야 다른 디바이스에서도 확인이 가능하다.</li>
+</ul>
+</li>
+<li>복제 서버가 여러 데이터센터 간에 분산된 경우
+<ul>
+<li>다른 디바이스의 연결이 동일한 데이터센터로 라우팅된다는 보장이 없다.</li>
+<li>데스크톱 → 홈 광대역 연결, 모바일 기기 → 셀룰러 데이터 네트워크</li>
+<li>각 디바이스의 네트워크 라우팅은 완전히 다르다.</li>
+<li>사용자 디바이스의 요청을 동일한 데이터센터로 라우팅해야 한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="단조-읽기">단조 읽기</h3>
+<p><img src="/docs/data-intensive-application/05-4.png" alt="그림 5-4"><br>
+<em>그림 5-4. 사용자는 최신 복제 서버에서 먼저 읽고 그당므 예전 복제 서버에서 읽는다. 시간 역전 현상이 나타난다. 이런 이상 현상을 방지하려면 단조 읽기가 필요하다.</em></p>
+<p><strong>시간이 거꾸로 흐르는 현상</strong></p>
+<ul>
+<li>팔로워 간에도 동일한 쓰기에 대해 갱신 시점의 차이가 존재한다.</li>
+<li>동일한 읽기 요청을 여러번 보낼 때 각기 다른 팔로워에게 전달이 될 수 있다.</li>
+<li>어떤 팔로워는 쓰기를 알고 있으나, 어떤 팔로워는 모른다면 시간이 거꾸로 흐르는 현상을 겪을 수 있다.</li>
+</ul>
+<p><strong>단조 읽기(monotonic read)</strong></p>
+<ul>
+<li>위와 같은 종류의 이상 현상이 발생하지 않음을 보장한다.</li>
+<li>강한 일관성 보다는 덜하고, 최종적 일관성 보다는 강한 보장이다.</li>
+<li>한 사용자가 여러 번에 걸쳐 읽어도 시간이 되돌아가는 현상을 경험하지 않는다.</li>
+<li>이전에 새로운 데이터를 읽은 후에는 예전 데이터를 읽지 않는다.</li>
+</ul>
+<p>단조 읽기를 달성하는 방법은 다음과 같다.</p>
+<ul>
+<li>각 사용자의 읽기가 항상 동일한 복제 서버에서 수행되도록 한다.</li>
+<li>사용자 ID의 해시를 기반으로 복제 서버를 선택</li>
+<li>복제 서버가 고장나면 사용자 질의를 다른 복제 서버로 재라우팅할 필요가 있음</li>
+</ul>
+<h3 id="일관된-순서로-읽기">일관된 순서로 읽기</h3>
+<p><strong>인과성의 위반</strong>
+예시용 대화를 하나 보자. 다음 대화에는 인과성이 있다.</p>
+<p><em>푼스 씨 : 미래에 대해 얼마나 멀리 볼 수 있나요. 케이크 부인?</em><br>
+<em>케이크 부인 : 보통 10초 정도요, 푼스 씨.</em></p>
+<p>이제 팔로워를 통해 이 대화를 듣고 있는 제3자 관찰자가 있다고 상상해보자.<br>
+케이크 부인이 한 말은 거의 지연없이 팔로워에게 전달이 되었으나 푼스 씨가 한 말은 긴 복제 지연이 있었다.<br>
+이런 상황에서 관찰자는 대화를 다음과 같이 들을 것이다.</p>
+<p><em>케이크 부인 : 보통 10초 정도요, 푼스 씨.</em><br>
+<em>푼스 씨 : 미래에 대해 얼마나 멀리 볼 수 있나요. 케이크 부인?</em></p>
+<p>이를 그림으로 표현하면 다음과 같다.</p>
+<p>파티션 간의 복제 시점에 차이가 있다면 관찰자 입장에서 질문 보다 대답을 먼저 확인할 가능성이 있다.</p>
+<p><img src="/docs/data-intensive-application/05-5.png" alt="그림 5-5"><br>
+<em>그림 5-5. 일부 파티션이 다른 것보다 느리게 복제되는 경우 관찰자는 질문을 보기 전에 대답을 볼 수 있다.</em></p>
+<p><strong>일관된 순서로 읽기(consistence prefix read)</strong></p>
+<ul>
+<li>이러한 종류의 이상현상을 방지하기 위해 일관된 순서로 읽기와 같은 유형의 보장이 필요</li>
+<li>일련의 쓰기가 특정 순서로 발생한 경우 다른 사용자에게도 쓰기에 대해 쓰여진 순서대로 읽는 것을 보장</li>
+<li><strong>인과성의 위반</strong>
+<ul>
+<li>**파티셔닝(샤딩)**된 데이터베이스에서 발생하는 특징적인 문제</li>
+<li>많은 분산 데이터베이스에서 파티션은 서로 독립적으로 동작 → 쓰기의 전역 순서가 없음</li>
+<li>한 가지 해결책은 서로 인과성이 있는 쓰기에 대해 동일한 파티션에 기록되도록 하는 방법</li>
+<li>그러나 일부 애플리케이션에서 효율적이지 않음</li>
+<li>인과성을 명시하기 위한 알고리즘 → 이후(이전 발생 관계와 동시성)에 다룰 예정</li>
+</ul>
+</li>
+</ul>
+<h3 id="복제-지연을-위한-해결책">복제 지연을 위한 해결책</h3>
+<p>해결 방안으로는 다음과 같은 것들이 있다.</p>
+<ul>
+<li>쓰기 후 읽기와 같은 강한 보장을 제공하도록 시스템을 설계
+<ul>
+<li>비동기식 복제를 사용하지만 동기식 방식으로 동작하는 것 처럼 보인다.</li>
+</ul>
+</li>
+<li>애플리케이션이 데이터베이스보다 더 강력한 보장을 제공하는 방법도 있다.
+<ul>
+<li>ex. 특정 종류의 리더에서 읽기를 수행</li>
+<li>그러나 애플리케이션에서 다루기에는 복잡하여 잘못되기 쉽다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>트랜잭션</strong></p>
+<ul>
+<li>애플리케이션이 단순해지기 위해 데이터베이스가 더 강력한 보장을 제공하는 방법</li>
+<li>애플리케이션 개발자가 미묘한 복제 문제를 걱정하지 않는다.</li>
+<li>또한 올바른 작업 수행을 위해 항상 데이터베이스를 신뢰할 수 있다.</li>
+<li>이것이 트랜잭션이 존재하는 이유</li>
+</ul>
+<p>분산 시스템에서의 트랜잭션</p>
+<ul>
+<li>단일 노드에 대한 트랜잭션을 오랫동안 존재했음</li>
+<li>분산(복제, 파티셔닝 된) 데이터베이스 상에선 많은 시스템이 트랜잭션을 포기</li>
+<li>트랜잭션은 가용성과 성능 측면에서 너무 비싸다.</li>
+<li>확장 가능한 시스템에서는 최종적 일관성을 선택하는 것이 불가피하다는 주장도 존재</li>
+<li>이러한 주장의 일부는 사실이지만 지나치게 단순화된 측면이 있다.</li>
+<li>트랜잭션 및 대안 메커니즘에 대해서는 이후 챕터에서 다룰 것</li>
+</ul>
+<h2 id="다중-리더-복제">다중 리더 복제</h2>
+<p><strong>다중 리더</strong></p>
+<ul>
+<li>쓰기 처리를 하는 각 노드는 데이터 변경을 모든 노드에 전달하는데 이를 다중 리더 설정 (마스터 마스터, 액티브/액티브 복제라고도 함)</li>
+<li>여기서 각 리더는 동시에 다른 리더의 팔로워 역할도함</li>
+<li>모든 쓰기를 해당 리더를 거쳐야 하고, 리더 연결이 불가능한 경우 쓰기 불가능한 단점 보완</li>
+</ul>
+<h3 id="다중-리더-복제의-사용-사례">다중 리더 복제의 사용 사례</h3>
+<p>다중 데이터 센터 운영</p>
+<p><img src="/docs/data-intensive-application/05-6.png" alt="그림 5-6"><br>
+<em>그림 5-6. 다중 데이터센터 간 다중 리더 복제</em></p>
+<p><strong>다중 리더 설정</strong></p>
+<ul>
+<li>각 데이터 센터마다 리더</li>
+<li>각 데이터 센터내 리더 팔로워 복제</li>
+<li>각 데이터 센터 간 리더가 다른 데이터 센터 리더에게 변경 사항 복제</li>
+<li>동일한 데이터를 다른 두 개의 데이터센터에서 동시에 변경 가능하므로 쓰기 충돌은 반드시 해소되어야함</li>
+<li>일부 데이터베이스는 기본적으로 다중 리더 설정 제공</li>
+</ul>
+<p><strong>단일 리더, 다중 리더 설정 비교</strong></p>
+<p><strong>성능</strong></p>
+<ul>
+<li>단일 리더 : 쓰기는 인터넷을 통해 리더가 있는 데이터 센터로 이동해야해서 쓰기 지연 발생</li>
+<li>다중 리더 : 쓰기는 로컬 데이터센터 처리 후 비동기 방식으로 다른 데이터센터에 복제</li>
+</ul>
+<p><strong>데이터센터 중단 내성</strong></p>
+<ul>
+<li>단일 리더 : 리더가 있는 데이터센터가 고장 나면 다른 데이터센터의 팔로워를 리더로 승진</li>
+<li>다중 리더 : 각 데이터센터 독립적으로 동작, 고장난 데이터센터가 온라인으로 돌아왔을때 복제</li>
+</ul>
+<p><strong>네트워크 문제 내성</strong></p>
+<ul>
+<li>단일 리더 : 데이터 센터 내 쓰기는 동기식이기에 데이터 센터 내 연결 문제에 민감</li>
+<li>다중 리더 : 비동기 복제를 사용해 네트워크 문제에 보다 잘 견딤, 일시적 네트워크 중단에도 쓰기 처리는 진행되기 때문</li>
+</ul>
+<p><strong>사용 사례 - 오프라인 작업을 하는 클라이언트</strong></p>
+<ul>
+<li>인터넷 연결이 끊어진 동안 애플리케이션 동작해야 하는 경우</li>
+<li>협업 편집 : 동시에 여러 사람이 문서를 편집할 수 있는 애플리케이션 ex) 이더패드, 구글 독스 등</li>
+</ul>
+<h3 id="쓰기-충돌-다루기">쓰기 충돌 다루기</h3>
+<p><img src="/docs/data-intensive-application/05-7.png" alt="그림 5-7"><br>
+<em>그림 5-7. 동일한 레코드를 두 리더가 동시에 갱신하면 쓰기 충돌이 발생한다.</em></p>
+<ul>
+<li>다중 리더 복제에서 가장 큰 문제는 쓰기 충돌</li>
+<li>각 사용자가 동시에 편집 후 로컬 리더에 저장하였으나 변경을 비동기로 복제 시 쓰기 충돌 발생</li>
+<li>동기식으로 충돌 감지를 하면 다중 리더 복제의 장점을 잃어버림</li>
+</ul>
+<p><strong>충돌 회피</strong></p>
+<ul>
+<li>충돌 처리하는 가장 간단한 전략</li>
+<li>충돌 처리가 어려워 충돌 피하는 것이 자주 권장됨</li>
+<li>특정 레코드의 모든 쓰기를 동일한 리더에서 처리함</li>
+<li>ex) 특정 사용자의 요청을 동일한 데이터센터로 항상 라우팅하고 데이터센터 내 리더를 사용해 읽기와 쓰기를 하게끔 보장
+→ 동일한 데이터센터로 라우팅하는 것이 아니면 충돌 회피가 실패</li>
+</ul>
+<p><strong>일관된 상태 수렴</strong></p>
+<ul>
+<li>모든 복제 서버가 동일해야 함이 원칙</li>
+<li>수렴(convergent) : 모든 변경이 복제돼 모든 복제 서버에 동일한 최종 값이 전달되게 해야 함</li>
+</ul>
+<p><strong>수렴 충돌 해소 방법들</strong></p>
+<ol>
+<li>각 쓰기에 고유 ID () 부여해 가장 높은 ID를 가진 쓰기를 선택</li>
+</ol>
+<ul>
+<li>타임스탬프를 사용하는 경우를 최종 쓰기 승리라 한다.</li>
+<li>대중적이지만 데이터 유실 위험이 있다.</li>
+</ul>
+<ol start="2">
+<li>각 복제 서버에 고유 ID를 부여하고 높은 숫자의 복제서버에서 생긴 쓰기가 낮은 숫자의 복제 서버에서 생긴 쓰기보다 항상 우선적으로 적용</li>
+</ol>
+<ul>
+<li>데이터 유실 가능성있다.</li>
+</ul>
+<ol start="3">
+<li>어떻게든 값을 병합</li>
+</ol>
+<ul>
+<li>예로 사전 순 정렬 후 연결</li>
+</ul>
+<ol start="3">
+<li>명시적 데이터 구조에 충돌을 기록해 모든 정보를 보존</li>
+</ol>
+<ul>
+<li>나중에 (사용자에게 알려줌) 충돌을 해소하는 애플리케이션 코드를 작성</li>
+</ul>
+<p><strong>사용자 정의 충돌 해소 로직</strong></p>
+<ul>
+<li>충돌 해소의 가장 적합한 방법은 애플리케이션에 따라 다르다.</li>
+<li>따라서 대부분 다중 리더 복제도구는 애플리케이션 코드를 사용해 충돌 해소 로직 작성</li>
+<li>쓰기 수행 중 :
+<ul>
+<li>복제된 변경사항 로그에서 데이터베이스 시스템 충돌 감지되면 충돌 핸들러 호출</li>
+<li>백그라운드에서 실행됨</li>
+</ul>
+</li>
+<li>읽기 수행 중 :
+<ul>
+<li>충돌 감지 시 모든 충돌 쓰기 저장</li>
+<li>다음 번 읽기 시 여러 데이터 반환. 애플리케이션은 사용자에게 충돌 내용 보여주거나 자동으로 충돌 해소해 결과를 데이터베이스에 기록</li>
+<li>카우치DB가 이렇게 동작</li>
+</ul>
+</li>
+</ul>
+<p><strong>자동 충돌 해소</strong></p>
+<ul>
+<li>충돌 없는 복제 데이터 타입
+<ul>
+<li>Set, Map, 정렬 목록, 카운터 등을 위한 데이터 구조의 집합</li>
+</ul>
+</li>
+<li>병합 가능한 영속 데이터 구조</li>
+<li>Git 처럼 명시적으로 히스토리 추적하고 삼중 병합 함수를 사용한다</li>
+<li>운영 변환</li>
+<li>이더패트, 구글 독스 같은 협업 편집 애플리케이션의 충돌 해소 알고리즘</li>
+</ul>
+<h3 id="다중-리더-복제-토폴로지">다중 리더 복제 토폴로지</h3>
+<p><strong>복제 토폴로지</strong></p>
+<ul>
+<li>복제 토폴로지는 쓰기를 한 노드에서 다른 노드로 전달하는 통신 경로</li>
+<li>리더가 둘 이상이라면 다양한 토폴로지가 가능</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05-8.png" alt="그림 5-8"><br>
+<em>그림 5-8. 다중 리더 복제를 설정하는 세가지 토폴로지 예제</em></p>
+<ol>
+<li>원형 토폴로지</li>
+</ol>
+<ul>
+<li>각 노드가 하나의 노드로부터 쓰기를 받고, 이 쓰기를 다른 노드에 전달</li>
+<li>MySQL 에서 기본적으로 제공</li>
+<li>노드 장애 시 노드 간 복제 메시지 흐름에 방해를 줌</li>
+</ul>
+<ol start="2">
+<li>별 모양 토폴로지</li>
+</ol>
+<ul>
+<li>지정된 루트 노드 하나가 다른 모든 노드에 쓰기 전달</li>
+<li>트리로 일반화 가능</li>
+<li>노드 장애 시 노드 간 복제 메시지 흐름에 방해를 줌</li>
+</ul>
+<ol start="3">
+<li>전체 연결 토폴로지</li>
+</ol>
+<ul>
+<li>모든 리더가 각자의 쓰기를 다른 모든 리더에 전송</li>
+<li>가장 일반적인 토폴로지</li>
+<li>내결함성이 상대적으로 좋음</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05-9.png" alt="그림 5-9"><br>
+<em>그림 5-9. 다중 리더 복제에게 일부 복제 서버에 쓰기가 잘못된 순서로 도착할 수 있다.</em></p>
+<ul>
+<li>전체 연결 토폴로지의 문제점</li>
+<li>네트워크 연결 속도 차이로 인한 복제 메시지 추월</li>
+<li>리더2는 삽입 이전에 갱신을 처리하게 됨</li>
+<li>올바른 이벤트 정렬을 위한 버전 벡터 기법으로 해결 가능</li>
+<li>따라서 다중 리더 복제 시스템을 사용하려면 이런 문제를 인지하고 문서를 주의깊게 읽은 다음 데이터 베이스를 철저하게 테스트해봐야 함</li>
+</ul>
+<h2 id="리더-없는-복제">리더 없는 복제</h2>
+<ul>
+<li>일부 데이터 저장소 시스템은 리더의 개념을 버리고 모든 복제 서버가 클라이언트로부터 쓰기를 직접 하는 방식을 사용하기도 함</li>
+<li>다이나모 스타일 DB로 리악, 카산드라, 볼드모트 등 오픈소스 데이터스토어가 있음</li>
+<li>일부 리더 없는 복제 구현에서는 클라이언트가 여러 복제 서버에 쓰기를 직접 전송하는 반면 코디네이터 노드가 클라이언트를 대신해 이를 수행하기도 함</li>
+</ul>
+<h3 id="노드가-다운됬을-때-데이터베이스에-쓰기">노드가 다운됬을 때 데이터베이스에 쓰기</h3>
+<p><img src="/docs/data-intensive-application/05-10.png" alt="그림 5-10"><br>
+<em>그림 5-10. 정족수(quorum) 쓰기, 정족 수 읽기와 노드 중단 후 읽기 복구</em></p>
+<ul>
+<li>다운된 노드에서는 쓰기가 누락되어 오래된(outdated) 값을 읽게 됨</li>
+<li>읽기 요청을 병렬로 여러 노드에 전송해 최신 값을 읽어와 해결 가능</li>
+<li>버전 숫자를 통해 읽어온 값 중 최신 값을 결정함</li>
+</ul>
+<p><strong>읽기 복구와 안티 엔트로피</strong>
+복제 계획은 최종적으로 모든 데이터가 모든 복제 서버에 복사된 것을 보장해야 함</p>
+<ul>
+<li>읽기 복구
+<ul>
+<li>클라이언트가 여러 노드에서 병렬로 읽기 수행하면 오래된 응답 감지 가능</li>
+<li>복제 서버의 오래된 값을 새로운 값으로 기록</li>
+<li>값을 자주 읽는 상황에 적합</li>
+</ul>
+</li>
+<li>안티 엔트로피 처리
+<ul>
+<li>백그라운드 프로세스와 복제 서버 간 데이터 차이를 찾아 누락된 데이터를 복사</li>
+<li>특정 순서로 쓰기를 복사하기 때문에 지연이 있을 수 있음</li>
+</ul>
+</li>
+</ul>
+<p><strong>정족수</strong></p>
+<ul>
+<li>여러 사람의 합의로 운영되는 의사기관에서 의결을 하는데 필요한 최소한의 참석자 수 (사전적 정의)</li>
+<li>유효한 읽기와 쓰기를 위한 복제서버 수, 쓰기 성공 노드 수, 질의 노드 수를 나타냄</li>
+<li>다이나모 스타일 DB에서는 복제 서버(n), 쓰기 노드(w), 읽기 노드(r) 설정 가능</li>
+<li>일반적으로 n 은 3 또는 5 등의 홀수, w = r = (n+1) / 2 (반올림) 설정</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05-11.png" alt="그림 5-11"><br>
+<em>그림 5-11. w + r &gt; n이면 읽는 r개의 복제 서버 중 최소한 하나는 가장 최근 성공한 쓰기를 알아야 한다.</em></p>
+<ul>
+<li>일반적으로 읽기와 쓰기는 항상 모든 n개의 복제 서버에 병렬 전송한다.</li>
+<li>w, r 은 기다릴 노드를 결정한다.</li>
+<li>읽기, 쓰기 성공 여부는 읽기, 쓰기가 성공한 노드의 갯수로 확인한다.</li>
+<li>w, r개 보다 사용가능한 노드 수가 적다면 에러를 반환한다.</li>
+</ul>
+<h3 id="정족수-일관성의-한계">정족수 일관성의 한계</h3>
+<ul>
+<li>w + r &gt; n 으로 설정하면 읽은 노드 중 최신 값을 가진 노드가 하나 이상이어야 함. (그림 5-11)</li>
+<li>그러나 모든 과정이 올바르게 동작해도 시점 문제로 오래된 값을 반환할 수 있음 (느슨한 정족수 사용)</li>
+<li>즉, 정족수를 아무리 잘 설정해도 오래된 값을 읽을 가능성이 있음</li>
+</ul>
+<h3 id="느슨한-정족수와-암시된-핸드오프">느슨한 정족수와 암시된 핸드오프</h3>
+<p><strong>정족수 불충족</strong></p>
+<ul>
+<li>네트워크 중단으로 데이터베이스 노드와 클라이언트 연결 유실</li>
+<li>응답 가능한 노드가 w, r보다 적을 수 있음</li>
+</ul>
+<p><strong>느슨한 정족수</strong></p>
+<ul>
+<li>정족수 불충족 상황에서 보통 저장하는 노드가 아닌 연결이 가능한 다른 노드에 쓰기를 하는 경우</li>
+</ul>
+<p><strong>암시된 핸드오프</strong></p>
+<ul>
+<li>네트워크 장애가 해제되면 일시적으로 수옹한 모든 쓰기를 해당 홈 노드로 전송</li>
+</ul>
+<h3 id="동시-쓰기-감지">동시 쓰기 감지</h3>
+<ul>
+<li>다이나모 스타일 데이터베이스는 여러 클라이언트가 동시에 같은 키에 쓰는 것을 허용해 엄격한 정족수를 사용해도 충돌이 발생할 수 있음</li>
+<li>문제는 네트워크 지연 등으로 이벤트가 다른 노드에 다른 순서로 도착할 수 있음</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05-12.png" alt="그림 5-12"><br>
+<em>그림 5-12. 다이나모 스타일 데이터스토어에ㅔ 동시 쓰기 잘 정의된 순서가 없다.</em></p>
+<p>get 요청에서 노드들마다 읽어오는 값이 달라 일관성이 깨짐</p>
+<p><strong>최종 쓰기 승리 (동시 쓰기 버리기)</strong></p>
+<ul>
+<li>복제본을 가장 최신 값으로 덮어 쓰는 방법</li>
+<li>쓰기에 타임스탬프를 붙여 최신 값을 선택하는 방법 (LWW)</li>
+<li>손실 데이터를 허용하지 않는다면 LWW가 부적합</li>
+<li>카산드라에서 유일하게 제공하는 충돌 해소 방법, 리악에서는 선택적 기능</li>
+<li>키를 한번만 쓰고 이후에 불변값으로 만들어 동시에 같은 키를 갱신하는 상황을 방지해야 함</li>
+<li>카산드라 사용 시 키로 UUID를 사용해 모든 쓰기작업에 고유한 키를 부여하는 것을 추천</li>
+</ul>
+<p><strong>이전 발생</strong></p>
+<ul>
+<li>작업 B가 작업 A에 대해 알거나 A에 의존적이거나, 어떤 방식으로든 A를 기반으로 한다면 작업 A는 작업 B의 이전 발생이라 함</li>
+<li>작업이 다른 작업보다 먼저 발생하지 않으면 (어느 작업도 다른 작업에 대해 알지 못하면) 동시 작업이라 일컫음</li>
+</ul>
+<p><strong>이전 발생 관계 파악하기</strong></p>
+<p><img src="/docs/data-intensive-application/05-13.png" alt="그림 5-13"><br>
+<em>그림 5-13. 두 클라이언트가 동시에 장바구니를 수정하는 동안 인과성 파악하기</em></p>
+<table>
+<thead>
+<tr>
+<th>버전\클라이언트</th>
+<th>클라이언트 1</th>
+<th>클라이언트 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>버전 1</td>
+<td>우유</td>
+<td></td>
+</tr>
+<tr>
+<td>버전 2</td>
+<td>우유</td>
+<td>달걀</td>
+</tr>
+<tr>
+<td>버전 3</td>
+<td>우유, 밀가루</td>
+<td>달걀</td>
+</tr>
+<tr>
+<td>버전 4</td>
+<td>우유, 밀가루</td>
+<td>달걀, 우유, 햄</td>
+</tr>
+<tr>
+<td>버전 5</td>
+<td>우유, 밀가루, 달걀, 베이컨</td>
+<td>달걀, 우유, 햄</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>client1 - 우유 추가, version1 = [(우유)]</li>
+<li>client2 - 달걀 추가, version2 = [(우유) , (달걀)]</li>
+<li>client1 - 밀가루 추가, version3 = [(우유, 밀가루), (달걀)]</li>
+</ol>
+<ul>
+<li>1번 응답인 우유에 밀가루 추가, version2 값 달걀</li>
+</ul>
+<ol start="4">
+<li>client2 - 햄 추가, version4 = [(달걀, 우유, 햄), (우유, 밀가루)]</li>
+</ol>
+<ul>
+<li>2번 응답인 우유, 달걀에 햄 추가, version3의 우유, 밀가루</li>
+</ul>
+<ol start="5">
+<li>client1 - 베이컨 추가, version5 = [(우유, 밀가루, 달걀, 베이컨), (달걀, 우유, 햄)]</li>
+</ol>
+<ul>
+<li>3번 응답인 우유, 밀가루, 달걀에 베이컨 추가, version4의 달걀, 우유, 햄</li>
+</ul>
+<p><img src="/docs/data-intensive-application/05-14.png" alt="그림 5-14"><br>
+<em>그림 5-14. 그림 5-14의 인과성 도표</em></p>
+<p><strong>동시, 이전 발생 결정 알고리즘</strong></p>
+<ul>
+<li>06.서버가 모든 키에 대한 버전 번호 유지, 버전 번호 증가하며 키를 기록함</li>
+<li>클라이언트가 키를 읽을 때는 최신 버전과 덮어쓰지 않은 모든 값 반환</li>
+<li>클라이언트가 키를 기록할 때는 이전 읽기의 버전 번호를 포함해야 하고 이전 읽기에서 받은 모든 값을 함께 합침</li>
+<li>서버가 특정 번호를 가진 쓰기를 받을 때는 해당 버전 이하 모든 값을 덮어쓸 수 있지만 높은 버전 번호의 값은 유지해야 함</li>
+</ul>
+<p><strong>동시에 쓴 값 병함</strong></p>
+<ul>
+<li>위 알고리즘은 데이터가 자동으로 삭제되지 않지만 클라이언트의 추가 작업이 필요</li>
+<li>동시에 쓴 값을 합쳐 정리하는 걸 리악에서 형제(sibling) 라 부름</li>
+<li>값을 제거할 때에는 제거했다고 버젼에 표시를 남겨야하는데 이를 툼스톤이라고 함</li>
+</ul>
+<p><strong>버전 벡터 (version vector)</strong></p>
+<ul>
+<li>모든 복제본의 버전 번호 모음을 나타냄</li>
+<li>리악2.0 에서 도티드 버전 벡터로 버전 벡터를 변형해 사용함</li>
+<li>값을 읽을 때 데이터베이스 복제본에서 클라이언트로, 값이 기록될 때 데이터베이스로 전송
+<ul>
+<li>쓰기 시 버전 번호 증가, 다른 복제본의 번호도 추적해 덮어쓸 값, 형제 값을 구분함</li>
+</ul>
+</li>
+<li>데이터베이스는 덮어쓰기와 동시 쓰기를 구분할 수 있음</li>
+</ul>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+	
+	
+<div class="text-muted mt-5 pt-3 border-top">
+    최종 수정 : 2022-02-17</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a target="_blank" rel="noopener" href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/devkuma" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a target="_blank" rel="noopener" href="https://blog.devkuma.com" aria-label="Blog">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a target="_blank" rel="noopener" href="https://www.facebook.com/redfreek2c" aria-label="Facebook">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2023 The devkuma All Rights Reserved</span>
+        
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+        
+    
+  <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+      integrity="sha512-mQwom8Ns4op+H29oDkD/LXO/OsXPvCFfkgZkFAVrhhePzRLU8NUI3Nkm43NhWUSmj3p5Cca2HTEkMQmXQRwDQQ==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/mhchem.min.js"
+        integrity="sha512-V1hl0fnOXW6Cdqe5ZVqtw8TBpJVpu3XRDRQti96j/04+tMarPrCdXEUE3UdfvfKYTpOn9DV4zEZBVr0HhDiuiQ=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+       integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js" integrity="sha512-ku2nmBrzAXY5YwohzTqLYH1/lvyMrpTVxgQKrvTabd/b/uesqltLORdmpVapYv6QhZVCLUX6wkvFaKOAY4xpUA==" crossorigin="anonymous"></script>
+<script src="/js/main.min.adcd5a71d01a294f35ddb01a28ea5f91f6ddf8ca2edf2bd09dfa22f6a676ad96.js" integrity="sha256-rc1acdAaKU813bAaKOpfkfbd&#43;Mou3yvQnfoi9qZ2rZY=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

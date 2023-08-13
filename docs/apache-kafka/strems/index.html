@@ -1,0 +1,1219 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="ko" class="no-js">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="Hugo 0.115.2">
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Kafka Streams를 사용한 스트림 처리 어플리케이션 개발 | devkuma</title>
+<meta name="description" content="스트림 프로세싱이란? 이벤트 스트림에 대해 데이터가 도착할 때마다 처리를 하여, 계속해서 이어가는 어플리케이션을 가리킨다. Kafka의 에코시스템에 있어서는 Kafka Broker에 Consumer로서 접속하여 무한 루프로 polling를 실행하여, 데이터가 도착할 때마다 짧은 간격(interval)으로 처리를 실시하는 어플리케이션이다.
+복수의 레코드를 사용해 집계 처리를 실시하는 경우도 있지만, 일정 기간마다 집계 단위를 구분하여, 1건 마다 집계 결과를 업데이트 하거나, 버퍼링해 두고 일정한 간격을 두고 처리를 실행하여 집계를 하는 등의 형태이다.
+Stateless 또는 Stateful 스트림 프로세싱의 처리 내용은 크게 Stateless 또는 Stateful로 나눌 수 있다.">
+<meta property="og:title" content="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발" />
+<meta property="og:description" content="스트림 프로세싱이란? 이벤트 스트림에 대해 데이터가 도착할 때마다 처리를 하여, 계속해서 이어가는 어플리케이션을 가리킨다. Kafka의 에코시스템에 있어서는 Kafka Broker에 Consumer로서 접속하여 무한 루프로 polling를 실행하여, 데이터가 도착할 때마다 짧은 간격(interval)으로 처리를 실시하는 어플리케이션이다.
+복수의 레코드를 사용해 집계 처리를 실시하는 경우도 있지만, 일정 기간마다 집계 단위를 구분하여, 1건 마다 집계 결과를 업데이트 하거나, 버퍼링해 두고 일정한 간격을 두고 처리를 실행하여 집계를 하는 등의 형태이다.
+Stateless 또는 Stateful 스트림 프로세싱의 처리 내용은 크게 Stateless 또는 Stateful로 나눌 수 있다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.devkuma.com/docs/apache-kafka/strems/" /><meta property="article:section" content="210_Data-Science_BigData" />
+<meta property="article:published_time" content="2022-06-01T17:24:00+09:00" />
+<meta property="article:modified_time" content="2023-08-13T11:59:53+09:00" />
+<meta itemprop="name" content="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발">
+<meta itemprop="description" content="스트림 프로세싱이란? 이벤트 스트림에 대해 데이터가 도착할 때마다 처리를 하여, 계속해서 이어가는 어플리케이션을 가리킨다. Kafka의 에코시스템에 있어서는 Kafka Broker에 Consumer로서 접속하여 무한 루프로 polling를 실행하여, 데이터가 도착할 때마다 짧은 간격(interval)으로 처리를 실시하는 어플리케이션이다.
+복수의 레코드를 사용해 집계 처리를 실시하는 경우도 있지만, 일정 기간마다 집계 단위를 구분하여, 1건 마다 집계 결과를 업데이트 하거나, 버퍼링해 두고 일정한 간격을 두고 처리를 실행하여 집계를 하는 등의 형태이다.
+Stateless 또는 Stateful 스트림 프로세싱의 처리 내용은 크게 Stateless 또는 Stateful로 나눌 수 있다."><meta itemprop="datePublished" content="2022-06-01T17:24:00+09:00" />
+<meta itemprop="dateModified" content="2023-08-13T11:59:53+09:00" />
+<meta itemprop="wordCount" content="3439">
+<meta itemprop="keywords" content="Apache Kafka,Message Queue," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발"/>
+<meta name="twitter:description" content="스트림 프로세싱이란? 이벤트 스트림에 대해 데이터가 도착할 때마다 처리를 하여, 계속해서 이어가는 어플리케이션을 가리킨다. Kafka의 에코시스템에 있어서는 Kafka Broker에 Consumer로서 접속하여 무한 루프로 polling를 실행하여, 데이터가 도착할 때마다 짧은 간격(interval)으로 처리를 실시하는 어플리케이션이다.
+복수의 레코드를 사용해 집계 처리를 실시하는 경우도 있지만, 일정 기간마다 집계 단위를 구분하여, 1건 마다 집계 결과를 업데이트 하거나, 버퍼링해 두고 일정한 간격을 두고 처리를 실행하여 집계를 하는 등의 형태이다.
+Stateless 또는 Stateful 스트림 프로세싱의 처리 내용은 크게 Stateless 또는 Stateful로 나눌 수 있다."/>
+
+
+
+
+<link rel="preload" href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" as="style">
+<link href="/scss/main.min.1a7198413ce86b6adea4ee14b177a61a94a05273f36b92a90b226e5638dd5e5b.css" rel="stylesheet" integrity="">
+
+<script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/docs/apache-kafka/strems/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-FW3TZ3QLYR');
+}
+</script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar navbar-dark js-navbar-scroll">
+<div class="container-fluid flex-column flex-md-row">
+<a class="navbar-brand" href="/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#fff" stroke="none"><path d="M775 4993c-268-38-509-215-618-453-71-155-67-24-67-1986 0-1958-5-1818 65-1971 43-94 86-155 162-230 117-115 283-198 448-223 48-7 618-10 1840-8l1770 3 75 23c231 70 408 216 505 417 81 168 75 7 75 1995 0 1969 5 1824-67 1980-96 211-277 360-528 436-57 18-150 19-1845 20-982 1-1798-1-1815-3zm543-584c53-11 123-30 154-44 144-61 319-213 379-328 19-36 22-37 57-31 20 4 44 10 52 14 20 10 119 30 250 50 228 35 454 36 695 4 91-12 256-47 299-63 16-7 29-10 30-9 1 2 18 28 38 58 115 178 309 304 533 348 39 8 272 8 310 0 103-21 141-34 233-80 157-77 285-206 357-356 54-113 72-195 73-329 1-103-5-142-44-273-25-87-148-259-223-315-40-29-50-51-32-71 5-5 21-38 36-74 61-145 96-253 110-340 3-19 11-60 17-90 13-62 17-434 5-520-16-123-37-209-76-325-56-165-174-395-246-477-11-13-35-43-54-68-44-58-254-267-306-305-22-17-42-32-45-35-18-18-235-161-275-181-16-9-54-28-83-44-29-15-55-26-57-23-2 2 6 16 18 30 12 15 30 35 39 47 37 44 109 161 134 217 42 92 69 194 81 304 46 396-119 758-455 996-261 186-532 256-862 225-205-19-372-77-540-185-142-92-289-241-378-382-110-175-166-481-127-699 37-203 125-383 260-533 31-34 51-62 44-62-22 0-198 89-304 153-55 34-140 93-190 131-92 70-307 279-360 350-17 22-39 51-50 65-19 25-38 52-97 146-66 106-175 374-191 472-3 16-8 39-11 53-40 177-41 522-2 725 3 17 8 44 11 60 16 86 81 266 130 359 15 27 14 30-7 44-77 53-208 204-252 291-97 188-96 485 2 677 33 66 129 191 183 238 192 171 465 239 737 185zm1414-2174c55-12 137-48 168-72 62-48 81-69 1e2-108 36-74 28-162-19-224-31-42-138-121-162-121-10 0-20-4-23-9-23-36-255-49-366-20-283 72-386 274-224 436 55 55 149 107 215 118 19 3 35 8 37 9 9 10 225 3 274-9z"/><path d="M3885 4013c-85-13-182-63-243-126l-33-34 40-26c22-15 43-27 45-27 9 0 225-150 252-175 6-5 36-30 65-55 66-55 172-159 222-219 23-26 42-41 51-38 23 9 91 108 112 162 13 35 19 76 18 135 0 76-3 92-34 155-57 119-168 210-289 238-58 14-152 18-206 10z"/><path d="M985 3976c-92-29-162-80-221-161-62-86-79-149-72-275 6-98 31-158 1e2-234l37-41 48 55c154 179 350 348 548 472 28 18 52 33 54 35 9 6-64 75-105 99-77 45-145 62-251 62-54 0-116-6-138-12z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+<div class="td-navbar-nav-scroll ms-md-auto" id="main_navbar">
+	<ul class="navbar-nav">
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-keyboard'></i><span>Programming</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/design/" >Design and Development</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/jvm/" >JVM Based Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/spring/" >Spring framework</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/web/" >Web Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/etc/" >그밖에 Programming</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/programming/tools/" >Programming Tools</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-database'></i><span>Data Science</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/big-data/" >Big Data</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/rdb/" >Relational Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/nosql/" >NoSQL Database</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/data-science/graph-db/" >Graph Databse</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item dropdown">
+			<a class="nav-link  dropdown-toggle" href="#" id="navbarDropdown" role="button"  data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<i class='fas fa-desktop'></i><span>Computer</span>
+			</a>
+			<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+			
+				
+				<a class="dropdown-item" href="/docs/category/computer/basic/" >컴퓨터 기본 지식</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/operating-system/" >Operating System</a>
+			
+				
+				<a class="dropdown-item" href="/docs/category/network/" >Network</a>
+			
+			</div>
+		</li>
+		
+		
+			
+			
+			
+			
+			
+		
+		<li class="nav-item">
+			<a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+		</li>
+		
+		</ul>
+</div>
+<div class="d-none d-lg-block">
+	<div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+</div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-docsapache-kafkastrems").addClass("active"); 
+    $("#td-section-nav #m-docsapache-kafkastrems-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docsapache-kafkastrems").parents("li").addClass("active-path"); 
+    $("#td-section-nav li.active-path").addClass("show"); 
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-docsapache-kafkastrems-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docsapache-kafkastrems-li").children("ul").children("li").addClass("show");  
+    $("#td-sidebar-menu").toggleClass("d-none"); 
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" class="td-search__input form-control td-search-input" placeholder="사이트에서 검색…" aria-label="사이트에서 검색…" autocomplete="off">
+</div>
+
+    <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ms-3 fas fa-bars" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="collapse td-sidebar-nav foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docscategorydata-sciencebig-data-li">
+  <a href="/docs/category/data-science/big-data/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-docscategorydata-sciencebig-data"><span class="">Big Data</span></a>
+  <ul class="ul-1">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsbig-data-li">
+  <input type="checkbox" id="m-docsbig-data-check"/>
+  <label for="m-docsbig-data-check"><a href="/docs/big-data/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsbig-data"><span class="">Big Data</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-dataterm-li">
+  <input type="checkbox" id="m-docsbig-dataterm-check"/>
+  <label for="m-docsbig-dataterm-check"><a href="/docs/big-data/term/" title="빅데이터 분석 기반이란? 데이터 파이프라인 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-dataterm"><span class="">빅데이터, 파이프라인 구축</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsmqttintro-li">
+  <input type="checkbox" id="m-docsmqttintro-check"/>
+  <label for="m-docsmqttintro-check"><a href="/docs/mqtt/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsmqttintro"><span class="">MQTT</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsbig-datastream-processing-li">
+  <input type="checkbox" id="m-docsbig-datastream-processing-check"/>
+  <label for="m-docsbig-datastream-processing-check"><a href="/docs/big-data/stream-processing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsbig-datastream-processing"><span class="">스트림 처리란? OSS 엔진 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-hadoop-li">
+  <input type="checkbox" id="m-docsapache-hadoop-check"/>
+  <label for="m-docsapache-hadoop-check"><a href="/docs/apache-hadoop/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-hadoop"><span class="">Apache Hadoop</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-spark-li">
+  <input type="checkbox" id="m-docsapache-spark-check"/>
+  <label for="m-docsapache-spark-check"><a href="/docs/apache-spark/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-spark"><span class="">Apache Spark</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docspyspark-li">
+  <input type="checkbox" id="m-docspyspark-check"/>
+  <label for="m-docspyspark-check"><a href="/docs/pyspark/" title="PySpark 개념 및 주요 기능" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docspyspark"><span class="">PySpark</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsdata-intensive-application-li">
+  <input type="checkbox" id="m-docsdata-intensive-application-check"/>
+  <label for="m-docsdata-intensive-application-check"><a href="/docs/data-intensive-application/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsdata-intensive-application"><span class="">데이터 중심 애플리케이션 설계</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application02-li">
+  <input type="checkbox" id="m-docsdata-intensive-application02-check"/>
+  <label for="m-docsdata-intensive-application02-check"><a href="/docs/data-intensive-application/02/" title="데이터 중심 애플리케이션 설계 | 02장. 데이터 모델과 질의 언어" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application02"><span class="">02장. 데이터 모델과 질의 언어</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application03-li">
+  <input type="checkbox" id="m-docsdata-intensive-application03-check"/>
+  <label for="m-docsdata-intensive-application03-check"><a href="/docs/data-intensive-application/03/" title="데이터 중심 애플리케이션 설계 | 03장. 저장소와 검색" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application03"><span class="">03장. 저장소와 검색</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application04-li">
+  <input type="checkbox" id="m-docsdata-intensive-application04-check"/>
+  <label for="m-docsdata-intensive-application04-check"><a href="/docs/data-intensive-application/04/" title="데이터 중심 애플리케이션 설계 | 04장. 부호화 발전" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application04"><span class="">04장. 부호화 발전</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application05-li">
+  <input type="checkbox" id="m-docsdata-intensive-application05-check"/>
+  <label for="m-docsdata-intensive-application05-check"><a href="/docs/data-intensive-application/05/" title="데이터 중심 애플리케이션 설계 | 05장. 복제" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application05"><span class="">05장. 복제</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application06-li">
+  <input type="checkbox" id="m-docsdata-intensive-application06-check"/>
+  <label for="m-docsdata-intensive-application06-check"><a href="/docs/data-intensive-application/06/" title="데이터 중심 애플리케이션 설계 | 06장. 파티셔닝" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application06"><span class="">06장. 파티셔닝</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application7-li">
+  <input type="checkbox" id="m-docsdata-intensive-application7-check"/>
+  <label for="m-docsdata-intensive-application7-check"><a href="/docs/data-intensive-application/7/" title="데이터 중심 애플리케이션 설계 | 07장. 트랜잭션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application7"><span class="">07장. 트랜잭션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application8-li">
+  <input type="checkbox" id="m-docsdata-intensive-application8-check"/>
+  <label for="m-docsdata-intensive-application8-check"><a href="/docs/data-intensive-application/8/" title="데이터 중심 애플리케이션 설계 | 08장. 분산 시스템의 골치거리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application8"><span class="">08장. 분산 시스템의 골치거리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application9-li">
+  <input type="checkbox" id="m-docsdata-intensive-application9-check"/>
+  <label for="m-docsdata-intensive-application9-check"><a href="/docs/data-intensive-application/9/" title="데이터 중심 애플리케이션 설계 | 09장. 일관성과 합의" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application9"><span class="">09장. 일관성과 합의</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application10-li">
+  <input type="checkbox" id="m-docsdata-intensive-application10-check"/>
+  <label for="m-docsdata-intensive-application10-check"><a href="/docs/data-intensive-application/10/" title="데이터 중심 애플리케이션 설계 | 10장. 일괄 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application10"><span class="">10장. 일괄 처리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsdata-intensive-application11-li">
+  <input type="checkbox" id="m-docsdata-intensive-application11-check"/>
+  <label for="m-docsdata-intensive-application11-check"><a href="/docs/data-intensive-application/11/" title="데이터 중심 애플리케이션 설계 | 11장. 스트림 처리" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsdata-intensive-application11"><span class="">11장. 스트림 처리</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-kafka-li">
+  <input type="checkbox" id="m-docsapache-kafka-check"/>
+  <label for="m-docsapache-kafka-check"><a href="/docs/apache-kafka/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-kafka"><span class="">Apache Kafka</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaintro-li">
+  <input type="checkbox" id="m-docsapache-kafkaintro-check"/>
+  <label for="m-docsapache-kafkaintro-check"><a href="/docs/apache-kafka/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaintro"><span class="">Apache Kafka 개념 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkainstall-li">
+  <input type="checkbox" id="m-docsapache-kafkainstall-check"/>
+  <label for="m-docsapache-kafkainstall-check"><a href="/docs/apache-kafka/install/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkainstall"><span class="">Apache Kafka 설치 및 확인</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkaclient-li">
+  <input type="checkbox" id="m-docsapache-kafkaclient-check"/>
+  <label for="m-docsapache-kafkaclient-check"><a href="/docs/apache-kafka/client/" title="Java로 간단한 Apache Kafka Producer/Consumer 클라이언트 만들기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkaclient"><span class="">Producer/Consumer 클라이언트</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkawhat-li">
+  <input type="checkbox" id="m-docsapache-kafkawhat-check"/>
+  <label for="m-docsapache-kafkawhat-check"><a href="/docs/apache-kafka/what/" title="Kafka 상세 개념 | 원래 Kafka란?" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkawhat"><span class="">Kafka 상세 개념</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-kafkastrems-li">
+  <input type="checkbox" id="m-docsapache-kafkastrems-check"/>
+  <label for="m-docsapache-kafkastrems-check"><a href="/docs/apache-kafka/strems/" title="Kafka Streams를 사용한 스트림 처리 어플리케이션 개발" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-kafkastrems"><span class="">Kafka Streams</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-phoenix-li">
+  <input type="checkbox" id="m-docsapache-phoenix-check"/>
+  <label for="m-docsapache-phoenix-check"><a href="/docs/apache-phoenix/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-phoenix"><span class="">Apache Phoenix</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsapache-zookeeper-li">
+  <input type="checkbox" id="m-docsapache-zookeeper-check"/>
+  <label for="m-docsapache-zookeeper-check"><a href="/docs/apache-zookeeper/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsapache-zookeeper"><span class="">Apache ZooKeeper</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperoverview-li">
+  <input type="checkbox" id="m-docsapache-zookeeperoverview-check"/>
+  <label for="m-docsapache-zookeeperoverview-check"><a href="/docs/apache-zookeeper/overview/" title="ZooKeeper 오픈 소스의 운용 관리·운용 자동화" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperoverview"><span class="">ZooKeeper 개요</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperinstall-li">
+  <input type="checkbox" id="m-docsapache-zookeeperinstall-check"/>
+  <label for="m-docsapache-zookeeperinstall-check"><a href="/docs/apache-zookeeper/install/" title="ZooKeeper 설치 방법" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperinstall"><span class="">ZooKeeper 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperdocker-install-li">
+  <input type="checkbox" id="m-docsapache-zookeeperdocker-install-check"/>
+  <label for="m-docsapache-zookeeperdocker-install-check"><a href="/docs/apache-zookeeper/docker-install/" title="ZooKeeper Docker로 설치하여 개발환경으로 구축하기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperdocker-install"><span class="">ZooKeeper Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsapache-zookeeperjava-api-li">
+  <input type="checkbox" id="m-docsapache-zookeeperjava-api-check"/>
+  <label for="m-docsapache-zookeeperjava-api-check"><a href="/docs/apache-zookeeper/java-api/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsapache-zookeeperjava-api"><span class="">ZooKeeper API</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidb-li">
+  <input type="checkbox" id="m-docstidb-check"/>
+  <label for="m-docstidb-check"><a href="/docs/tidb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidb"><span class="">TiDB</span></a></label>
+  
+  <ul class="ul-2 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbabout-li">
+  <input type="checkbox" id="m-docstidbabout-check"/>
+  <label for="m-docstidbabout-check"><a href="/docs/tidb/about/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbabout"><span class="">TiDB에 대해서</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboverview-li">
+  <input type="checkbox" id="m-docstidboverview-check"/>
+  <label for="m-docstidboverview-check"><a href="/docs/tidb/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboverview"><span class="">TiDB 소개</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexperimental-features-li">
+  <input type="checkbox" id="m-docstidbexperimental-features-check"/>
+  <label for="m-docstidbexperimental-features-check"><a href="/docs/tidb/experimental-features/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexperimental-features"><span class="">TiDB의 실험 기능</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbmysql-compatibility-li">
+  <input type="checkbox" id="m-docstidbmysql-compatibility-check"/>
+  <label for="m-docstidbmysql-compatibility-check"><a href="/docs/tidb/mysql-compatibility/" title="TiDB - MySQL과의 호환성" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbmysql-compatibility"><span class="">MySQL 호환성</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbtidb-limitations-li">
+  <input type="checkbox" id="m-docstidbtidb-limitations-check"/>
+  <label for="m-docstidbtidb-limitations-check"><a href="/docs/tidb/tidb-limitations/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbtidb-limitations"><span class="">TiDB 제한 사항</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbtutorial-li">
+  <input type="checkbox" id="m-docstidbtutorial-check"/>
+  <label for="m-docstidbtutorial-check"><a href="/docs/tidb/tutorial/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbtutorial"><span class="">TiDB 설치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbhardware-and-software-requirements-li">
+  <input type="checkbox" id="m-docstidbhardware-and-software-requirements-check"/>
+  <label for="m-docstidbhardware-and-software-requirements-check"><a href="/docs/tidb/hardware-and-software-requirements/" title="TiDB 소프트웨어 및 하드웨어 권장 사항" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbhardware-and-software-requirements"><span class="">소프트웨어 및 하드웨어 권장 사항</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalltiup-li">
+  <input type="checkbox" id="m-docstidbinstalltiup-check"/>
+  <label for="m-docstidbinstalltiup-check"><a href="/docs/tidb/install/tiup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalltiup"><span class="">TiUP 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalllinux-li">
+  <input type="checkbox" id="m-docstidbinstalllinux-check"/>
+  <label for="m-docstidbinstalllinux-check"><a href="/docs/tidb/install/linux/" title="TiDB 로컬 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalllinux"><span class="">TiDB 로컬 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbinstalldocker-compose-li">
+  <input type="checkbox" id="m-docstidbinstalldocker-compose-check"/>
+  <label for="m-docstidbinstalldocker-compose-check"><a href="/docs/tidb/install/docker-compose/" title="TiDB Docker 설치 - 테스트 환경 구축" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbinstalldocker-compose"><span class="">TiDB Docker 설치</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-tidb-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-tidb-check"/>
+  <label for="m-docstidbquick-start-with-tidb-check"><a href="/docs/tidb/quick-start-with-tidb/" title="TiDB 단일 컴퓨터에서 운영 환경 클러스터 배포 시뮬레이션" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-tidb"><span class="">TiDB 배포 시뮬레이션</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbproduction-deployment-using-tiup-li">
+  <input type="checkbox" id="m-docstidbproduction-deployment-using-tiup-check"/>
+  <label for="m-docstidbproduction-deployment-using-tiup-check"><a href="/docs/tidb/production-deployment-using-tiup/" title="TiUP를 사용하여 TiDB 클러스터 배포" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbproduction-deployment-using-tiup"><span class="">TiDB 클러스터 배포</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbquick-start-li">
+  <input type="checkbox" id="m-docstidbquick-start-check"/>
+  <label for="m-docstidbquick-start-check"><a href="/docs/tidb/quick-start/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbquick-start"><span class="">퀵 스타트</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbquick-start-with-htap-li">
+  <input type="checkbox" id="m-docstidbquick-start-with-htap-check"/>
+  <label for="m-docstidbquick-start-with-htap-check"><a href="/docs/tidb/quick-start-with-htap/" title="TiDB HTAP 퀵 스타트 가이드" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbquick-start-with-htap"><span class="">HTAP 사용하기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbbasic-sql-operations-li">
+  <input type="checkbox" id="m-docstidbbasic-sql-operations-check"/>
+  <label for="m-docstidbbasic-sql-operations-check"><a href="/docs/tidb/basic-sql-operations/" title="TiDB의 SQL 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbbasic-sql-operations"><span class="">TiDB로 SQL 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbexplore-htap-li">
+  <input type="checkbox" id="m-docstidbexplore-htap-check"/>
+  <label for="m-docstidbexplore-htap-check"><a href="/docs/tidb/explore-htap/" title="TiDB HTAP 살펴보기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbexplore-htap"><span class="">HTAP 배우기</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbimport-example-data-li">
+  <input type="checkbox" id="m-docstidbimport-example-data-check"/>
+  <label for="m-docstidbimport-example-data-check"><a href="/docs/tidb/import-example-data/" title="TiDB 샘플 데이터베이스 가져오기" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbimport-example-data"><span class="">샘플 데이터베이스 가져오기</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbcluster-architecture-li">
+  <input type="checkbox" id="m-docstidbcluster-architecture-check"/>
+  <label for="m-docstidbcluster-architecture-check"><a href="/docs/tidb/cluster-architecture/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbcluster-architecture"><span class="">클러스터 아키텍처</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbarchitecture-li">
+  <input type="checkbox" id="m-docstidbarchitecture-check"/>
+  <label for="m-docstidbarchitecture-check"><a href="/docs/tidb/architecture/" title="TiDB 아키텍처 - 프로덕트 구성 이해" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbarchitecture"><span class="">아키텍처</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbstorege-li">
+  <input type="checkbox" id="m-docstidbstorege-check"/>
+  <label for="m-docstidbstorege-check"><a href="/docs/tidb/storege/" title="TiDB 스토리지" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbstorege"><span class="">스토리지</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbcomputing-li">
+  <input type="checkbox" id="m-docstidbcomputing-check"/>
+  <label for="m-docstidbcomputing-check"><a href="/docs/tidb/computing/" title="TiDB 컴퓨팅" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbcomputing"><span class="">컴퓨팅</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidbscheduling-li">
+  <input type="checkbox" id="m-docstidbscheduling-check"/>
+  <label for="m-docstidbscheduling-check"><a href="/docs/tidb/scheduling/" title="TiDB 스케줄링" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidbscheduling"><span class="">스케줄링</span></a></label>
+  
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docstidbfailover-li">
+  <input type="checkbox" id="m-docstidbfailover-check"/>
+  <label for="m-docstidbfailover-check"><a href="/docs/tidb/failover/" title="TiDB 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docstidbfailover"><span class="">자동 장애 조치</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docstidboperator-li">
+  <input type="checkbox" id="m-docstidboperator-check"/>
+  <label for="m-docstidboperator-check"><a href="/docs/tidb/operator/" title="TiDB Operator - 자동 장애 조치" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docstidboperator"><span class="">TiDB Operator</span></a></label>
+  
+</li>
+  </ul>
+</li>
+  </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsinfluxdb-li">
+  <input type="checkbox" id="m-docsinfluxdb-check"/>
+  <label for="m-docsinfluxdb-check"><a href="/docs/influxdb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsinfluxdb"><span class="">InfluxDB</span></a></label>
+  
+</li>
+  </ul>
+</li>
+    </ul>
+  </nav>
+</div>
+
+
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            
+<div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#스트림-프로세싱이란">스트림 프로세싱이란?</a></li>
+    <li><a href="#stateless-또는-stateful">Stateless 또는 Stateful</a></li>
+    <li><a href="#stateful-애플리케이션의-state-store">Stateful 애플리케이션의 State Store</a></li>
+    <li><a href="#kafka-streams란">Kafka Streams란?</a></li>
+    <li><a href="#주요-특징">주요 특징</a></li>
+    <li><a href="#tutorial-코드">Tutorial 코드</a></li>
+    <li><a href="#kafka-streams-애플리케이션-모델">Kafka Streams 애플리케이션 모델</a></li>
+    <li><a href="#topology">Topology</a>
+      <ul>
+        <li><a href="#source-node">Source Node</a></li>
+        <li><a href="#processor-node">Processor Node</a></li>
+        <li><a href="#sink-node">Sink Node</a></li>
+      </ul>
+    </li>
+    <li><a href="#task">Task</a></li>
+    <li><a href="#dsl">DSL</a></li>
+    <li><a href="#kstream-ktable-globalktable">KStream, KTable, GlobalKTable</a>
+      <ul>
+        <li><a href="#kstream">KStream</a></li>
+        <li><a href="#ktable-globalktable">KTable, GlobalKTable</a></li>
+      </ul>
+    </li>
+    <li><a href="#groupby-groupbykey">GroupBy, GroupByKey</a></li>
+    <li><a href="#aggregate">aggregate</a></li>
+    <li><a href="#windowedby">windowedBy</a></li>
+    <li><a href="#processor-api">Processor API</a></li>
+    <li><a href="#statestore의-실태">StateStore의 실태</a></li>
+    <li><a href="#changelog-토픽">changelog 토픽</a>
+      <ul>
+        <li><a href="#복원restore-처리의-주의-사항">복원(restore) 처리의 주의 사항</a></li>
+        <li><a href="#changelog-비활성화">changelog 비활성화</a></li>
+      </ul>
+    </li>
+    <li><a href="#statestore-캐시">StateStore 캐시</a></li>
+    <li><a href="#windowstore의-실태">WindowStore의 실태</a></li>
+  </ul>
+</nav>
+      </div>
+    
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ci/" data-taxonomy-term="ci"><span class="taxonomy-label">CI</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">297</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">e-Book</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gremlin/" data-taxonomy-term="gremlin"><span class="taxonomy-label">Gremlin</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">435</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">jQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">macOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/oauth/" data-taxonomy-term="oauth"><span class="taxonomy-label">OAuth</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">60</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/secure-coding-guide/" data-taxonomy-term="secure-coding-guide"><span class="taxonomy-label">Secure Coding Guide</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spock/" data-taxonomy-term="spock"><span class="taxonomy-label">Spock</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">111</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">40</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">108</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">WEB</span><span class="taxonomy-count">388</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+  
+
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/category/data-science/big-data/">Big Data</a></li>
+  <li class="breadcrumb-item">
+    <a href="https://www.devkuma.com/docs/apache-kafka/">Apache Kafka</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Kafka Streams</li>
+  </ol>
+</nav>
+            
+<div class="td-content">
+	<h1>Kafka Streams를 사용한 스트림 처리 어플리케이션 개발</h1>
+	
+	<header class="article-meta">
+		
+		
+			
+				<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span></a></li>
+    </ul>
+</div>
+
+			
+		
+		
+	</header>
+	
+	<h2 id="스트림-프로세싱이란">스트림 프로세싱이란?</h2>
+<p>이벤트 스트림에 대해 데이터가 도착할 때마다 처리를 하여, 계속해서 이어가는 어플리케이션을 가리킨다. Kafka의 에코시스템에 있어서는 Kafka Broker에 Consumer로서 접속하여 무한 루프로 polling를 실행하여, 데이터가 도착할 때마다 짧은 간격(interval)으로 처리를 실시하는 어플리케이션이다.</p>
+<p>복수의 레코드를 사용해 집계 처리를 실시하는 경우도 있지만, 일정 기간마다 집계 단위를 구분하여, 1건 마다 집계 결과를 업데이트 하거나, 버퍼링해 두고 일정한 간격을 두고 처리를 실행하여 집계를 하는 등의 형태이다.</p>
+<h2 id="stateless-또는-stateful">Stateless 또는 Stateful</h2>
+<p>스트림 프로세싱의 처리 내용은 크게 Stateless 또는 Stateful로 나눌 수 있다.</p>
+<p>Stateless 처리란, 어느 이벤트 레코드가 도착했을 때, 그 레코드만으로 처리가 완료하는 처리를 말한다. 레코드 A를 레코드 B의 형태로 변환하여 다른 토픽이나 다른 데이터 스토어로 전송하는 처리 등이 일반적이다.</p>
+<p>한편, Stateful한 처리란, 도착한 이벤트 레코드나 그것을 기초로 생성한 데이터를 일정 기간 보관 유지해 두고, 그것과 조합하여 결과를 생성하는 처리를 말한다. 일반적으로 이벤트 수를 집계하여 합계, 평균 및 히스토그램(histogram)을 산출하거나, 처리 효율성을 위해 버퍼링하여 정리하여 처리한다거나, 다른 스트림과 데이터 스토어와 데이터를 결합하여 데이터를 질을 높일 수 있게 하는 것을 들 수 있다.</p>
+<p>Stateful한 처리에 있어서는 일정량의 레코드를 저장해 두는 데이터 스토어가 별도 필요하게 되는데, 이를 StateStore라고 한다. 스트림 프로세싱에 있어서의 StateStore에는 중요하게 고려해야 할 포인트가 몇개 존재하는데, 이는 이후에 계속해서 설명하도록 하겠다.</p>
+<h2 id="stateful-애플리케이션의-state-store">Stateful 애플리케이션의 State Store</h2>
+<p>스트림 프로세싱은 어느 데이터가 도달하면 그 때마다 처리가 행해지므로, 어떤 데이터 스토어를 이용하면 데이터가 올 때마다 데이터의 받거나 보존을 해야 한다.</p>
+<p>따라서, 중요한 요소로 낮은 대기 시간이 필요하다. 데이터 양에 따라 Redis와 같은 간단하고 빠른 KVS라도 네트워크 대기 시간이 발생 할수 있기 때문에 충분하다고는 할 수 없다.</p>
+<p>그래서 스트림 프로세싱에서는 기본적으로 각 처리 노드의 로컬에 데이터 스토어를 보관 유지하고 레이턴시를 낮게 유지하는 방법을 채택한다.</p>
+<p>이후에 설명할 Kafka Streams나 Apache Flink 등의 스트림 프로세싱 프레임워크에서는 RocksDB가 사용되고 있다. RocksDB는 애플리케이션에 통합되는 KVS 유형으로 각 노드의 로컬로 RocksDB를 이동시켜 낮은 대기 시간 상태를 유지한다.</p>
+<p>각 노드의 로컬로 이동한다는 것은 노드가 의도하지 않은 사고로 다운되어 복귀 불능이 되면 데이터가 손실될 위험이 있음을 의미한다. 이를 피하기 위해 노드 독립적인 데이터 지속성 메커니즘도 별도로 필요하다. 이 구조에서는 네트워크 통신의 오버 헤드는 불가피하기 때문에 어느 정도의 버퍼링이 필요하다.</p>
+<p>또한, Kafka를 이용한 스트리밍 애플리케이션에서는 확장성을 보장하기 위해 애플리케이션을 분산하여 여러 노드에서 실행할 수 있다. 이러한 경우에는 노드 갯수의 증가에 따라 처리하는 파티션의 할당이 바뀔 가능성이 있다. 앞장에서 설명했듯이 Kafka Consumer는 동일한 Consumer Group에서는 하나의 파티션을 처리할 수 있는 것은 하나의 클라이언트뿐이다. 대수가 증감하면 그 할당이 재배치되게 되어, 처리 대상이 다른 노드에 이동하는 것을 고려하지 않으면 안된다. 처리가 다른 노드로 이동하게 되었을 때에 그때까지 각 노드의 로컬로 보관 유지하고 있던 데이터를 어쨌든 새롭게 처리가 할당할 수 있었던 노드에 옮겨놓지 않으면, 지금까지 유지하고 있던 StateStore의 데이터가 이용 할 수 없게 된다. 예를 들어, 노드가 늘어난 순간에 집계된 카운트가 갑자기 0으로 돌아가게 되는 것이다. 이를 피하기 위해 처리 노드의 전환에 맞게 StateStore를 재배치하는 메커니즘이 필수적이다.</p>
+<h2 id="kafka-streams란">Kafka Streams란?</h2>
+<p>Kafka Streams는 Apache Kafka 개발 프로젝트에서 공식적으로 제공되는 스트림 프로세싱 프레임워크이다. Java로 구현되어 있다.</p>
+<p>앞에서 설명한 대로 Stateful한 어플리케이션을 구현하려고 하면, 그 상태 관리에 상당히 복잡한 구조가 요구된다. Kafka Streams를 이용하면 프레임워크가 이러한 복잡성을 간소화 할수 있다. 또, Consumer 클라이언트의 polling loop나 다른 토픽에 레코드를 전송하기 위한 Producer 클라이언트의 집계 등도 복잡해지기 때문에, Stateless인 어플리케이션이라도 대폭으로 코드를 간략화할 수 있다.</p>
+<p>기본적으로 여기에서 설명하는 것은 Confluent가 제공하는 <a href="https://docs.confluent.io/platform/current/streams/concepts.html" target="_blank" rel="noopener">문서<i class="fas fa-external-link-alt"></i></a>에 대략적으로 작성되어 있다. 더 상세를 알고 싶다면 참조하여라.</p>
+<p>cf. <a href="https://docs.confluent.io/platform/current/streams/concepts.html" target="_blank" rel="noopener">Confluent | Streams Concepts<i class="fas fa-external-link-alt"></i></a></p>
+<h2 id="주요-특징">주요 특징</h2>
+<p>Kafka의 개발에 주요한 역할을 담당하고 있는 <a href="https://docs.confluent.io/platform/current/streams/introduction.html" target="_blank" rel="noopener">Confluent의 문서<i class="fas fa-external-link-alt"></i></a>에 따르면 다음과 같은 특징이 있다.</p>
+<blockquote>
+<p><strong>Powerful</strong></p>
+<ul>
+<li>Makes your applications highly scalable, elastic, distributed, fault-tolerant</li>
+<li>Supports exactly-once processing semantics</li>
+<li>Stateful and stateless processing</li>
+<li>Event-time processing with windowing, joins, aggregations</li>
+<li>Supports Kafka Streams Interactive Queries to unify the worlds of streams and databases</li>
+<li>Choose between a declarative, functional API and a lower-level imperative API for maximum control and flexibility</li>
+</ul>
+</blockquote>
+<p><strong>고기능</strong></p>
+<ul>
+<li>애플리케이션에 높은 확장성, 탄력성, 분산성, 내결함성을 구현</li>
+<li>&ldquo;엄밀히 한번&quot;의 처리 시멘틱스 지원</li>
+<li>Stateful와 stateless 프로세싱</li>
+<li>윈도우, 조인, 집계를 사용한 이벤트 시간 프로세싱</li>
+<li>스트림과 데이터베이스를 통합하기 위해 Kafka Streams의 대화형 쿼리를 지원</li>
+<li>높은 제어성과 유연성을 위해 선언형으로 함수형 API와 하위 레벨의 명령형 API 중에서 선택할 수 있다.</li>
+</ul>
+<blockquote>
+<p><strong>Lightweight</strong></p>
+<ul>
+<li>Low barrier to entry</li>
+<li>Equally viable for small, medium, large, and very large use cases</li>
+<li>Smooth path from local development to large-scale production</li>
+<li>No processing cluster required</li>
+<li>No external dependencies other than Kafka</li>
+</ul>
+</blockquote>
+<p><strong>가벼운 기능</strong></p>
+<ul>
+<li>도입에 진입 장벽이 낮음</li>
+<li>소규모, 중규모, 대규모, 특대규모의 사례에 대응</li>
+<li>로컬 개발 환경에서 대규모 프로덕션 환경으로 원활하게 전환</li>
+<li>처리 클러스터 필요 없음</li>
+<li>Kafka 이외의 외부 종속성 없음</li>
+</ul>
+<p>cf. <a href="https://docs.confluent.io/platform/current/streams/introduction.html" target="_blank" rel="noopener">Confluent | Introduction<i class="fas fa-external-link-alt"></i></a></p>
+<p>이 중에서도 가장 중요하다고 생각되는 점은 Kafka 이외의 외부 의존관계가 없다는 점이다. 이러한 분산 처리 프레임워크의 경우, YARN과 같은 리소스 매니저나 다른 데이터 스토어가 필요한 경우도 종종 있지만, Kafka Streams에는 필요하지 않는다. 이는 도입의 진입 장벽을 크게 낮춰준다.</p>
+<h2 id="tutorial-코드">Tutorial 코드</h2>
+<p>Kafka Streams으로 응용 프로그램을 만들려먼 다음과 같은 코드를 작성해야 한다. (공식 문서로부터의 인용을 조금 변경한 것이다.)</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.KafkaStreams</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.kstream.StreamsBuilder</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.processor.Topology</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Use the builders to define the actual processing topology, e.g. to specify
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// from which input topics to read, which stream operations (filter, map, etc.)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// should be called, and so on.  We will cover this in detail in the subsequent
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// sections of this Developer Guide.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000">StreamsBuilder</span> <span style="color:#000">builder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">StreamsBuilder</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">builder</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">stream</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">inputTopic</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Consumed</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">with</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">stringSerde</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">stringSerde</span><span style="color:#ce5c00;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">peek</span><span style="color:#ce5c00;font-weight:bold">((</span><span style="color:#000">k</span><span style="color:#ce5c00;font-weight:bold">,</span><span style="color:#000">v</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">logger</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">info</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Observed event: {}&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">v</span><span style="color:#ce5c00;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">mapValues</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">s</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">s</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">toUpperCase</span><span style="color:#ce5c00;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">peek</span><span style="color:#ce5c00;font-weight:bold">((</span><span style="color:#000">k</span><span style="color:#ce5c00;font-weight:bold">,</span><span style="color:#000">v</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">logger</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">info</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Transformed event: {}&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">v</span><span style="color:#ce5c00;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">to</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">outputTopic</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Produced</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">with</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">stringSerde</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">stringSerde</span><span style="color:#ce5c00;font-weight:bold">));</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">Topology</span> <span style="color:#000">topology</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">builder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">build</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">//
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// OR
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">//
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">topology</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">addProcessor</span><span style="color:#ce5c00;font-weight:bold">(...);</span> <span style="color:#8f5902;font-style:italic">// when using the Processor API
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Use the configuration properties to tell your application where the Kafka cluster is,
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// which Serializers/Deserializers to use by default, to specify security settings,
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// and so on.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">Properties</span> <span style="color:#000">props</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#ce5c00;font-weight:bold">...;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">KafkaStreams</span> <span style="color:#000">streams</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">KafkaStreams</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">topology</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">props</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">streams</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">start</span><span style="color:#ce5c00;font-weight:bold">();</span> <span style="color:#8f5902;font-style:italic">// non blocking
+</span></span></span></code></pre></div><p>이처럼 Kafka Streams는 DSL을 연결하거나 Processor API 라는 특정 인터페이스에 규칙에 맞게 Java 클래스를 구현하는 것만으로 Kafka에 접속하는 Conumer나 Producer의 만들어지고, 처리 스레드의 시작 등의 간략화할 수 있다.</p>
+<h2 id="kafka-streams-애플리케이션-모델">Kafka Streams 애플리케이션 모델</h2>
+<p>Kafka Streams는 Source Node, Processor Node, Sink Node를 조합하여 Topology라는 단위를 만들어 애플리케이션을 구축한다. 각각 어떤 의미를 가지는지 설명해 보도록 하겠다.</p>
+<h2 id="topology">Topology</h2>
+<p>Topology 라는 단어는 기본으로 수학 용어로 위상 기하학을 나타낸다. 수학적인 것이라 자세하게는 설명할 수 없지만 물건의 형상이 가지는 성질에 초점을 맞춘 학문과 같은 거다. 거기에서 파생되어 네트워크 토폴로지 라는 네트워크 그래프가 어떤 구성을 하고 있는지의 형상 패턴을 가리키는 용어가 있다. Kafka Streams의 Topology는이 네트워크 토폴로지 와 동일하다고 생각할 수 있다.</p>
+<p>Topology 라는 단어는 기본으로 수학 용어로 위상 기하학을 나타낸다. 수학도가 아니어서 자세하게는 설명할 수 없지만, 물건의 형상이 가지는 성질에 초점을 맞춘 학문과 같은 것이다. 거기에서 파생되어 네트워크 토폴로지라는 네트워크 그래프가 어떤 구성을 하고 있는지의 형상 패턴을 가리키는 용어가 있다. Kafka Streams의 Topology는 이 네트워크 토폴로지와 동일하다고 생각할 수 있다.</p>
+<p>Kafka Streams는 특정 역할을 가진 노드를 연결하여 그래프 구조를 구축하고 Topology를 형성하고 동작한다. 이 Topology는 2개 이상의 하위 토폴로지에 의해 형성될 수 있다.</p>
+<img src="/docs/kafka/streams-architecture-topology.jpeg" alt="Streams architecture topology" width="50%" height="50%">
+<p>이미지 : <a href="https://docs.confluent.io/platform/current/streams/architecture.html" target="_blank" rel="noopener">Confluent | Streams Architecture<i class="fas fa-external-link-alt"></i></a></p>
+<p>이러한 그래프 구조를 하나 이상 보관 유지하는 객체가 Kafka Streams의 Topology이다.</p>
+<p>두개 이상의 하위 토폴로지가 어떻게 생성되는지에 따라, 하나의 응용 프로그램이 여러 소스 토픽에서 데이터를 받아오도록 정의되었고, 소스 토픽에 의존하는 Processor Node 또는 Sink Node에 직접 종속성이 없는 경우이다. 즉, Source Node에서 추적하여 하나의 그래프가 구축되도록 의존관계가 연결되어 있는 범위가 하나의 서브 토폴로지이다. 위의 예에서는 Source Node가 여러 개 있지만, 아래 Processor가 양쪽의 Source Node에 의존하고 있기 때문에 그래프가 하나에 연결되어 있는 것을 알 수 있다. 이 경우 서브 토폴로지는 하나이다. 만약, 왼쪽의 Source Node가 그 외의 전체와 독립해 어떤 것도 연결되어 있지 않은 Processor Node에만 의존하고 있는 경우는 2개의 서브 토폴로지가 될 수 있게 된다.</p>
+<h3 id="source-node">Source Node</h3>
+<p>Kafka 토픽서 데이터를 받아오는 처리를 수행하는 노드를 Source Node라고 한다. Kafka Streams에는 세 가지 유형의 데이터 받아오는 패턴이 있다. 자세한 내용은 DSL 섹션에서 설명하겠다. 위의 샘플 코드의 DSL에는 stream가 그에 해당한다.</p>
+<h3 id="processor-node">Processor Node</h3>
+<p>Source Node에서 받은 데이터를 실제로 처리하는 노드를 가리킨다. 실제로 개발자가 구현하는 것은 거의 이 노드가 된다. Processor Node는 여러개를 연결할 수 있다. 처리 과정을 분할하는 것으로 보기 좋게 구현할 수 있다. 위의 샘플 코드의 DSL 에서는 <code>peek</code>와 <code>mapValues</code>가 이에 해당된다.</p>
+<h3 id="sink-node">Sink Node</h3>
+<p>다른 Kafka 토픽에 데이터를 전송하는 처리를 수행하는 노드를 가리킨다. 위의 샘플 코드의 DSL은 <code>to</code>가 이에 해당한다.</p>
+<p>이와 같이 Source Node가 어떠한 토픽으로부터 데이터를 받아와 Processor Node로 어떠한 처리를 실시하여 데이터를 가공하거나 일시적으로 보존하거나 다른 데이터 스토어에 저장하거나, 필요하다면 그 데이터를 또 다른 토픽으로 내보내어 다른 처리에 연결해 간다. Kafka Streams 응용 프로그램은 이렇게 구축된다.</p>
+<h2 id="task">Task</h2>
+<p>Kafka Streams는 당연히 여러 머신에서 분산 처리를 할 수 있도록 설계되어 있다. Kafka Streams에는 서브 토폴로지가 polling 대상으로 하는 소스  토픽의 파티션 수에 해당하는 작업(Task)라는 단위로 클라이언트에 처리를 할당한다.</p>
+<p>예를 들어, 토폴로지 A에 서브 토폴로지 A-1과 서브 토폴로지 A-2가 있고, 서브 토폴로지 A-1가 토픽 B-1을 서브 토폴로지 A-2가 토픽 B-2를 참조한다고 가정한다. 이 때 토픽 B-1의 파티션 수가 8이고 토픽 B-2의 파티션 수가 10이면, 1_0 ~ 1_7이라는 태스크와 2_0 ~ 2_10이라는 태스크가 작성된다. 태스크의 총 수는 18이다. 이 18개의 작업을 현재 Consumer Group에 속한 클라이언트에 할당한다. 할당 전략에는 몇 가지 패턴이 있지만 이러한 동작에 대한 자세한 내용은 다음 번부터 설명하겠다.</p>
+<h2 id="dsl">DSL</h2>
+<p>위에서 설명한 토폴로지를 쉽게 구축하기 위해 Kafka Streams는 편리한 DSL을 제공한다. DSL을 사용하면, Lambda를 메서드 체인으로 연결하는 인터페이스로 스트림 응용 프로그램을 쉽게 작성할 수 있다.</p>
+<p>이에 관해서는 전체를 알고 싶다면 <a href="https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html" target="_blank" rel="noopener">공식 문서<i class="fas fa-external-link-alt"></i></a>을 참조하여라.</p>
+<p>이후에는 중요한 DSL에 대해서만 설명하도록 하겠다.</p>
+<h2 id="kstream-ktable-globalktable">KStream, KTable, GlobalKTable</h2>
+<p>Kafka Streams의 DSL에는 토픽에서 데이터를 받아오는 방법으로 세 가지 패턴을 제공한다. 이 3가지 입력을 나타내는 객체에 대해 메서드 호출을 연결하는  것으로 DSL을 설명한다.</p>
+<h3 id="kstream">KStream</h3>
+<p>간단한 Kafka 토픽의 입력 스트림을 가리킨다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">StreamsBuilder</span> <span style="color:#000">builder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">StreamsBuilder</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">KStream</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">wordCounts</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">builder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">stream</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;word-counts-input-topic&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic">/* input topic */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Consumed</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">with</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#8f5902;font-style:italic">/* key serde */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">()</span>   <span style="color:#8f5902;font-style:italic">/* value serde */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>이와 같이 입력을 할 때에 Serde(Serializer/Deserializer)를 지정한다. (실제 입력에서는 Deserializer만 이용되지 않는다.)</p>
+<p>이 Serde를 통해 Kafka Streams는 Java 객체와 바이트 배열을 자동으로 변환한다.</p>
+<h3 id="ktable-globalktable">KTable, GlobalKTable</h3>
+<p>테이블과 같이 취급할 수 있는 입력 스트림을 가리킨다. 테이블처럼 취급할 수 있다는 것은 로드 시작부터 현재에 이르기까지 Kafka Broker에 입력된 모든 레코드를 로컬로 유지하고 있어 다른 스트림과 결합하거나 KVS처럼 사용할 수 있음을 의미한다.</p>
+<p>이는 입력 레코드의 상태를 보관 유지하고 있는 것이고, KTable를 사용하는 것은 Stateful인 어플리케이션이다.</p>
+<p>KTable은 각 파티션의 내용이 할당된 클라이언트에만 유지되지만, GlobalKTable은 모든 노드가 한 항목의 모든 파티션의 데이터를 계속 유지된다. 따라서 입력 토픽의 데이터 양을 주의해서 활용해야 한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">GlobalKTable</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">wordCounts</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">builder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">globalTable</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;word-counts-input-topic&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Materialized</span><span style="color:#ce5c00;font-weight:bold">.&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">KeyValueStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">Bytes</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">byte</span><span style="color:#ce5c00;font-weight:bold">[]&gt;&gt;</span><span style="color:#000">as</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#4e9a06">&#34;word-counts-global-store&#34;</span> <span style="color:#8f5902;font-style:italic">/* table/store name */</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">withKeySerde</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">())</span> <span style="color:#8f5902;font-style:italic">/* key serde */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">withValueSerde</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">())</span> <span style="color:#8f5902;font-style:italic">/* value serde */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>KTable에는 저장소 이름과 저장할 데이터의 Serde가 필요하다. 이 저장소 이름을 사용하면 각 노드에 RocksDB 데이터베이스 파일이 만들어지고 여기에 데이터가 모인다. 이 데이터 스토어를 StateStore라고 한다. 위에 예이 있는 <code>Materialized.as</code>라는 메서드를 이용해 스토어명이나 Serde를 전환하거나, 그 외 인수의 건네주는 방법으로 인메모리의 데이터 스토어를 사용하도록 변경하는 것도 가능하다.</p>
+<p>StateStore에 보존된 데이터는 (인메모리 스토어가 아닌 한) 프로세스가 재기동해도 유지되지만, 파티션의 할당이 바뀌어 담당하는 태스크가 전환되면 불필요해 지거나, 새롭게 재작성이 필요하게 될 수 있다. 더 이상 필요하지 않은 RocksDB 데이터는 일정 기간 후에 자동으로 삭제된다.</p>
+<h2 id="groupby-groupbykey">GroupBy, GroupByKey</h2>
+<p>KStream이나 KTable을 집계하고 싶을 때, 어느 키를 기본으로 집계할지를 지정하는 DSL이다. count 또는 aggregate의 전제로 호출해야 한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">KGroupedStream</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">groupedStream</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">stream</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">groupBy</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">key</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">value</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">value</span><span style="color:#ce5c00;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Grouped</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">with</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#8f5902;font-style:italic">/* key (note: type was modified) */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">())</span>  <span style="color:#8f5902;font-style:italic">/* value */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>groupBy를 이용하면 반드시 데이터의 재 파티션이 이루어 진다. 재 파티션은, 재 파티션용의 토픽이 자동으로 생성되고 해당 토픽으로 레코드를 전송하여 다시 받아오는 처리를 한다. 네트워크 및 스토리지에 중복 부하가 걸리므로 재 파티션 은 최대한 피해야 한다.</p>
+<p>재 파티셔닝을 피하려면 groupByKey를 사용한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">KGroupedStream</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">groupedStream</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">stream</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">groupByKey</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Grouped</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">with</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic">/* key */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">())</span>     <span style="color:#8f5902;font-style:italic">/* value */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>groupByKey는 현재 키를 그대로 사용하여 그룹화를 지정한다. 이 경우는 처리의 과정에서 키가 변경되지 않으면, 재 파티션은 수행되지 않는다. map 등의 변환 처리에 의해 키가 변경되고 있는 경우에는 groupByKey를 사용해도 재 파티션이 실행되어 버린다.</p>
+<h2 id="aggregate">aggregate</h2>
+<p>DSL 중에서 가장 범용적인 집계 처리를 구현할 수 있는 DSL이다. 이니셜(initial)의 값을 생성하는 이니셜라이저(initialize), 새롭게 레코드가 도착했을 때에 실행되는 가산기(adder), 변경전의 레코드의 정보를 이용해 실행되는 서브 트랙터(subtractor, 옵션)의 3개의 람다를 건네주어 집계 처리를 구현한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">KTable</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">byte</span><span style="color:#ce5c00;font-weight:bold">[],</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">aggregatedTable</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">groupedTable</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">aggregate</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000">L</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic">/* initializer */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">aggKey</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">newValue</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">aggValue</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">aggValue</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">newValue</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">length</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#8f5902;font-style:italic">/* adder */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">aggKey</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">oldValue</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">aggValue</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">aggValue</span> <span style="color:#ce5c00;font-weight:bold">-</span> <span style="color:#000">oldValue</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">length</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#8f5902;font-style:italic">/* subtractor */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Materialized</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">as</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;aggregated-table-store&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">/* state store name */</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">withValueSerde</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">())</span> <span style="color:#8f5902;font-style:italic">/* serde for aggregate value */</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>집계 결과를 처리 노드의 로컬에 계속 유지하고 있지 않으면, 다음의 레코드가 도착했을 때에 현재의 집계치가 무엇인가 알 수 없다. 따라서 집계 처리는 필연적으로 KTable가 있어야 한다. 집계된 결과는 DSL 이 자동으로 구축한 StateStore에 저장되고 유지된다.</p>
+<p>StateStore의 실태에 대해서는 여러가지 알아야 하는 하는 요소가 있기 때문에, 이 후에 정리해 설명하도록 하겠다. 우선 결과가 StateStore라는 위치에 저장된다는 것을 기억하자.</p>
+<h2 id="windowedby">windowedBy</h2>
+<p>일정 시간마다 집계 범위를 구분할 수 있는 DSL이다. 이 기능을 사용하면 5분마다 합계를 계속 계산하거나, 한 번의 세션에 포함된 이벤트 수를 세는 등의 작업을 할 수 있다. window 처리는 시간축에 의존하는 처리이므로, 레코드의 타임 스탬프와 보존 기간이 중요하다. 경우에 따라 오래된 타임 스탬프의 레코드가 늦게 도착할 수 있으며 오래된 집계 데이터를 언제든지 보유하면 데이터가 무한히 증가하여 스토리지를 압박하게 된다. 이러한 상황에 대응하기 위해 window 처리에는 보관 기간을 별도로 설정할 수 있도록 되어 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Aggregating with time-based windowing (here: with 5-minute tumbling windows)
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">KTable</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">Windowed</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">timeWindowedAggregatedStream</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">groupedStream</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">windowedBy</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">TimeWindows</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">of</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Duration</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">ofMinutes</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">5</span><span style="color:#ce5c00;font-weight:bold">)))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">aggregate</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ce5c00;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000">L</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic">/* initializer */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">aggKey</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">newValue</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">aggValue</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">aggValue</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#000">newValue</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#8f5902;font-style:italic">/* adder */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Materialized</span><span style="color:#ce5c00;font-weight:bold">.&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">WindowStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">Bytes</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">byte</span><span style="color:#ce5c00;font-weight:bold">[]&gt;&gt;</span><span style="color:#000">as</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;time-windowed-aggregated-stream-store&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">/* state store name */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">withValueSerde</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">()));</span> <span style="color:#8f5902;font-style:italic">/* serde for aggregate value */</span>
+</span></span></code></pre></div><p>윈도우 처리에는 그 구분 방법에 따라 Tumbling Window, Sliding Window, Hopping Window, Session Window와 현재 4가지 종류가 있다. 비교적 복잡하기 해서 자세한 내용은 <a href="https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html#windowing" target="_blank" rel="noopener">confluent 문서<i class="fas fa-external-link-alt"></i></a>를 참고하길 바란다.</p>
+<h2 id="processor-api">Processor API</h2>
+<p>Kafka Streams의 low level API 에 해당하는 것으로, 위에 DSL 은 모두 이 Processor API 로 구현되고 있다.</p>
+<p>간단히 말해 Processor API 는 단순한 클래스 정의로 사용할 수 있다. <code>init</code> 메서드 <code>ProcessorContext</code>라는 객체가 주어지므로 이를 이용하여 Kafka Streams 정보를 얻고, StateStore에 대한 참조를 하거나 하여 후속 처리에 데이터를 보낼 수 있다. 자세한 내용은 <a href="https://docs.confluent.io/platform/current/streams/developer-guide/processor-api.html" target="_blank" rel="noopener">confluent 문서<i class="fas fa-external-link-alt"></i></a>을 참조하여라.</p>
+<p>처리의 실태는 <code>process</code> 메서드에 구현하게 되고 있어, 레코드가 도착하게 될때마다 이 처리가 호출된다. 또한 일정 시간마다 스케줄 처리를 할 수도 있다. <code>ProcessorContextl#schedule</code> 메서드에서 Punctuator라는 처리를 등록하여 일정 기간마다 자동으로 실행할 수 있다. 실행 간격의 타임 스탬프를 처리하는 방법에 대해 Kafka Streams는 STREAM_TIME과 WALL_CLOCK_TIME의 두 가지 유형을 제공한다. 각각의 차이에 대해서는 위에 링크에 상세 내용을 참조하여라.</p>
+<p>다음은 위 문서에서 인용한 코드 샘플이다. 중요한 부분은 StateStore를 받아오는 부분, 스케줄 처리를 등록하는 부분, 그리고 <code>context.forward</code>를 호출하여 이후에 레코드를 전달하는 부분이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">WordCountProcessor</span> <span style="color:#204a87;font-weight:bold">implements</span> <span style="color:#000">Processor</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">private</span> <span style="color:#000">KeyValueStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Integer</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">kvStore</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">init</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">ProcessorContext</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">schedule</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Duration</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">ofSeconds</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">),</span> <span style="color:#000">PunctuationType</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">STREAM_TIME</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">timestamp</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">try</span> <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">KeyValueIterator</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Integer</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">iter</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">kvStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">all</span><span style="color:#ce5c00;font-weight:bold">())</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#204a87;font-weight:bold">while</span> <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">iter</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">hasNext</span><span style="color:#ce5c00;font-weight:bold">())</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">KeyValue</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Integer</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">entry</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">iter</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">next</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">forward</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Record</span><span style="color:#ce5c00;font-weight:bold">&lt;&gt;(</span><span style="color:#000">entry</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">key</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">entry</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">value</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">toString</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#000">timestamp</span><span style="color:#ce5c00;font-weight:bold">));</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ce5c00;font-weight:bold">});</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">kvStore</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">getStateStore</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Counts&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">process</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">Record</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">record</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">[]</span> <span style="color:#000">words</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">record</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">value</span><span style="color:#ce5c00;font-weight:bold">().</span><span style="color:#c4a000">toLowerCase</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">Locale</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">getDefault</span><span style="color:#ce5c00;font-weight:bold">()).</span><span style="color:#c4a000">split</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;\\W+&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">String</span> <span style="color:#000">word</span> <span style="color:#ce5c00;font-weight:bold">:</span> <span style="color:#000">words</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">final</span> <span style="color:#000">Integer</span> <span style="color:#000">oldValue</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">kvStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">get</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">word</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">oldValue</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#204a87;font-weight:bold">null</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000">kvStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">put</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">word</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ce5c00;font-weight:bold">}</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000">kvStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">put</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">word</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">oldValue</span> <span style="color:#ce5c00;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#5c35cc;font-weight:bold">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">public</span> <span style="color:#204a87;font-weight:bold">void</span> <span style="color:#000">close</span><span style="color:#ce5c00;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// close any resources managed by this processor
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#8f5902;font-style:italic">// Note: Do not close any StateStores as these are managed by the library
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#ce5c00;font-weight:bold">}</span>
+</span></span></code></pre></div><p>이는 Kafka Streams 안에 넣기 위해서는 <code>Topology</code> 클래스의 constructor, 또는 로 생성된 topology 에 대해서 를 호출하는 것으로, 임의의 Processor 클래스를 꽂을 수가 있다. 또, 이 때 이용하고 싶은 StateStore가 있으면 그 이름을 건네주어 관련짓습니다. 그렇지 않으면 Processor API 에서 StateStore를 찾을 수 없다. 이 경우 예외가 발생한다. <code>StreamBuilder#build</code> <code>Topology#addProcessor</code></p>
+<p>이를 Kafka Streams 안에 넣으려면, <code>Topology</code> 클래스의 생성자 또는 <code>StreamBuilder#build</code>에서 생성된 topology에 대해 <code>Topology#addProcessor</code>를 호출하여 모든 Processor 클래스를 지정할 수 있다. 또, 이 때 이용하고 싶은 StateStore가 있으면 그 이름을 넘겨 지정한다. 그렇지 않으면 Processor API에서 StateStore를 찾을 수 없다. 이 경우 예외가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">Topology</span> <span style="color:#000">builder</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">Topology</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// add the source processor node that takes Kafka topic &#34;source-topic&#34; as input
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000">builder</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">addSource</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Source&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;source-topic&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// add the WordCountProcessor node which takes the source processor as its upstream processor
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">addProcessor</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Process&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#204a87;font-weight:bold">new</span> <span style="color:#000">WordCountProcessor</span><span style="color:#ce5c00;font-weight:bold">(),</span> <span style="color:#4e9a06">&#34;Source&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// add the count store associated with the WordCountProcessor processor
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">addStateStore</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">countStoreSupplier</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Process&#34;</span><span style="color:#ce5c00;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// add the sink processor node that takes Kafka topic &#34;sink-topic&#34; as output
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#8f5902;font-style:italic">// and the WordCountProcessor node as its upstream processor
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">addSink</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Sink&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;sink-topic&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;Process&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><h2 id="statestore의-실태">StateStore의 실태</h2>
+<p>공식적으로 제공되고 있는 StateStore는 크게 나누어 RocksDB를 이용한 persistent 스토어와 프로세스가 종료하면 없어지는 휘발성 인메모리 스토어의 2가지 종류가 있는데, 일반적으로 자주 사용되는 것은 persistent 스토어으로 생각된다. 우선 공통의 요소에 대해 설명하도로 하겠다. 덧붙여서, API의 형식에 따라 자체 구현을 하면, 독자적인 StateStore를 정의하는 것도 가능하다.</p>
+<p>StateStore를 low level API 로 이용하는 경우는 스스로 StateStore를 구축할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// Creating a persistent key-value store:
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic">// here, we create a `KeyValueStore&lt;String, Long&gt;` named &#34;persistent-counts&#34;.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.processor.StateStoreSupplier</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.state.StoreBuilder</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">org.apache.kafka.streams.state.Stores</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000">StoreBuilder</span> <span style="color:#000">countStoreBuilder</span> <span style="color:#ce5c00;font-weight:bold">=</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000">Stores</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">keyValueStoreBuilder</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Stores</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">persistentKeyValueStore</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;persistent-counts&#34;</span><span style="color:#ce5c00;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">(),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>이는 Processor API 로 이용하고 싶을 때에는 다음과 같은 형태로 이용한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">KeyValueStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">counterStore</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">getStateStore</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;persistent-counts&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">long</span> <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">counterStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">fetch</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;key&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">count</span><span style="color:#ce5c00;font-weight:bold">++;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">counterStore</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">put</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;key&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">count</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>이 예에서는 간단한 키의 완전 일치되는 경우를 받아오고 있지만, Kafka Streams가 제공하고 있는 StateStore는 키의 바이트열로 정렬 되고 있기 때문에, <code>range</code> 메서드를 사용해 일정한 범위의 키를 얻을 수도 있다.</p>
+<p>StateStore에서 중요한 요소는 다음과 같다.</p>
+<ul>
+<li>KVS이며, 키 순서로 정렬된다.</li>
+<li>키와 값 모두 실제로 저장되는 값은 바이트 열이며, 애플리케이션과 상호 작용할 때 Serialize/Deserialize를 수행한다.</li>
+<li>changelog 토픽을 이용하여 내구성을 보증한다.</li>
+<li>읽고 쓰기에 대한 cache의 메커니즘을 가지고 있다.</li>
+</ul>
+<h2 id="changelog-토픽">changelog 토픽</h2>
+<p>앞에서 가볍게 다뤘지만, StateStore를 사용하면 자동으로 changelog 토픽이라는 것이 Kafka Broker에 작성된다. (인메모리 스토어의 경우는 디폴트 무효)</p>
+<p>changelog 토픽는 StateStore에 작성된 변경 사항을 보유하는 토픽이다. StateStore에 데이터가 쓰여지거나 삭제되거나 (null을 넣거나) 할 때마다 changelog 토픽에 레코드가 전송된다.</p>
+<p>Kafka Streams에는 이 changelog 토픽를 사용하여 처리 노드 다운 및 태스크 재할당에 대응한다.</p>
+<p>Kafka Streams 프로세스가 새로 시작되면, 응용 프로그램이 StateStore를 사용하도록 정의되어 있고, 로컬 저장소에 StateStore 데이터가 없으면 Kafka Streams가 복원 처리를 수행하여 Kafka Broker에 존재한다. changelog 토픽에서 모든 레코드를 검색 하고 로컬 StateStore를 복원한다.</p>
+<p>마찬가지로 노드의 증감에 의해 리밸런스가 실행되어 태스크가 재할당되었을 때에도, 자신의 로컬에 할당할 수 있었던 태스크 ID에 대응하는 StateStore가 존재하지 않는 경우, 우선 레스토어 처리가 실행되고 나서 처리가 계속 된다.</p>
+<p>Kafka Broker는 production에서 운용하는 경우 보통이면 3개 이상의 복제본을 갖도록 설정되어 있으며, 데이터 자체의 내결함성은 Kafka Broker의 기능에 의해 보장되도록 되어 있다.</p>
+<h3 id="복원restore-처리의-주의-사항">복원(restore) 처리의 주의 사항</h3>
+<p>StateStore를 활용할 때 가장 주의해야 하는 것은 복원 처리이다.</p>
+<p>Kafka Streams는 Restore이 필요할 때 처리를 중지한다. 처리가 시작 및 재개되는 것은 복원 처리가 완료된 후이다. 즉, StateStore에 쌓여 있는 데이터량이 매우 많아지면, Restore 처리에 걸리는 시간도 장기화되어, 막상 노드가 다운하거나 증감할 때에 긴 시간 처리가 정지하는 위험이 생긴다.</p>
+<p>이를 피하는 것은 현재 매우 어려운 문제이다. 일정 이상 낡은 데이터나 이용 빈도가 낮은 데이터는 네트워크의 오버헤드를 허용해 외부 스토어에 놓치는 등, 데이터량을 삭감하는 구조를 얽히게 쌓을 수 밖에 없다.</p>
+<h3 id="changelog-비활성화">changelog 비활성화</h3>
+<p>StateStore를 만들 었을 때, StoreBuilder의 <code>withLoggingDisabled()</code>를 호출하면 changelog 와의 관계를 무효화 할 수 있다. 인메모리 스토어의 경우 기본적으로 비활성화되어 있다.</p>
+<p>changelog 토픽이 사용 불가능하면 복원 처리가 수행되지 않는다. RocksDB 스토어를 사용하는 경우, 동일한 노드에서 동일한 ID의 태스크가 실행되는 한 데이터가 계속 유지된다. 한편, Consumer의 리밸런스에 의해 태스크의 재배치가 행해졌을 경우나 처리 노드가 다운되어 복귀 불가능하게 되었을 경우는 그 데이터는 소멸된다.</p>
+<p>주요 용도는 로컬 캐시이다. 메모리를 극복하지 않는 양이라도 파일 시스템을 이용해 노드 로컬의 캐시로서 이용할 수가 있다.</p>
+<p>예를 들어, 불변의 데이터이면 외부의 데이터 스토어에 축적해 두고, 최초의 한번은 네트워크 액세스의 오버헤드가 발생하지만, 그 후에는 로컬의 파일 시스템에 캐시되어 네트워크를 경유한 액세스를 회피 하는 등의 용도로 이용할 수 있다.</p>
+<h2 id="statestore-캐시">StateStore 캐시</h2>
+<p>스트림 처리는 그 특징상 단기간에 같은 키의 데이터를 몇번이나 읽고 쓰기할 가능성이 높은 것이다. 예를 들어, user_id의 링크를 통해서 숫자 등을 계산하는 경우, 해당 이벤트 레코드가 집중되어 아무 것도 도착하지 않을 수 있다. 이런 상황에서 매번 스토리지에 데이터를 쓰고 changelog 토픽을 변경하는 것은 쓸모없는 오버헤드로 이어질 수 있다.</p>
+<p>Kafka Streams에서는 이를 피하기 위해 캐시가 기본적으로 활성화되어 있다. 기입한 내용은 일정 기간 메모리에 유지되어 flush 타이밍으로 실제의 StateStore에 기입 changelog 를 갱신한다.</p>
+<p>DSL로 구축된 KTable에서는 이 캐시 기능을 이용하여 forward가 지연된다. 예를 들어 aggregate에서 집계된 결과를 다음 DSL 에서 사용하거나 다른 주제로 보낼 때 기본 동작은 일정 기간 동안 StateStore에 캐시되어 버퍼링된다. 일정 시간이 지나거나 캐시를 위한 메모리 공간을 소모하면 CacheFlushListener가 레코드를 다음 프로세서로 전달된다.</p>
+<h2 id="windowstore의-실태">WindowStore의 실태</h2>
+<p>방금 DSL 설명에서 <code>windowBy</code>라는 DSL에 대해 소개하였다. 이 DSL 을 이용함으로써 일정 시간 윈도우마다 레코드를 집계할 수 있다.</p>
+<p>사실 이것은 WindowStore라는 StateStore의 변형에 의해 구현된다. WindowStore를 작성할 때는 다음과 같다. 1분마다의 윈도우 폭으로, 2시간분의 데이터를 보관 유지하는 WindowStore는 아래와 같이 작성한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">StoreBuilder</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">WindowStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;&gt;</span> <span style="color:#000">counterStoreByMinute</span> <span style="color:#ce5c00;font-weight:bold">=</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#000">Stores</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">windowStoreBuilder</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#000">Stores</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">persistentWindowStore</span><span style="color:#ce5c00;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#4e9a06">&#34;counter&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#000">Duration</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">ofHours</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">2</span><span style="color:#ce5c00;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#000">Duration</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">ofMinutes</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#204a87;font-weight:bold">false</span><span style="color:#ce5c00;font-weight:bold">),</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">String</span><span style="color:#ce5c00;font-weight:bold">(),</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#000">Serdes</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">Long</span><span style="color:#ce5c00;font-weight:bold">());</span>
+</span></span></code></pre></div><p>이는 Processor API 로 이용하고 싶을 때에는 다음과 같은 형태로 이용한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#000">WindowStore</span><span style="color:#ce5c00;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">Long</span><span style="color:#ce5c00;font-weight:bold">&gt;</span> <span style="color:#000">counterStoreByMinute</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">getStateStore</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;counter&#34;</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">long</span> <span style="color:#000">durationMillis</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">Duration</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">ofMinutes</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#ce5c00;font-weight:bold">).</span><span style="color:#c4a000">toMillis</span><span style="color:#ce5c00;font-weight:bold">();</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">long</span> <span style="color:#000">currentWindowStart</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#000">context</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">timestamp</span><span style="color:#ce5c00;font-weight:bold">()</span> <span style="color:#ce5c00;font-weight:bold">/</span> <span style="color:#000">durationMillis</span><span style="color:#ce5c00;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">*</span> <span style="color:#000">durationMillis</span><span style="color:#ce5c00;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">long</span> <span style="color:#000">count</span> <span style="color:#ce5c00;font-weight:bold">=</span> <span style="color:#000">counterStoreByMinute</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">fetch</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;key&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">windowStart</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">count</span><span style="color:#ce5c00;font-weight:bold">++;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">counterStoreByMinute</span><span style="color:#ce5c00;font-weight:bold">.</span><span style="color:#c4a000">put</span><span style="color:#ce5c00;font-weight:bold">(</span><span style="color:#4e9a06">&#34;key&#34;</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">count</span><span style="color:#ce5c00;font-weight:bold">,</span> <span style="color:#000">currentWindowStart</span><span style="color:#ce5c00;font-weight:bold">);</span>
+</span></span></code></pre></div><p>키-값 스토어에 타임스탬프를 맞춰 부여하는 형태로 취득이나 보존을 실시한다. DSL의 뒷면에 있는 경우는 자동으로 timestamp에서 Time Window를 설정해 주지만, WindowStore를 직접 다루는 경우는, TimeWindow의 개시가 되는 타임 스탬프가 어딘가는 수동으로 산출할 필요가 있다. WindowStore에 미리 주어진 Window Duration은 기록된 타임 스탬프를 기준으로 하여 어느 정도의 윈도우인지를 나타내는데 사용된다.</p>
+<p>위의 예제는 매우 단순한 형태이었지만 timestamp의 시작과 끝 시간을 전달하여 해당 범위에 포함된 레코드를 순서대로 검색할 수도 있다. 또한 일반 KeyValueStore와 마찬가지로 키의 범위 탐색과 timestamp의 시작과 종료 시간의 범위 탐색을 조합할 수도 있다.</p>
+<p>내부 구현으로서, WindowStore는 복수의 RocksDB의 스토어로 구성되어 있어, 기록하는 타임 스탬프 마다 대략의 segment로 분할되어 있다. 저장할 때 타임 스탬프에서 해당 세그먼트를 식별하고 해당 영역에 데이터를 쓴다. 취득할 때는 대상 범위의 segment에서만 데이터를 취득하는 것으로 검색 범위를 작게 하고 있다. 또한 timestamp의 범위에서 segment를 결정할 수 있기 때문에 현재 처리하고 있는 타임스탬프와 비교해 보존 기한을 지난 것은, 정리해 파일 마다 삭제하는 것으로 간단하게 파기할 수 있다.</p>
+<p>기입시에는 레코드에 주어진 키 (위의 예에서는 &ldquo;key&quot;캐릭터 라인)의 말미에 밀리 세컨드 단위의 unix timestamp가 자동적으로 부여되어 기록된다.</p>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+	
+	
+<div class="text-muted mt-5 pt-3 border-top">
+    최종 수정 : 2023-08-13</div>
+
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="col-6 col-sm-4 text-xs-center order-sm-2">
+        
+        
+        
+      </div>
+      <div class="col-6 col-sm-4 text-end text-xs-center order-sm-3">
+        
+        
+        
+<ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a target="_blank" rel="noopener" href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a target="_blank" rel="noopener" href="https://github.com/devkuma" aria-label="GitHub">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a target="_blank" rel="noopener" href="https://blog.devkuma.com" aria-label="Blog">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a target="_blank" rel="noopener" href="https://www.facebook.com/redfreek2c" aria-label="Facebook">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+        
+        
+      </div>
+      <div class="td-footer__copyright-etc col-12 col-sm-4 text-center py-2 order-sm-2">
+        <span>&copy; 2023 The devkuma All Rights Reserved</span>
+        
+        
+      </div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+        
+    
+  <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+      integrity="sha512-mQwom8Ns4op+H29oDkD/LXO/OsXPvCFfkgZkFAVrhhePzRLU8NUI3Nkm43NhWUSmj3p5Cca2HTEkMQmXQRwDQQ==" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+        integrity="sha512-sHSNLECRJSK+BFs7E8DiFc6pf6n90bLI85Emiw1jhreduZhK3VXgq9l4kAt9eTIHYAcuQBKHL01QKs4/3Xgl8g=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/mhchem.min.js"
+        integrity="sha512-V1hl0fnOXW6Cdqe5ZVqtw8TBpJVpu3XRDRQti96j/04+tMarPrCdXEUE3UdfvfKYTpOn9DV4zEZBVr0HhDiuiQ=="
+        crossorigin="anonymous">
+</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+       integrity="sha512-iWiuBS5nt6r60fCz26Nd0Zqe0nbk1ZTIQbl3Kv7kYsX+yKMUFHzjaH2+AnM6vp2Xs+gNmaBAVWJjSmuPw76Efg==" crossorigin="anonymous"
+       onload='renderMathInElement(document.body, null);'>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js" integrity="sha512-ku2nmBrzAXY5YwohzTqLYH1/lvyMrpTVxgQKrvTabd/b/uesqltLORdmpVapYv6QhZVCLUX6wkvFaKOAY4xpUA==" crossorigin="anonymous"></script>
+<script src="/js/main.min.adcd5a71d01a294f35ddb01a28ea5f91f6ddf8ca2edf2bd09dfa22f6a676ad96.js" integrity="sha256-rc1acdAaKU813bAaKOpfkfbd&#43;Mou3yvQnfoi9qZ2rZY=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.f724d3de49218995223b7316aa2e53e2b34bf42026bf399ebb21bb02212402d1.js" integrity="sha256-9yTT3kkhiZUiO3MWqi5T4rNL9CAmvzmeuyG7AiEkAtE=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
