@@ -23,11 +23,11 @@
     
     
     <item>
-      <title>Testcontainers</title>
-      <link>https://www.devkuma.com/docs/testcontainers/</link>
+      <title>Testcontainers에 대해 소개</title>
+      <link>https://www.devkuma.com/docs/testcontainers/overview/</link>
       <pubDate>Thu, 25 Aug 2022 10:42:43 +0900</pubDate>
       <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/testcontainers/</guid>
+      <guid>https://www.devkuma.com/docs/testcontainers/overview/</guid>
       <description>
         
         
@@ -136,6 +136,88 @@ FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
 &lt;/ol&gt;
 &lt;p&gt;위 2가지 설정이 되어 있어야, 컨테이너 재사용이 가능하다.&lt;/p&gt;
 
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
+      <title>Apple macOS M1 환경에서 Colima 활용하여 Testcontainers 실행</title>
+      <link>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Docker가 Docker Desktop의 &lt;a href=&#34;https://www.docker.com/blog/updating-product-subscriptions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사용 약관&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;을 변경하므로써, 대기업에서 일하는 개발자는 Docker Desktop를 더 이상 무료로 사용할 수 없게 되었다.
+무료로 사용하기 위해 hyperkit, virtualbox 여러 대안이 나왔지만, 아직까지는 Apple macOS M1 환경에서는 쉽지 않은듯 하다.&lt;/p&gt;
+&lt;p&gt;여기서는 Docker Desktop 사용하지 않고, &lt;a href=&#34;https://github.com/abiosoft/colima&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Colima&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 활용하여 Apple M1 환경에서 Testcontainers를 실행하는 가장 간단한 방법을 소개한다.&lt;/p&gt;
+&lt;h2 id=&#34;docker-설정&#34;&gt;docker 설정&lt;/h2&gt;
+&lt;p&gt;먼저, Homebrew를 사용하여 docker를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install docker
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;colima-설정&#34;&gt;Colima 설정&lt;/h2&gt;
+&lt;p&gt;그리고, Homebrew를 사용하여 Colima를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install colima
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그런 다음 지정된 CPU와 메모리로 Colima를 실행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima start --cpu &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; --memory &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 명령은 VM을 4CPU와 8GiB 메모리로 실행하고 있다.&lt;/p&gt;
+&lt;p&gt;Colima 서버는 sock 주소로 사용 가능해 졌다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;unix:///Users/&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/.colima/default/docker.sock.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;docker 클라이언트를 사용하여 Colima 서버에 연결할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;docker context ls&lt;/code&gt; 명령어롤 사용하여 모든 컨텍스트를 확인할 수 있고, &lt;code&gt;docker context use colima&lt;/code&gt; 명령으로 Colima로 전환할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker context ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME            DESCRIPTION                               DOCKER ENDPOINT                                  ERROR
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima *        colima                                    unix:///Users/user/.colima/default/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;default         Current DOCKER_HOST based configuration   unix:///var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;desktop-linux                                             unix:///Users/user/.docker/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Colima를 중지하는 방법은 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima stop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testcontainers-설정&#34;&gt;Testcontainers 설정&lt;/h2&gt;
+&lt;h3 id=&#34;apple-m1&#34;&gt;Apple M1&lt;/h3&gt;
+&lt;p&gt;Apple M1 칩에서 macOS를 사용하는 경우에는 최소한 &lt;a href=&#34;https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JNA(Java Native Acces)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;가 5.7.0 사용되는지 확인해야 한다.&lt;/p&gt;
+&lt;p&gt;IntelliJ IDEA에서 의존성으로 아래 라이브러리가 포함되어 있는지 확인하면 된다.
+&lt;img src=&#34;https://www.devkuma.com/docs/testcontainers/testcontainers-jna-version.png&#34; alt=&#34;JNA 버전&#34;&gt;&lt;/p&gt;
+&lt;p&gt;혹시 버전이 낮다면 5.7.0으로 올리면 된다.&lt;/p&gt;
+&lt;h3 id=&#34;testcontainers-환경-변수&#34;&gt;Testcontainers 환경 변수&lt;/h3&gt;
+&lt;p&gt;Colima를 사용하여 Testcontainers를 실행하려면 다음 환경 변수가 필요하다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
+TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+TESTCONTAINERS_RYUK_DISABLED=true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이러한 환경 변수가 필요한 이유는 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DOCKER_HOST&lt;/code&gt; : Colima의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/code&gt; : 컨테이너 내부의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/code&gt; : Ryuk을 비활성화한다. 그렇지 않으면 컨테이너가 종료되지 않고, 테스트가 시간 초과할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bash/Zsh 셸에서는 다음과 같이 환경 변수를 선언하여, &lt;a href=&#34;https://java.testcontainers.org/features/configuration/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Docker 호스트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;를 재정의할 수 있다.&lt;br&gt;
+&lt;code&gt;~/.bashrc&lt;/code&gt; or &lt;code&gt;~/.zshrc&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;/var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;DOCKER_HOST&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;unix://&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/.colima/docker.sock&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변경한 이후에는 환경 변경을 반영하기 위해 IntelliJ IDEA를 다시 시작해야 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
+      <title>Testcontainers</title>
+      <link>https://www.devkuma.com/docs/testcontainers/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/</guid>
+      <description>
+        
+        
+        
       </description>
       
       <category>Testing</category>

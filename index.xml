@@ -22,6 +22,88 @@
     
     
     <item>
+      <title>Apple macOS M1 환경에서 Colima 활용하여 Testcontainers 실행</title>
+      <link>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Docker가 Docker Desktop의 &lt;a href=&#34;https://www.docker.com/blog/updating-product-subscriptions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사용 약관&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;을 변경하므로써, 대기업에서 일하는 개발자는 Docker Desktop를 더 이상 무료로 사용할 수 없게 되었다.
+무료로 사용하기 위해 hyperkit, virtualbox 여러 대안이 나왔지만, 아직까지는 Apple macOS M1 환경에서는 쉽지 않은듯 하다.&lt;/p&gt;
+&lt;p&gt;여기서는 Docker Desktop 사용하지 않고, &lt;a href=&#34;https://github.com/abiosoft/colima&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Colima&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 활용하여 Apple M1 환경에서 Testcontainers를 실행하는 가장 간단한 방법을 소개한다.&lt;/p&gt;
+&lt;h2 id=&#34;docker-설정&#34;&gt;docker 설정&lt;/h2&gt;
+&lt;p&gt;먼저, Homebrew를 사용하여 docker를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install docker
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;colima-설정&#34;&gt;Colima 설정&lt;/h2&gt;
+&lt;p&gt;그리고, Homebrew를 사용하여 Colima를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install colima
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그런 다음 지정된 CPU와 메모리로 Colima를 실행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima start --cpu &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; --memory &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 명령은 VM을 4CPU와 8GiB 메모리로 실행하고 있다.&lt;/p&gt;
+&lt;p&gt;Colima 서버는 sock 주소로 사용 가능해 졌다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;unix:///Users/&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/.colima/default/docker.sock.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;docker 클라이언트를 사용하여 Colima 서버에 연결할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;docker context ls&lt;/code&gt; 명령어롤 사용하여 모든 컨텍스트를 확인할 수 있고, &lt;code&gt;docker context use colima&lt;/code&gt; 명령으로 Colima로 전환할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker context ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME            DESCRIPTION                               DOCKER ENDPOINT                                  ERROR
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima *        colima                                    unix:///Users/user/.colima/default/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;default         Current DOCKER_HOST based configuration   unix:///var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;desktop-linux                                             unix:///Users/user/.docker/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Colima를 중지하는 방법은 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima stop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testcontainers-설정&#34;&gt;Testcontainers 설정&lt;/h2&gt;
+&lt;h3 id=&#34;apple-m1&#34;&gt;Apple M1&lt;/h3&gt;
+&lt;p&gt;Apple M1 칩에서 macOS를 사용하는 경우에는 최소한 &lt;a href=&#34;https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JNA(Java Native Acces)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;가 5.7.0 사용되는지 확인해야 한다.&lt;/p&gt;
+&lt;p&gt;IntelliJ IDEA에서 의존성으로 아래 라이브러리가 포함되어 있는지 확인하면 된다.
+&lt;img src=&#34;https://www.devkuma.com/docs/testcontainers/testcontainers-jna-version.png&#34; alt=&#34;JNA 버전&#34;&gt;&lt;/p&gt;
+&lt;p&gt;혹시 버전이 낮다면 5.7.0으로 올리면 된다.&lt;/p&gt;
+&lt;h3 id=&#34;testcontainers-환경-변수&#34;&gt;Testcontainers 환경 변수&lt;/h3&gt;
+&lt;p&gt;Colima를 사용하여 Testcontainers를 실행하려면 다음 환경 변수가 필요하다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
+TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+TESTCONTAINERS_RYUK_DISABLED=true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이러한 환경 변수가 필요한 이유는 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DOCKER_HOST&lt;/code&gt; : Colima의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/code&gt; : 컨테이너 내부의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/code&gt; : Ryuk을 비활성화한다. 그렇지 않으면 컨테이너가 종료되지 않고, 테스트가 시간 초과할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bash/Zsh 셸에서는 다음과 같이 환경 변수를 선언하여, &lt;a href=&#34;https://java.testcontainers.org/features/configuration/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Docker 호스트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;를 재정의할 수 있다.&lt;br&gt;
+&lt;code&gt;~/.bashrc&lt;/code&gt; or &lt;code&gt;~/.zshrc&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;/var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;DOCKER_HOST&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;unix://&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/.colima/docker.sock&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변경한 이후에는 환경 변경을 반영하기 위해 IntelliJ IDEA를 다시 시작해야 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
+      <title>Testcontainers</title>
+      <link>https://www.devkuma.com/docs/testcontainers/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/</guid>
+      <description>
+        
+        
+        
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
       <title>Java Guava 라이브러리에서 제공하는 Stream의 mapWithIndex 메소드</title>
       <link>https://www.devkuma.com/docs/guava/stream-map-with-index/</link>
       <pubDate>Thu, 20 Jul 2023 01:10:00 +0900</pubDate>
@@ -6770,94 +6852,6 @@ namespace는 아래와 같이 정의하고, cpp의 곳에는 php나 java등이 �
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Total in &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3146&lt;/span&gt; ms
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 예에서는 여러개의 템플릿이나 짧은 코드가 사용되지 않는다는 것을 알 수 있다.&lt;/p&gt;
 
-      </description>
-      
-      <category>Hugo</category>
-      
-      <category>Blog</category>
-      
-    </item>
-    
-    <item>
-      <title>Hugo 여러 서버 한번에 시작 및 및 종료하는 방법 설명</title>
-      <link>https://www.devkuma.com/docs/hugo/multi-server/</link>
-      <pubDate>Sun, 14 May 2023 14:52:00 +0900</pubDate>
-      <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/hugo/multi-server/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;hugo-서버-다중-시작-정보&#34;&gt;Hugo 서버 다중 시작 정보&lt;/h2&gt;
-&lt;p&gt;Hugo로 여러 사이트의 실행해야 하는 경우에 하나의 명령 프롬프트에서 동시에 서버를 시작하는 방법에 대해서 설명한다.&lt;/p&gt;
-&lt;p&gt;여기서는 다음과 같이 홈 디렉토리 아래에 여러 개의 Hugo 프로젝트가 있다고 가정한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;~/website/site1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;~/website/site2
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;~/website/site3
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;각 Hugo 프로젝트에 대해 Hugo 서버를 시작하려면 다음과 같이, 포트 번호를 다르게 지정하여 여러 Hugo 서버를 시작할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50001&lt;/span&gt; -s ~/website/site1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50002&lt;/span&gt; -s ~/website/site2
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50003&lt;/span&gt; -s ~/website/site3
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그러나, 위에서 설명한 것처럼 하나의 서버 프로세스가 하나의 명령 프롬프트를 차지하게 되므로, 여러 Hugo 서버를 시작할 때 여러 명령 프롬프트를 열어 두어야 한다.&lt;/p&gt;
-&lt;h2 id=&#34;1개-프롬프트에서-여러-hugo-서버-시작&#34;&gt;1개 프롬프트에서 여러 Hugo 서버 시작&lt;/h2&gt;
-&lt;h3 id=&#34;windows의-경우&#34;&gt;Windows의 경우&lt;/h3&gt;
-&lt;p&gt;Windows &lt;code&gt;start&lt;/code&gt;명령을 사용하면, 백그라운드로 hugo 명령을 실행할 수 있으므로, 추가 명령 프롬프트를 열지 않고도 여러 Hugo 서버를 시작할 수 있다.&lt;/p&gt;
-&lt;p&gt;예를 들어, 다음 배치 파일은 백그라운드으로 3개의 Hugo 서버를 시작한다.&lt;br&gt;
-&lt;strong&gt;start-servers.bat&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;echo&lt;/span&gt; off
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;start&lt;/span&gt; /b hugo server -p 50001 -s C:/website/site1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;start&lt;/span&gt; /b hugo server -p 50002 -s C:/website/site2
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;start&lt;/span&gt; /b hugo server -p 50003 -s C:/website/site3
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;title&lt;/span&gt; Hugo Servers
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;마지막 라인에 &lt;code&gt;title Hugo Servers&lt;/code&gt;라는 명령으로 명령 프롬프트의 창 제목을 &amp;ldquo;Hugo Servers&amp;quot;으로 변경한다. 윈도우 타이틀을 변경해 두면, 태스크 바를 본 것만으로 무엇을 위한 윈도우인지를 판별하기 쉬워지므로 추천한다.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;백그라운드로 실행되는 Hugo 서버를 함께 종료하려면, &lt;code&gt;taskkill&lt;/code&gt; 명령을 사용하여 &lt;code&gt;hugo.exe&lt;/code&gt; 프로세스를 모두 종료한다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;stop-servers.bat&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bat&#34; data-lang=&#34;bat&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;echo&lt;/span&gt; off
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;taskkill /f /im hugo.exe
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;linux-macos의-경우&#34;&gt;Linux, macOS의 경우&lt;/h3&gt;
-&lt;p&gt;Linux, macOS의 경우에는 아래와 같이 마지막에 &lt;code&gt;&amp;amp;&lt;/code&gt;를 붙여서, hugo 명령 실행하면 간단하게 여러 서버를 백그라운드러 시작할 수가 있다.&lt;br&gt;
-&lt;strong&gt;start-servers.sh&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hugo server -p 50001 -s ~/website/site1 &amp;amp;
-hugo server -p 50002 -s ~/website/site2 &amp;amp;
-hugo server -p 50003 -s ~/website/site3 &amp;amp;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Hugo 서버 프로세스를 함께 종료하려면 &lt;code&gt;killall&lt;/code&gt; 명령으로 쉽게 종료할 수 있다.&lt;br&gt;
-&lt;strong&gt;stop-servers.sh&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;killall hugo
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;아니면 쉘 스크립트가 아니라, 함수나 별칭으로 정의하여 사용하면 빠를 것이다.&lt;br&gt;
-&lt;strong&gt;~/.bash_profile&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;function&lt;/span&gt; hugo-start &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50001&lt;/span&gt; -s ~/website/site1 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50002&lt;/span&gt; -s ~/website/site2 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hugo server -p &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50003&lt;/span&gt; -s ~/website/site3 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;function&lt;/span&gt; hugo-stop &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    killall hugo
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-      </description>
-      
-      <category>Hugo</category>
-      
-      <category>Blog</category>
-      
-    </item>
-    
-    <item>
-      <title>Hugo 서버에서 페이지 변경 내용이 반영되지 않는 경우 (hugo server --ignoreCache)</title>
-      <link>https://www.devkuma.com/docs/hugo/ignore-cache/</link>
-      <pubDate>Sun, 14 May 2023 14:30:00 +0900</pubDate>
-      <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/hugo/ignore-cache/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;캐시-무시-옵션&#34;&gt;캐시 무시 옵션&lt;/h2&gt;
-&lt;p&gt;Hugo 서버를 시작하여 페이지가 업데이트가 되어도 웹 브라우저를 다시 로드해도 변경 내용이 반영되지 않을 수 있다(특히 &lt;code&gt;layouts&lt;/code&gt;, &lt;code&gt;partials&lt;/code&gt; 등 공유하고 사용하는 부분 등).&lt;/p&gt;
-&lt;p&gt;페이지 빌드에 성공했지만 변경 내용이 반영되지 않으면, Hugo 서버 캐시를 의심해 보는 것이 좋다. &lt;code&gt;hugo server&lt;/code&gt; 명령을 실행할 때 &lt;code&gt;--ignoreCache&lt;/code&gt; 옵션을 사용하면 캐시를 사용하지 않고 렌더링된다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ hugo server --ignoreCache
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
       </description>
       
       <category>Hugo</category>

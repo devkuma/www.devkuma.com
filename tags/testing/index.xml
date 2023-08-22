@@ -231,6 +231,192 @@
     </item>
     
     <item>
+      <title>Testcontainers에 대해 소개</title>
+      <link>https://www.devkuma.com/docs/testcontainers/overview/</link>
+      <pubDate>Thu, 25 Aug 2022 10:42:43 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/overview/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;개요&#34;&gt;개요&lt;/h2&gt;
+&lt;p&gt;테스트 환경은 프로젝트 설정을 할 때 가장 중요한 부분 중 하나이다. 테스트를 함에 있어서 운영과 동일한 형태의 테스트 환경에서 테스트를 하는 것이 중요하기 때문이다.&lt;br&gt;
+그러나, 매번 동일하게 환경을 구축할 수 없고 모든 개발 자들과 같은 환경을 맞추기도 쉽지 않다.&lt;/p&gt;
+&lt;p&gt;그러기 위해서는 테스트 코드를 실행 시킬 때마다 Docker를 사용을 하여 테스트를 위한 컨테이너를 실행시켜, 테스트을 진행을 하고, 끝난 이후에는 컨테이너를 종료 및 제거해주면 좋을 것이다.
+그런 기능을 Testcontainer를 이용해서 가능하다.&lt;/p&gt;
+&lt;h2 id=&#34;testcontainers이란&#34;&gt;Testcontainers이란?&lt;/h2&gt;
+&lt;p&gt;Testcontainers는 테스트를 위해 Docker Container 를 실행시켜주는 자바 라이브러리이다.&lt;br&gt;
+Docker를 활용한 Infrastructure 구성할 수 있는데, 매우 다양한 서비스 지원한다.
+FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
+&lt;h3 id=&#34;testcontainers-관련-사이트&#34;&gt;Testcontainers 관련 사이트&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;공식 문서: &lt;a href=&#34;https://www.testcontainers.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.testcontainers.org/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/testcontainers/testcontainers-java/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/testcontainers/testcontainers-java/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/junit/testcontainer-structure.png&#34; alt=&#34;Testcontainer 구성&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;testcontainers은-왜-사용해야-하나&#34;&gt;Testcontainers은 왜 사용해야 하나?&lt;/h2&gt;
+&lt;p&gt;테스트 환경은 프로젝트 설정을 할 때 가장 중요한 부분 중에 하나이다.&lt;/p&gt;
+&lt;p&gt;가장 어렵고 귀찮은 작업이기도 하지만 처음 한번만 잘해 놓으면 추후에 테스트 작성 시에 걱정 없이 아주 깔끔한 테스트 코드를 짤 수 있게 된다. 하지만 그만큼 프로젝트 환경 설정에서 가장 많은 시간을 들이게 되고, 많은 시행착오를 겪는 구간 중 하나라고 볼 수 있다.&lt;/p&gt;
+&lt;p&gt;Testcontainers는 MySQL, PostgreSQL, Redis, Apache Kafka, Amazon SQS, 그밖에 기타 등의 시스템을 Docker 컨테이너로 만들어 테스트할 수 있는 환경을 제공해 준다.&lt;/p&gt;
+&lt;p&gt;Testcontainers가 없다면, 실제 시스템 환경을 만들어 줘야 하고, 테스트를 진행할 때마다 테스트 데이터를 초기화해줘야 하는 과정이 필요할 것이다.
+또, 테스트를 위해 만든 시스템 환경에 다른 사람이 동시에 접근을 하게 되었을 때에, 다른 테스트로 인해 테스트를 실패할 수 있게 된다. 혹은 외부 모듈로 인해 테스트가 간헐적으로 실패할 수 있다.&lt;/p&gt;
+&lt;p&gt;즉, 상황에 따라 혹은 외부에 영향으로 여러 결과가 바뀔 수 있다는 것을 의미하는데, 이럴 경우 실패 구간을 찾기 매우 어렵다는 특징을 가지고 있다. 이런 경우에는 멱등성(idempotent)이 유지가 되지 않는다고 하는데,테스트에서 매우 중요한 개념이다. 바로 이 멱등성을 지키는 것이 테스트 전체의 생산성에 아주 큰 영향을 주기 때문이다.&lt;/p&gt;
+
+
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
+&lt;h4 class=&#34;alert-heading&#34;&gt;멱등성(idempotent)이란?&lt;/h4&gt;
+
+    연산을 여러 번 적용하더라도 결과가 바뀌지 않는 성질을 뜻한다.&lt;br&gt;
+쉽게 말해서 함수(혹은 API)를 여러 번 실행하더라도 늘 같은 결과가 나와야 한다는 의미이다.
+
+&lt;/div&gt;
+
+&lt;h2 id=&#34;다양한-module-지원&#34;&gt;다양한 Module 지원&lt;/h2&gt;
+&lt;p&gt;Testcontainers는 다양한 모듈을 지원하는데, 그중에 몇개만 소개 하면 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/mysql/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MySQL Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/mongodb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MogoDB Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/tidb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TiDB Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;testcontainers-사용하기&#34;&gt;Testcontainers 사용하기&lt;/h2&gt;
+&lt;p&gt;여기서 간단히 사용 방법에서 대해서 설명하겠다.&lt;/p&gt;
+&lt;h3 id=&#34;라이브러리-추가&#34;&gt;라이브러리 추가&lt;/h3&gt;
+&lt;p&gt;Gradle에 JUnit 5에서 사용하려면 아래와 같이 라이브러리가 필요하다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.junit.jupiter:junit-jupiter:5.8.1&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.testcontainers:testcontainers:1.17.3&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.testcontainers:junit-jupiter:1.17.3&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;테스트-코드-작성&#34;&gt;테스트 코드 작성&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Testcontainers&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCacheIntTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCache&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// container {
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Container&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;DockerImageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;parse&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;redis:5.0.3-alpine&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;withExposedPorts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6379&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// }
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@BeforeEach&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;setUp&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getHost&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;Integer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getFirstMappedPort&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Now we have an address and port for Redis, no matter where it is running
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;testSimplePutAndGet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;put&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;example&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;retrieved&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;assertThat&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;retrieved&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;isEqualTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;example&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;testcontainers&#34;&gt;&lt;code&gt;@Testcontainers&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;테스트 중에 Redis 컨테이너를 실행하기 위해서는 먼저 &lt;code&gt;@Testcontainers&lt;/code&gt;가 테스트 클래스에 지정이되어야 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Testcontainers&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCacheIntTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;컨테이너-생성&#34;&gt;컨테이너 생성&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Container&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;DockerImageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;parse&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;redis:5.0.3-alpine&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;withExposedPorts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6379&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;@Container&lt;/code&gt; 주석은 테스트 라이프 사이클의 다양한 이벤트에 대해 이 필드에 알리도록 JUnit에 지정한다.
+여기서는 Testcontainers &lt;code&gt;GenericContainer&lt;/code&gt;이며 Docker Hub의 특정 Redis 이미지를 사용하도록 설정하였고, 지정한 포트(6379)를 공개하도록 설정하였다.&lt;/p&gt;
+&lt;h4 id=&#34;코드가-컨테이너와-통신할-수-있는지-확인&#34;&gt;코드가 컨테이너와 통신할 수 있는지 확인&lt;/h4&gt;
+&lt;p&gt;컨테이너의 주소를 Testcontainers에 요청한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getHost&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;컨테이너의 포트를 Testcontainers에 요청한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;Integer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getFirstMappedPort&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;container-재사용-options&#34;&gt;Container 재사용 (options)&lt;/h2&gt;
+&lt;p&gt;Testcontainers를 사용하게 되면, 테스트를 실행할 때마다 docker Container가 매번 새로 생성되게 되는데, 그럴때마다 매우 시간이 오래 걸린다.&lt;/p&gt;
+&lt;p&gt;이를 해결하기 위해 Testcontainers에서는 아직 공개되지 않은 기능이긴 하나, Container 재사용 옵션을 제공한다. (Fast 원칙!)&lt;/p&gt;
+&lt;p&gt;Requirements&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;개발자 홈 디렉터리의 &lt;code&gt;.testcontainers.properties&lt;/code&gt; 파일 설정
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;testcontainers.reuse.enable=true
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;JDBC url 설정에서 &lt;code&gt;TC_REUSABLE=true&lt;/code&gt; 옵션 지정
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jdbc:tc:mysql:///test?TC_REUSABLE=true&amp;amp;TC_INITSCRIPT=file:src/test/resources/schema.ddl
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;위 2가지 설정이 되어 있어야, 컨테이너 재사용이 가능하다.&lt;/p&gt;
+
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
+      <title>Apple macOS M1 환경에서 Colima 활용하여 Testcontainers 실행</title>
+      <link>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Docker가 Docker Desktop의 &lt;a href=&#34;https://www.docker.com/blog/updating-product-subscriptions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사용 약관&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;을 변경하므로써, 대기업에서 일하는 개발자는 Docker Desktop를 더 이상 무료로 사용할 수 없게 되었다.
+무료로 사용하기 위해 hyperkit, virtualbox 여러 대안이 나왔지만, 아직까지는 Apple macOS M1 환경에서는 쉽지 않은듯 하다.&lt;/p&gt;
+&lt;p&gt;여기서는 Docker Desktop 사용하지 않고, &lt;a href=&#34;https://github.com/abiosoft/colima&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Colima&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 활용하여 Apple M1 환경에서 Testcontainers를 실행하는 가장 간단한 방법을 소개한다.&lt;/p&gt;
+&lt;h2 id=&#34;docker-설정&#34;&gt;docker 설정&lt;/h2&gt;
+&lt;p&gt;먼저, Homebrew를 사용하여 docker를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install docker
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;colima-설정&#34;&gt;Colima 설정&lt;/h2&gt;
+&lt;p&gt;그리고, Homebrew를 사용하여 Colima를 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install colima
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그런 다음 지정된 CPU와 메모리로 Colima를 실행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima start --cpu &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; --memory &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위 명령은 VM을 4CPU와 8GiB 메모리로 실행하고 있다.&lt;/p&gt;
+&lt;p&gt;Colima 서버는 sock 주소로 사용 가능해 졌다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;unix:///Users/&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;/.colima/default/docker.sock.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;docker 클라이언트를 사용하여 Colima 서버에 연결할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;docker context ls&lt;/code&gt; 명령어롤 사용하여 모든 컨텍스트를 확인할 수 있고, &lt;code&gt;docker context use colima&lt;/code&gt; 명령으로 Colima로 전환할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker context ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME            DESCRIPTION                               DOCKER ENDPOINT                                  ERROR
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima *        colima                                    unix:///Users/user/.colima/default/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;default         Current DOCKER_HOST based configuration   unix:///var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;desktop-linux                                             unix:///Users/user/.docker/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Colima를 중지하는 방법은 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima stop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testcontainers-설정&#34;&gt;Testcontainers 설정&lt;/h2&gt;
+&lt;h3 id=&#34;apple-m1&#34;&gt;Apple M1&lt;/h3&gt;
+&lt;p&gt;Apple M1 칩에서 macOS를 사용하는 경우에는 최소한 &lt;a href=&#34;https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JNA(Java Native Acces)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;가 5.7.0 사용되는지 확인해야 한다.&lt;/p&gt;
+&lt;p&gt;IntelliJ IDEA에서 의존성으로 아래 라이브러리가 포함되어 있는지 확인하면 된다.
+&lt;img src=&#34;https://www.devkuma.com/docs/testcontainers/testcontainers-jna-version.png&#34; alt=&#34;JNA 버전&#34;&gt;&lt;/p&gt;
+&lt;p&gt;혹시 버전이 낮다면 5.7.0으로 올리면 된다.&lt;/p&gt;
+&lt;h3 id=&#34;testcontainers-환경-변수&#34;&gt;Testcontainers 환경 변수&lt;/h3&gt;
+&lt;p&gt;Colima를 사용하여 Testcontainers를 실행하려면 다음 환경 변수가 필요하다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
+TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+TESTCONTAINERS_RYUK_DISABLED=true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이러한 환경 변수가 필요한 이유는 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;DOCKER_HOST&lt;/code&gt; : Colima의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/code&gt; : 컨테이너 내부의 sock 주소를 지정한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/code&gt; : Ryuk을 비활성화한다. 그렇지 않으면 컨테이너가 종료되지 않고, 테스트가 시간 초과할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bash/Zsh 셸에서는 다음과 같이 환경 변수를 선언하여, &lt;a href=&#34;https://java.testcontainers.org/features/configuration/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Docker 호스트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;를 재정의할 수 있다.&lt;br&gt;
+&lt;code&gt;~/.bashrc&lt;/code&gt; or &lt;code&gt;~/.zshrc&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;/var/run/docker.sock
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;DOCKER_HOST&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;unix://&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/.colima/docker.sock&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;TESTCONTAINERS_RYUK_DISABLED&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변경한 이후에는 환경 변경을 반영하기 위해 IntelliJ IDEA를 다시 시작해야 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
       <title>Unit Testing</title>
       <link>https://www.devkuma.com/docs/testing/unit/</link>
       <pubDate>Thu, 15 Sep 2022 20:08:00 +0900</pubDate>
@@ -436,6 +622,24 @@
     </item>
     
     <item>
+      <title>Testcontainers</title>
+      <link>https://www.devkuma.com/docs/testcontainers/</link>
+      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/testcontainers/</guid>
+      <description>
+        
+        
+        
+      </description>
+      
+      <category>Testing</category>
+      
+      <category>Testcontainers</category>
+      
+    </item>
+    
+    <item>
       <title>WebClient 테스트 - MockWebServer를 이용해 외부API 호출 메서드 테스트</title>
       <link>https://www.devkuma.com/docs/mock-web-server/</link>
       <pubDate>Sat, 17 Dec 2022 16:31:28 +0900</pubDate>
@@ -616,128 +820,6 @@
       <category>Testing</category>
       
       <category>Java</category>
-      
-    </item>
-    
-    <item>
-      <title>Testcontainers</title>
-      <link>https://www.devkuma.com/docs/testcontainers/</link>
-      <pubDate>Thu, 25 Aug 2022 10:42:43 +0900</pubDate>
-      <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/testcontainers/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;개요&#34;&gt;개요&lt;/h2&gt;
-&lt;p&gt;테스트 환경은 프로젝트 설정을 할 때 가장 중요한 부분 중 하나이다. 테스트를 함에 있어서 운영과 동일한 형태의 테스트 환경에서 테스트를 하는 것이 중요하기 때문이다.&lt;br&gt;
-그러나, 매번 동일하게 환경을 구축할 수 없고 모든 개발 자들과 같은 환경을 맞추기도 쉽지 않다.&lt;/p&gt;
-&lt;p&gt;그러기 위해서는 테스트 코드를 실행 시킬 때마다 Docker를 사용을 하여 테스트를 위한 컨테이너를 실행시켜, 테스트을 진행을 하고, 끝난 이후에는 컨테이너를 종료 및 제거해주면 좋을 것이다.
-그런 기능을 Testcontainer를 이용해서 가능하다.&lt;/p&gt;
-&lt;h2 id=&#34;testcontainers이란&#34;&gt;Testcontainers이란?&lt;/h2&gt;
-&lt;p&gt;Testcontainers는 테스트를 위해 Docker Container 를 실행시켜주는 자바 라이브러리이다.&lt;br&gt;
-Docker를 활용한 Infrastructure 구성할 수 있는데, 매우 다양한 서비스 지원한다.
-FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
-&lt;h3 id=&#34;testcontainers-관련-사이트&#34;&gt;Testcontainers 관련 사이트&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;공식 문서: &lt;a href=&#34;https://www.testcontainers.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.testcontainers.org/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;GitHub: &lt;a href=&#34;https://github.com/testcontainers/testcontainers-java/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/testcontainers/testcontainers-java/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/junit/testcontainer-structure.png&#34; alt=&#34;Testcontainer 구성&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;testcontainers은-왜-사용해야-하나&#34;&gt;Testcontainers은 왜 사용해야 하나?&lt;/h2&gt;
-&lt;p&gt;테스트 환경은 프로젝트 설정을 할 때 가장 중요한 부분 중에 하나이다.&lt;/p&gt;
-&lt;p&gt;가장 어렵고 귀찮은 작업이기도 하지만 처음 한번만 잘해 놓으면 추후에 테스트 작성 시에 걱정 없이 아주 깔끔한 테스트 코드를 짤 수 있게 된다. 하지만 그만큼 프로젝트 환경 설정에서 가장 많은 시간을 들이게 되고, 많은 시행착오를 겪는 구간 중 하나라고 볼 수 있다.&lt;/p&gt;
-&lt;p&gt;Testcontainers는 MySQL, PostgreSQL, Redis, Apache Kafka, Amazon SQS, 그밖에 기타 등의 시스템을 Docker 컨테이너로 만들어 테스트할 수 있는 환경을 제공해 준다.&lt;/p&gt;
-&lt;p&gt;Testcontainers가 없다면, 실제 시스템 환경을 만들어 줘야 하고, 테스트를 진행할 때마다 테스트 데이터를 초기화해줘야 하는 과정이 필요할 것이다.
-또, 테스트를 위해 만든 시스템 환경에 다른 사람이 동시에 접근을 하게 되었을 때에, 다른 테스트로 인해 테스트를 실패할 수 있게 된다. 혹은 외부 모듈로 인해 테스트가 간헐적으로 실패할 수 있다.&lt;/p&gt;
-&lt;p&gt;즉, 상황에 따라 혹은 외부에 영향으로 여러 결과가 바뀔 수 있다는 것을 의미하는데, 이럴 경우 실패 구간을 찾기 매우 어렵다는 특징을 가지고 있다. 이런 경우에는 멱등성(idempotent)이 유지가 되지 않는다고 하는데,테스트에서 매우 중요한 개념이다. 바로 이 멱등성을 지키는 것이 테스트 전체의 생산성에 아주 큰 영향을 주기 때문이다.&lt;/p&gt;
-
-
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
-&lt;h4 class=&#34;alert-heading&#34;&gt;멱등성(idempotent)이란?&lt;/h4&gt;
-
-    연산을 여러 번 적용하더라도 결과가 바뀌지 않는 성질을 뜻한다.&lt;br&gt;
-쉽게 말해서 함수(혹은 API)를 여러 번 실행하더라도 늘 같은 결과가 나와야 한다는 의미이다.
-
-&lt;/div&gt;
-
-&lt;h2 id=&#34;다양한-module-지원&#34;&gt;다양한 Module 지원&lt;/h2&gt;
-&lt;p&gt;Testcontainers는 다양한 모듈을 지원하는데, 그중에 몇개만 소개 하면 아래와 같다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/mysql/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MySQL Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/mongodb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MogoDB Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.testcontainers.org/modules/databases/tidb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TiDB Module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;testcontainers-사용하기&#34;&gt;Testcontainers 사용하기&lt;/h2&gt;
-&lt;p&gt;여기서 간단히 사용 방법에서 대해서 설명하겠다.&lt;/p&gt;
-&lt;h3 id=&#34;라이브러리-추가&#34;&gt;라이브러리 추가&lt;/h3&gt;
-&lt;p&gt;Gradle에 JUnit 5에서 사용하려면 아래와 같이 라이브러리가 필요하다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.junit.jupiter:junit-jupiter:5.8.1&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.testcontainers:testcontainers:1.17.3&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.testcontainers:junit-jupiter:1.17.3&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;테스트-코드-작성&#34;&gt;테스트 코드 작성&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Testcontainers&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCacheIntTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCache&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// container {
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Container&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;DockerImageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;parse&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;redis:5.0.3-alpine&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;withExposedPorts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6379&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// }
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@BeforeEach&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;setUp&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getHost&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;Integer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getFirstMappedPort&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// Now we have an address and port for Redis, no matter where it is running
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCache&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Test&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;testSimplePutAndGet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;put&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;example&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;retrieved&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;underTest&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;get&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;test&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;assertThat&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;retrieved&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;isEqualTo&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;example&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;testcontainers&#34;&gt;&lt;code&gt;@Testcontainers&lt;/code&gt;&lt;/h4&gt;
-&lt;p&gt;테스트 중에 Redis 컨테이너를 실행하기 위해서는 먼저 &lt;code&gt;@Testcontainers&lt;/code&gt;가 테스트 클래스에 지정이되어야 한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Testcontainers&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;RedisBackedCacheIntTest&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;컨테이너-생성&#34;&gt;컨테이너 생성&lt;/h4&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Container&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;GenericContainer&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;DockerImageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;parse&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;redis:5.0.3-alpine&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;withExposedPorts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6379&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;@Container&lt;/code&gt; 주석은 테스트 라이프 사이클의 다양한 이벤트에 대해 이 필드에 알리도록 JUnit에 지정한다.
-여기서는 Testcontainers &lt;code&gt;GenericContainer&lt;/code&gt;이며 Docker Hub의 특정 Redis 이미지를 사용하도록 설정하였고, 지정한 포트(6379)를 공개하도록 설정하였다.&lt;/p&gt;
-&lt;h4 id=&#34;코드가-컨테이너와-통신할-수-있는지-확인&#34;&gt;코드가 컨테이너와 통신할 수 있는지 확인&lt;/h4&gt;
-&lt;p&gt;컨테이너의 주소를 Testcontainers에 요청한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;address&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getHost&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;컨테이너의 포트를 Testcontainers에 요청한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;Integer&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;port&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;redis&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getFirstMappedPort&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;container-재사용-options&#34;&gt;Container 재사용 (options)&lt;/h2&gt;
-&lt;p&gt;Testcontainers를 사용하게 되면, 테스트를 실행할 때마다 docker Container가 매번 새로 생성되게 되는데, 그럴때마다 매우 시간이 오래 걸린다.&lt;/p&gt;
-&lt;p&gt;이를 해결하기 위해 Testcontainers에서는 아직 공개되지 않은 기능이긴 하나, Container 재사용 옵션을 제공한다. (Fast 원칙!)&lt;/p&gt;
-&lt;p&gt;Requirements&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;개발자 홈 디렉터리의 &lt;code&gt;.testcontainers.properties&lt;/code&gt; 파일 설정
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;testcontainers.reuse.enable=true
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;JDBC url 설정에서 &lt;code&gt;TC_REUSABLE=true&lt;/code&gt; 옵션 지정
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jdbc:tc:mysql:///test?TC_REUSABLE=true&amp;amp;TC_INITSCRIPT=file:src/test/resources/schema.ddl
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;위 2가지 설정이 되어 있어야, 컨테이너 재사용이 가능하다.&lt;/p&gt;
-
-      </description>
-      
-      <category>Testing</category>
-      
-      <category>Testcontainers</category>
       
     </item>
     
