@@ -145,7 +145,7 @@ FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
     </item>
     
     <item>
-      <title>Apple macOS M1 환경에서 Colima 활용하여 Testcontainers 실행</title>
+      <title>Apple M1 칩셋의 macOS 환경에서 Colima 활용하여 Testcontainers 실행하는 방법</title>
       <link>https://www.devkuma.com/docs/testcontainers/colima-macos-m1/</link>
       <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
       <author>redfreek2c@gmail.com (kimkc)</author>
@@ -153,10 +153,15 @@ FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
       <description>
         
         
-        &lt;p&gt;Docker가 Docker Desktop의 &lt;a href=&#34;https://www.docker.com/blog/updating-product-subscriptions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사용 약관&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;을 변경하므로써, 대기업에서 일하는 개발자는 Docker Desktop를 더 이상 무료로 사용할 수 없게 되었다.
-무료로 사용하기 위해 hyperkit, virtualbox 여러 대안이 나왔지만, 아직까지는 Apple macOS M1 환경에서는 쉽지 않은듯 하다.&lt;/p&gt;
+        &lt;p&gt;Docker에서 Docker Desktop의 &lt;a href=&#34;https://www.docker.com/blog/updating-product-subscriptions/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;사용 약관&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;을 변경하므로써, 대기업에서 일하는 개발자는 Docker Desktop를 더 이상 무료로 사용할 수 없게 되었다.
+macOS 환경에서 무료로 사용하기 위해 대체할 dirver가 필요한데 &lt;a href=&#34;https://github.com/moby/hyperkit&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;hyperkit&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;, &lt;a href=&#34;https://www.virtualbox.org/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;VirtualBox&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 여러 대안이 나왔지만, 아직까지는 Apple M1 칩셋의 macOS 환경에서는 사용이 쉽지 않은듯 하다.&lt;/p&gt;
+&lt;p&gt;2023년 8월 기준으로 상황은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;hyperkit : Apple M1 칩셋 환경에서 동작 안함 (homehrew로 설치를 시도하면 에러남)&lt;/li&gt;
+&lt;li&gt;virsalbox : Apple M1 칩셋 환경에서 동작가능한 버전이 Beta임&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;여기서는 Docker Desktop 사용하지 않고, &lt;a href=&#34;https://github.com/abiosoft/colima&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Colima&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 활용하여 Apple M1 환경에서 Testcontainers를 실행하는 가장 간단한 방법을 소개한다.&lt;/p&gt;
-&lt;h2 id=&#34;docker-설정&#34;&gt;docker 설정&lt;/h2&gt;
+&lt;h2 id=&#34;docker-설정&#34;&gt;Docker 설정&lt;/h2&gt;
 &lt;p&gt;먼저, Homebrew를 사용하여 docker를 설치한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install docker
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;colima-설정&#34;&gt;Colima 설정&lt;/h2&gt;
@@ -178,7 +183,7 @@ FIRST 원칙 중에 Repeatable 원칙을 지킬 수 있게 해준다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;colima stop
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;testcontainers-설정&#34;&gt;Testcontainers 설정&lt;/h2&gt;
 &lt;h3 id=&#34;apple-m1&#34;&gt;Apple M1&lt;/h3&gt;
-&lt;p&gt;Apple M1 칩에서 macOS를 사용하는 경우에는 최소한 &lt;a href=&#34;https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JNA(Java Native Acces)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;가 5.7.0 사용되는지 확인해야 한다.&lt;/p&gt;
+&lt;p&gt;Apple M1 칩에서 macOS를 사용하는 경우에는 최소한 &lt;a href=&#34;https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;JNA(Java Native Acces)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;가 5.7.0 버전 이상으로 사용되고 있는지 확인해야 한다.&lt;/p&gt;
 &lt;p&gt;IntelliJ IDEA에서 의존성으로 아래 라이브러리가 포함되어 있는지 확인하면 된다.
 &lt;img src=&#34;https://www.devkuma.com/docs/testcontainers/testcontainers-jna-version.png&#34; alt=&#34;JNA 버전&#34;&gt;&lt;/p&gt;
 &lt;p&gt;혹시 버전이 낮다면 5.7.0으로 올리면 된다.&lt;/p&gt;
@@ -211,7 +216,7 @@ TESTCONTAINERS_RYUK_DISABLED=true
     <item>
       <title>Testcontainers</title>
       <link>https://www.devkuma.com/docs/testcontainers/</link>
-      <pubDate>Wed, 23 Aug 2023 01:05:59 +0900</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <author>redfreek2c@gmail.com (kimkc)</author>
       <guid>https://www.devkuma.com/docs/testcontainers/</guid>
       <description>
