@@ -22,6 +22,65 @@
     
     
     <item>
+      <title>Java Guava 라이브러리에서 제공하는 ClassPath를 모든 클래스 찾기</title>
+      <link>https://www.devkuma.com/docs/guava/stream-map-with-index/</link>
+      <pubDate>Tue, 12 Dec 2023 22:13:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/guava/stream-map-with-index/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;로드-가능하는-모든-클래스-찾기&#34;&gt;로드 가능하는 모든 클래스 찾기&lt;/h2&gt;
+&lt;p&gt;여기서는 Google Guava 라이브러리를 사용하여 클래스를 찾는 방법을 살펴보겠다.&lt;br&gt;
+Google Guava는 클래스 로더의 소스를 검색하고 로드 가능한 모든 클래스을 찾는 &lt;code&gt;ClassPath&lt;/code&gt; 유틸리티 클래스를 제공한다.&lt;/p&gt;
+&lt;p&gt;아래 예제는 입력 받은 패키지 이하에 존재하는 모든 클래스를 찾아서 표시해준다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.devkuma.guava.classloader&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;java.io.IOException&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;java.util.Set&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;java.util.stream.Collectors&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.google.common.reflect.ClassPath&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FindAllClasses&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Class&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;findAllClasses&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;packageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;throws&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;IOException&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;ClassPath&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;from&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ClassLoader&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getSystemClassLoader&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getAllClasses&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;stream&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;filter&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getPackageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                                              &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;packageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;map&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;load&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;collect&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Collectors&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;toSet&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;());&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[]&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;args&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;throws&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;IOException&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;FindAllClasses&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;instance&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FindAllClasses&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Class&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;classes&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;instance&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;findAllClasses&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;com.devkuma.guava&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;classes&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clazz&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;getCanonicalName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;());&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;실행 결과:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;com.devkuma.guava.joiner.JoinerWithKeyValueSeparator
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;com.devkuma.guava.joiner.JoinerArrayJoin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;com.devkuma.guava.strings.StringCommonPrefixCommonSuffix
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;com.devkuma.guava.joiner.JoinerListJoin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 이하 생략 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;입력 받은 패키지명을 &lt;code&gt;com.devkuma.guava&lt;/code&gt;을 입력하였다.&lt;/p&gt;
+
+      </description>
+      
+      <category>Java</category>
+      
+      <category>Guava</category>
+      
+    </item>
+    
+    <item>
       <title>Gradle &#34;bootJar&#34;와 &#34;jar&#34; 태스크로 생성되는 jar 파일의 차이점</title>
       <link>https://www.devkuma.com/docs/gradle/bootjar-jar/</link>
       <pubDate>Sun, 10 Dec 2023 10:19:00 +0900</pubDate>
@@ -6493,117 +6552,6 @@ namespace는 아래와 같이 정의하고, cpp의 곳에는 php나 java등이 �
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-
-      </description>
-      
-      <category>D3.js</category>
-      
-      <category>JavaScript</category>
-      
-    </item>
-    
-    <item>
-      <title>D3.js forceSimulation 좌표 갱신 알고리즘/실행 함수</title>
-      <link>https://www.devkuma.com/docs/d3-js/forcesimulation-info/</link>
-      <pubDate>Sat, 20 May 2023 16:38:53 +0900</pubDate>
-      <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/d3-js/forcesimulation-info/</guid>
-      <description>
-        
-        
-        &lt;p&gt;노드 간의 상호 작용력 설정에 대해서는 &lt;a href=&#34;https://www.devkuma.com/docs/d3-js/forcesimulation-node-detail/&#34;&gt;여기&lt;/a&gt;를, 링크 설정에 대해서는 &lt;a href=&#34;https://www.devkuma.com/docs/d3-js/forcesimulation-link-detail/&#34;&gt;여기&lt;/a&gt;를 확인한다.&lt;/p&gt;
-&lt;h2 id=&#34;좌표-업데이트-정보&#34;&gt;좌표 업데이트 정보&lt;/h2&gt;
-&lt;p&gt;D3.js의 &lt;code&gt;forceSimulation&lt;/code&gt;은 원점은 &lt;code&gt;(0, 0)&lt;/code&gt;으로 하고, 1스텝의 위치 변화량을 &lt;code&gt;(vx, vy)&lt;/code&gt;로 하면 다음의 함수로 위치 변화량을 계산한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;function&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;force&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;alpha&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;n&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;nodes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;length&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;k&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;alpha&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0.1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;n&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;nodes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vx&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;k&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vy&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;node&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;k&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;원점(지정한 &lt;code&gt;x&lt;/code&gt;, &lt;code&gt;y&lt;/code&gt;)으로부터의 거리에, &lt;code&gt;alpha * 0.1&lt;/code&gt;을 곱한 분의 좌표를 업데이트한다. &lt;code&gt;alpha&lt;/code&gt;가 1이면 10%씩 원점에 가까워지도록 움직인다.&lt;/p&gt;
-&lt;p&gt;또한 &lt;code&gt;alpha&lt;/code&gt;는 시뮬레이션의 1스텝마다 아래 식이 더해지고 업데이트된다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;alphaTarget&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;–&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;alpha&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;alphaDecay&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;기본 &lt;code&gt;alphaTarget&lt;/code&gt;은 &lt;code&gt;0&lt;/code&gt;, &lt;code&gt;alphaDecay&lt;/code&gt;는 &lt;code&gt;0.0228&lt;/code&gt;이므로 서서히 &lt;code&gt;alpha&lt;/code&gt;가 감소한다. 이 &lt;code&gt;alpha&lt;/code&gt;가 &lt;code&gt;alphaMin(기본값 : 0.001)&lt;/code&gt; 아래로 떨어지면 시뮬레이션이 중지된다. 기본적으로 약 300회 반복 계산이 수행되는 설정이다. 다음 기능을 사용하여 이러한 설정과 시뮬레이션 실행을 제어할 수 있다.&lt;/p&gt;
-&lt;h2 id=&#34;simulation-실행-함수&#34;&gt;simulation 실행 함수&lt;/h2&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;함수&lt;/th&gt;
-&lt;th&gt;설명&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.restart()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;시뮬레이션을 다시 시작한다.&lt;br&gt;드래그 등의 이벤트 발생시에 정지한 시뮬레이션을 기동하려고 할 때에 사용한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.stop()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;시뮬레이션을 중지한다.&lt;br&gt;이미 중지된 경우에는 아무 동작도 수행하지 않는다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.tick()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;시뮬레이션의 내부 함수이다.&lt;br&gt;시뮬레이션 작성시 또는 &lt;code&gt;restart()&lt;/code&gt;에 의해 호출된다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.node()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;노드를 지정한다.&lt;br&gt;사용 방법은 &lt;a href=&#34;https://www.devkuma.com/docs/d3-js/forcesimulation-node-detail/&#34;&gt;여기&lt;/a&gt;를 참조한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.alpha()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;alpha&lt;/code&gt;의 값을 0.0 ~ 1.0 사이로 설정한다.&lt;br&gt;기본값은 1이다.&lt;br&gt;값을 지정하지 않으면 현재 alpha 값을 반환한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.alphaMin()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;alphaMin 의 값을 0.0 ~ 1.0 사이로 설정한다.&lt;br&gt;기본값은 0.001이다.&lt;br&gt;값을 지정하지 않으면 현재 alpha 값을 반환한다.&lt;br&gt;시뮬레이션은 현재 alpha 가 alphaMin 보다 작을 때 중지된다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.alphaDecay()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;alphaDecay&lt;/code&gt;의 값을 0.0 ~ 1.0 사이로 설정한다.&lt;br&gt;기본값은 &lt;code&gt;0.0228(=1-pow(0.001, 1/300))&lt;/code&gt;이다.&lt;br&gt;값을 지정하지 않으면 현재 &lt;code&gt;alphaDecay&lt;/code&gt; 값을 반환한다.&lt;br&gt;&lt;code&gt;alphaDecay&lt;/code&gt;가 클수록 시뮬레이션은 더 빨리 수렴하지만, 국소 솔루션에 머무를 수 있다.&lt;br&gt;&lt;code&gt;alphaDecay&lt;/code&gt;의 값을 줄이면 시뮬레이션을 실행하는데 시간이 오래 걸리지만 더 나은 레이아웃으로 수렴한다.&lt;br&gt; 시뮬레이션을 영구적으로 계속하려면 alphaDecay 를 0으로 설정하거나 alphaTarget을 alphaMin 보다 큰 값으로 설정한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.alphaTarget()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;&lt;code&gt;alphaTarget&lt;/code&gt; 의 값을 0.0 ~ 1.0 사이로 설정한다.&lt;br&gt;기본값은 &lt;code&gt;0&lt;/code&gt;이다.&lt;br&gt;값을 지정하지 않으면 현재 &lt;code&gt;alphaTarget&lt;/code&gt; 값을 반환한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.velocityDecay()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;노드의 속도 감쇠 계수를 설정한다.&lt;br&gt;0.0 ~ 1.0의 값을 설정할 수 있다.&lt;br&gt;값이 설정되어 있지 않은 경우는, 현재의 속도 감쇠 계수를 돌려준다.&lt;br&gt;기본값은 0.4이다.&lt;br&gt;현재의 속도에 (1- velocityDecay )의 값이 곱해지고, 값이 클수록 속도 감쇠가 커진다.&lt;br&gt;&lt;code&gt;0으&lt;/code&gt;로 설정하면 노드가 계속 진동하고 1로 설정하면 속도가 변하지 않는다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.force()&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;노드 간 및 링크 상호 작용을 설정하는 함수이다.&lt;br&gt;노드 사이는 &lt;a href=&#34;https://www.devkuma.com/docs/d3-js/forcesimulation-node-detail/&#34;&gt;여기&lt;/a&gt;를, 링크는 &lt;a href=&#34;https://www.devkuma.com/docs/d3-js/forcesimulation-link-detail/&#34;&gt;여기&lt;/a&gt;를 참조한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.find(x,y[,radius])&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;지정된 검색 반경에서 위치(&lt;code&gt;x&lt;/code&gt;, &lt;code&gt;y&lt;/code&gt;)에 가장 가까운 노드를 반환한다.&lt;br&gt;&lt;code&gt;radius&lt;/code&gt;를 지정하지 않으면, 탐색 반경이 무한대가 된다.&lt;br&gt;검색 영역에 노드가 없으면 &lt;code&gt;undefined&lt;/code&gt;를 반환한다.&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;&lt;code&gt;simulation.on(typenames, [listener])&lt;/code&gt;&lt;/td&gt;
-&lt;td&gt;이벤트 리스너를 등록한다.&lt;br&gt;이벤트 리스너가 이미 같은 타입과 이름으로 등록되어 있는 경우, 새로운 리스너를 덮어쓴다.&lt;br&gt;&lt;code&gt;listener&lt;/code&gt;가 &lt;code&gt;null&lt;/code&gt;의 경우이면, 이벤트 리스너를 삭제한다.&lt;br&gt;&lt;code&gt;typenames&lt;/code&gt;는 &lt;code&gt;&amp;quot;tick&amp;quot;&lt;/code&gt;과 &lt;code&gt;&amp;quot;end&amp;quot;&lt;/code&gt;를 지정할 수 있다.&lt;ul&gt;&lt;li&gt;&lt;code&gt;tick&lt;/code&gt;: 시뮬레이션 단계 업데이트 시간&lt;/li&gt;&lt;li&gt;&lt;code&gt;end&lt;/code&gt;: 시뮬레이션 완료시(&lt;code&gt;alpha&lt;/code&gt; &amp;lt; &lt;code&gt;alphaMin&lt;/code&gt;)&lt;/li&gt;&lt;/ul&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&#34;부록-용어&#34;&gt;부록: 용어&lt;/h2&gt;
-&lt;h3 id=&#34;decay&#34;&gt;decay&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;[명사] 부패, 부식&lt;/li&gt;
-&lt;li&gt;[명사] (사회제도 등의) 쇠퇴[퇴락]&lt;/li&gt;
-&lt;li&gt;[동사] 부패하다, 썩다; 부패시키다, 썩게 만들다 (=rot)&lt;/li&gt;
-&lt;li&gt;[동사] (건물지역이) 퇴락하다&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;velocity&#34;&gt;velocity&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;[명사][전문 용어] 속도&lt;/li&gt;
-&lt;li&gt;[명사][격식] 빠른 속도&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;tick&#34;&gt;tick&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;[동사] 째깍(똑딱)거리다&lt;/li&gt;
-&lt;li&gt;[동사] (정답 등에) 체크 표시(✓)를 하다&lt;/li&gt;
-&lt;li&gt;[명사] 체크 표시(✓) (→cross, X (4))&lt;/li&gt;
-&lt;li&gt;[명사] 진드기&lt;/li&gt;
-&lt;/ol&gt;
 
       </description>
       
