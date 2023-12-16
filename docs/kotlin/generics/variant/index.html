@@ -18,29 +18,33 @@
 <link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
 
-<title>Kotlin 제네릭(Generic) | devkuma</title>
-<meta name="description" content="제네릭 클래스 인수 Any 형으로 받아 Any 형의 속성에 저장함으로써, Int, Char, String 등 다양한 유형에 따라 클래스나 함수를 정의 할 수 있`다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value)	// 123 } 그러나 value는 Any 형이므로, 아래와 같이 value에 &#43; 1 연산을 하게 되면 오류가 발생한다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value &#43; 1)	// Error } &amp;lt;T&amp;gt;으로 제네릭 형식을 정의함으로써 value는 Int, Char, String 등 인수에 따른 형식의 속성으로 취급하게 하여 이 문제를 해결 할 수 있다.">
-<meta property="og:title" content="Kotlin 제네릭(Generic)" />
-<meta property="og:description" content="제네릭 클래스 인수 Any 형으로 받아 Any 형의 속성에 저장함으로써, Int, Char, String 등 다양한 유형에 따라 클래스나 함수를 정의 할 수 있`다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value)	// 123 } 그러나 value는 Any 형이므로, 아래와 같이 value에 &#43; 1 연산을 하게 되면 오류가 발생한다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value &#43; 1)	// Error } &lt;T&gt;으로 제네릭 형식을 정의함으로써 value는 Int, Char, String 등 인수에 따른 형식의 속성으로 취급하게 하여 이 문제를 해결 할 수 있다." />
+<title>Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해 | devkuma</title>
+<meta name="description" content="공변인(covariant)은 무슨 뜻인가? Int은 Any로 사용할 수 있다(Any는 Java에서는 Object을 말한다.).
+그럼
+List&amp;lt;Int&amp;gt;는 List&amp;lt;Any&amp;gt;로 취급할 수 있을까? MutableList&amp;lt;Int&amp;gt;는 MutableList&amp;lt;Any&amp;gt;로 취급할 수 있을까? 이에 대한 대답은 사용중인 Generic 클래스가 형식 매개 변수에 대해 공변성(covariant) 또는 불변(invariant)인지 여부에 따라 결정된다.
+List&amp;lt;Int&amp;gt;는 List&amp;lt;Any&amp;gt;로 사용할 수 있다(List는 공변이다(=covariant)). MutableList&amp;lt;Int&amp;gt;는 MutableList&amp;lt;Any&amp;gt;로 사용할 수 없다(MutableList는 공변이 아니다(= invariant)). &amp;lsquo;Generic 클래스가 공변이다&amp;rsquo;라는 것은 타입 인수로 지정한 타입의 부모와 자식 관계가 Generic 클래스에 의해 생성된 타입의 부모와 자식 관계와 같다는 것을 의미한다.">
+<meta property="og:title" content="Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해" />
+<meta property="og:description" content="공변인(covariant)은 무슨 뜻인가? Int은 Any로 사용할 수 있다(Any는 Java에서는 Object을 말한다.).
+그럼
+List&lt;Int&gt;는 List&lt;Any&gt;로 취급할 수 있을까? MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 취급할 수 있을까? 이에 대한 대답은 사용중인 Generic 클래스가 형식 매개 변수에 대해 공변성(covariant) 또는 불변(invariant)인지 여부에 따라 결정된다.
+List&lt;Int&gt;는 List&lt;Any&gt;로 사용할 수 있다(List는 공변이다(=covariant)). MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 사용할 수 없다(MutableList는 공변이 아니다(= invariant)). &lsquo;Generic 클래스가 공변이다&rsquo;라는 것은 타입 인수로 지정한 타입의 부모와 자식 관계가 Generic 클래스에 의해 생성된 타입의 부모와 자식 관계와 같다는 것을 의미한다." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://www.devkuma.com/docs/kotlin/generic/" /><meta property="article:section" content="130_Programming_JVM" />
-<meta property="article:published_time" content="2021-09-26T03:22:00+09:00" />
-<meta property="article:modified_time" content="2021-09-26T00:00:00+00:00" />
-<meta itemprop="name" content="Kotlin 제네릭(Generic)">
-<meta itemprop="description" content="제네릭 클래스 인수 Any 형으로 받아 Any 형의 속성에 저장함으로써, Int, Char, String 등 다양한 유형에 따라 클래스나 함수를 정의 할 수 있`다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value)	// 123 } 그러나 value는 Any 형이므로, 아래와 같이 value에 &#43; 1 연산을 하게 되면 오류가 발생한다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value &#43; 1)	// Error } &lt;T&gt;으로 제네릭 형식을 정의함으로써 value는 Int, Char, String 등 인수에 따른 형식의 속성으로 취급하게 하여 이 문제를 해결 할 수 있다."><meta itemprop="datePublished" content="2021-09-26T03:22:00+09:00" />
-<meta itemprop="dateModified" content="2021-09-26T00:00:00+00:00" />
-<meta itemprop="wordCount" content="215">
+<meta property="og:url" content="https://www.devkuma.com/docs/kotlin/generics/variant/" /><meta property="article:section" content="130_Programming_JVM" />
+<meta property="article:published_time" content="2023-12-17T03:05:00+09:00" />
+<meta property="article:modified_time" content="2023-12-17T03:05:00+09:00" />
+<meta itemprop="name" content="Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해">
+<meta itemprop="description" content="공변인(covariant)은 무슨 뜻인가? Int은 Any로 사용할 수 있다(Any는 Java에서는 Object을 말한다.).
+그럼
+List&lt;Int&gt;는 List&lt;Any&gt;로 취급할 수 있을까? MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 취급할 수 있을까? 이에 대한 대답은 사용중인 Generic 클래스가 형식 매개 변수에 대해 공변성(covariant) 또는 불변(invariant)인지 여부에 따라 결정된다.
+List&lt;Int&gt;는 List&lt;Any&gt;로 사용할 수 있다(List는 공변이다(=covariant)). MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 사용할 수 없다(MutableList는 공변이 아니다(= invariant)). &lsquo;Generic 클래스가 공변이다&rsquo;라는 것은 타입 인수로 지정한 타입의 부모와 자식 관계가 Generic 클래스에 의해 생성된 타입의 부모와 자식 관계와 같다는 것을 의미한다."><meta itemprop="datePublished" content="2023-12-17T03:05:00+09:00" />
+<meta itemprop="dateModified" content="2023-12-17T03:05:00+09:00" />
+<meta itemprop="wordCount" content="2154">
 <meta itemprop="keywords" content="Kotlin," /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Kotlin 제네릭(Generic)"/>
-<meta name="twitter:description" content="제네릭 클래스 인수 Any 형으로 받아 Any 형의 속성에 저장함으로써, Int, Char, String 등 다양한 유형에 따라 클래스나 함수를 정의 할 수 있`다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value)	// 123 } 그러나 value는 Any 형이므로, 아래와 같이 value에 &#43; 1 연산을 하게 되면 오류가 발생한다.
-class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value &#43; 1)	// Error } &lt;T&gt;으로 제네릭 형식을 정의함으로써 value는 Int, Char, String 등 인수에 따른 형식의 속성으로 취급하게 하여 이 문제를 해결 할 수 있다."/>
+<meta name="twitter:title" content="Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해"/>
+<meta name="twitter:description" content="공변인(covariant)은 무슨 뜻인가? Int은 Any로 사용할 수 있다(Any는 Java에서는 Object을 말한다.).
+그럼
+List&lt;Int&gt;는 List&lt;Any&gt;로 취급할 수 있을까? MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 취급할 수 있을까? 이에 대한 대답은 사용중인 Generic 클래스가 형식 매개 변수에 대해 공변성(covariant) 또는 불변(invariant)인지 여부에 따라 결정된다.
+List&lt;Int&gt;는 List&lt;Any&gt;로 사용할 수 있다(List는 공변이다(=covariant)). MutableList&lt;Int&gt;는 MutableList&lt;Any&gt;로 사용할 수 없다(MutableList는 공변이 아니다(= invariant)). &lsquo;Generic 클래스가 공변이다&rsquo;라는 것은 타입 인수로 지정한 타입의 부모와 자식 관계가 Generic 클래스에 의해 생성된 타입의 부모와 자식 관계와 같다는 것을 의미한다."/>
 
 
 
@@ -53,7 +57,7 @@ class Foo(val value: Any) fun main() { val a1 = Foo(123) println(a1.value &#43; 
   integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
   crossorigin="anonymous"></script>
 
-<link rel="canonical" href="https://www.devkuma.com/docs/kotlin/generic/">
+<link rel="canonical" href="https://www.devkuma.com/docs/kotlin/generics/variant/">
 <link rel="apple-touch-icon" href="/logo/180x180.jpg">
 <link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
 <link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
@@ -215,13 +219,13 @@ if (!doNotTrack) {
   <script>
     $(function() {
     $("#td-section-nav a").removeClass("active");
-    $("#td-section-nav #m-docskotlingeneric").addClass("active"); 
-    $("#td-section-nav #m-docskotlingeneric-li span").addClass("td-sidebar-nav-active-item"); 
-    $("#td-section-nav #m-docskotlingeneric").parents("li").addClass("active-path"); 
+    $("#td-section-nav #m-docskotlingenericsvariant").addClass("active"); 
+    $("#td-section-nav #m-docskotlingenericsvariant-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docskotlingenericsvariant").parents("li").addClass("active-path"); 
     $("#td-section-nav li.active-path").addClass("show"); 
     $("#td-section-nav li.active-path").children("input").prop('checked', true);
-    $("#td-section-nav #m-docskotlingeneric-li").siblings("li").addClass("show");  
-    $("#td-section-nav #m-docskotlingeneric-li").children("ul").children("li").addClass("show");  
+    $("#td-section-nav #m-docskotlingenericsvariant-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docskotlingenericsvariant-li").children("ul").children("li").addClass("show");  
     $("#td-sidebar-menu").toggleClass("d-none"); 
     });
   </script>
@@ -1272,11 +1276,19 @@ if (!doNotTrack) {
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlinoperator-overloading-li">
   <input type="checkbox" id="m-docskotlinoperator-overloading-check"/>
-  <label for="m-docskotlinoperator-overloading-check"><a href="/docs/kotlin/operator-overloading/" title="Kotlin 연산자 오버로딩(Operator overloading)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlinoperator-overloading"><span class="">연산자 오버로딩(Operator overloading)</span></a></label>
+  <label for="m-docskotlinoperator-overloading-check"><a href="/docs/kotlin/operator-overloading/" title="Kotlin 연산자 오버로딩(Operator overloading)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlinoperator-overloading"><span class="">연산자 오버로딩</span></a></label>
   
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlincontrol-statement-li">
   <input type="checkbox" id="m-docskotlincontrol-statement-check"/>
-  <label for="m-docskotlincontrol-statement-check"><a href="/docs/kotlin/control-statement/" title="Kotlin 제어 구문(Control statement)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlincontrol-statement"><span class="">제어 구문(Control statement)</span></a></label>
+  <label for="m-docskotlincontrol-statement-check"><a href="/docs/kotlin/control-statement/" title="Kotlin 제어 구문(Control statement)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlincontrol-statement"><span class="">제어 구문</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlinexception-li">
+  <input type="checkbox" id="m-docskotlinexception-check"/>
+  <label for="m-docskotlinexception-check"><a href="/docs/kotlin/exception/" title="Kotlin 예외 처리 (try, catch, finally)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlinexception"><span class="">예외 처리</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlinstring-int-convert-li">
+  <input type="checkbox" id="m-docskotlinstring-int-convert-check"/>
+  <label for="m-docskotlinstring-int-convert-check"><a href="/docs/kotlin/string-int-convert/" title="문자열과 숫자 변환 (toIntOrNull, toInt)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlinstring-int-convert"><span class="">예외 처리</span></a></label>
   
 </li>
   </ul>
@@ -1433,6 +1445,21 @@ if (!doNotTrack) {
   
 </li>
   </ul>
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docskotlinchaptergeneric-li">
+  <input type="checkbox" id="m-docskotlinchaptergeneric-check"/>
+  <label for="m-docskotlinchaptergeneric-check"><a href="/docs/kotlin/chapter/generic/" title="Kotlin 제네릭스" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docskotlinchaptergeneric"><span class="">제네릭스</span></a></label>
+  
+  <ul class="ul-3 foldable">
+    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlingenericsbasic-li">
+  <input type="checkbox" id="m-docskotlingenericsbasic-check"/>
+  <label for="m-docskotlingenericsbasic-check"><a href="/docs/kotlin/generics/basic/" title="Kotlin 제네릭(Generic)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlingenericsbasic"><span class="">제네릭(Generic)</span></a></label>
+  
+</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlingenericsvariant-li">
+  <input type="checkbox" id="m-docskotlingenericsvariant-check"/>
+  <label for="m-docskotlingenericsvariant-check"><a href="/docs/kotlin/generics/variant/" title="Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlingenericsvariant"><span class="">제네릭(Generic)</span></a></label>
+  
+</li>
+  </ul>
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docskotlinchapterthread-concurrency-li">
   <input type="checkbox" id="m-docskotlinchapterthread-concurrency-check"/>
   <label for="m-docskotlinchapterthread-concurrency-check"><a href="/docs/kotlin/chapter/thread-concurrency/" title="Kotlin 쓰레드와 동시성" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docskotlinchapterthread-concurrency"><span class="">쓰레드와 동시성</span></a></label>
@@ -1445,17 +1472,6 @@ if (!doNotTrack) {
 </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlincoroutine-li">
   <input type="checkbox" id="m-docskotlincoroutine-check"/>
   <label for="m-docskotlincoroutine-check"><a href="/docs/kotlin/coroutine/" title="Kotlin 코루틴(Coroutines)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlincoroutine"><span class="">코루틴 Coroutines</span></a></label>
-  
-</li>
-  </ul>
-</li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docskotlinchaptergeneric-li">
-  <input type="checkbox" id="m-docskotlinchaptergeneric-check"/>
-  <label for="m-docskotlinchaptergeneric-check"><a href="/docs/kotlin/chapter/generic/" title="Kotlin 제네릭스" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docskotlinchaptergeneric"><span class="">제네릭스</span></a></label>
-  
-  <ul class="ul-3 foldable">
-    <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docskotlingeneric-li">
-  <input type="checkbox" id="m-docskotlingeneric-check"/>
-  <label for="m-docskotlingeneric-check"><a href="/docs/kotlin/generic/" title="Kotlin 제네릭(Generic)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docskotlingeneric"><span class="">제네릭(Generic)</span></a></label>
   
 </li>
   </ul>
@@ -1848,8 +1864,27 @@ if (!doNotTrack) {
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#제네릭-클래스">제네릭 클래스</a></li>
-    <li><a href="#제네릭-함수">제네릭 함수</a></li>
+    <li><a href="#공변인covariant은-무슨-뜻인가">공변인(covariant)은 무슨 뜻인가?</a>
+      <ul>
+        <li><a href="#listint는-listany로-취급-가능하다"><code>List&lt;Int&gt;</code>는 <code>List&lt;Any&gt;</code>로 취급 가능하다.</a></li>
+        <li><a href="#mutablelistint는-mutablelistany로-처리-할-수-없습니다">MutableList<Int>는 MutableList<Any>로 처리 할 수 ​​없습니다.</a></li>
+      </ul>
+    </li>
+    <li><a href="#공변형-generic-클래스covariant-class-정의">공변형 Generic 클래스(covariant class) 정의</a>
+      <ul>
+        <li><a href="#kotlin-list-및-mutablelist-정의">Kotlin List 및 MutableList 정의</a></li>
+      </ul>
+    </li>
+    <li><a href="#반공변-generic-클래스contravariant-class-정의">반공변 Generic 클래스(contravariant class) 정의</a></li>
+    <li><a href="#declaration-site-variance선언-위치-변환-및-use-site-variance사용-위치-변환">declaration-site variance(선언 위치 변환) 및 use-site variance(사용 위치 변환)</a>
+      <ul>
+        <li><a href="#declaration-site-variance선언-위치-변환">declaration-site variance(선언 위치 변환)</a></li>
+        <li><a href="#use-site-variance사용-위치-변환">use-site variance(사용 위치 변환)</a></li>
+      </ul>
+    </li>
+    <li><a href="#in-position-과-out-position">in position 과 out position</a></li>
+    <li><a href="#kotlin의-배열은-불변-java의-배열은-공변">Kotlin의 배열은 불변, Java의 배열은 공변</a></li>
+    <li><a href="#listany와-list-star-projection의-차이점">List&lt;Any?&gt;와 List&lt;*&gt; (star projection)의 차이점</a></li>
   </ul>
 </nav>
       </div>
@@ -1953,7 +1988,7 @@ if (!doNotTrack) {
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">54</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">16</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
@@ -2071,7 +2106,7 @@ if (!doNotTrack) {
 </nav>
             
 <div class="td-content">
-	<h1>Kotlin 제네릭(Generic)</h1>
+	<h1>Kotlin 제네릭스 - 공변(covariant)과 불변(invariant)에 대해 이해</h1>
 	
 	<header class="article-meta">
 		
@@ -2089,43 +2124,269 @@ if (!doNotTrack) {
 		
 	</header>
 	
-	<h2 id="제네릭-클래스">제네릭 클래스</h2>
-<p>인수 Any 형으로 받아 Any 형의 속성에 저장함으로써, <code>Int</code>, <code>Char</code>, <code>String</code> 등 다양한 유형에 따라 클래스나 함수를 정의 할 수 있`다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Any</span><span style="color:#000;font-weight:bold">)</span>
+	<h2 id="공변인covariant은-무슨-뜻인가">공변인(covariant)은 무슨 뜻인가?</h2>
+<p><code>Int</code>은 <code>Any</code>로 사용할 수 있다(<code>Any</code>는 Java에서는 <code>Object</code>을 말한다.).</p>
+<p>그럼</p>
+<ol>
+<li><code>List&lt;Int&gt;</code>는 <code>List&lt;Any&gt;</code>로 취급할 수 있을까?</li>
+<li><code>MutableList&lt;Int&gt;</code>는 <code>MutableList&lt;Any&gt;</code>로 취급할 수 있을까?</li>
+</ol>
+<p>이에 대한 대답은 사용중인 Generic 클래스가 형식 매개 변수에 대해 공변성(covariant) 또는 불변(invariant)인지 여부에 따라 결정된다.</p>
+<ol>
+<li><code>List&lt;Int&gt;</code>는 <code>List&lt;Any&gt;</code>로 사용할 수 있다(<code>List</code>는 공변이다(=covariant)).</li>
+<li><code>MutableList&lt;Int&gt;</code>는 <code>MutableList&lt;Any&gt;</code>로 사용할 수 없다(<code>MutableList</code>는 공변이 아니다(= invariant)).</li>
+</ol>
+<p>&lsquo;Generic 클래스가 공변이다&rsquo;라는 것은 타입 인수로 지정한 타입의 부모와 자식 관계가 Generic 클래스에 의해 생성된 타입의 부모와 자식 관계와 같다는 것을 의미한다. 예를 들어, <code>List&lt;E&gt;</code>는 그 타입 매개변수 <code>E</code>에 대해 공변이므로 <code>List&lt;Int&gt;</code>를 <code>List&lt;Any&gt;</code>로 취급할 수 있다(<code>List&lt;Int&gt;</code>는 <code>List&lt;Any&gt;</code>의 하위 타입으로 간주된다).</p>
+<h3 id="listint는-listany로-취급-가능하다"><code>List&lt;Int&gt;</code>는 <code>List&lt;Any&gt;</code>로 취급 가능하다.</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">showElems</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">e</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">list</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">e</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">a1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">123</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">)</span>		<span style="color:#8f5902;font-style:italic">// 123
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">a</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// List&lt;Int&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">showElems</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span>            <span style="color:#8f5902;font-style:italic">// OK!
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>그러나 value는 Any 형이므로, 아래와 같이 <code>value</code>에 <code>+ 1</code> 연산을 하게 되면 오류가 발생한다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Any</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>반면에 <code>MutableList&lt;E&gt;</code>는 타입 매개변수 <code>E</code>에 대해 공변이 아니므로 <code>MutableList&lt;Int&gt;</code>는 <code>MutableList&lt;Any&gt;</code>로 취급할 수 없다. 전혀 호환되지 않는 타입으로 취급된다.</p>
+<p>왜 이런 차이가 발생하는 것일까? 다음과 같은 코드를 생각하면 쉽게 이해할 수 있다.</p>
+<h3 id="mutablelistint는-mutablelistany로-처리-할-수-없습니다">MutableList<Int>는 MutableList<Any>로 처리 할 수 ​​없습니다.</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">addElems</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Hello&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;World&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">a1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">123</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#204a87;font-weight:bold">value</span> <span style="color:#000;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>	<span style="color:#8f5902;font-style:italic">// Error
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">a</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// MutableList&lt;Int&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">addElems</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span>                     <span style="color:#8f5902;font-style:italic">// Compile Error!
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p><code>&lt;T&gt;</code>으로 제네릭 형식을 정의함으로써 value는 <code>Int</code>, <code>Char</code>, <code>String</code> 등 인수에 따른 형식의 속성으로 취급하게 하여 이 문제를 해결 할 수 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>만약 위와 같은 코드가 가능하게 된다면, <code>MutableList&lt;Int&gt;</code> 타입의 객체에 <code>Int</code> 이외의 임의의 요소를 추가할 수 있게 되어 버린다. 그래서 <code>MutableList&lt;E&gt;</code>는 타입 매개변수 <code>E</code>에 대해 공변이 아니라고 정의되어 있는 것이다. 따라서 위와 같은 코드는 컴파일 오류가 발생한다.</p>
+<p><code>List&lt;Int&gt;</code>의 요소가 더 범용적인 <code>Any</code>로만 사용된다면 문제가 없지만, <code>MutableList&lt;Int&gt;</code>가 더 범용적인 타입인 <code>Any</code>를 받아들이는 것은 문제가 있다는 뜻이다.</p>
+<p>다소 어렵지만 공변(covariant)과 불변(invariant)은 Kotlin의 제네릭스를 다루는데 있어서 매우 중요한 개념이므로, 다시 한 번 정리해 보겠다.</p>
+<p>A가 B의 하위 유형일 때, <code>List&lt;A&gt;</code>는 <code>List&lt;B&gt;</code>의 하위 타입이 된다. 이러한 Generic 클래스를 공변(covariant)이라고 한다.
+A가 B의 하위 타입이더라도 <code>MutableList&lt;A&gt;</code>는 <code>MutableList&lt;B&gt;</code>의 서브타입이 될 수 없다. 이러한 Generic 클래스를 불변(invariant)라고 한다(=공변이 아니다).</p>
+<h2 id="공변형-generic-클래스covariant-class-정의">공변형 Generic 클래스(covariant class) 정의</h2>
+<p>어떤 타입 파라미터에 대해 공변인 Generic 클래스를 정의하려면 타입 매개변수에 <code>out</code> 키워드를 붙여서 정의한다. 반대로 아무런 수식어를 붙이지 않고 타입 매개변수를 정의하면 해당 Generic 클래스는 기본적으로 불변(invariant)이 된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">elem</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">get</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#000">T</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">elem</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>타입 파라미터에 <code>out</code>을 붙인다는 것은 해당 Generic 클래스의 구현에서 해당 타입 파라미터를 출력용으로만 사용하겠다는 선언이기도 한다. 출력용으로 사용한다는 것은 반환값의 위치에서만 해당 타입 파라미터를 사용한다는 의미아다. 그래서 이런 클래스를 producer라고 읽기도 하고, 샘플 코드의 클래스 이름으로 Producer가 사용되기도 한다. 개인적으로는 이러한 명칭은 샘플 코드로는 이해하기 어렵다고 생각하기 때문에, 여기서는 Holder라는 클래스명으로 사용하였다.</p>
+<p>전문 용어로는 getter 등의 출력 위치에서 사용하는 것을 <strong>out position</strong>에서 사용하고, setter 등의 입력 위치에서 사용하는 것을 <strong>in position</strong>에서 사용한다고 한다. 타입 매개변수에 <code>out</code>을 붙일 수 있는 것은 해당 타입 매개변수를 <code>out position</code>에서만 사용하는 경우에만 가능하다(정확히는 <code>in position</code>에서 사용하지 않는 경우).</p>
+<p>예를 들어, 위에 예제 코드에서는 타입 파라미터 <code>T</code>를 getter의 반환값(out position)의 타입으로만 사용하고 있다(생성자 파라미터로도 사용하지만, 생성자의 <code>val</code> 파라미터는 본질적으로 getter를 정의하는 것이므로, out position으로 간주된다). in position에서는 타입 파라미터 <code>T</code>를 전혀 사용하지 않기 때문에 <code>out</code> 수식어를 추가할 수 있으며, 공변(covariant)인 Generic 클래스로 만들 수 있다.</p>
+<p>만약 다음과 같이 <code>out</code>을 붙인 타입 파라미터를 in position으로 사용한다면,</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">elem</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">dump</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">t</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">Type</span> <span style="color:#000">parameter</span> <span style="color:#000">T</span> <span style="color:#204a87;font-weight:bold">is</span> <span style="color:#000">declared</span> <span style="color:#204a87;font-weight:bold">as</span> <span style="color:#a40000">&#39;</span><span style="color:#204a87;font-weight:bold">out</span><span style="color:#a40000">&#39;</span> <span style="color:#000">but</span> <span style="color:#000">occurs</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#a40000">&#39;</span><span style="color:#204a87;font-weight:bold">in</span><span style="color:#a40000">&#39;</span> <span style="color:#000">position</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">type</span> <span style="color:#000">T</span>
+</span></span></code></pre></div><p>이와 같은 컴파일 에러가 발생하게 된다. 왜냐하면, 이런 사용법을 허용하면 앞서 설명한 <code>MutableList</code> 예제와 같이 타입의 안전성을 유지할 수 없게 되는 경우가 발생하기 때문이다.</p>
+<p>이제 다음과 같이 상속 관계가 있는 <code>Animal</code> 클래스와 <code>Bird</code> 클래스가 있다고 가정해 보자. <code>Bird</code>는 <code>Animal</code>의 하위 타입이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">open</span> <span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Animal</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">eat</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;EAT&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Bird</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Animal</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">fly</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;FLY&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>그리고 <code>Holder&lt;Animal&gt;</code>을 파라미터로 받는 <code>doEat</code> 함수를 다음과 같이 정의했다고 하자.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">doEat</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">holder</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Animal</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">animal</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">holder</span><span style="color:#000;font-weight:bold">.</span><span style="color:#204a87;font-weight:bold">get</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">animal</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">eat</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><code>Holder</code> 클래스는 공변 제네릭 클래스로 정의(타입 파라미터 <code>T</code>에 <code>out</code>을 붙여 정의)되어 있으므로 <code>Holder&lt;Bird&gt;</code> 객체는 <code>Holder&lt;Animal&gt;</code> 객체 대신 사용할 수 있다. 따라서 다음과 같이 <code>doEat</code> 함수에 <code>Holder&lt;Bird&gt;</code> 객체를 전달할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">holder</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Bird</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Bird</span><span style="color:#000;font-weight:bold">())</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">doEat</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">holder</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>이것이 <code>class Holder&lt;out T&gt;</code>와 같이 타입 파라미터에 <code>out</code>을 붙여 정의한 효과이다. 만약 out을 붙이지 않고 <code>class Holder&lt;T&gt;</code>와 같이 불변(invariant) 클래스로 정의했다면, <code>doEat(holder)</code> 호출은 다음과 같은 에러가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">Type</span> <span style="color:#000">mismatch</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">inferred</span> <span style="color:#000">type</span> <span style="color:#204a87;font-weight:bold">is</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Bird</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">but</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Animal</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">was</span> <span style="color:#000">expected</span>
+</span></span></code></pre></div><p>Holder이 공변이 아니기 때문에 Holder<Bird>과 Holder<Animal> 사이에는 호환되지 않습니다. 다만, 이것에는 조금만 빠져나가는 길이 있어, 제네릭 클래스를 사용하는 측(여기에서는 doEat 함수를 정의하는 장소)에서, 다음과 같이 out 를 붙여, 「공변(covariant)인 형태 파라미터로서 사용해요」라고 선언해 버리는 방법이 있습니다.</p>
+<p><code>Holder</code>가 공변이 아니기 때문에 <code>Holder&lt;Bird&gt;</code>와 <code>Holder&lt;Animal&gt;</code> 사이에는 아무런 호환성이 없기 때문이다. 다만, 여기에는 약간의 허점이 있는데, 제네릭 클래스를 사용하는 쪽(여기서는 <code>doEat</code> 함수를 정의하는 곳)에서 다음과 같이 <code>out</code>을 붙여서 &lsquo;공변형(covariant) 타입 파라미터로 사용하겠다&rsquo;라고 선언하는 방법이 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">doEat</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">holder</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Holder</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">Animal</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">animal</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">holder</span><span style="color:#000;font-weight:bold">.</span><span style="color:#204a87;font-weight:bold">get</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">animal</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">eat</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>이는 <code>Holder</code> 클래스 자체는 공변으로 정의하지 않았지만, 적어도 이 함수의 구현에서는 공변 클래스로 사용한다는 것을 나타낸다(<code>Holder&lt;Animal&gt;</code> 대신 <code>Holder&lt;Bird&gt;</code>로 전달해도 된다). 이렇게 제네릭 클래스를 사용하는 곳에서 타입 인수에 <code>out</code> 한정자를 붙이는 방법을 **use-site variance(사용 위치 변환)**라고 한다. 더 자세한 내용은 아래에서 설명한다.</p>
+<h3 id="kotlin-list-및-mutablelist-정의">Kotlin List 및 MutableList 정의</h3>
+<p>그럼 Kotlin의 <code>List</code> 인터페이스와 <code>MutableList</code> 인터페이스의 정의를 살펴보겠다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Collection</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;,</span> <span style="color:#000">MutableCollection</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><code>List</code> 인터페이스의 타입 파라미터 <code>E</code>에는 <code>out</code>이 붙어 있고, <code>MutableList</code> 인터페이스에는 붙어 있지 않다. 따라서 <code>List</code>는 타입 파라미터 E에 대해 공변(covariant) 제네릭 클래스이고, <code>MutableList</code>는 불변(invariant) 제네릭 클래스이다.</p>
+<p>타입 파라미터의 <code>out</code> 수식어는 주로 팩토리 계열의 클래스나 불변(immutable)인 데이터 홀더 계열의 클래스에서 많이 사용하게 된다. 하지만 <code>clear()</code>와 같이 매개변수를 전혀 받지 않고 객체의 내용을 변경하는 함수도 있을 수 있으므로, 불변(immutable) 클래스만 공변(covariant) 클래스가 될 수 있는 것은 아니다.</p>
+<h2 id="반공변-generic-클래스contravariant-class-정의">반공변 Generic 클래스(contravariant class) 정의</h2>
+<p>공변(covariant)에 가까운 개념으로 그 반대의 성질을 가진 반공변(contravariant)이 있다. 공변(covariant)인 제네릭 클래스에서 생성된 타입은 해당 타입 인수로 지정한 타입의 부모와 자식 관계가 동일하지만, 반공변(contravariant)인 제네릭 클래스에서 생성된 타입은 이 부모와 자식 관계가 역전된다. 글로만 설명하면 이해하기 어렵기 때문에, 코드로 살펴보자.</p>
+<p>먼저 공변(covarinat)에 대한 복습부터 시작하겠다. 공변인 타입 매개변수는 <code>out</code>으로 한정한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span>
+</span></span></code></pre></div><p><code>List&lt;Int&gt;</code>은 <code>List&lt;Any&gt;</code>의 하위 타입이다.</p>
+<p>다음으로, 반공변(contravariant)의 예이다. 반공변인 인터페이스의 대표적인 예로 Comparator 인터페이스를 들 수 있다. 반공변 타입 매개변수는 <code>in</code>으로 한정한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">Comparator</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">compare</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">Int</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p><code>Comparator&lt;Int&gt;</code>는 <code>Comparator&lt;Any&gt;</code>의 상위 타입이 된다. 즉, <code>Comparator&lt;Any&gt;</code>가 <code>Comparator&lt;Int&gt;</code>의 하위 타입이 된다. 이 부분의 부모와 자식 관계가 공변(covariant)였을 때와 반대로 되어 있기 때문에 반공변(contravariant)이라고 부른다.</p>
+<p>왜 이렇게 부모와 자식 관계가 역전되는 것일까? <code>Comparator&lt;Any&gt;</code>와 <code>Comparator&lt;Int&gt;</code>의 관계를 생각해보자. <code>Comparator&lt;Int&gt;</code>를 매개변수로 받는 함수에는 <code>Comparator&lt;Any&gt;</code> 객체를 전달할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">anyComp</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Comparator</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">hashCode</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">-</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">hashCode</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">intList</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">intList</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">sortWith</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">anyComp</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><p>왜냐하면 <code>Comparator&lt;Any&gt;</code> 구현에서는 <code>Any</code> 인터페이스만 참조하기 때문에 <code>Int</code> 객체 간의 비교에 해당 구현을 사용해도 아무런 문제가 없기 때문이다.</p>
+<p><code>in</code> 수식어를 붙일 수 있는 타입 파라미터는 in position에서만 사용되는 것으로 제한된다(정확히는 public 함수의 반환값과 같이 out position에서는 전혀 사용되지 않는 것들). 그 제네릭 클래스 내에서 타입 매개변수를 받아들이는(혹은 소비하는) 용도로만 사용하기 때문에 그 제네릭 클래스를 consumer라고 부르기도 한다. 그래서 예제 코드에서는 반공변(contravariant) 제네릭 클래스의 이름이 Comsumer로 되어 있기도 하다.</p>
+<p>Kotlin의 <code>Continuation</code> 인터페이스도 반공변 제네릭 인터페이스 중 하나이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">Continuation</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">context</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">CoroutineContext</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">resume</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">resumeWithException</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">exception</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Throwable</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><h2 id="declaration-site-variance선언-위치-변환-및-use-site-variance사용-위치-변환">declaration-site variance(선언 위치 변환) 및 use-site variance(사용 위치 변환)</h2>
+<p>앞에서 Holder 클래스 설명에서도 조금 나왔지만, 제네릭 클래스의 타입 파라미터에 <code>out</code>이나 <code>in</code>과 같은 공변 수식어(variance modifier)를 붙이는 경우, Kotlin에서는 그 추가 시점이 두 가지 패턴으로 나뉜다.</p>
+<ul>
+<li>declaration-site variance(선언 위치 변환)
+<ul>
+<li>클래스나 인터페이스 선언 시 타입 매개변수를 <code>out</code>이나 <code>in</code>으로 수정한다.</li>
+</ul>
+</li>
+<li>use-site variance(사용 위치 변환)
+<ul>
+<li>이미 정의된 제네릭 클래스를 사용할 때 타입 인수에 <code>out</code>이나 <code>in</code>을 붙인다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="declaration-site-variance선언-위치-변환">declaration-site variance(선언 위치 변환)</h3>
+<p>다음은 <code>List</code> 인터페이스와 같이 인터페이스를 선언할 때 타입 파라미터에 <code>out</code>이나 <code>in</code> 수식어를 붙이는 방법이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Collection</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">E</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>이 경우 이 <code>List</code> 인터페이스를 사용하는 곳에서는 기본적으로 공변(covariant)으로 처리된다. 예를 들어, <code>List&lt;Number&gt;</code>를 받는 함수에는 <code>List&lt;Int&gt;</code>나 <code>List&lt;Double&gt;</code>을 전달할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">showNumbers</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">nums</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">nums</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">a1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">123</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#204a87;font-weight:bold">value</span> <span style="color:#000;font-weight:bold">+</span> <span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">)</span>	<span style="color:#8f5902;font-style:italic">// 124
+</span></span><span style="display:flex;"><span>    <span style="color:#000">showNumbers</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">))</span>       <span style="color:#8f5902;font-style:italic">// List&lt;Int&gt;을 전달할 있다.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">showNumbers</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">0.1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0.2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">0.3</span><span style="color:#000;font-weight:bold">))</span> <span style="color:#8f5902;font-style:italic">// List&lt;Double&gt;도 전달 할 수 있다.
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>아래와 같이하여 형식에 제한을 걸 수 있다. 아래에서는 <code>Int</code> 및 <code>Double</code> 등 Number의 서브 클래스로 제한하고 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Foo</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><h2 id="제네릭-함수">제네릭 함수</h2>
-<p>함수에서도 제네릭을 사용할 수 있다. 다음은 임의의 타입 <code>T</code>의 인수를 받아, <code>T</code>형의 값을 반환하는 함수이다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">T</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>호출시 형식을 지정하지만 인수에 의해 형태가 명확한 경우는 생략 할 수 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">foo</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">123</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">foo</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#4e9a06">&#34;ABC&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">123</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000">foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;ABC&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span></code></pre></div><p>아래와 같이하여 형식에 제한을 걸 수 있다. 아래에서는 <code>Int</code> 및 <code>Double</code> 등 <code>Number</code>의 서브 클래스로 제한하고 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">T</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>제약 조건을 여러 개 지정하려면 <code>where</code>를 사용한다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">foo</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">x</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">where</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Runnable</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Cancellable</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span> <span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div>
+</span></span></code></pre></div><p>좀 더 쉽게 설명하면, <code>List</code> 인터페이스에서는 다음과 같은 대입이 가능하다는 것이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">nums</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// OK
+</span></span></span></code></pre></div><p>반대로,MutableList 인터페이스는 공변 (convariant) 으로 정의되어 있지 않기 (= 불변 (invariant)) 때문에, 다음과 같은 대입을 할 수 없습니다.</p>
+<p>반대로 <code>MutableList</code> 인터페이스는 공변(convariant)으로 정의되어 있지 않기 때문에(=불변(invariant)) 다음과 같은 대입이 불가능하다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">nums</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// NG
+</span></span></span></code></pre></div><h3 id="use-site-variance사용-위치-변환">use-site variance(사용 위치 변환)</h3>
+<p>제네릭 클래스를 사용할 때 그 타입 인수에 <code>in</code>이나 <code>out</code> 키워드를 붙이는 방법이다.</p>
+<p>예를 들어, Kotlin의 <code>MutableList</code>는 불변(invariant) 제네릭 클래스이므로 다음과 같이 <code>MutableList&lt;Int&gt;</code>를 <code>MutableList&lt;Number&gt;</code>로 취급할 수 없다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div><p>이러한 불변(invariant) 클래스라도 사용하는 곳에 <code>out</code> 키워드를 붙이면 그 부분만 공변으로 간주하여 사용할 수 있다. 그 부작용으로 in position으로 요소를 다룰 수 없게 되므로 <code>add()</code> 함수 등을 호출할 수 없게 된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">out</span> <span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1.5</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div><p>이와 같이 타입 인수를 사용하는 것을 전문 용어로 **타입 투영(type projection)**이라고 부른다. 이 경우 <code>out</code> 키워드를 붙였기 때문에 out-projected 되었다고 한다.</p>
+<p>좀 더 실용적인 예로 다음과 같이 배열(Array)의 내용을 복사하는 함수를 생각해 보겠다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">copyArray</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">src</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;,</span> <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">assert</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">src</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">size</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">size</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">src</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">indices</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">src</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>Kotlin의 <code>Array</code> 클래스는 다음과 같이 타입 파라미터에 variance modifier(<code>out</code>, <code>in</code>)가 붙지 않기 때문에 <code>MutableList</code>와 마찬가지로 불변(invariant)의 제네릭 클래스이다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span>
+</span></span></code></pre></div><p>따라서 <code>Array&lt;Int&gt;</code>와 <code>Array&lt;Number&gt;</code>와는 호환되지 않으며, 다음과 같은 코드는 에러가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">arr1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">arrayOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">arr2</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">arrayOfNulls</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">copyArray</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">arr1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">arr2</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div><p>따라서 사용 위치 변환(use-site variance) 메커니즘을 이용하여 <code>dst</code> 파라미터의 타입 파라미터에 <code>in</code> 키워드를 붙여서 반공변량(contravariant)으로 만든다. <code>in</code> 키워드를 붙인다는 것은 이 <code>dst</code> 객체는 <code>T</code> 타입의 요소만 가져온다(consume)는 선언이 된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">copyArray2</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">src</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;,</span> <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">assert</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">src</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">size</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">size</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">i</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">src</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">indices</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">dst</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">src</span><span style="color:#000;font-weight:bold">[</span><span style="color:#000">i</span><span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>그러면 이 함수의 <code>src</code> 파라미터에 <code>Array&lt;Int&gt;</code>를 전달하면 <code>dst</code> 파라미터에 <code>Array&lt;Number&gt;</code> 등을 하위 타입으로 간주하여 전달할 수 있게 된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">arr1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">arrayOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">arr2</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">arrayOfNulls</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Number</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">copyArray2</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">arr1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">arr2</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// OK
+</span></span></span></code></pre></div><p><code>Array</code> 클래스는 원래 불변(invariant) 클래스로 정의된 것인데, 이 함수만 반공변(contravariant)으로 사용할 수 있게 되었다는 뜻이다.</p>
+<p>참고로 Java에는 이 use-site variance만 존재하며, <code>&lt;? extends Hoge&gt;</code>나 <code>&lt;? super Hoge&gt;</code>와 같은 상한 경계, 하한 경계를 지정하는 방법이 사용되었다.</p>
+<h2 id="in-position-과-out-position">in position 과 out position</h2>
+<p>타입 매개변수를 공변(covariant)으로 만들려면 <code>out</code> 수정자를, 반공변(contravariant)으로 만들려면 <code>in</code> 수정자를 붙여야 한다. 이러한 수식어를 붙일 때의 제약 조건은 다음과 같다.</p>
+<ul>
+<li><code>out</code>: in position에서 사용하는 타입 매개변수에는 붙일 수 없다.</li>
+<li><code>in</code>: out position에서 사용하는 타입 매개변수에는 붙일 수 없다.</li>
+</ul>
+<p>여기서는 어떤 위치에서 타입 파라미터를 참조하는 것이 in position과 out position 중 어느 위치에서 사용하는 것으로 간주되는지 정리해 본다.</p>
+<ul>
+<li>in position
+<ul>
+<li>public인 함수의 파라미터</li>
+<li>public인 프로퍼티의 setter(생성자 파라미터로, <code>var</code>가 붙은 것. 내부적으로 setter가 정의되어 있기 때문에 in position으로 간주됨)</li>
+</ul>
+</li>
+<li>out position
+<ul>
+<li>public 함수의 반환값</li>
+<li>public인 프로퍼티의 getter(생성자 매개변수로 <code>val</code> 또는 <code>var</code>가 붙은 것. 내부적으로 getter가 정의되어 있기 때문에 out position으로 간주됨)</li>
+</ul>
+</li>
+<li>in position도 out position도 아니다(공변이나 반공변도 가능하다).
+<ul>
+<li>private인 함수나 프로퍼티의 매개변수 및 반환값(private인 함수에서는 타입 오용의 우려가 없기 때문에)</li>
+<li>생성자 매개변수로 <code>val</code>도 <code>var</code>도 붙지 않은 것(초기화 시에만 호출되며, 타입 매개변수 오용의 위험이 적기 때문에 in position도 out position도 아닌 것으로 간주됨)</li>
+</ul>
+</li>
+</ul>
+<h2 id="kotlin의-배열은-불변-java의-배열은-공변">Kotlin의 배열은 불변, Java의 배열은 공변</h2>
+<p>Kotlin의 <code>Array</code> 클래스는 불변(invariant) 제네릭 클래스로 정의되어 있다. 따라서 기본적으로 <code>Array</code> 클래스에서 생성되는 서로 다른 타입 사이에 부모-자식 관계는 발생하지 않는다(앞서 설명한 타입 투영(use-site variance) 메커니즘을 사용하는 경우는 예외이다).</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">arr</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Array</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">arrayOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div><p>한편, Java의 배열은 공변(covariant)으로 정의되어 있다. 그래서 다음과 같은 대입이 가능했다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">Integer</span><span style="color:#000;font-weight:bold">[]</span> <span style="color:#000">nums</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">{</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">};</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">Object</span><span style="color:#000;font-weight:bold">[]</span> <span style="color:#000">objs</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">nums</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">objs</span><span style="color:#000;font-weight:bold">[</span><span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;ABC&#34;</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#8f5902;font-style:italic">// Runtime ERROR
+</span></span></span></code></pre></div><p>이 스펙의 문제점으로 위와 같이 <code>Integer[]</code> 배열에 <code>String</code> 객체를 저장하는 코드가 컴파일될 수 있다는 점을 들 수 있다. 이러한 문제를 해결하기 위해 Kotlin에서는 <code>Array&lt;E&gt;</code> 클래스를 (원시적인 요소를 담는 <code>IntArray</code>나 <code>CharArray</code>와 마찬가지로) 불변(invariant)으로 만들기로 했다. <code>Array&lt;Int&gt;</code>와 <code>Array&lt;Any&gt;</code> 사이에는 호환성이 없기 때문에 위의 Java 예시처럼 예상치 못한 타입의 요소가 저장될 염려가 없다.</p>
+<h2 id="listany와-list-star-projection의-차이점">List&lt;Any?&gt;와 List&lt;*&gt; (star projection)의 차이점</h2>
+<p>제네릭 타입의 객체를 받는 함수를 정의할 때 요소의 타입 정보를 특별히 의식하지 않는 경우에는 타입 매개변수 대신 보다 간결한 스타 프로젝션(star projection) 구문을 사용할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">dump</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;*&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000;font-weight:bold">((</span><span style="color:#000">index</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">elem</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">withIndex</span><span style="color:#000;font-weight:bold">())</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;</span><span style="color:#4e9a06">$index</span><span style="color:#4e9a06">: </span><span style="color:#4e9a06">$elem</span><span style="color:#4e9a06">&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;AAA&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;BBB&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;CCC&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">dump</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>위의 <code>dump</code> 함수를 다음과 같이 타입 파라미터를 사용하여 정의해도 동일하게 동작하지만, 함수 정의에서 타입 정보를 사용하지 않기 때문에 스타 프로젝션 구문을 사용하는 것이 더 간단하게 작성할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">dump</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;)</span>
+</span></span></code></pre></div><p>타입 매개변수의 위치에 <code>&lt;*&gt;</code>을 지정하는 것과 <code>&lt;Any?&gt;</code>를 지정하는 것은 비슷하게 느껴지지만 다음과 같이 분명한 차이가 있다.</p>
+<ul>
+<li><code>MutableList&lt;*&gt;</code>: 특정 타입의 요소가 들어있는 리스트</li>
+<li><code>MutableList&lt;Any?&gt;</code>: 무엇이든 담을 수 있는 목록</li>
+</ul>
+<p><code>MutableList&lt;*&gt;</code>으로 참조하는 목록의 실제로는 <code>MutableList&lt;Int&gt;</code>이지만, <code>MutableList&lt;Any?&gt;</code>으로 참조하는 목록은 반드시 <code>MutableList&lt;Any?&gt;</code> 이다.</p>
+<p><code>MutableList&lt;*&gt;</code>를 받는 함수는 구체적인 타입은 신경 쓰지 않지만, 호출자에서 구체적인 타입 인자를 지정하여 만든 목록이 전달될 것을 예상하고 있다. 즉, 다음과 같은 코드는 타입 안전성이 없기 때문에 컴파일 에러가 발생한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">addSomething</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;*&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Hello&#34;</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// ERROR: 함부로 String을 넣으면 안된다.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">intList</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">addSomething</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">intList</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>한편, <code>MutableList&lt;Any?&gt;</code>은 무엇이든 저장할 수 있는 목록임을 나타낸다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">addSomething</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">?&gt;)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Hello&#34;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">list</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Any</span><span style="color:#000;font-weight:bold">?&gt;(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#4e9a06">&#34;A&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#204a87;font-weight:bold">null</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">addSomething</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">list</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>MutableList은 불변(invariant)인 클래스이므로 <code>MutableList&lt;Any?&gt;</code>을 받는 함수는 <code>MutableList&lt;Any?&gt;</code> 객체만 전달할 수 있다.</p>
+<p>스타 프로젝션은 요소를 읽기 전용으로 만드는 특성을 가지고 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">mutableListOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">list1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">100</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// OK
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list2</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">MutableList</span><span style="color:#000;font-weight:bold">&lt;*&gt;</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">list1</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">list2</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">100</span><span style="color:#000;font-weight:bold">)</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div><p>참고로 Java에서는 와일드카드 문자로 <code>*</code>가 아닌 <code>?</code>를 와일드카드 문자로 사용하지만, Kotlin과 마찬가지로 컬렉션 클래스를 읽기 전용으로 만드는 작용이 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">strList</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">new</span> <span style="color:#000">ArrayList</span><span style="color:#000;font-weight:bold">&lt;&gt;();</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">strList</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Hello&#34;</span><span style="color:#000;font-weight:bold">);</span>  <span style="color:#8f5902;font-style:italic">// OK
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;?&gt;</span> <span style="color:#000">roList</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">strList</span><span style="color:#000;font-weight:bold">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000">roList</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">add</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;World&#34;</span><span style="color:#000;font-weight:bold">);</span>  <span style="color:#8f5902;font-style:italic">// ERROR
+</span></span></span></code></pre></div>
 	<br>
 
 <br>
@@ -2154,7 +2415,7 @@ if (!doNotTrack) {
 	
 	
 <div class="text-muted mt-5 pt-3 border-top">
-    최종 수정 : 2021-09-26</div>
+    최종 수정 : 2023-12-17</div>
 
 </div>
 
