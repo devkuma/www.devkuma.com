@@ -23,6 +23,537 @@
     
     
     <item>
+      <title>Helm 개요</title>
+      <link>https://www.devkuma.com/docs/helm/overview/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/helm/overview/</guid>
+      <description>
+        
+        
+        &lt;p&gt;헬름(Helm)를 배우기 전에 먼저 쿠버네티스에 대해서 알아야 하기 때문에 쿠버네티스에 대해서 모른다면, &lt;a href=&#34;https://www.devkuma.com/docs/kubernetes/&#34;&gt;Docker&lt;/a&gt;에 대해 먼저 학습을 하고 오길 바란다.&lt;/p&gt;
+&lt;h2 id=&#34;helm-개요&#34;&gt;Helm 개요&lt;/h2&gt;
+&lt;p&gt;Helm(헬름)은 Kubernetes 클러스터용 패키지 매니저로, Kubernetes 클러스터에서 실행되는 응용 프로그램에서 배포에 이 &amp;ldquo;Helm(헬름)&amp;rdquo; 이라는 도구를 활용된다.&lt;br&gt;
+Helm은 설정 파일을 바탕으로 어플리케이션의 배포를 자동 실행하는 도구로 Kubernetes 어플리케이션 패키지 매니저(package manger)로서 현재 가장 인기 있는 제품이다.&lt;/p&gt;
+&lt;p&gt;Helm은 Deis(2017년에 Microsoft가 인수)한 프로젝트 중 하나로, 2015년에 개최된 최초의 KubeCon(The Kubernetes Community Conference)에서 Helm Classic으로 발표되었다. Helm 프로젝트는 2016년 1월 Kubernetes 프로젝트와 통합되어 Kubernetes의 하위 프로젝트가 되었다. 그리고 2016년 후반에 Helm 2.0, 2018년 6월에 Helm 3.0이 출시되어 본격적인 CNCF(Cloud Native Computing Foundation) 프로젝트로 승격되었다.&lt;/p&gt;
+&lt;h2 id=&#34;kubernetes에-응용-프로그램을-배포하기-위한-사실상-표준-도구인-helm&#34;&gt;Kubernetes에 응용 프로그램을 배포하기 위한 사실상 표준 도구인 &amp;ldquo;Helm&amp;rdquo;&lt;/h2&gt;
+&lt;p&gt;최근에는 컨테이너 클러스터 기술인 Kubernetes를 활용한 서비스의 운용이 늘어나고 있으며, Kubernetes에서 동작하는 것을 전제로 하는 소프트웨어도 등장하고 있다. 한편, Kubernetes에서의 어플리케이션의 배치에 대해서는 과제도 많다.&lt;/p&gt;
+&lt;p&gt;Kubernetes는 서비스를 여러 소규모 컴포넌트로 분할하여 구현하는 마이크로서비스 아키텍처와 궁합이 좋다. 이러한 구성의 서비스에서는 각 컨포넌트를 개별적으로 클러스터에 배포해야 한다. 또, 서비스를 외부에 공개해야 하거나, 각종 설정을 하기 위해서 Kubernetes 클러스터에 &amp;ldquo;리소스&amp;quot;를 작성하여 설정을 실행해야 한다. 이러한 작업은 때로는 복잡해지기 때문에 Kubernetes 클러스터에서 배포를 지원하거나 배포된 컨테이너를 관리하기 위한 다양한 도구가 등장하고 있다.&lt;/p&gt;
+&lt;p&gt;이번에 소개하려는 Helm은 그러한 Kubernetes 클러스터에의 어플리케이션의 배포를 지원하는 툴 중에 하나이다 (그림 1).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-site.png&#34; alt=&#34;Helm 공식 웹사이트&#34;&gt;
+&lt;strong&gt;그림1.&lt;/strong&gt; &lt;em&gt;Helm 공식 웹사이트&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;최근의 OS나 프로그래밍 언어의 대부분에서는 제3자(Third-party)로 인해 만들어진 소프트웨어(패키지) 모와서 공개하는 서비스(리포지토리)가 제공되고 있고, 거기에 공개되고 있는 소프트웨어의 검색이나 다운로드, 인스톨 등을 간단한 조작으로 할 수 있는 &amp;ldquo;패키지 매니저&amp;quot;라고 하는 소프트웨어가 제공되어 있다. Helm은 Kubernetes용 패키지 매니저라고도 불리며, OS나 프로그래밍 언어의 패키지 매니저와 유사한 기능을 갖추고 있다. Helm이 제공하는 구체적인 기능을 간단히 정리하면 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Chart라고 하는 설정 파일을 기반으로 다양한 리소스 자동 생성&lt;/li&gt;
+&lt;li&gt;배포된 애플리케이션 삭제 및 업데이트와 같은 관리&lt;/li&gt;
+&lt;li&gt;리포지토리에 게시된 Chart 찾기, 다운로드 및 설치&lt;/li&gt;
+&lt;li&gt;Chart 패키징 및 리포지토리에 업로드&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Kubernetes의 베이스가 되고 있는 컨테이너 기술의 Docker에서는 이미 컨테이너 이미지를 제공하는 리포지토리 메카니즘이 이미 준비되어 있다. 그래서 Helm에서는 이미지 자체는 직접 다루지 않고, &amp;ldquo;Chart(차트)&amp;ldquo;라고 하는 설정 파일만을 리포지토리로 관리하는 구조로 되고 있다. 그 점을 제외하면 Helm에서 제공하는 기능은 일반적인 패키지 관리자가 제공하는 기능과 거의 동일하며, &lt;code&gt;helm&lt;/code&gt;이라는 CLI 도구를 사용하여 Chart를 다운로드하거나, 이를 기반으로 클러스터에 자동으로 응용 프로그램을 배포할 수 있다.&lt;/p&gt;
+&lt;p&gt;또, Helm에서는 &amp;ldquo;stable&amp;quot;나 &amp;ldquo;incubator&amp;quot;라고 하는 명칭의 공식 리포지토리가 제공되고 있는 것 외에, 써드 파티에 의한 리포지토리도 많이 제공되고 있다. 이러한 리포지토리에 공개된 Chart는 &lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Arfifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;라는 사이트에서 통해서 검색할 수 있게 되어 있다(그림 2).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/artifact-hub-site.png&#34; alt=&#34;Helm의 공식 저장소 &amp;ldquo;Arfifact Hub&amp;rdquo;&#34;&gt;
+&lt;strong&gt;그림2.&lt;/strong&gt; &lt;em&gt;Helm의 공식 저장소 &amp;ldquo;Arfifact Hub&amp;rdquo;&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;helm의-역사와-커뮤니티&#34;&gt;Helm의 역사와 커뮤니티&lt;/h2&gt;
+&lt;p&gt;Helm은 2016년 2월에 v1.0이 릴리스되어, 현재까지 2번의 메이저 업데이트가 진행되고 있다. 최신판은 2022년 8월에 발매된 v3.9.4이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Helm v1
+&lt;ul&gt;
+&lt;li&gt;2015년 DEIS의 내부 프로젝트로 시작
+&lt;ul&gt;
+&lt;li&gt;2017년 DEIS는 Microsoft에 인수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Helm v2
+&lt;ul&gt;
+&lt;li&gt;2016년 1월 : Google 프로젝트에 합류&lt;/li&gt;
+&lt;li&gt;2016 ~ 2018년 : Helm2 고도화(2.0.0 ~ 2.12.2)&lt;/li&gt;
+&lt;li&gt;2018년 6월 : CNCF 프로젝트에 합류&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Helm v3
+&lt;ul&gt;
+&lt;li&gt;2019년 11월 : 릴리즈 발표&lt;/li&gt;
+&lt;li&gt;2019년 ~ 2021년 : Helm3 고도화(3.0.0 ~3.5.2)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;예당초 Kubernetes의 서브 프로젝트로서 개발이 진행되고 있었지만, 그 후 Linux Foundation 산하의 비영리 단체인 Cloud Native Computing Foundation(CNCF) 산하가 되어, 현재도 그 체제로 개발이 진행되고 있다. CNCF는 클라우드 관련 기술 개발을 추진하는 단체로 Kubernetes 자체도 CNCF 산하에서 개발이 진행되고 있다. 이러한 역사적 배경 때문에 Helm은 Kubernetes의 (사실상) 공식 패키지 매니저라고도 알려져 있다.&lt;/p&gt;
+&lt;p&gt;Helm 프로젝트 자신이 제공하는 &amp;ldquo;stable&amp;quot;이나 &amp;ldquo;incubator&amp;rdquo; 등의 공식 리포지토리에서는 이미 다양한 어플리케이션의 Chart가 공개되고 있으며, 유지에 의해 작성된 Chart도 많이 공개되고 있다. 또, 이전에 소개한 Kubernetes 관련 툴의 Istio 나 Jenkins X 라고 하는 소프트웨어에서도, Helm이 공식의 설치 도구으로서 채택되어 사용되고 있다.&lt;/p&gt;
+&lt;p&gt;덧붙여, helm은 선박 등에서 사용되는 배의 키를 의미하는 단어이다. 또, chart는 향해용 지도에서 유래하고 있다.&lt;/p&gt;
+&lt;h2 id=&#34;helm의-주요-특징&#34;&gt;Helm의 주요 특징&lt;/h2&gt;
+&lt;p&gt;Helm은 Go 언어로 작성되었으며 Helm 클라이언트와 Helm 라이브러리의 두 가지 구성 요소로 구성된다.&lt;br&gt;
+Helm은 Helm 클라이언트를 통해 Kubernetes에서 실행되는 응용 프로그램을 Linux yum 명령과 같이 설치 (배포)하고 제거 할 수 있다. 애플리케이션 관리는 차트(Chart)라는 패키지화된 구성 파일을 사용하여 수행된다. 차트에는 애플리케이션 자체가 포함되어 있지 않으며 애플리케이션을 구축하는 데 필요한 정보가 포함되어 있다. 또한 Artifact Hub라는 사이트에는 다양한 차트가 공개되어 있어 사용할 수 있다.&lt;/p&gt;
+&lt;p&gt;Helm 라이브러리는 Kubernetes 클라이언트 라이브러리를 사용하여 Kubernetes와 통신한다. 통신에는 REST+JSON이 사용된다. 자체 데이터베이스는 필요하지 않으며 Kubernetes 비밀에 데이터를 보관한다.&lt;/p&gt;
+&lt;p&gt;Helm의 기본 개념은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;차트 : 응용 프로그램 인스턴스를 만드는데 필요한 구성 파일 집합이다.&lt;/li&gt;
+&lt;li&gt;구성 : 차트 설치시 응용 프로그램에 대한 다양한 매개 변수를 설정하기 위한 것이다.&lt;/li&gt;
+&lt;li&gt;릴리스 : 차트가 설치되고 애플리케이션(릴리스 오브젝트)이 실행 가능한 상태가 된 인스턴스를 릴리스라고 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helm은 다음을 할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;차트 새로 만들기&lt;/li&gt;
+&lt;li&gt;차트를 차트 아카이브(tgz)로 패키징&lt;/li&gt;
+&lt;li&gt;차트가 저장된 차트 리포지토리 작업&lt;/li&gt;
+&lt;li&gt;Kubernetes 클러스터에 차트 설치 및 제거&lt;/li&gt;
+&lt;li&gt;Helm으로 설치한 차트의 릴리스주기 관리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helm 클라이언트와 라이브러리의 역할은 각각 다음과 같다.&lt;/p&gt;
+&lt;h3 id=&#34;helm-클라이언트&#34;&gt;Helm 클라이언트&lt;/h3&gt;
+&lt;p&gt;최종 사용자를 위한 명령줄 프로그램에서 다음을 담당한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;로컬 차트 개발&lt;/li&gt;
+&lt;li&gt;리포지토리 관리&lt;/li&gt;
+&lt;li&gt;릴리스 관리&lt;/li&gt;
+&lt;li&gt;Helm 라이브러리와 협력하여 차트를 제출하거나 릴리스 업그레이드 및 제거 요청을 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;helm-라이브러리&#34;&gt;Helm 라이브러리&lt;/h3&gt;
+&lt;p&gt;모든 Helm 작업을 Kubernetes API와 함께 실행한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;차트에서 릴리스 객체 만들기&lt;/li&gt;
+&lt;li&gt;릴리스 객체를 구축하고 Kubernetes에 설치&lt;/li&gt;
+&lt;li&gt;릴리스 객체를 업그레이드하거나 제거하기&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;helm과-유사한-도구&#34;&gt;Helm과 유사한 도구&lt;/h2&gt;
+&lt;p&gt;Helm과 유사한 도구로는 Ksonnet, Kapitan, Kustomize, kompose 및 Ansible이 있다.&lt;/p&gt;
+&lt;h2 id=&#34;helm-명령의-예&#34;&gt;Helm 명령의 예&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;명령&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;helm install&lt;/td&gt;
+&lt;td&gt;차트를 설치한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm list&lt;/td&gt;
+&lt;td&gt;릴리스 목록을 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm pull&lt;/td&gt;
+&lt;td&gt;차트를 다운로드하여 로컬로 확장한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm repo add&lt;/td&gt;
+&lt;td&gt;차트 리포지토리를 추가한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm repo list&lt;/td&gt;
+&lt;td&gt;차트 리포지토리 목록을 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm search&lt;/td&gt;
+&lt;td&gt;차트를 검색한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm show&lt;/td&gt;
+&lt;td&gt;차트의 세부 정보를 표시한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm uninstall&lt;/td&gt;
+&lt;td&gt;릴리스를 삭제한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;helm upgrade&lt;/td&gt;
+&lt;td&gt;새 차트로 업그레이드한다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Helm 공식 사이트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/helm/helm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub 저장소&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helm이란? Kubernetes 프로젝트 관리, 유스 케이스</title>
+      <link>https://www.devkuma.com/docs/helm/what-is-helm/</link>
+      <pubDate>Thu, 18 Jan 2024 12:30:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/helm/what-is-helm/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helm이란&#34;&gt;Helm이란?&lt;/h2&gt;
+&lt;p&gt;Helm은 Kubernetes 구성 파일을 하나의 재사용 가능한 패키지로 통합하여 Kubernetes 애플리케이션의 생성, 패키징, 구성 및 배포를 자동화하는 도구이다.&lt;/p&gt;
+&lt;p&gt;마이크로서비스 아키텍처에서는 애플리케이션이 커질수록 마이크로서비스의 수가 늘어나면서 관리가 어려워진다. 오픈소스 컨테이너 오케스트레이션 기술인 쿠버네티스(Kubernetes)를 사용하면 여러 마이크로서비스를 하나의 배포로 묶어 프로세스를 간소화할 수 있다. 하지만 쿠버네티스 애플리케이션의 개발 라이프사이클을 관리할 때에도 버전 관리, 리소스 할당, 업데이트, 롤백 등 여러 가지 고유한 문제가 발생한다.&lt;/p&gt;
+&lt;p&gt;이러한 문제에 대한 가장 손쉬운 해결책 중 하나는 헬름(Helm)으로, 헬름을 사용하면 배포의 일관성, 반복성, 안정성을 높일 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;helm을-사용하여-쿠버네티스-관리-간소화&#34;&gt;Helm을 사용하여 쿠버네티스 관리 간소화&lt;/h2&gt;
+&lt;p&gt;컨테이너는 애플리케이션과 그 종속성을 하나의 이미지 파일로 묶은 경량 소프트웨어 컴포넌트이다. 컨테이너는 서로 다른 환경 간 이식성이 뛰어나 애플리케이션의 시작 시간을 단축하고 빠르게 확장할 수 있다.&lt;/p&gt;
+&lt;p&gt;쿠버네티스 배포는 YAML 설정 파일을 사용한다. 배포가 복잡하고 자주 업데이트되는 경우, 이러한 파일의 모든 버전을 추적하는 것은 어려운데, Helm은 하나의 배포용 YAML 파일과 버전 정보를 관리할 수 있는 편리한 도구이다. 이 파일을 사용하면 간단한 명령어로 복잡한 쿠버네티스 클러스터를 설정하고 관리할 수 있다. 여기에서는 헬름의 다양한 구성 요소를 살펴보고, 이를 활용하여 쿠버네티스 관리를 간소화하는 방법을 살펴본다.&lt;/p&gt;
+&lt;h3 id=&#34;helm-chart란&#34;&gt;Helm chart란?&lt;/h3&gt;
+&lt;p&gt;Helm chart는 애플리케이션을 쿠버네티스 클러스터에 배포하는 데 필요한 모든 리소스를 포함하는 패키지이다. 패키지에는 배포, 서비스, 시크릿, 그리고 특정 애플리케이션의 상태를 정의하는 구성 맵의 다양한 YAML 설정 파일이 포함되어 있다.&lt;/p&gt;
+&lt;p&gt;Helm chart는 이러한 YAML 파일과 템플릿을 패키징한 것으로, 이를 통해 매개 변수화된 값에 따라 추가 설정 파일을 생성할 수 있다. 이러한 방식으로 다양한 환경에 맞게 설정 파일을 커스터마이징하거나 여러 배포에 재사용할 수 있는 설정 파일을 생성할 수 있다. 또한, 각 Helm chart를 개별적으로 버전 관리할 수 있기 때문에 서로 다른 설정의 여러 버전의 애플리케이션을 쉽게 관리할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;config-파일&#34;&gt;config 파일&lt;/h3&gt;
+&lt;p&gt;config 파일에는 애플리케이션의 설정이 포함되어 있으며, 일반적으로 YAML 파일에 저장되며, Kubernetes 클러스터의 리소스는 이 값에 따라 배포된다.&lt;/p&gt;
+&lt;h3 id=&#34;release&#34;&gt;release&lt;/h3&gt;
+&lt;p&gt;Chart를 실행하는 인스턴스를 릴리스라고 하며, &lt;code&gt;helm install&lt;/code&gt; 명령을 실행하면 config 파일과 차트 파일을 가져와 모든 쿠버네티스 리소스를 배포한다.&lt;/p&gt;
+&lt;h2 id=&#34;아키텍처&#34;&gt;아키텍처&lt;/h2&gt;
+&lt;p&gt;Helm의 개념을 이해했다면, 이제 헬름의 아키텍처를 살펴볼 차례인데, Helm의 아키텍처에는 클라이언트와 라이브러리라는 두 가지 주요 구성요소가 있다.&lt;/p&gt;
+&lt;p&gt;Helm 클라이언트는 로컬 차트 개발, 리포지토리 및 릴리스 관리를 위한 엔드 유저용 커멘드 라인 유틸리티로, MySQL 명령을 실행하기 위해 MySQL 데이터베이스 클라이언트를 사용하는 것처럼 Helm 명령을 실행하기 위해 Helm 클라이언트를 사용한다.&lt;/p&gt;
+&lt;p&gt;Helm 라이브러리는 모든 주요 처리를 담당한다. 이 라이브러리에는 Helm 명령으로 지정된 처리를 실행하기 위한 실제 코드가 포함되어 있으며, Helm 라이브러리에서 config와 차트 파일의 조합을 처리하고 릴리스를 생성한다.&lt;/p&gt;
+&lt;p&gt;Helm 아키텍처는 버전 2에서 3으로 넘어오면서 크게 개선됐다. 버전 2에서는 Tiller 서버가 헬름 클라이언트와 쿠버네티스 API 서버를 중개하는 역할을 했다. 또한 Helm에서 생성한 모든 리소스를 추적했다. 버전 3에서는 클라이언트 전용 아키텍처를 지향하며 Tiller 서버를 없애고 API 직접 연결을 통해 쿠버네티스 API 서버와 상호작용하도록 했다.&lt;/p&gt;
+&lt;h2 id=&#34;helm-작동-원리&#34;&gt;Helm 작동 원리&lt;/h2&gt;
+&lt;p&gt;Helm 애플리케이션 라이브러리는 차트를 사용하여 Kubernetes 애플리케이션을 정의, 생성, 설치 및 업그레이드할 수 있다. Helm 차트를 사용하면 쿠버네티스 명령줄 인터페이스(CLI)를 사용하지 않고도 클러스터를 제어하고 복잡한 쿠버네티스 명령어를 기억하지 않고도 쿠버네티스 매니페스트를 관리할 수 있다.&lt;/p&gt;
+&lt;p&gt;Helm이 유용하도록 현실적인 시나리오를 생각해 보자. 프로덕션 환경에 10개의 복제본이 있는 애플리케이션을 배포한다고 가정해보자. 애플리케이션의 YAML 파일에 이 사양을 지정하고 &lt;code&gt;kubectl&lt;/code&gt; 명령을 사용하여 배포를 실행한다.&lt;/p&gt;
+&lt;p&gt;다음은 스테이징 환경에서 동일한 응용 프로그램을 실행한다. 그러나 스테이징 환경에는 3개의 복제본(replica)가 필요하며, 스테이징 환경에서는 내부 애플리케이션 빌드를 실행해야 한다. 이 경우 배포용 YAML 파일의 복제본 수와 Docker image 태그를 업데이트하고 스테이징 Kubernetes 클러스터에서 업데이트된 파일을 사용한다.&lt;/p&gt;
+&lt;p&gt;애플리케이션이 복잡할수록 YAML 파일의 수가 늘어난다. 하나의 앱을 다양한 환경에 배포하기 위해 수많은 YAML 파일을 업데이트하는 것은 매우 번거로운 일이며, 결과적으로 YAML 파일의 설정 필드도 늘어날 수밖에 없다. Helm을 사용하면 환경에 따라 필드를 파라미터화할 수 있다. 앞의 예에서는 복제본 수와 Docker 이미지에 정적 값을 지정하지 않고, 다른 파일에서 해당 값을 지정한다. 그 다른 파일은 &lt;code&gt;values.yaml&lt;/code&gt;이다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-values-yaml-file-1.png&#34; alt=&#34;Values.yaml 파일&#34;&gt;&lt;/p&gt;
+&lt;p&gt;이 방식을 이용하면 환경별로 values 파일을 준비하고 각 파일에 적절한 값을 설정하면 되는데, Helm에서는 실제 YAML 설정과 설정 필드 값 관리를 분리할 수 있다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-values-yaml-file-2.png&#34; alt=&#34;구성 가능한 필드 값&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;helm-저장소&#34;&gt;Helm 저장소&lt;/h2&gt;
+&lt;p&gt;Helm 리포지토리(repository)는 Helm 차트를 업로드할 수 있는 곳이다. 개인 리포지토리를 만들어 조직 내에서 차트를 공유할 수도 있고, &lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;라는 글로벌 Helm 리포지토리를 통해 다양한 용도의 차트를 검색하고 설치할 수 있는 기능도 있다. 간단히 말해, Docker 이미지의 Docker Hub가 Helm 차트의 Artifact Hub라고 할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;helm으로-배포-및-롤백하기&#34;&gt;Helm으로 배포 및 롤백하기&lt;/h2&gt;
+&lt;p&gt;Helm 차트를 생성한 후에는 앱을 배포하는 것은 매우 간단하며, 모든 Kubernetes 리소스를 배포하는 데 2~3개의 Helm 명령어만 실행하면 된다.&lt;/p&gt;
+&lt;p&gt;실제 예를 들어, 헬름 차트를 사용하여 배포한 쿠버네티스 클러스터에서 애플리케이션을 실행하고 있다고 가정해보자. 이 애플리케이션에 &lt;a href=&#34;https://prometheus.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Prometheus&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;와 같은 모니터링 솔루션을 구성해보자. 두 가지 선택지가 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Prometheus 애플리케이션을 위한 모든 배포와 서비스를 처음부터 새로 만든다면, 시간이 오래 걸린다.&lt;/li&gt;
+&lt;li&gt;Artifact Hub에서 Prometheus 차트를 찾아 자신의 요구 사항에 따라 설정을 업데이트하고 설치한다. Docker Hub에서 기존 Docker 이미지를 찾아 Dockerfile의 FROM 문에 지정하는 것과 유사하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;다음 단계에 따라 원하는 헬름 차트를 설치할 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Helm 라이브러리가 Helm 차트를 가져온 위치를 파악할 수 있도록 Helm 리포지토리를 로컬에 등록한다.&lt;/li&gt;
+&lt;li&gt;설정한 리포지토리에서 사용 가능한 모든 Helm 차트를 가져온다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;values.yaml&lt;/code&gt; 파일을 필요에 따라 업데이트하고, &lt;code&gt;helm install&lt;/code&gt; 명령을 사용하여 특정 Helm 차트를 설치한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helm을 사용하는 또 다른 장점은 롤백 프로세스가 간단하다는 것이다.&lt;/p&gt;
+&lt;p&gt;Helm은 애플리케이션 레벨에서 작동한다. 즉, 실행 중인 애플리케이션의 상태(&amp;lsquo;릴리스&amp;rsquo;)가 유지된다. 애플리케이션의 새 버전을 배포했는데 예상대로 작동하지 않는 상황을 생각해 보면, &lt;code&gt;helm rollback&lt;/code&gt; 명령을 사용하여 이전 안정된 릴리스로 되돌릴 수 있다. 이 명령은 모든 배포, 서비스, 쿠버네티스 리소스를 롤백한다.&lt;/p&gt;
+&lt;p&gt;Helm이 없었다면 이렇게 쉽게 롤백할 수 없었을 것이고, 각 쿠버네티스 리소스마다 롤백을 수행해야 했기 때문에 복잡한 애플리케이션을 관리하기가 더 어려웠을 것이다.&lt;/p&gt;
+&lt;h2 id=&#34;helm과-cicd&#34;&gt;Helm과 CI/CD&lt;/h2&gt;
+&lt;p&gt;Helm을 활용하면 CI/CD(Continuous Integration &amp;amp; Continuous Delivery) 파이프라인에서 Kubernetes 애플리케이션의 빌드 및 테스트가 훨씬 더 쉬워진다. 애플리케이션을 임의의 환경에 자동으로 배포하여 빌드 시간을 단축할 수 있다. 파이프라인에서 셀프 호스팅 런너를 사용하면 빌드 및 테스트 환경의 유연성을 높일 수 있다.&lt;/p&gt;
+&lt;p&gt;CircleCI의 셀프 호스팅 런너를 사용하면 사용자가 관리하는 환경에서 CI/CD 작업을 실행할 수 있다. 즉, 독립형 가상 머신이나 쿠버네티스와 같은 전체 클러스터를 실행 환경으로 사용할 수 있다. 컨테이너 러너를 사용하면 헬름 차트를 사용하여 컨테이너화된 워크로드를 프라이빗 쿠버네티스 클러스터에 배포하고 필요에 따라 환경을 확장할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;helm-사용의-장점과-단점&#34;&gt;Helm 사용의 장점과 단점&lt;/h2&gt;
+&lt;p&gt;Helm에는 도움이 되는 사용 사례와 그렇지 않은 사용 사례가 있다. 이 섹션에서는 Helm이 도움이 되는 사용 사례와 도움이 되지 않는 사용 사례를 확인하고, Helm이 도움이 되는지 아닌지를 구분하는 몇 가지 포인트를 제시한다.&lt;/p&gt;
+&lt;h3 id=&#34;helm이-적합한-경우&#34;&gt;Helm이 적합한 경우&lt;/h3&gt;
+&lt;p&gt;Helm은 수많은 마이크로서비스를 포함하는 복잡한 애플리케이션을 쿠버네티스에서 실행하는 프로젝트에 유용하며, Helm을 사용하면 애플리케이션 배포 및 관리를 쉽게 자동화하여 수작업을 줄이고 시스템의 안정성과 안정성을 향상시킬 수 있다. 또한, 사전 구성된 다양한 패키지로 구성된 리포지토리를 통해 애플리케이션에 새로운 기능을 쉽게 추가할 수 있다.&lt;/p&gt;
+&lt;p&gt;Helm을 사용하여 애플리케이션의 구성요소를 설치 및 업그레이드가 용이한 모듈형 차트로 구성하면 애플리케이션 구성요소 관리 프로세스를 간소화할 수 있다. 또한, 애플리케이션 유지보수에 필요한 수작업이 줄어들어 복잡한 시스템을 수동으로 관리할 때 발생하는 오류와 불일치를 방지할 수 있다.&lt;/p&gt;
+&lt;p&gt;Helm은 여러 환경(개발, 스테이징, 프로덕션 등)에 컨테이너를 배포할 수 있도록 지원하므로, 개발 프로세스 전반에 걸쳐 컨테이너의 라이프사이클을 쉽게 관리할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;helm이-적합하지-않은-경우&#34;&gt;Helm이 적합하지 않은 경우&lt;/h3&gt;
+&lt;p&gt;Helm은 서버에 배포해야 할 컨테이너가 하나뿐인 프로젝트에는 적합하지 않다. 이 경우 헬름으로 컨테이너 배포를 관리할 필요가 없으며, 오히려 헬름을 사용하면 프로세스가 복잡해질 수 있으며, 헬름은 여러 개의 컨테이너 배포를 하나의 단위로 관리하기 위해 만들어졌기 때문에 이 시나리오에는 적합하지 않다.&lt;/p&gt;
+&lt;p&gt;패키지 관리자를 사용하지 않고 소수의 쿠버네티스 애플리케이션을 수동으로 관리할 수 있는 경우에도 Helm은 큰 도움이 되지 않는다.&lt;/p&gt;
+&lt;p&gt;또한, Helm과 같은 타사 도구 사용을 금지하는 엄격한 보안 정책이 있는 환경에서는 Helm을 사용할 수 없을 것이다.&lt;/p&gt;
+&lt;h2 id=&#34;helm을-도입해야-하는-이유&#34;&gt;Helm을 도입해야 하는 이유&lt;/h2&gt;
+&lt;p&gt;프로젝트에 Helm을 사용하는 것이 도움이 되는지 아닌지를 판단할 수 있는 몇 가지 포인트가 있다. 예를 들어, 프로젝트에 여러 개의 쿠버네티스 애플리케이션이 포함되어 있고, 이를 통합적으로 관리하고 배포해야 하는 경우이다. 이런 경우에는 Helm을 사용하여 이러한 애플리케이션을 하나의 차트로 패키징하면 관리와 배포가 용이해진다.&lt;/p&gt;
+&lt;p&gt;프로젝트에서 쿠버네티스 애플리케이션을 자주 업데이트하고 배포하는 경우에도 Helm은 애플리케이션의 라이프사이클(배포, 업데이트, 롤백 등)을 관리할 수 있는 툴을 갖추고 있기 때문에 도움이 된다. 따라서 애플리케이션 업데이트 관리와 배포가 훨씬 더 쉬워진다.&lt;/p&gt;
+&lt;p&gt;마지막은 프로젝트에 여러 팀과 구성원이 참여하여 공동으로 Kubernetes 애플리케이션을 개발하고 배포해야 하는 경우다. 이 경우 헬름의 버전 관리 및 차트 공유 기능이 도움이 되며, 팀 간 협업과 배포 간 일관성 유지가 용이해진다.&lt;/p&gt;
+&lt;h2 id=&#34;helm의-참고-정보&#34;&gt;Helm의 참고 정보&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://circleci.com/blog/what-is-helm/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What is Helm? A complete guide | CircleCI&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helm Chart</title>
+      <link>https://www.devkuma.com/docs/helm/chart/</link>
+      <pubDate>Thu, 18 Jan 2024 12:30:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/helm/chart/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helm-chart란&#34;&gt;Helm chart란?&lt;/h2&gt;
+&lt;p&gt;Helm chart는 애플리케이션을 쿠버네티스 클러스터에 배포하는 데 필요한 모든 리소스를 포함하는 패키지이다. 패키지에는 배포, 서비스, 시크릿, 그리고 특정 애플리케이션의 상태를 정의하는 구성 맵의 다양한 YAML 설정 파일이 포함되어 있다.&lt;/p&gt;
+&lt;p&gt;Helm chart는 이러한 YAML 파일과 템플릿을 패키징한 것으로, 이를 통해 매개 변수화된 값에 따라 추가 설정 파일을 생성할 수 있다. 이러한 방식으로 다양한 환경에 맞게 설정 파일을 커스터마이징하거나 여러 배포에 재사용할 수 있는 설정 파일을 생성할 수 있다. 또한, 각 Helm chart를 개별적으로 버전 관리할 수 있기 때문에 서로 다른 설정의 여러 버전의 애플리케이션을 쉽게 관리할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;helm-pagakage와-chart&#34;&gt;Helm pagakage와 chart&lt;/h3&gt;
+&lt;p&gt;Helm은 charts라는 packaging format을 사용한다. 패키지는 Helm chart를 패키지를 하는 것이고, 차트는 쿠버네티스의 리소스 yaml 파일을 &lt;strong&gt;템플릿&lt;/strong&gt;으로 만들고, &lt;strong&gt;메타 정보 파일&lt;/strong&gt; 등을 압축하는 파일을 말한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;여기서 chart는 k8s resources를 describe하는 file들의 집합이다.&lt;/li&gt;
+&lt;li&gt;chart는 무언가를 배포하기 위해 사용된다.
+&lt;ul&gt;
+&lt;li&gt;ex) memcached pod, web app w/ HTTP servers, databases, etc.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;chart는 특정 directory tree로 구성된 file들로 생성되어 있다.
+&lt;ul&gt;
+&lt;li&gt;이 file들은 배포될 version의 archive로 packaging 될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;chart-파일-생성-및-구조&#34;&gt;chart 파일 생성 및 구조&lt;/h2&gt;
+&lt;h3 id=&#34;chart-디렉토리-생성&#34;&gt;chart 디렉토리 생성&lt;/h3&gt;
+&lt;p&gt;helm 차트를 생성할 디렉토리를 만들고, &lt;code&gt;helm create {directory}&lt;/code&gt; 명령어으로 기본 디렉토리를 생성한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% mkdir charts
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; charts
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm create app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Creating app
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;chart-파일-구조&#34;&gt;chart 파일 구조&lt;/h3&gt;
+&lt;p&gt;생성된 기본 파일 구조는 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% tree app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── Chart.yaml                    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chart에 대한 이름, 버전, 설명 등의 정보가 작성된 YAML 파일. (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── charts                        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 이 Chart에 종속된 차트들을 포함하는 디렉터리. (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── templates                     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# values와 결합될 때, 유효한 쿠버네티스 manifest 파일들이 생성될 템플릿들의 디렉터리 (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── NOTES.txt                 &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 간단한 사용법을 포함하는 텍스트 파일 (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── _helpers.tpl              &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# template manifest 파일들에서 공유하는 변수 정의 (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── deployment.yaml           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# *.yml 클러스터에 띄울 리소스 템플릿 파일들&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── hpa.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── ingress.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── service.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── serviceaccount.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── tests
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│       └── test-connection.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;└── values.yaml                   &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chart에 템플릿에서 사용될 기본 환경 설정 변수들을 정의한 파일 (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; directories, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; files
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;매니페스트 파일(manifest file)이란? 컴퓨팅에서 집합의 일부 또는 논리정연한 단위인 파일들의 그룹을 위한 메타데이터를 포함하는 파일이다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;yaml-파일&#34;&gt;Yaml 파일&lt;/h2&gt;
+&lt;h3 id=&#34;chartyaml&#34;&gt;chart.yaml&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Helm Chart 자체의 API 버전 (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart 명 (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart 버전으로 SemVer(Semantic versioning)규칙을 준수해야 한다. (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;         &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (예:X.X.X 형식), SemVer 규칙 참조: https://semver.org/lang/ko/&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kubeVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hart설치와 실행을 보장하는 최소 호환되는 쿠버네티스 버전의 SemVer 범위 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;             &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (예: &amp;#34;&amp;gt;=1.15.3&amp;#34;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;description&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart의 이 프로젝트에 대한 간략한 설명 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart 타입 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;keywords&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;Chart의 이 프로젝트에 대한 키워드 리스트 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Helm search 시 keyword도 같이 검색됨.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;home&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart 프로젝트 홈페이지의 URL (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;sources&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;Chart의 이 프로젝트의 소스 코드 URL 리스트 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chart repository 주소는 아님.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;dependencies&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 차트 필요조건들의 리스트 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;차트명 (nginx)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;차트의 버전 (&amp;#34;1.2.3&amp;#34;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;repository&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;저장소 URL (&amp;#34;https://example.com/charts&amp;#34;) 또는 (&amp;#34;@repo-name&amp;#34;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;condition: (optional) 차트들의 활성/비활성을 결정하는 boolean 값을 만드는 yaml 경로 (예시&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;subchart1.enabled)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;tags&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;활성화 / 비활성을 함께하기 위해 차트들을 그룹화 할 수 있는 태그들&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;enabled&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;(optional) 차트가 로드될수 있는지 결정하는 boolean&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import-values&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;ImportValues 는 가져올 상위 키에 대한 소스 값의 맵핑을 보유한다. 각 항목은 문자열이거나 하위 / 상위 하위 목록 항목 쌍일 수 있다.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;alias&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;(optional) 차트에 대한 별명으로 사용된다. 같은 차트를 여러번 추가해야할때 유용하다.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;maintainers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;저작자(maintainer)의 이름 (각 maintainer마다 required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;email&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;저작자(maintainer)의 email (각 maintainer마다 optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;url&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;저작자(maintainer)에 대한 URL (각 maintainer마다 optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;아이콘으로 사용될 SVG나 PNG 이미지 URL이며, 카탈로그에서 차트 표시시 사용됨. (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;appVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart를 이용해 서비스되는 앱의 버전 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chart를 이용해 서비스되는 앱의 버전이며 SemVer형식을 따르지 않아도 됨.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;deprecated&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;차트의 deprecated된 차트인지 여부를 boolean(true/false)로 명시 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;annotations&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;example&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;키로 매핑된 주석들의 리스트 (optional).&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;valuesyaml&#34;&gt;values.yaml&lt;/h3&gt;
+&lt;p&gt;template에서 사용은 &lt;code&gt;{{ .Values.image.tag }}&lt;/code&gt;와 같은 형태로 사용한다. 이는 들여 쓰기(indentation) 유의하여 작성해야 한다.&lt;/p&gt;
+&lt;h3 id=&#34;templates-폴더에-배포할-resource-정의&#34;&gt;templates 폴더에 배포할 resource 정의&lt;/h3&gt;
+&lt;p&gt;기본적으로 deployment, service, serviceaccount,ingress 가 존재한다.&lt;/p&gt;
+&lt;p&gt;필요에 따라 persistentvolume, configmap 등을 정의&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;apps/v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kind&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Deployment&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;app&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;if not .Values.autoscaling.enabled }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;replicas&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.replicaCount }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;end }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;selector&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;matchLabels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;template&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;with .Values.podAnnotations }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;annotations&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;toYaml . | nindent 8 }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;end }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Chart.Name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;imagePullPolicy&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.image.pullPolicy }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;http&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.port  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;protocol&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TCP&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;envFrom&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;configMapRef&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.config.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumeMounts&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;mountPath&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.mountpath  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.volumename }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.volumename }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;claimName&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.PVC.name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;helm의-template-문법&#34;&gt;helm의 template 문법&lt;/h3&gt;
+&lt;p&gt;템플릿 파일은 Go 템플릿 작성에 대한 표준 규약을 따른다.&lt;a href=&#34;https://pkg.go.dev/text/template&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;(텍스트/템플릿 Go 패키지 문서)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;{{ }}&lt;/code&gt;로 변수를 사용한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.Values&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;values.yaml&lt;/code&gt; 파일에서 정의된 변수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.Charts&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Charts.yaml&lt;/code&gt; 파일에서 정의 된 변수&lt;/li&gt;
+&lt;li&gt;Chart의 버전은 &lt;code&gt;Chart.Version&lt;/code&gt;으로, 메인테이너는 &lt;code&gt;Chart.Maintainers&lt;/code&gt;로 받아올 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.Release&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;배포할 때에 할당한 정보들을 사용
+&lt;ul&gt;
+&lt;li&gt;예를 들면, &lt;code&gt;--namespeace test&lt;/code&gt;로 install 할시에 &lt;code&gt;.Release.Namespace&lt;/code&gt;에 test로 할당된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Name&lt;/code&gt;: 릴리즈의 이름(Chart 이름 아님)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Namespace&lt;/code&gt;: Chart가 릴리즈된 네임스페이스&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Service&lt;/code&gt;: 릴리즈를 수행하는 서비스&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.IsUpgrade&lt;/code&gt;: 현재 업그레이드나 롤백중이면 true로 설정된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.IsInstall&lt;/code&gt;: 현재 설치중이면 true로 설정된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;include...&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;_helpers.tpl 파일에서 정의된 변수&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;with ~ end&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;변수에 대한 scope을 정하는 문법으로 해당 구간은 &lt;code&gt;.&lt;/code&gt; 가 설정한 변수에 속함을 정의&lt;/li&gt;
+&lt;li&gt;(예:  아래 코드를 보면  .drink 는  .Values.favorite.drink를 의미한다.)
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;{{- with .Values.favorite }}
+  drink: {{ .drink | default &amp;#34;tea&amp;#34; | quote }}
+  food: {{ .food | upper | quote }}
+{{- end }}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;toYaml&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;해당 변수를 yaml형식으로 변경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;quote&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;string 타입으로 변경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;chart-검사하기&#34;&gt;Chart 검사하기&lt;/h3&gt;
+&lt;p&gt;정의한 chart가 문법적으로 이상이 없는지 확인할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm lint &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yaml 위치&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이는 단지 문법적 오류만 점검할 뿐 문제없이 설치된다는 의미가 아니다.&lt;/p&gt;
+&lt;p&gt;templates을 기반으로 변수들 참조하여 리소스 배포시 결과 미리보기를 할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm template &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yaml 위치&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;해당 과정을 통해 배포하고자하는 형태가 맞나 확인 가능하다.&lt;/p&gt;
+&lt;p&gt;chart를 시험 설치하여 오류 확인할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm install &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;release name&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yaml 위치&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;  --debug --dry-run
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--dry-run&lt;/code&gt;: 실제 클러스터에 설치 하지 않고 chart를 시험 설치하는 옵션&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--debug&lt;/code&gt;: 배포를 위한 manifest 파일 내용을 보여준다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;chart-생성하고-repo에-등록하기&#34;&gt;chart 생성하고 repo에 등록하기&lt;/h3&gt;
+&lt;p&gt;helm repository는 차트 저장소의 각 차트의 대한 정보를 담고 있는 &lt;code&gt;index.yaml&lt;/code&gt; 파일이 있어야 한다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;index.yaml&lt;/code&gt;이 존재하는 폴더에서 아래와 같은 명령어를 통해 패키징하여 chart 생성한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm package &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yaml 위치
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;Chart.yaml&lt;/code&gt;에 정의한 &lt;code&gt;{name}-{version}.tgz&lt;/code&gt;로 압축 파일이 생성한다.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;저장소에 등록하지 않고 생성한 압축파일로 로컬에서 사용할거라면 &lt;code&gt;helm install {name}&lt;/code&gt;으로 가능하다&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;chart를 생성하였으니 차트정보를 담고있는 index파일 업데이트&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm repo index &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;index.yaml 경로&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;GitHub repository인 경우 &lt;code&gt;git push&lt;/code&gt;를 진행한 후,&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;chart 목록을 repository에서 다시 가져와 업데이트를 진행한다.&lt;/p&gt;
+&lt;p&gt;업데이트되었는지 검색하여 확인을 진행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm search repo &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;차트명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;검색 단어는 키워드 정도로 해당단어가 포함돠는 차트와 차트의 repository 목록이 출력된다.&lt;/p&gt;
+&lt;h3 id=&#34;생성한-chart를-이용해-설치하기&#34;&gt;생성한 Chart를 이용해 설치하기&lt;/h3&gt;
+&lt;p&gt;생성한 차트를 아래 명령어로 설치한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm install &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;배포할 이름&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;레포지토리명/chart명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; -n &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;네임스페이스&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/ko/docs/topics/charts/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Helm | 차트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helm 설치</title>
+      <link>https://www.devkuma.com/docs/helm/install/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/helm/install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helm-설치&#34;&gt;Helm 설치&lt;/h2&gt;
+&lt;p&gt;helm 커멘드는 &lt;a href=&#34;https://github.com/helm/helm/releases&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub의 릴리스 페이지&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 받아올 수 있고, 여기에서는 소스 코드 외에 Windows 및 Linux, macOS용의 바이너리도 제공되고 있다. 배포 아카이브 내에는 바이너리 파일(&amp;ldquo;helm&amp;rdquo;)이 그대로 저장되어 있기에, Helm를 이용하고 싶은 머신에서 다운로드하여 압축을 해제하여 적당한 디렉토리에 복사하면 설치 완료이다.&lt;/p&gt;
+&lt;p&gt;또, macOS의 Homebrew나 Windows의 Chocolatey라고 하는 패키지 매니저 통해서더 설치 할 수 있다. 이에 대해 자세한 설명은 &lt;a href=&#34;https://helm.sh/ko/docs/intro/install/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 문서&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;를 참조해 주었으면 한다.&lt;/p&gt;
+&lt;p&gt;helm 명령은 Kubernetes 클러스터에 액세스하기 위해 &lt;code&gt;kubectl&lt;/code&gt; 명령을 사용하므로 &lt;code&gt;helm&lt;/code&gt; 명령을 실행하는 시스템에 &lt;code&gt;kubectl&lt;/code&gt; 명령이 설치되어 있으며 &lt;code&gt;kubectl&lt;/code&gt; 명령으로 Kubernetes 클러스터에 액세스 할 수 있도록 설정해야 한다.&lt;/p&gt;
+&lt;p&gt;지원하는 Kubernetes 클러스터의 버전에 대해서는 명시되어 있지 않지만, &amp;ldquo;Kubernetes의 최신 안정판&amp;quot;과의 조합이 추천된다. 그렇다고는 해도, 구버전의 Kubernetes라고 해도 바로 이용할 수 없게 되는 것은 아니다. 다만, Kubernetes 1.6 이전에서는 역할(Role) 기반의 액세스 컨트롤(RBAC) 관련 설정으로 제한이 있다고 되어 있다.&lt;/p&gt;
+&lt;p&gt;덧붙여서, Helm의 v2에서는 &lt;code&gt;helm&lt;/code&gt; 명령에 추가적으로 Kubernetes에서 동작하는 &lt;code&gt;tiller&lt;/code&gt;라고 하는 어플리케이션이 필요하지만, v3에서는 tiller는 폐지되어, &lt;code&gt;helm&lt;/code&gt; 명령만이 필요하게 변경되었다.&lt;/p&gt;
+&lt;h3 id=&#34;macos에서-설치homebrew&#34;&gt;macOS에서 설치(Homebrew)&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% brew install helm
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Running &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;brew update --auto-update&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Auto-updated Homebrew!
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Updated &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; taps &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;homebrew/core and homebrew/services&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;You have &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; outdated formulae installed.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;You can upgrade them with brew upgrade
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;or list them with brew outdated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading https://ghcr.io/v2/homebrew/core/helm/manifests/3.9.4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;######################################################################## 100.0%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading https://ghcr.io/v2/homebrew/core/helm/blobs/sha256:01a042f197753
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading from https://pkg-containers.githubusercontent.com/ghcr1/blobs/sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;######################################################################## 100.0%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Pouring helm--3.9.4.arm64_monterey.bottle.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Caveats
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;zsh completions have been installed to:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  /opt/homebrew/share/zsh/site-functions
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Summary
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🍺  /opt/homebrew/Cellar/helm/3.9.4: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;64&lt;/span&gt; files, 47.6MB
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Running &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;brew cleanup helm&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hide these hints with HOMEBREW_NO_ENV_HINTS &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;see &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;man brew&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
       <title>Kubernetes</title>
       <link>https://www.devkuma.com/docs/kubernetes/</link>
       <pubDate>Sun, 04 Sep 2022 12:54:00 +0900</pubDate>
@@ -41,6 +572,109 @@
     </item>
     
     <item>
+      <title>Helm 사용하기</title>
+      <link>https://www.devkuma.com/docs/helm/uses/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/helm/uses/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;공개된-chart를-사용하여-애플리케이션-배포&#34;&gt;공개된 Chart를 사용하여 애플리케이션 배포&lt;/h3&gt;
+&lt;p&gt;앞에서 설명하였듯이, Helm에서는 Chart라고 하는 설정 파일에 기반으로 어플리케이션의 배포를 실행한다. Chart는 &lt;code&gt;helm&lt;/code&gt; 명령를 실행하는 로컬 머신상에 준비된 것 뿐만이 아니라, 리포지토리로 공개되고 있는 Chart를 직접 다운로드하여 이용하는 것도 가능하다. 우선은 Helm에 의한 어플리케이션의 배포 예로서 리포지토리에서 공개되고 있는 Chart를 이용하는 방법에 대해 보도록 하겠다.&lt;/p&gt;
+&lt;p&gt;앞에서 이미 언급했듯이 공개된 Chart는 &lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Arfifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;라는 사이트에서 검색할 수 있다. Arfifact Hub에서는 &lt;code&gt;&amp;lt;리포지토리명&amp;gt;/&amp;lt;Chart명&amp;gt;/&lt;/code&gt;이라는 형식으로 Chart가 표시되어 있으며, 그 중에 리포지토리 명이 &amp;ldquo;&lt;a href=&#34;https://charts.helm.sh/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;stable&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&amp;ldquo;이나 &amp;ldquo;&lt;a href=&#34;https://charts.helm.sh/incubator/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;incubator&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&amp;ldquo;로 되어 있는 것이 Helm의 공식 리포지토리에서 제공되고 있는 Chart로 리포지토리명이 그 이외의 것이 되고 있는 것은 타사가 제공하고 있는 Chart이다. 같은 이름의 Chart가 다른 리포지토리에 공개되어 있는 경우도 있지만, 이것들은 소스가 다르다는 점에 주의해야 한다.&lt;/p&gt;
+&lt;p&gt;그럼 리포지토리를 통해서 Chart를 설치하려면, 먼저 Chart를 제공하는 리포지토리를 로컬 컴퓨터에 등록해야 한다. Helm의 설치 직후에는 어느 리포지토리도 등록되어 있지 않은 상태가 되어 있을 것이므로, 공식 리포지토리로 제공되고 있는 Chart를 이용하는 경우에서도 리포지토리의 추가 작업이 필요하게 된다.&lt;/p&gt;
+&lt;p&gt;리포지토리의 추가는 &lt;code&gt;helm repo add &amp;lt;리포지토리 이름&amp;gt; &amp;lt;URL&amp;gt;&lt;/code&gt;명령으로 수행 할 수 있다. 예를 들어 공식 &amp;ldquo;bitnami&amp;rdquo; 리포지토리를 추가하는 경우 다음과 같이 실행한다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% helm repo add bitnami https://charts.bitnami.com/bitnami
+&amp;#34;bitnami&amp;#34; has been added to your repositories
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;덧붙여 Linux 환경에서는 사용하는 리포지토리의 설정은 홈 디렉토리에서 &lt;code&gt;.config/helm&lt;/code&gt;이라는 디렉토리에 있고, 리포지토리로 공개되고 있는 Chart 목록의 캐시는 홈 디렉토리에서 &lt;code&gt;.cache/helm/repository&lt;/code&gt; 디렉토리에 저장된다. 이러한 정보는 &lt;code&gt;helm -h&lt;/code&gt; 명령으로 표시할 수 있는 &lt;code&gt;helm&lt;/code&gt; 명령의 도움말에 기재되어 있으므로, 필요에 따라서 확인해 둔다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm -h
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;The Kubernetes package manager
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 중간 생략 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Operating System &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Cache Path                &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Configuration Path             &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Data Path               &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;---------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;--------------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;-------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Linux            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.cache/helm         &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.config/helm             &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.local/share/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; macOS            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/Caches/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/Preferences/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/helm      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Windows          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %TEMP%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm               &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %APPDATA%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %APPDATA%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 이하 생략 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;리포지토리의 등록 후에는 &lt;code&gt;helm search&lt;/code&gt; 명령으로 리포지토리에 등록되어 있는 Chart를 검색할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm search repo &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&amp;lt;검색 키워드&amp;gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;키워드를 생략하게 되면 등록되어 있는 리포지토리에서 제공되고 있는 모든 Chart가 출력된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm search repo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                                        	CHART VERSION	APP VERSION  	DESCRIPTION
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/airflow                             	13.1.5       	2.3.4        	Apache Airflow is a tool to express and execute...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/apache                              	9.2.3        	2.4.54       	Apache HTTP Server is an open-source HTTP serve...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/argo-cd                             	4.1.3        	2.4.11       	Argo CD is a continuous delivery tool &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; Kuber...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 이하 생략 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;등록된 리포지토리의 정보는 로컬에 캐시되므로 시간이 지남에 따라 오래되었을 수 있다. &lt;code&gt;helm repo update&lt;/code&gt; 명령을 실행하면 리포지토리 캐시를 최신 캐시로 업데이트할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hang tight &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;while&lt;/span&gt; we grab the latest from your chart repositories...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...Successfully got an update from the &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;bitnami&amp;#34;&lt;/span&gt; chart repository
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Update Complete. ⎈Happy Helming!⎈
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Helm에서는, Chart를 사용해 어플리케이션을 배포하는 것을 &amp;ldquo;install(인스톨)&amp;rdquo; 이라고 하고, 인스톨 된 어플리케이션의 인스턴스는 &amp;ldquo;Release(릴리스)&amp;ldquo;라고 한다. 또한 각 인스턴스에는 고유한 이름(Release명)이 있다. Release명이 중복하지 되지 않고, 동일한 Chart로부터 여러 Release를 작성하는 것도 가능하다.&lt;/p&gt;
+&lt;p&gt;그럼 리포지토리에 공개된 Chart를 사용하여 응용 프로그램을 설치(배포)하려면 &lt;code&gt;helm install &amp;lt;Release 이름&amp;gt; &amp;lt;Chart 이름&amp;gt;&lt;/code&gt; 명령을 실행한다.&lt;/p&gt;
+&lt;p&gt;다음의 예는 &amp;ldquo;stable/wordpress&amp;quot;라고 하는 Chart를 &amp;ldquo;wordpress&amp;quot;라는 Release명으로 배포한 것이다. 배포에 성공하면 그 어플리케이션에 관한 메모등을 포함한 &amp;ldquo;NOTES&amp;quot;가 표시된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm install wordpress bitnami/wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME: wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;LAST DEPLOYED: Thu Sep &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;15&lt;/span&gt; 00:33:19 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2022&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAMESPACE: default
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;STATUS: deployed
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REVISION: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;TEST SUITE: None
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NOTES:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CHART NAME: wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CHART VERSION: 15.2.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;APP VERSION: 6.0.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;** Please be patient &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;while&lt;/span&gt; the chart is being deployed **
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Your WordPress site can be accessed through the following DNS name from within your cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    wordpress.default.svc.cluster.local &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;port 80&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;To access your WordPress site from outside the cluster follow the steps below:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1. Get the WordPress URL by running these commands:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  NOTE: It may take a few minutes &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; the LoadBalancer IP to be available.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        Watch the status with: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kubectl get svc --namespace default -w wordpress&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;kubectl get svc --namespace default wordpress --include &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;WordPress URL: http://&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;WordPress Admin URL: http://&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2. Open a browser and access WordPress using the obtained URL.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;3. Login with the following credentials below to see your blog:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; Username: user
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; Password: &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;kubectl get secret --namespace default wordpress -o &lt;span style=&#34;color:#000&#34;&gt;jsonpath&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{.data.wordpress-password}&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; base64 -d&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;배포는 현재 Kubernetes의 컨텍스트에 대해 수행되므로, 특정 네임스페이스를 사용하고 싶은 경우은 사전에 &lt;code&gt;kubectl config&lt;/code&gt; 명령 등으로 컨텍스트를 설정해 둔다.&lt;/p&gt;
+&lt;p&gt;그리고, 이 &lt;code&gt;bitnami/wordpress&lt;/code&gt; Chart에서는 영속화 스토리지를 이용하기 때문에, 클러스터내에서 디폴트의 Storage Class가 설정되어 있어야 있다. Storage Class의 설정 방법은 사용하고 있는 Kubernetes 클러스터에 따라서 다르지만, Kubernetes용 Storage Class 생성에 대해서 따로 알아보길 바란다.&lt;/p&gt;
+&lt;p&gt;배포된 Release 목록은 &amp;ldquo;helm list&amp;rdquo; 명령으로 확인할 수 있다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% helm list
+NAME     	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+wordpress	default  	1       	2022-09-15 00:33:19.166716 +0900 KST	deployed	wordpress-15.2.2	6.0.2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;여기에서 작성된 Pod를 &lt;code&gt;kubectl get pods&lt;/code&gt; 명령으로 확인해 보면, 다음과 같이 &amp;ldquo;wordpress-d5c8dffb7-bws4d&amp;quot;과 &amp;ldquo;wordpress-mariadb-0&amp;quot;의 2개의 Pod가 작성되고 있는 것을 알 수 있다(환경에 따라 &amp;ldquo;d5c8dffb7-bws4d&amp;quot;의 부분은 바뀐다).&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pods
+NAME                        READY   STATUS             RESTARTS        AGE
+wordpress-d5c8dffb7-bws4d   0/1     CrashLoopBackOff   5 (2m21s ago)   7m33s
+wordpress-mariadb-0         1/1     Running            0               7m33s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&amp;hellip; 작성중(Pod에 에라가 발생하여 작성 중지;;;) &amp;hellip;&lt;/p&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
       <title>Kubernetes 개요</title>
       <link>https://www.devkuma.com/docs/kubernetes/overview/</link>
       <pubDate>Sun, 04 Sep 2022 12:54:00 +0900</pubDate>
@@ -53,54 +687,54 @@
 &lt;h2 id=&#34;쿠버네티스란&#34;&gt;쿠버네티스란?&lt;/h2&gt;
 &lt;p&gt;쿠버네티스(Kubernetes, 약어로 k8s)의 &lt;a href=&#34;https://kubernetes.io/ko/docs/home/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 문서&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에 따르면, 오픈소스 시스템으로 &amp;ldquo;컨테이너를 관리하는 기반 도구&amp;rdquo; 이다.&lt;br&gt;
 여러 호스트에서 컨테이너를 다루려는 경우에 편리하고, 어플리케이션의 개발 및 관리가 편하고 안전할 수 있게 해준다.&lt;/p&gt;
-&lt;p&gt;Google이 2014년 6월에 시작한 Go으로 만든 OSS이다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt;과 &lt;code&gt;docker-compose&lt;/code&gt;의 차이점은 동일한 호스트에서 여러 컨테이너 관리 또는 단일 컨테이너 관리인지에 대한 차이이다. 이렇게 구성하면 호스트가 중지되면 컨테이너도 같이 중지가 되어 버린다. 따라서, 호스트를 여러 개 만들고 여러 컨테이너를 이러한 생성된 호스트 그룹에 할당해는 것이 &amp;ldquo;컨테이너 오케스트레이션(Container Orchestration) 도구&amp;quot;이다. 이런 도구로 가장 많이 사용되는 것은 Kubernetes이다.&lt;/p&gt;
+&lt;p&gt;Google이 2014년 6월에 시작한 Go으로 만든 오픈 소스 소프트웨어(Open source software; OSS)이다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt;과 &lt;code&gt;docker-compose&lt;/code&gt;의 차이점은 동일한 호스트에서 여러 컨테이너 관리 또는 단일 컨테이너 관리인지에 대한 차이이다. 이렇게 구성하면 호스트가 중지되면 컨테이너도 같이 중지가 되어 버린다. 따라서, 호스트를 여러 개 만들고 여러 컨테이너를 이러한 생성된 호스트 그룹에 할당해는 것이 &amp;ldquo;컨테이너 오케스트레이션(Container Orchestration) 도구&amp;quot;이다. 이런 도구로 Kubernetes가 가장 많이 사용되고 있다.&lt;/p&gt;
 &lt;h2 id=&#34;kubernetes의-특징&#34;&gt;Kubernetes의 특징&lt;/h2&gt;
 &lt;p&gt;K8s라고도 알려진 Kubernetes의 기본 기능으로는 컨테이너으로 된 애플리케이션을 배포, 확장, 로드 균형 조정, 로깅, 모니터링 등이 있다.&lt;/p&gt;
-&lt;p&gt;또, 어플리케이션의 운용은 신경을 많이 써야 하는 문제로서, 고부하 등으로 이상이 발생했을 조치해야 하거나, 스케일 아웃 하거나, 자동 장애 조치(Failover) 등이 필요하다.&lt;/p&gt;
-&lt;p&gt;VM을 사용하는 구성에서는 결국 관리는 그 VM 단위로 해야 되서 스케일 아웃, 자동 장애 조치의 설정도 VM 단위로 할 수 밖에 없다.&lt;br&gt;
-Kubernetes를 사용하면 컨테이너 단위 또는 응용 프로그램 단위로 관리 할 수 있고(실제로 VM을 사용하고 있으며 응용 프로그램 단위로 관리하는 것 처럼 다를 수 있고), 스케일 아웃, 장애 ​​조치도 응용 프로그램 단위로 설정 수 있다.&lt;/p&gt;
-&lt;p&gt;Kubernetes를 사용하는 이점을 정리하면 다음과 같다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;여러 호스트의 여러 컨테이너에 로드 밸런싱/워크로드를 분산할 수 있다.&lt;/li&gt;
-&lt;li&gt;1개의 Pod(컨테이너)가 정지했을 경우에도 자동으로 회복할 수 있다.&lt;/li&gt;
-&lt;li&gt;무정지 갱신(롤링, 업데이트)을 할 수 있다.&lt;/li&gt;
-&lt;li&gt;어플리케이션 가동 중에 Scale-up, Scale-down을 할 수 있다.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;또, 어플리케이션의 운영에는 신경을 많이 써야 하는 문제로서, 고부하 등으로 이상이 발생했을 조치해야 하거나, 스케일 아웃 하거나, 자동 장애 조치(Failover) 등이 필요하다.&lt;/p&gt;
+&lt;p&gt;VM을 사용하는 구성에서는 결국에는 관리는 그 VM 단위로 해야 되서 스케일 아웃, 자동 장애 조치의 설정도 VM 단위로 할 수 밖에 없다.&lt;br&gt;
+Kubernetes를 사용하면 컨테이너 단위 또는 어플리케이션 단위로 관리 할 수 있고(실제로 VM을 사용하고 있으며 어플리케이션 단위로 관리하는 것 처럼 다를 수 있고), 스케일 아웃, 장애 ​​조치도 응용 프로그램 단위로 설정 수 있다.&lt;/p&gt;
 &lt;h2 id=&#34;왜-쿠버네티스를-사용하는가&#34;&gt;왜 쿠버네티스를 사용하는가?&lt;/h2&gt;
-&lt;p&gt;마이크로 서비스 아키텍처를 하기 위해서는 쿠버네티스가 필요하다.&lt;/p&gt;
+&lt;p&gt;마이크로서비스 아키텍처를 하기 위해서는 쿠버네티스가 필요하다.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/microservices.png&#34; alt=&#34;Monoliths and Microservices&#34;&gt;&lt;br&gt;
 &lt;em&gt;Figure 1: Monoliths and Microservices&lt;/em&gt; - &lt;a href=&#34;https://martinfowler.com/articles/microservices.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://martinfowler.com/articles/microservices.html&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;*&lt;/p&gt;
-&lt;p&gt;마이크로 서비스 아키텍처이란?&lt;/p&gt;
+&lt;p&gt;마이크로서비스 아키텍처이란?&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;어플리케이션의 기능을 세분화하고 각각을 별도의 프로세스로 동작한다. (cf. 모놀리식 아키텍처: Monolithic Architecture)&lt;/li&gt;
 &lt;li&gt;구성 가능하고 확장 가능하며 유연하고 탄력적이다.&lt;/li&gt;
 &lt;li&gt;개발 체제도 스케일하게 동작한다.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;그럼, 시스템에 변화된 구조에 대해서 알아보겠다.&lt;/p&gt;
-&lt;p&gt;기존에는 시스템들은 다기능인 프로세스으로 구성된 모놀리식 아키텍처였다.&lt;br&gt;
+&lt;p&gt;좀 더 구체적으로 시스템에 변화된 구조를 보면서 보도록 하겠다.&lt;/p&gt;
+&lt;p&gt;예전에는 대부분의 시스템들이 다기능인 프로세스으로 구성된 모놀리식 아키텍처로 구성되었다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-1.png&#34; alt=&#34;Monolithic&#34;&gt;&lt;/p&gt;
-&lt;p&gt;그러다가, 마이크로서비스 아키텍처로 변경이 되었다.
+&lt;p&gt;그러다가, 아래와 같은 마이크로서비스 아키텍처가 도입이 되었다.
 &lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-2.png&#34; alt=&#34;Microservice&#34;&gt;&lt;/p&gt;
 &lt;p&gt;그러고 다시, 다시 마이크로서비스가 컨테이너 아키텍처로 변경이 되었다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-3.png&#34; alt=&#34;Container&#34;&gt;&lt;/p&gt;
 &lt;p&gt;이렇게 되므로써, 배포 단위가 세분화 되고 업데이트, 기능 추가가 용이해 졌다.
 &lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-4.png&#34; alt=&#34;Container&#34;&gt;&lt;/p&gt;
-&lt;p&gt;이것만 보면 장점만 있는 것처럼 보이지만, 다른 한편으로 구조는 복잡해져서 관리는 어렵게 된다.&lt;/p&gt;
+&lt;p&gt;이것만 보면 장점만 있는 것처럼 보이겠지만, 다른 한편으로 구조는 복잡해져서 관리는 어렵게 되었다.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;컨테이너의 기동이 번거롭다.&lt;/li&gt;
 &lt;li&gt;컨테이너간 통신의 제어가 복잡하다.&lt;/li&gt;
 &lt;li&gt;컨테이너의 데이터 지속성은 어떻게 하는가?&lt;/li&gt;
 &lt;li&gt;컨테이너가 장애가 발생하였거나, 정지가 되었을때 회복은 어떻게 해야 할 것인가?&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;이런걸 불편한 점으로 해결해 주는 것이 쿠버네티스이다.&lt;/p&gt;
+&lt;p&gt;이런걸 불편한 점을 해결해 주는 것이 쿠버네티스이다.&lt;/p&gt;
+&lt;p&gt;이런 마이크로서비스 아키텍처에서 Kubernetes를 사용하게 되었었을 이점은 아래와 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 호스트의 여러 컨테이너에 로드 밸런싱/워크로드를 분산할 수 있다.&lt;/li&gt;
+&lt;li&gt;1개의 Pod(컨테이너)가 정지했을 경우에도 자동으로 회복할 수 있다.&lt;/li&gt;
+&lt;li&gt;무정지 갱신(롤링, 업데이트)을 할 수 있다.&lt;/li&gt;
+&lt;li&gt;어플리케이션 가동 중에 Scale-up, Scale-down을 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&#34;kubernetes-기능&#34;&gt;Kubernetes 기능&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;클러스터링&lt;/p&gt;
+&lt;p&gt;클러스터링(Clustering)&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;여러 시스템을 클러스터링하고 리소스 풀링 할 수 있다.&lt;/li&gt;
-&lt;li&gt;클러스터를 구성하는 머신을 노드라고 한다.&lt;/li&gt;
+&lt;li&gt;클러스터를 구성하는 머신을 노드(Node)라고 한다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
@@ -538,37 +1172,37 @@ minikube 설치를 하고 Kubernetes Cluster와의 작업을 위해 필요하다
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REPOSITORY                    TAG       IMAGE ID       CREATED        SIZE
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcr.io/k8s-minikube/kicbase   v0.0.33   f7ba2bce4549   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; weeks ago    1.06GB
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다운받은 docker image로 minikube container를 실행하여 kubernetes cluster 생성된 것을 확인 할수 잇다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% docker ps
-CONTAINER ID   IMAGE                                 COMMAND                  CREATED             STATUS             PORTS                                                                                                                        NAMES
-d9391f64eba5   gcr.io/k8s-minikube/kicbase:v0.0.33   &amp;#34;/usr/local/bin/entr...&amp;#34;   About an hour ago   Up About an hour   0.0.0.0:49463-&amp;gt;22/tcp, 0.0.0.0:49464-&amp;gt;2376/tcp, 0.0.0.0:49466-&amp;gt;5000/tcp, 0.0.0.0:49467-&amp;gt;8443/tcp, 0.0.0.0:49465-&amp;gt;32443/tcp   minikube
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Kubernetes Cluster와 Kubectl의 연결을 위한 정보가 담긴 config 파일 생성되었다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% cat ~/.kube/config
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority: /Users/user/.minikube/ca.crt
-    extensions:
-    - extension:
-        last-update: Wed, 07 Sep 2022 11:56:39 KST
-        provider: minikube.sigs.k8s.io
-        version: v1.26.1
-      name: cluster_info
-    server: https://127.0.0.1:50472
-  name: minikube
-contexts:
-- context:
-    cluster: minikube
-    user: minikube
-  name: minikube
-current-context: minikube
-kind: Config
-preferences: {}
-users:
-- name: minikube
-  user:
-    client-certificate: /Users/user/.minikube/profiles/minikube/client.crt
-    client-key: /Users/user/.minikube/profiles/minikube/client.key
-&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;minikube-cluster-상태-확인&#34;&gt;Minikube cluster 상태 확인&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                 COMMAND                  CREATED             STATUS             PORTS                                                                                                                        NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;d9391f64eba5   gcr.io/k8s-minikube/kicbase:v0.0.33   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/entr...&amp;#34;&lt;/span&gt;   About an hour ago   Up About an hour   0.0.0.0:49463-&amp;gt;22/tcp, 0.0.0.0:49464-&amp;gt;2376/tcp, 0.0.0.0:49466-&amp;gt;5000/tcp, 0.0.0.0:49467-&amp;gt;8443/tcp, 0.0.0.0:49465-&amp;gt;32443/tcp   minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Kubernetes Cluster와 Kubectl의 연결을 위한 정보가 담긴 config 파일 생성되었다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cat ~/.kube/config
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;apiVersion: v1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;clusters:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    certificate-authority: /Users/user/.minikube/ca.crt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    extensions:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - extension:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        last-update: Wed, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;07&lt;/span&gt; Sep &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2022&lt;/span&gt; 11:56:39 KST
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        provider: minikube.sigs.k8s.io
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        version: v1.26.1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      name: cluster_info
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    server: https://127.0.0.1:50472
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;contexts:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- context:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    cluster: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    user: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;current-context: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kind: Config
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;preferences: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;users:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  user:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    client-certificate: /Users/user/.minikube/profiles/minikube/client.crt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    client-key: /Users/user/.minikube/profiles/minikube/client.key
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;minikube-cluster-상태-확인&#34;&gt;Minikube cluster 상태 확인&lt;/h4&gt;
 &lt;p&gt;클러스터에 상태 확인하는 명령어는 아래와 같다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube status
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube status
@@ -626,11 +1260,10 @@ users:
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;24733d0fd443   gcr.io/k8s-minikube/kicbase:v0.0.33   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/entr...&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; minutes ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; minutes   0.0.0.0:54248-&amp;gt;22/tcp, 0.0.0.0:54249-&amp;gt;2376/tcp, 0.0.0.0:54251-&amp;gt;5000/tcp, 0.0.0.0:54247-&amp;gt;8443/tcp, 0.0.0.0:54250-&amp;gt;32443/tcp   minikube
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;분명히 hello-minikube라는 컨테이너는 별도로 움직이지 않았으며, minikube의 컨테이너 위에 동작하는거 같다. 아마도 이 minikube 컨테이너 자체에 kubernetes의 단일 노드와 Pod, Deployment가 만들어진 것 같다.&lt;/p&gt;
 &lt;p&gt;그럼 Pod에 생겼는지 확인한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;```bash
-% kubectl get pod
-NAME                              READY   STATUS    RESTARTS   AGE
-hello-minikube-5d44b6b577-l99jz   1/1     Running   0          4m59s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;STATUS가 Running이 되어 있고, 기동하고 있는 것을 확인할 수 있다. 또 &amp;ldquo;1/1&amp;quot;이라는 것으로 부터 Pod의 수는 1개라는 것도 알 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                              READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hello-minikube-5d44b6b577-l99jz   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4m59s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;STATUS가 Running이 되어 있고, 기동하고 있는 것을 확인할 수 있다. 또 &amp;ldquo;1/1&amp;quot;이라는 것으로 부터 Pod의 수는 1개라는 것도 알 수 있다.&lt;/p&gt;
 &lt;h3 id=&#34;서비스-동작-확인&#34;&gt;서비스 동작 확인&lt;/h3&gt;
 &lt;p&gt;서비스 URL은 아래와 같이 명령어로 확인 할 수 있다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube service hello-minikube --url
@@ -640,12 +1273,12 @@ hello-minikube-5d44b6b577-l99jz   1/1     Running   0          4m59s
 &lt;h3 id=&#34;삭제&#34;&gt;삭제&lt;/h3&gt;
 &lt;p&gt;다음은 삭제 절차이다.&lt;/p&gt;
 &lt;p&gt;서비스 삭제는 아래와 같은 명령어로 진행한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl delete services hello-minikube
-service &amp;#34;hello-minikube&amp;#34; deleted
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;hello-minikube Deployment 삭제는 아래와 같은 명령어로 진행한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl delete deployment hello-minikube
-deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;부록-컨테이너-안을-들여다-보기&#34;&gt;부록: 컨테이너 안을 들여다 보기&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete services hello-minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hello-minikube&amp;#34;&lt;/span&gt; deleted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;hello-minikube Deployment 삭제는 아래와 같은 명령어로 진행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete deployment hello-minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hello-minikube&amp;#34;&lt;/span&gt; deleted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;부록-컨테이너-안을-들여다-보기&#34;&gt;부록: 컨테이너 안을 들여다 보기&lt;/h2&gt;
 &lt;p&gt;공식 문서에 있던 로컬 개발 환경을 만드는 튜토리얼은 이 정도로 끝이지만, 컨테이너 안을 들여다 보려고 한다.&lt;/p&gt;
 &lt;p&gt;아래 명령으로 minikube에 들어가 본다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -itu &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; minikube /bin/bash
@@ -746,7 +1379,7 @@ deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
     </item>
     
     <item>
-      <title>Kubernetes 사용하기(kubectl 사용)</title>
+      <title>Kubernetes, kubectl CLI(커멘트 라인 도구) 사용하기</title>
       <link>https://www.devkuma.com/docs/kubernetes/kubectl/overview/</link>
       <pubDate>Fri, 09 Sep 2022 07:52:00 +0900</pubDate>
       <author>redfreek2c@gmail.com (kimkc)</author>
@@ -764,7 +1397,7 @@ deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
 &lt;li&gt;NAME : 자원의 이름&lt;/li&gt;
 &lt;li&gt;flags : 부가적으로 설정할 옵션 (&amp;ndash;help, -o options)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;명령어 사용 예시&lt;/p&gt;
+&lt;p&gt;명령어 사용 예시:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get pod webserver -o wide
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;kubectl-명령어-자동-완성&#34;&gt;kubectl 명령어 자동 완성&lt;/h2&gt;
 &lt;h3 id=&#34;bash&#34;&gt;bash&lt;/h3&gt;
@@ -786,17 +1419,18 @@ deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl --help
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl logs --help
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;execute-pod&#34;&gt;Execute pod&lt;/h2&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;kubectl exec -it [Pod 이름] -- [경로]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ex)&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;kubectl exec -it prism-69b8c846c-gc9zj -- /bin/sh
-``
-- /bin/sh가 아니라 /bin/bash로 생성한 경우도 있으니 참고
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl exec -it [Pod 이름] -- [경로]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;예를 들면, 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it prism-69b8c846c-gc9zj -- /bin/sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;/bin/sh&lt;/code&gt;가 아니라, &lt;code&gt;/bin/bash&lt;/code&gt;로 생성한 경우도 있으니 참고&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/tasks/tools/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 문서 | 도구 설치&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/ko/docs/tasks/tools/included/optional-kubectl-configs-bash-linux/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 문서 | 리눅스에서 bash 자동 완성 사용하기&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
-
-## 참조
-- [공식 문서 | 도구 설치](https://kubernetes.io/ko/docs/tasks/tools/)
-- [공식 문서 | 리눅스에서 bash 자동 완성 사용하기](https://kubernetes.io/ko/docs/tasks/tools/included/optional-kubectl-configs-bash-linux/)
-&lt;/code&gt;&lt;/pre&gt;
       </description>
       
       <category>Kubernetes</category>
@@ -873,7 +1507,8 @@ deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
         
         &lt;h2 id=&#34;pod-란&#34;&gt;Pod 란?&lt;/h2&gt;
 &lt;p&gt;Pod(파드)는 Application의 최소 실행 단위이며, Kubernetes에서 관리의 기본 단위로써 그룹화한 가상 호스트와 같은 것을 의미한다.&lt;br&gt;
-이 Pod는 가상 Network Interface(동일한 IP, 파일 시스템)를 공유하기 때문에 가상 호스트와 같은 역할을 한다.&lt;br&gt;
+즉, Kubernetes에서 컨테이너, 혹은 컨테이너들의 묶음을 지칭하는 이름이다. 그냥 단순하게 컨테이너라고 보면 된다.&lt;/p&gt;
+&lt;p&gt;이 Pod는 가상 Network Interface(동일한 IP, 파일 시스템)를 공유하기 때문에 가상 호스트와 같은 역할을 한다.&lt;br&gt;
 하나 혹은 다수의 Application container, storage, network 등의 정보를 포함한다.&lt;/p&gt;
 &lt;h2 id=&#34;pod의-특징&#34;&gt;Pod의 특징&lt;/h2&gt;
 &lt;ul&gt;
@@ -978,43 +1613,43 @@ deployment.apps &amp;#34;hello-minikube&amp;#34; deleted
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;172.17.0.4 - - &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;08/Sep/2022:23:38:30 +0000&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET / HTTP/1.1&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;200&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;612&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;-&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;curl/7.85.0-DEV&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;-&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;pod-실행-결과-확인---curl&#34;&gt;Pod 실행 결과 확인 - curl&lt;/h3&gt;
 &lt;p&gt;&lt;code&gt;curl&lt;/code&gt; 명령어로 접속이 되는지 확인 해보겠다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-barh&#34; data-lang=&#34;barh&#34;&gt;curl [IP]
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;실행 결과:&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ curl 172.17.0.3
-&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-&amp;lt;head&amp;gt;
-&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
-&amp;lt;style&amp;gt;
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-&amp;lt;/style&amp;gt;
-&amp;lt;/head&amp;gt;
-&amp;lt;body&amp;gt;
-&amp;lt;h1&amp;gt;Welcome to nginx!&amp;lt;/h1&amp;gt;
-&amp;lt;p&amp;gt;If you see this page, the nginx web server is successfully installed and
-working. Further configuration is required.&amp;lt;/p&amp;gt;
-
-&amp;lt;p&amp;gt;For online documentation and support please refer to
-&amp;lt;a href=&amp;#34;http://nginx.org/&amp;#34;&amp;gt;nginx.org&amp;lt;/a&amp;gt;.&amp;lt;br/&amp;gt;
-Commercial support is available at
-&amp;lt;a href=&amp;#34;http://nginx.com/&amp;#34;&amp;gt;nginx.com&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
-
-&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Thank you for using nginx.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
-&amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl [IP]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;실행 결과:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ curl 172.17.0.3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;!DOCTYPE html&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;html&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;head&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;title&amp;gt;Welcome to nginx!&amp;lt;/title&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;style&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        width: 35em&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        margin: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; auto&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        font-family: Tahoma, Verdana, Arial, sans-serif&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;/style&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;/head&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;body&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;h1&amp;gt;Welcome to nginx!&amp;lt;/h1&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;p&amp;gt;If you see this page, the nginx web server is successfully installed and
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;working. Further configuration is required.&amp;lt;/p&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;p&amp;gt;For online documentation and support please refer to
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;a &lt;span style=&#34;color:#000&#34;&gt;href&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://nginx.org/&amp;#34;&lt;/span&gt;&amp;gt;nginx.org&amp;lt;/a&amp;gt;.&amp;lt;br/&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Commercial support is available at
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;a &lt;span style=&#34;color:#000&#34;&gt;href&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://nginx.com/&amp;#34;&lt;/span&gt;&amp;gt;nginx.com&amp;lt;/a&amp;gt;.&amp;lt;/p&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;p&amp;gt;&amp;lt;em&amp;gt;Thank you &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; using nginx.&amp;lt;/em&amp;gt;&amp;lt;/p&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;/body&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;lt;/html&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;
 &lt;h4 class=&#34;alert-heading&#34;&gt;minikube를 사용중 이라면...&lt;/h4&gt;
 
     &lt;p&gt;minikube에서 실제 장비에서는 연결을 시도 하면 연결이 되지 않는다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% curl  172.17.0.3
-curl: (7) Failed to connect to 172.17.0.3 port 80 after 4036 ms: No route to host
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;아래와 같이 클러스터 내부에 들어가 &lt;code&gt;curl&lt;/code&gt;을 실행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% curl  172.17.0.3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;7&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; Failed to connect to 172.17.0.3 port &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt; after &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4036&lt;/span&gt; ms: No route to host
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;아래와 같이 클러스터 내부에 들어가 &lt;code&gt;curl&lt;/code&gt;을 실행한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl run --image curlimages/curl:latest -it --restart Never --rm curl sh
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;If you don&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;t see a &lt;span style=&#34;color:#204a87&#34;&gt;command&lt;/span&gt; prompt, try pressing enter.
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/ $ curl 172.17.0.3
@@ -1061,9 +1696,9 @@ curl: (7) Failed to connect to 172.17.0.3 port 80 after 4036 ms: No route to hos
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;내용을 수정한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@webserver:/usr/share/nginx/html# &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello, devkuma&amp;#34;&lt;/span&gt; &amp;gt; index.html
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;수정된 내용이 반영되었는지, 서버에 접속해 본다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ curl 172.17.0.3
-Hello, devkuma
-&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;pod에서-포트-포워드---kubectl-port-forward&#34;&gt;Pod에서 포트 포워드 - kubectl port-forward&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ curl 172.17.0.3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hello, devkuma
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;pod에서-포트-포워드---kubectl-port-forward&#34;&gt;Pod에서 포트 포워드 - kubectl port-forward&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl port-forward 8080:80
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;yaml-파일-만들어서-pod를-기동&#34;&gt;yaml 파일 만들어서 Pod를 기동&lt;/h3&gt;
 &lt;p&gt;여기서는 Pod 기동을 yaml으로 생성해서, 그 yaml를 이용해서 Pod를 기동시켜 보도록 하겠다.&lt;/p&gt;
@@ -1572,18 +2207,18 @@ deployment.apps/helloworld created
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl scale --replicas&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; deploy/helloworld
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps/helloworld scaled
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;deployment를 다시 확인한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get deployment
-NAME         READY   UP-TO-DATE   AVAILABLE   AGE
-helloworld   5/5     5            5           34s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;배포된 pod를 목록을 확인 한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pod
-NAME                          READY   STATUS    RESTARTS   AGE
-helloworld-7b8f9795b8-4878c   1/1     Running   0          15s
-helloworld-7b8f9795b8-6rc9m   1/1     Running   0          15s
-helloworld-7b8f9795b8-9k6cg   1/1     Running   0          42s
-helloworld-7b8f9795b8-b55sv   1/1     Running   0          15s
-helloworld-7b8f9795b8-b9qwr   1/1     Running   0          15s
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;rolling-update&#34;&gt;Rolling Update&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get deployment
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld   5/5     &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;            &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;           34s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;배포된 pod를 목록을 확인 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                          READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-4878c   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          15s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-6rc9m   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          15s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-9k6cg   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          42s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-b55sv   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          15s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-b9qwr   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          15s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;rolling-update&#34;&gt;Rolling Update&lt;/h2&gt;
 &lt;p&gt;다음은 롤링 업데이트를 수행하려고 한다. 그럴려면 먼저 포드 그룹의 이름을 알아야 한다. (위의 방법에서는 각 Pod 이름 helloworld와는 다른 name이 붙는다. 맞추는 방법도 있지만 여기에서는 설명하지 않는다). 그래서 생성한 deployment를 구성하는 yaml 파일을 출력한다. 출력은 아래의 명령으로 수행할 수 있다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get deployment helloworld --output yaml
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;실행 결과:&lt;/p&gt;
@@ -1658,47 +2293,47 @@ helloworld-7b8f9795b8-b9qwr   1/1     Running   0          15s
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl &lt;span style=&#34;color:#204a87&#34;&gt;set&lt;/span&gt; image deploy/helloworld hello-app&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;gcr.io/google-samples/hello-app:2.0
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps/helloworld image updated
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;중간 결과 출력 결과는 아래와 같다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pod
-NAME                          READY   STATUS              RESTARTS   AGE
-helloworld-666776755c-jfsfd   0/1     ContainerCreating   0          4s
-helloworld-666776755c-mgc95   1/1     Running             0          4s
-helloworld-666776755c-s96qf   0/1     ContainerCreating   0          0s
-helloworld-666776755c-w57b5   0/1     ContainerCreating   0          4s
-helloworld-7b8f9795b8-4878c   1/1     Terminating         0          84s
-helloworld-7b8f9795b8-6rc9m   1/1     Running             0          84s
-helloworld-7b8f9795b8-9k6cg   1/1     Running             0          111s
-helloworld-7b8f9795b8-b55sv   1/1     Running             0          84s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;최종 결과 출력 결과는 아래와 같다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ kubectl get pod
-helloworld-666776755c-jfsfd   1/1     Running   0          25s
-helloworld-666776755c-mgc95   1/1     Running   0          25s
-helloworld-666776755c-s96qf   1/1     Running   0          21s
-helloworld-666776755c-vcmzc   1/1     Running   0          20s
-helloworld-666776755c-w57b5   1/1     Running   0          25s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;출력 결과를 보면, 오래된 &lt;code&gt;helloworld&lt;/code&gt;가 점차 삭제되고 새로운 &lt;code&gt;helloworld&lt;/code&gt;가 생성되었는지 확인할 수 있다. 이번 출력 결과에서는 Pod로서 존재하고 있는 개수가 중간 경과의 시점에서 8개가 되었다. 이는 중지 도중에 생성이 이루어지기에 존재하고 있는 Pod의 개수가 증가하고 있다. 이 최대 개수는 운영 환경의 리소스(메모리 등)에 따라 차이가 있을 수 있어, 최대 몇 개까지 존재할 수 있는지 지정할 수도 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                          READY   STATUS              RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-jfsfd   0/1     ContainerCreating   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-mgc95   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-s96qf   0/1     ContainerCreating   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          0s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-w57b5   0/1     ContainerCreating   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-4878c   1/1     Terminating         &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          84s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-6rc9m   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          84s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-9k6cg   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          111s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-b55sv   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          84s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;최종 결과 출력 결과는 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-jfsfd   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          25s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-mgc95   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          25s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-s96qf   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          21s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-vcmzc   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          20s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-w57b5   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          25s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;출력 결과를 보면, 오래된 &lt;code&gt;helloworld&lt;/code&gt;가 점차 삭제되고 새로운 &lt;code&gt;helloworld&lt;/code&gt;가 생성되었는지 확인할 수 있다. 이번 출력 결과에서는 Pod로서 존재하고 있는 개수가 중간 경과의 시점에서 8개가 되었다. 이는 중지 도중에 생성이 이루어지기에 존재하고 있는 Pod의 개수가 증가하고 있다. 이 최대 개수는 운영 환경의 리소스(메모리 등)에 따라 차이가 있을 수 있어, 최대 몇 개까지 존재할 수 있는지 지정할 수도 있다.&lt;/p&gt;
 &lt;p&gt;자세한 내용은 다시 설명하도록 하겠다.&lt;/p&gt;
 &lt;h2 id=&#34;roll-back&#34;&gt;Roll back&lt;/h2&gt;
 &lt;p&gt;마지막으로 Roll back에 대해서는 아래의 명령으로 실행한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl rollout undo deploy/helloworld
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps/helloworld rolled back
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;중간 결과 출력 결과는 아래와 같다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pod
-NAME                          READY   STATUS              RESTARTS   AGE
-helloworld-666776755c-mgc95   1/1     Running             0          4m32s
-helloworld-7b8f9795b8-99qsq   0/1     ContainerCreating   0          5s
-helloworld-7b8f9795b8-lk8b9   0/1     ContainerCreating   0          5s
-helloworld-7b8f9795b8-xnhnt   1/1     Running             0          6s
-helloworld-7b8f9795b8-zbfc7   1/1     Running             0          6s
-helloworld-7b8f9795b8-zn6vn   1/1     Running             0          6s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;최종 결과 출력 결과는 아래와 같다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pod
-NAME                          READY   STATUS    RESTARTS   AGE
-helloworld-7b8f9795b8-99qsq   1/1     Running   0          16s
-helloworld-7b8f9795b8-lk8b9   1/1     Running   0          16s
-helloworld-7b8f9795b8-xnhnt   1/1     Running   0          17s
-helloworld-7b8f9795b8-zbfc7   1/1     Running   0          17s
-helloworld-7b8f9795b8-zn6vn   1/1     Running   0          17s
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;동작은 Rolling Update와 비슷하게 서서시 교체되는 식이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                          READY   STATUS              RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-666776755c-mgc95   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4m32s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-99qsq   0/1     ContainerCreating   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          5s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-lk8b9   0/1     ContainerCreating   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          5s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-xnhnt   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          6s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zbfc7   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          6s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zn6vn   1/1     Running             &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          6s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;최종 결과 출력 결과는 아래와 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                          READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-99qsq   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          16s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-lk8b9   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          16s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-xnhnt   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zbfc7   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zn6vn   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;동작은 Rolling Update와 비슷하게 서서시 교체되는 식이다.&lt;/p&gt;
 
       </description>
       
