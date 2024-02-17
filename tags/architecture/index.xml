@@ -1,0 +1,307 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Architecture</title>
+    <link>https://www.devkuma.com/tags/architecture/</link>
+    <image>
+      <url>https://www.devkuma.com/tags/architecture/logo/180x180.jpg</url>
+      <title>Architecture</title>
+      <link>https://www.devkuma.com/tags/architecture/</link>
+    </image>
+    <description>Recent content in Architecture on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ko</language>
+    <managingEditor>redfreek2c@gmail.com (kimkc)</managingEditor>
+    <webMaster>redfreek2c@gmail.com (kimkc)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/tags/architecture/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>가상 면접 사례로 배우는 대규모 시스템 설계 기초 2 | 02장. 주변 친구</title>
+      <link>https://www.devkuma.com/docs/system-design-interview-2/02/</link>
+      <pubDate>Sat, 17 Feb 2024 17:10:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/system-design-interview-2/02/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&amp;lsquo;주변 친구(Nearby friends)&amp;lsquo;라는 모바일 앱 기능을 지원하는 규모 확장이 용이한 백엔드 시스템을 설계해 보겠다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://techcrunch.com/2014/04/17/facebook-nearby-friends/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;페이스북의 &amp;lsquo;주변 친구&amp;rsquo; 기능 출시&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1단계-문제-이해-및-설계-범위-확정&#34;&gt;1단계: 문제 이해 및 설계 범위 확정&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;lsquo;주변에 있다&amp;rsquo;는 직선 거리로 5마일(mile) 내에 있을 시를 말한다.
+&lt;ul&gt;
+&lt;li&gt;이 수치는 설정이 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;사용자의 이동 이력을 저장한다.
+&lt;ul&gt;
+&lt;li&gt;기계 학습(machine learning) 등 다양한 용도로 사용될 수 있을 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;사용자가 10분 이상 비활성 상태면 주변 친구 목록에서 사라진다.&lt;/li&gt;
+&lt;li&gt;사생활 데이터 보호범도 고려하지 않는다.
+&lt;ul&gt;
+&lt;li&gt;복잡해서 제외한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;기능-요구-사항&#34;&gt;기능 요구 사항&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;사용자는 모바일 앱에서 주변 친구를 확인할 수 있어야 한다.
+&lt;ul&gt;
+&lt;li&gt;해당 친구까지의 거리, 해당 정보가 마지막으로 갱신된 시각(timestamp) 표시&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;이 친구 목록을 몇 초마다 갱신되어야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;비기능-요구-사항&#34;&gt;비기능 요구 사항&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;낮은 지연 시간(low latency)
+&lt;ul&gt;
+&lt;li&gt;주변 친구의 위치 변화가 오래 걸리면 안된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;안정성
+&lt;ul&gt;
+&lt;li&gt;전반적으로 안정적이어야 하지만, 때로는 몇 개의 데이터 정도 유실되도 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;결과적 일관성
+&lt;ul&gt;
+&lt;li&gt;위치 데이터를 저장하는데 강한 일관성을 지원할 필요는 없다.&lt;/li&gt;
+&lt;li&gt;복제본의 데이터가 원본과 동일하게 변경될때까지는 몇 초정 정도 걸려도 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;개략적-규모-추정&#34;&gt;개략적 규모 추정&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;lsquo;주변 친구&amp;rsquo;는 5마일 반경 이내 친구로 정의&lt;/li&gt;
+&lt;li&gt;친구 위치 정보는 30초 주기
+&lt;ul&gt;
+&lt;li&gt;사람이 빨리 걷지는 않기 때문에 30초면 충분&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;하루 주변 친구 검색 기능 활용할 사용자 1억명으로 가정&lt;/li&gt;
+&lt;li&gt;동시 접속자 사용자 수는 10% 가정
+&lt;ul&gt;
+&lt;li&gt;10% * 1억 = 천만명&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;평균적 한 사용자가 4000명의 친구를 갖는다고 가정&lt;/li&gt;
+&lt;li&gt;이 기능은 페이지당 20명의 주변 친구를 표시
+&lt;ul&gt;
+&lt;li&gt;요청이 있으면 더 많은 친구를 보여준다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2단계-개략적-설계안-제시-및-동의-구하기&#34;&gt;2단계: 개략적 설계안 제시 및 동의 구하기&lt;/h2&gt;
+&lt;p&gt;다른 장과 다르게 위치 정보를 모든 친구에 보내줘야 해서 서버-클라이언트 간에 HTTP 프로토콜을 사용할 수 없다는 것을 감안하여, 먼저 개략적 설계안를 이해하지 못하면 어떤 API를 만들어야 할지 알기 어렵기 때문에, 계략적 설계안부터 살펴본다.&lt;/p&gt;
+&lt;h3 id=&#34;계략적-설계안&#34;&gt;계략적 설계안&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/system-design-interview-2/chap2-1.jpg&#34; alt=&#34;공용 백엔드&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모든 활성 상태 사용자의 위치 변화 내역을 수신한다.&lt;/li&gt;
+&lt;li&gt;사용자 위치가 변경 될때마다, 활성 상태인 친구에서 변경 내역 절달한다.&lt;/li&gt;
+&lt;li&gt;두 사용자의 사이가 먼 경우에는 변경 내역을 전송&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;문제는 큰 규모에 적용하기 쉽지 않다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;활성 상태의 동시 접속 사용자가 천만 명 정도에 위치 정보를 30초마다 갱신하면 초당 334,000번 위치 정보 갱신
+&lt;ul&gt;
+&lt;li&gt;TPS : 10,000,000 트랜잭션 / 30초 = 3,333,333.33333TPS(약 334,000번)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;평균 사용자가 1명은 400명 친구를 갖고, 그 가운데 10%가 인근 활성화 상태라고 가정하면 1,400만건 위치 정보 갱신 요청
+&lt;ul&gt;
+&lt;li&gt;초당 334,000번 * 400명 * 10% = 1,400만&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;이 엄청난 양의 갱신 내역을 사용자 단말로 보내야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;설계안&#34;&gt;설계안&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/system-design-interview-2/chap2-2.jpg&#34; alt=&#34;계략적 설계안&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;로드 밴런스
+&lt;ul&gt;
+&lt;li&gt;WebSocket 및 HTTP 서버 앞단에 위치&lt;/li&gt;
+&lt;li&gt;부하를 고르게 분산하기 위해 트래픽을 서버들에 배분하는 역할&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RESTful API 서버
+&lt;ul&gt;
+&lt;li&gt;친구를 추가/삭제하거나 사용자 정보를 갱신하는 등의 부가적인 작업을 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;웹 소켓 서버
+&lt;ul&gt;
+&lt;li&gt;친구 위치 정보 변경을 실시간으로 상태를 유지하는 서버 클러스터
+&lt;ul&gt;
+&lt;li&gt;각 클라이언트는 한대의 웹소켓 연결을 지속적으로 유지&lt;/li&gt;
+&lt;li&gt;위치 변경되는 내역을 이 연결로 전송&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;레디스 위치 정보 캐시
+&lt;ul&gt;
+&lt;li&gt;활성 상태의 사용자의 가장 최근 위치 정보를 캐시하는데 사용&lt;/li&gt;
+&lt;li&gt;TTL을 지정하여, 시간이 지나면 위치 정보 캐시 삭제&lt;/li&gt;
+&lt;li&gt;캐시 정보 갱신될마다 TTL도 갱신&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;사용자 데이터베이스
+&lt;ul&gt;
+&lt;li&gt;사용자 데이터 및 사용자의 친구 관계 정보도 저장&lt;/li&gt;
+&lt;li&gt;RDB, NoSQL 어느 쪽이든 사용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;위치 이동 이력 데이터베이스
+&lt;ul&gt;
+&lt;li&gt;사용자의 위치 변경 이력 보관&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;레디스 펍/섭 서버
+&lt;ul&gt;
+&lt;li&gt;초경략 메세시 버스로 Redis Pub/Sub 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;주기적 위치 갱신&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;클라이언트 위치 변경 사실을 로드밸런서에 전송&lt;/li&gt;
+&lt;li&gt;로드밸러서는 그 위치 변경 내역을 웹소캣으로 전송&lt;/li&gt;
+&lt;li&gt;웹소켓 서버는 해당 이벤트를 위치 이동 데이터베이스에 저장&lt;/li&gt;
+&lt;li&gt;웹소켓 서버는 캐시에 저장. TTL도 갱신&lt;/li&gt;
+&lt;li&gt;웹소켓 서버는 레이스 펍/섭 서버에 해당 사용자 채널에 위치 발행. 3~5는 병렬로 수행&lt;/li&gt;
+&lt;li&gt;레디스 펍/섭 모든 구독자(온라인 친구)에게 브로드캐스트&lt;/li&gt;
+&lt;li&gt;새 위치를 보낸 사용자와 메세지를 받은 사용자의 사이 거리 새로 계산&lt;/li&gt;
+&lt;li&gt;7에서 계산한 거리가 검색 반경에 넘지 않으면 각 클라이언트에 정보를 전송하고, 넘으면 전송 안함&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;api-설계&#34;&gt;API 설계&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;서버 API - 주기적인 위치 갱신&lt;/li&gt;
+&lt;li&gt;클라이언트 API - 클라이언트 갱신된 친구 위치를 수신하는 데 사용할 API&lt;/li&gt;
+&lt;li&gt;서버 API - 웹소켓 초기화 API&lt;/li&gt;
+&lt;li&gt;클라이언트 API - 새 친구 구독 API&lt;/li&gt;
+&lt;li&gt;클라이언트 API - 구독 해지 API&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;데이터-모델&#34;&gt;데이터 모델&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;위치 정보 캐시&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;키 : 사용자 ID&lt;/li&gt;
+&lt;li&gt;값 : {위치, 경도, 시각}&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;현재 정보만 저장.&lt;br&gt;
+레디스는 활성화 사용자를 TTL를 지정해서 저장하여 적합.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;위치 이동 이력 데이터베이스&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;컬럼 : 사용자 ID, 위치, 경도, 시각&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;대용량 처리를 요구될 수록 샤딩이 필요한 데이터베이스가 필요.&lt;/p&gt;
+&lt;h2 id=&#34;3단계-상세-설계&#34;&gt;3단계: 상세 설계&lt;/h2&gt;
+&lt;h3 id=&#34;중요-구성요서별-규모-확장성&#34;&gt;중요 구성요서별 규모 확장성&lt;/h3&gt;
+&lt;h4 id=&#34;api-서버&#34;&gt;API 서버&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;클러스터를 CPU, I/O 사용률에 따라 자동으로 눌리는 방법은 다양하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;웹소켓-서버&#34;&gt;웹소켓 서버&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;사용률에 따라 규모를 자동으로 늘리는 것은 어렵지 않다.&lt;/li&gt;
+&lt;li&gt;자동으로 확장하려면 로드밸런스에서 처리 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;클라이언트-초기화&#34;&gt;클라이언트 초기화&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;위치 정보 캐시 갱신한다.&lt;/li&gt;
+&lt;li&gt;모든 친구 정보를 가져온다.&lt;/li&gt;
+&lt;li&gt;활성화된 모든 친구의 위치 정보를 한번에 가져온다.&lt;/li&gt;
+&lt;li&gt;비활성된 사용자는 이미 TLL로 인해 없을 것이다.&lt;/li&gt;
+&lt;li&gt;전달 받은 친구 위치 각각에 대해 웹소켓 연결한다.&lt;/li&gt;
+&lt;li&gt;웹소켓 서버는 각 친구의 레디스 서버 펍/섭 채널을 구독한다.&lt;/li&gt;
+&lt;li&gt;사용자의 현재 위를 레디스 펍/섭 서버의 전용 채널을 통해 모든 친구에게 전송한다.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;사용자-데이터베이스&#34;&gt;사용자 데이터베이스&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;저장되는 데이터
+&lt;ul&gt;
+&lt;li&gt;사용자 ID, 사용자명, 프로파일 이미지의 URL 등&lt;/li&gt;
+&lt;li&gt;친구 관데 데이터&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;대용량을 위한 사용자 ID로 샤딩된 데이터베이스 필요&lt;/li&gt;
+&lt;li&gt;규모의 크다면, 실제로를 사용자 및 친구 데이터를 관리하는 팀이 따로 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;위치-정보-캐시&#34;&gt;위치 정보 캐시&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;대용량 처리를 하려며 사용자 ID를 기준으로 여러 서버에 샤딩하면 부하를 분배할 수 있다.&lt;/li&gt;
+&lt;li&gt;가용성을 높이기려면, 대기 노드를 복제하여, 주 노드가 장애가 나면 대기 노드의 주 노드 승격으로 장애 시간을 줄인다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;레디스-펍섭-서버&#34;&gt;레디스 펍/섭 서버&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;레디스 펍/섭을 선택한 이유는 채널을 만드는 비용이 아주 저렴하기 때문이다.&lt;/li&gt;
+&lt;li&gt;레디스 펍/섭의 병목은 메모리가 아니라 CPU 사용량이다.&lt;/li&gt;
+&lt;li&gt;예상되는 메모리 사용량은 200GB 정도 될거 같고, 100GB의 설치할 수 있는 서버를 사용하면 된다.&lt;/li&gt;
+&lt;li&gt;위치 정보 갱신은 초당 1400만건 / 서버 한 대로 감당 가능한 구독자 수는 100,000명 = 140대 서버 예상&lt;/li&gt;
+&lt;li&gt;대규모를 감당하려면, 분산 레디스 펍/섭 클러스터가 필요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;분산-레디스-펍섭-서버-클러스터&#34;&gt;분산 레디스 펍/섭 서버 클러스터&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;메세지를 발행할 사용ID를 기준으로 펍/섭 서버들을 샤딩하면 된다.
+&lt;ul&gt;
+&lt;li&gt;모든 채널은 서로 독립적이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;운영에는 서비스 탐색(service discovery) 컨포넌트를 도입하여 이 문제를 해결할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;etcd, 주키퍼 등이 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;방안으로 안정 해시(consistent hash)의 해시 링를 참조한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;친구-추가삭제&#34;&gt;친구 추가/삭제&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;친구 추가/삭제시에 콜백을 해당 앱에 등록해 둘 수 있다.&lt;/li&gt;
+&lt;li&gt;이 콜백은 호출되면 웹소켓 서버로 친구의 펍/섭 채널을 구독/구독 해지 하라고 메세지를 보낸다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;친구가-많은-사용자&#34;&gt;친구가 많은 사용자&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;친구 5000명까지만 처리, 방향을 갖는 팔로어 모델처럼 단방향은 논의 배제&lt;/li&gt;
+&lt;li&gt;수천 명의 친구를 구독하는 데 필요한 펍/섭 구독 관계는 클러스터 내의 많은 웹소켓 서버에 분산&lt;/li&gt;
+&lt;li&gt;부하는 각 소켓 서버가 나누어 처리하므로 핫스팟 문제는 발생하지 않을 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;주변의-임의-사용자&#34;&gt;주변의 임의 사용자&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;지오해시에 따라 구축된 펍/섭 채널 풀을 둔다.
+&lt;ul&gt;
+&lt;li&gt;상세 내용 생략&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;레디스-펍섭-외의-대안&#34;&gt;레디스 펍/섭 외의 대안&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;얼랭(Erlang)이 대안으로 대체 될 수 있다.
+&lt;ul&gt;
+&lt;li&gt;상세 내용 생략&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4단계-마무리&#34;&gt;4단계: 마무리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;사용자의 위치 정보 변경 내역을 그 친구에게 효율적으로 전달하는 시스템 설계하였다.&lt;/li&gt;
+&lt;li&gt;웹소켓, 레디스, 레디스 펍/섭이 이 설계안의 핵심 컴포넌트이다.&lt;/li&gt;
+&lt;li&gt;소규모에서 규모가 커짐에 따른 해결책도 살펴봤다.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Architecture</category>
+      
+    </item>
+    
+  </channel>
+</rss>
