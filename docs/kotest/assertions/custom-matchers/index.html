@@ -17,16 +17,21 @@
 <link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
 
-<title>JavaFX | devkuma</title>
-<meta name="description" content="자바 표준 GUI 라이브러리">
-<meta property="og:title" content="JavaFX" />
-<meta property="og:description" content="자바 표준 GUI 라이브러리" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://www.devkuma.com/docs/java-fx/" />
-<meta itemprop="name" content="JavaFX">
-<meta itemprop="description" content="자바 표준 GUI 라이브러리"><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="JavaFX"/>
-<meta name="twitter:description" content="자바 표준 GUI 라이브러리"/>
+<title>Kotest 사용자 정의 매처 (Custom Matchers) | devkuma</title>
+<meta name="description" content="Kotest에서는 커스텀 매처를 만들어 특정 조건을 확인할 수 있다.">
+<meta property="og:title" content="Kotest 사용자 정의 매처 (Custom Matchers)" />
+<meta property="og:description" content="Kotest에서는 커스텀 매처를 만들어 특정 조건을 확인할 수 있다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.devkuma.com/docs/kotest/assertions/custom-matchers/" /><meta property="article:section" content="130_Programming_JVM" />
+<meta property="article:published_time" content="2024-02-25T10:28:00+09:00" />
+<meta property="article:modified_time" content="2024-03-11T22:46:22+09:00" />
+<meta itemprop="name" content="Kotest 사용자 정의 매처 (Custom Matchers)">
+<meta itemprop="description" content="Kotest에서는 커스텀 매처를 만들어 특정 조건을 확인할 수 있다."><meta itemprop="datePublished" content="2024-02-25T10:28:00+09:00" />
+<meta itemprop="dateModified" content="2024-03-11T22:46:22+09:00" />
+<meta itemprop="wordCount" content="488">
+<meta itemprop="keywords" content="Kotlin,Kotest," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kotest 사용자 정의 매처 (Custom Matchers)"/>
+<meta name="twitter:description" content="Kotest에서는 커스텀 매처를 만들어 특정 조건을 확인할 수 있다."/>
 
 
 
@@ -39,7 +44,7 @@
   integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ=="
   crossorigin="anonymous"></script>
 
-<link rel="canonical" href="https://www.devkuma.com/docs/java-fx/">
+<link rel="canonical" href="https://www.devkuma.com/docs/kotest/assertions/custom-matchers/">
 <link rel="apple-touch-icon" href="/logo/180x180.jpg">
 <link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
 <link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
@@ -58,7 +63,7 @@ if (!doNotTrack) {
 }
 </script>
   </head>
-  <body class="td-section">
+  <body class="td-page">
     <header>
       <nav class="td-navbar navbar-dark js-navbar-scroll">
 <div class="container-fluid flex-column flex-md-row">
@@ -176,13 +181,13 @@ if (!doNotTrack) {
   <script>
     $(function() {
     $("#td-section-nav a").removeClass("active");
-    $("#td-section-nav #m-docsjava-fx").addClass("active"); 
-    $("#td-section-nav #m-docsjava-fx-li span").addClass("td-sidebar-nav-active-item"); 
-    $("#td-section-nav #m-docsjava-fx").parents("li").addClass("active-path"); 
+    $("#td-section-nav #m-docskotestassertionscustom-matchers").addClass("active"); 
+    $("#td-section-nav #m-docskotestassertionscustom-matchers-li span").addClass("td-sidebar-nav-active-item"); 
+    $("#td-section-nav #m-docskotestassertionscustom-matchers").parents("li").addClass("active-path"); 
     $("#td-section-nav li.active-path").addClass("show"); 
     $("#td-section-nav li.active-path").children("input").prop('checked', true);
-    $("#td-section-nav #m-docsjava-fx-li").siblings("li").addClass("show");  
-    $("#td-section-nav #m-docsjava-fx-li").children("ul").children("li").addClass("show");  
+    $("#td-section-nav #m-docskotestassertionscustom-matchers-li").siblings("li").addClass("show");  
+    $("#td-section-nav #m-docskotestassertionscustom-matchers-li").children("ul").children("li").addClass("show");  
     $("#td-sidebar-menu").toggleClass("d-none"); 
     });
   </script>
@@ -1927,7 +1932,18 @@ if (!doNotTrack) {
 
 </div>
 
-            
+            <div class="td-toc">
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#사용자-정의-매처">사용자 정의 매처</a></li>
+    <li><a href="#사용자-정의-매처-정의">사용자 정의 매처 정의</a></li>
+    <li><a href="#확장-변형">확장 변형</a></li>
+    <li><a href="#짝수-포함-여부를-확인하는-사용자-정의-매처-정의">짝수 포함 여부를 확인하는 사용자 정의 매처 정의</a></li>
+    <li><a href="#참조">참조</a></li>
+  </ul>
+</nav>
+      </div>
+    
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tags</h5>
       <ul class="taxonomy-terms">
@@ -2139,265 +2155,146 @@ if (!doNotTrack) {
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
     <a href="/docs/category/programming/jvm/">JVM 기반 프로그래밍 언어</a></li>
+  <li class="breadcrumb-item">
+    <a href="/docs/kotest/">Kotest</a></li>
+  <li class="breadcrumb-item">
+    <a href="/docs/kotest/assertions/">Assertions</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    JavaFX</li>
+    Kotest 사용자 정의 매처</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>JavaFX</h1>
-  <div class="lead">자바 표준 GUI 라이브러리</div>
+	<h1>Kotest 사용자 정의 매처 (Custom Matchers)</h1>
+	<div class="lead">Kotest에서는 커스텀 매처를 만들어 특정 조건을 확인할 수 있다.</div>
 	<header class="article-meta">
-		<div class="taxonomy taxonomy-terms-article taxo-tags">
+		
+		
+			
+				<div class="taxonomy taxonomy-terms-article taxo-tags">
   <h5 class="taxonomy-title">Tags:</h5>
   <ul class="taxonomy-terms">
-    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span></a></li>
-    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span></a></li>
     </ul>
 </div>
 
-
+			
+		
 		
 	</header>
 	
-	<p><img src="/docs/java/javafx-logo.jpg" alt="Java 입문"></p>
-<p>Java 8에서 새로운 GUI 라이브러리 &ldquo;JavaFX 8&quot;이 표준 탑재되었다. 이 새로운 라이브러리를 사용하는 데스크톱 응용 프로그램 작성 방법을 정리하였다.</p>
+	<h2 id="사용자-정의-매처">사용자 정의 매처</h2>
+<p>Kotest에서 자신만의 매처를 쉽게 정의할 수 있다.</p>
+<p><code>Matcher&lt;T&gt;</code> 인터페이스를 확장하기만 하면 된다. 여기서 <code>T</code>는 일치시키고자 하는 유형이다. <code>Matcher</code> 인터페이스는 <code>MatcherResult</code>의 인스턴스를 반환하는 하나의 함수로 <code>test</code>를 정의한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">Matcher</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#204a87;font-weight:bold">in</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">test</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">MatcherResult</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>이 <code>MatcherResult</code> 유형은 테스트 통과 여부를 나타내는 부울을 반환하는 함수와 2개의 실패 메시지 등 3가지 함수를 정의한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000">MatcherResult</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">passed</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#000">Boolean</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">failureMessage</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#000">String</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">negatedFailureMessage</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#000">String</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><ul>
+<li>passed
+<ul>
+<li>단언문을 만족하는지(true) 만족하지 않는지(false)를 나타낸다.</li>
+</ul>
+</li>
+<li>failureMessage
+<ul>
+<li>일치 조건이 실패한 경우 사용자에게 보내는 메시지이다.</li>
+<li>단언문 실패를 하였으면 보여주고, 성공시키려면 어떤 일을 해야 하는지 알려주는 메시지이다.</li>
+<li>일반적으로 예상 값과 실제 값에 대한 세부 정보 및 차이점을 포함할 수 있다.</li>
+</ul>
+</li>
+<li>negatedFailureMessage
+<ul>
+<li>일치 조건이 부정 모드에서 참으로 평가된 경우 사용자에게 보내는 메시지이다.</li>
+<li>Matcher를 부정을 사용하여, Matcher가 실패하는 경우 표시해야 하는 메시지이다.</li>
+<li>여기에는 일반적으로 술어가 실패할 것으로 예상했음을 나타낸다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="사용자-정의-매처-정의">사용자 정의 매처 정의</h2>
+<p>실패 메시지의 2개의 차이점은 예제를 통해 더 명확하게 알 수 있다. 문자열에 필요한 길이가 있는지 확인하기 위해 문자열에 대한 길이 매처를 작성한다고 가정해 보겠다. 구문은 <code>str.shouldHaveLength(8)</code>와 같은 형식이 필요하다.</p>
+<p>그러면 첫 번째 메시지는 <code>&quot;string had length 15 but we expected length 8&quot;</code>와 같아야 한다. 두 번째 메시지는 <code>&quot;string should not have length 8&quot;</code>와 같아야 한다.</p>
+<p>먼저 매처 유형을 구현한다:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.kotest.matchers.Matcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.kotest.matchers.MatcherResult</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">haveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">length</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Int</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Matcher</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">String</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">value</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">MatcherResult</span><span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">length</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#000">length</span><span style="color:#000;font-weight:bold">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span> <span style="color:#4e9a06">&#34;string had length </span><span style="color:#4e9a06">${value.length}</span><span style="color:#4e9a06"> but we expected length </span><span style="color:#4e9a06">$length</span><span style="color:#4e9a06">&#34;</span> <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span> <span style="color:#4e9a06">&#34;string should not have length </span><span style="color:#4e9a06">$length</span><span style="color:#4e9a06">&#34;</span> <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>오류 메시지를 함수 호출로 래핑하여 필요하지 않은 경우 평가하지 않도록 한다. 이는 생성하는 데 시간이 걸리는 오류 메시지의 경우 중요하다.</p>
+<p>그런 다음 이 매처를 다음과 같이 <code>should</code> 및 <code>shouldNot</code> 접두사 함수에 전달할 수 있다:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#4e9a06">&#34;hello foo&#34;</span> <span style="color:#000">should</span> <span style="color:#000">haveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">9</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#4e9a06">&#34;hello bar&#34;</span> <span style="color:#000">shouldNot</span> <span style="color:#000">haveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="확장-변형">확장 변형</h2>
+<p>여기서는 matcher 함수를 호출하고, 함수 연결을 위한 원래 값을 반환하는 확장 함수를 정의하려고 한다. 이는 Kotest가 내장된 매처를 구성하는 방식이며, Kotest는 <code>shouldXYZ</code> 명명 전략대로 맞출려고 한다. 예를 들면, 아래와 같다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">String</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">shouldHaveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">length</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Int</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">String</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">this</span> <span style="color:#000">should</span> <span style="color:#000">haveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">length</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">this</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">String</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">shouldNotHaveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">length</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">Int</span><span style="color:#000;font-weight:bold">):</span> <span style="color:#000">String</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">this</span> <span style="color:#000">shouldNot</span> <span style="color:#000">haveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">length</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">this</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>이렇게 하므로써, 다음과 같이 호출할 수 있다:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#4e9a06">&#34;hello foo&#34;</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">shouldHaveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">9</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#4e9a06">&#34;hello bar&#34;</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">shouldNotHaveLength</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></div><h2 id="짝수-포함-여부를-확인하는-사용자-정의-매처-정의">짝수 포함 여부를 확인하는 사용자 정의 매처 정의</h2>
+<p>다음으로는 목록에 짝수가 포함되어 있는지 확인하는 커스텀 Matcher를 만들어 보자고 한다.</p>
+<p>다음은 <code>containEvenNumbers</code>라는 커스텀 Matcher를 만들어, 목록에 2로 나눠져서 0이 되는 여부를 확인하고 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">com.devkuma.kotest.tutorial.assertions.custommatchers</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.kotest.core.spec.style.FunSpec</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.kotest.matchers.*</span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.kotest.matchers.should</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">containEvenNumbers</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">Matcher</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;&gt;</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">value</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">MatcherResult</span><span style="color:#000;font-weight:bold">(</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">value</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">any</span> <span style="color:#000;font-weight:bold">{</span> <span style="color:#204a87;font-weight:bold">it</span> <span style="color:#000;font-weight:bold">%</span> <span style="color:#0000cf;font-weight:bold">2</span> <span style="color:#ce5c00;font-weight:bold">==</span> <span style="color:#0000cf;font-weight:bold">0</span> <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span> <span style="color:#4e9a06">&#34;List should contain even numbers&#34;</span> <span style="color:#000;font-weight:bold">},</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">{</span> <span style="color:#4e9a06">&#34;List should not contain even numbers&#34;</span> <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;.</span><span style="color:#000">shouldContainEvenNumbers</span><span style="color:#000;font-weight:bold">():</span> <span style="color:#000">List</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">Int</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">this</span> <span style="color:#000">should</span> <span style="color:#000">containEvenNumbers</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#204a87;font-weight:bold">this</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">infix</span> <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">&gt;</span> <span style="color:#000">T</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">should</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">matcher</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">T</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#ce5c00;font-weight:bold">-&gt;</span> <span style="color:#000">Unit</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">matcher</span><span style="color:#000;font-weight:bold">(</span><span style="color:#204a87;font-weight:bold">this</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">ContainEvenNumbersCustomMatcher</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">FunSpec</span><span style="color:#000;font-weight:bold">({</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">test</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;should&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">list</span> <span style="color:#000">should</span> <span style="color:#000">containEvenNumbers</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000">test</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;shouldContainEvenNumbers&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">list</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#0000cf;font-weight:bold">1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">2</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">3</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">4</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">5</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">list</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">shouldContainEvenNumbers</span><span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">})</span>
+</span></span></code></pre></div><hr>
+<p>커스텀 매처를 통해 테스트 코드의 가독성을 높일 수 있다. 단, 네이밍을 잘못 하면 오히려 반대의 효과가 발생할 수 있다느 점을 유의하도록 하자.</p>
+<h2 id="참조">참조</h2>
+<ul>
+<li><a href="https://kotest.io/docs/assertions/custom-matchers.html" target="_blank" rel="noopener">Custom Matchers<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
 
-    <div class="section-index">
-    
-    
-    
-    
-    
-    
-    
-    
-    <hr class="panel-line">
-        
+	<br>
 
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/application-basic-code/">JavaFX 응용 프로그램 기본 코드</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/action-event/">JavaFX 액션 이벤트 사용</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/control/">JavaFX 주요 컨트롤러 이용</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/fxml-gui-design/">JavaFX FXML GUI 디자인</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/fxml-action-event/">JavaFX FXML 액션 이벤트 구현</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/list-view-selection-model/">JavaFX ListView와 SelectionModel</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/property-event-handling/">JavaFX 속성 이벤트 처리</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/canvas-graphics/">JavaFX Canvas 그래픽 그리기</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/shape-vector-graphics/">JavaFX 셰이프(Shape)을 사용한 벡터 그래픽</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/graphics-effect/">JavaFX 그래픽 특수 효과</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-
-            
-            <div class="entry">
-                <h5>
-                    <a href="/docs/java-fx/animation/">JavaFX 애니메이션 기능</a>
-                </h5>
-                <p></p>
-                
-                
-                
-                
-                
-                
-                
-                <ul>
-                
-                </ul>
-                
-            </div>
-        
-    
-</div>
-
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
      crossorigin="anonymous"></script>
 
 <ins class="adsbygoogle"
@@ -2410,13 +2307,22 @@ if (!doNotTrack) {
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
 	
 	
 	
 <div class="text-muted mt-5 pt-3 border-top">
-    최종 수정 : 2024-01-18</div>
+    최종 수정 : 2024-03-11</div>
 
 </div>
+
 
           </main>
         </div>
