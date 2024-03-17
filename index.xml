@@ -22,6 +22,89 @@
     
     
     <item>
+      <title>Kotest 프로퍼티 기반 테스트(Property-based Testing)</title>
+      <link>https://www.devkuma.com/docs/kotest/proptest/introduction/</link>
+      <pubDate>Sun, 17 Mar 2024 21:48:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/kotest/proptest/introduction/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;프로퍼티-기반-테스트&#34;&gt;프로퍼티 기반 테스트&lt;/h2&gt;
+&lt;p&gt;Kotest는 독립적으로 사용할 수 있는 여러 하위 프로젝트로 나눠진다. 이러한 하위 프로젝트 중 하나가 프로퍼티 테스트 프레임워크(Property-based Testing)이다. 당연하겠지만, 프로퍼티 테스트 지원의 이점을 누리기 위해 Kotest를 테스트 프레임워크로 사용할 필요는 없다.&lt;/p&gt;
+&lt;h3 id=&#34;프로퍼티-테스트란-무엇인가요&#34;&gt;프로퍼티 테스트란 무엇인가요?&lt;/h3&gt;
+&lt;p&gt;개발자는 일반적으로 예제 기반 테스트를 작성한다. 이는 여러분이 잘 알고 있고 좋아하는 다양한 단위 테스트이다. 몇 가지 입력값과 예상 결과를 제공하면 Kotest 또는 JUnit과 같은 테스트 프레임워크가 실제 결과가 예상에 부합하는지 확인한다.&lt;/p&gt;
+&lt;p&gt;이 접근 방식의 한 가지 문제점은 개발자가 미처 생각하지 못한 에지 케이스 또는 선택한 입력의 커버리지 부족으로 인해 오류를 놓치기 쉽다는 것이다. 대신 프로퍼티 테스트를 사용하면 수백 또는 수천 개의 값이 동일한 테스트에 입력되며, 값은 (일반적으로) 프로퍼티 테스트 프레임워크에서 임의로 생성된다.&lt;/p&gt;
+&lt;p&gt;예를 들어, 좋은 프로퍼티 테스트 프레임워크에는 음수 무한대, 빈 목록, ASCII가 아닌 문자가 포함된 문자열 등과 같은 값이 포함된다. 예제 기반 테스트를 작성할 때 우리가 종종 잊어버리는 것들이다.&lt;/p&gt;
+&lt;p&gt;프로퍼티 테스트는 원래 퀵체크(Quickcheck)와 같은 프레임워크에서 어떤 객체에 대한 프로퍼티, 즉 모든 입력에 대해 참이어야 하는 프로퍼티을 테스트하는 개념으로 고안된 것이다. 다른 말로 하면 불변성이다. 불변성의 예를 들어, 두 개의 문자열 a와 b가 주어진다면, &lt;code&gt;length(a + b)&lt;/code&gt;는 항상 &lt;code&gt;length(a) + length(b)&lt;/code&gt;와 같아야 한다.&lt;/p&gt;
+&lt;p&gt;여기서 &lt;em&gt;프로퍼티 테스트&lt;/em&gt;라는 용어가 유래하였다.&lt;/p&gt;
+&lt;p&gt;그러나 모나드 법칙(monad laws)이나 기본 숫자 함수 같은 것만 테스트하기 위해 프로퍼티 테스트를 사용할 필요는 없다. 다양한 입력 값을 활용할 수 있는 모든 테스트가 좋은 후보이다. 예를 들어, 사용자 이름의 유효성을 검사하는 함수가 있는데 유효한 이메일이 수락되는지 테스트하고 싶을 수 있다. 여기서 프로퍼티 테스트는 유효성 검사 로직을 강화하는 데 도움이 되는 수천 개의 조합을 생성하는 데 유용할 것이다.&lt;/p&gt;
+&lt;h2 id=&#34;시작하기&#34;&gt;시작하기&lt;/h2&gt;
+&lt;p&gt;프로퍼티 테스트 프레임워크는 모든 대상에서 지원됩니다.&lt;/p&gt;
+&lt;h3 id=&#34;jvmgradle&#34;&gt;JVM/Gradle&lt;/h3&gt;
+&lt;p&gt;빌드에 다음 종속성을 추가한다:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;jvmmaven&#34;&gt;JVM/Maven&lt;/h3&gt;
+&lt;p&gt;빌드에 다음 종속성을 추가한다:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;io.kotest&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;kotest-property-jvm&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${version}&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;multiplatform&#34;&gt;Multiplatform&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;commonTest&lt;/code&gt; 소스 집합에 다음 종속성을 추가한다:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;kotlin&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;sourceSets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;commonTest&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;by&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;getting&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;또는 특정 대상에 종속성을 추가할 수도 있다. 예를 들어 Javascript 대상에 &lt;code&gt;jsTest&lt;/code&gt; 소스 집합만 사용하는 종속성을 추가할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;kotlin&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;targets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000&#34;&gt;js&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;browser&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;nodejs&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;sourceSets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;jsTest&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;by&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;getting&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;다음-단계&#34;&gt;다음 단계&lt;/h2&gt;
+&lt;p&gt;테스트에 대한 입력 값을 생성하기 위해 Kotest는 제너레이터(generator)라는 용어를 사용한다. 입력 인수당 하나의 제너레이터가 테스트 함수에 전달되고 테스트는 설정된 반복 횟수 동안 실행된다.&lt;/p&gt;
+&lt;p&gt;자세히 알아보기&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;테스트 함수가 사용되는 방법.&lt;/li&gt;
+&lt;li&gt;다양한 유형의 제너레이터와 그에 대한 연산.&lt;/li&gt;
+&lt;li&gt;사용자 지정 생성기를 작성하는 방법.&lt;/li&gt;
+&lt;li&gt;시드를 포함하여 테스트에 대한 구성을 지정하는 방법.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kotest.io/docs/proptest/property-based-testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Property-based Testing | Kotest&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Kotlin</category>
+      
+      <category>Kotest</category>
+      
+    </item>
+    
+    <item>
       <title>Kotest 예외(Exceptions)</title>
       <link>https://www.devkuma.com/docs/kotest/assertions/exceptions/</link>
       <pubDate>Sun, 17 Mar 2024 21:23:00 +0900</pubDate>
@@ -3713,89 +3796,6 @@ Spec 클래스의 깨끗한 인스턴스에서 매번, 변수를 재사용하고
 &lt;/ol&gt;
 &lt;p&gt;이러한 &amp;ldquo;Red, Green, Refactor&amp;rdquo; 접근 방식을 따르면서 Kotest를 사용하면 소프트웨어 개발 과정에서 테스트 주도 개발을 보다 효과적으로 수행할 수 있다. 테스트가 실패한 후 성공하도록 코드를 작성하고, 이후 코드를 개선하면서도 테스트를 통해 코드의 안정성을 보장할 수 있다.&lt;/p&gt;
 &lt;p&gt;TDD는 소프트웨어의 설계, 품질, 유지보수성을 향상시키는 데 도움이 되며, Kotest와 같은 테스트 라이브러리를 사용하여 효과적으로 적용할 수 있다. TDD를 사용하여 소프트웨어를 개발할 때 Kotest를 활용하면 더욱 효과적으로 테스트를 작성하고 유지할 수 있다.&lt;/p&gt;
-
-      </description>
-      
-      <category>Kotlin</category>
-      
-      <category>Kotest</category>
-      
-    </item>
-    
-    <item>
-      <title>Kotest 프로퍼티 기반 테스트(Property-based Testing)</title>
-      <link>https://www.devkuma.com/docs/kotest/proptest/introduction/</link>
-      <pubDate>Sun, 25 Feb 2024 10:28:00 +0900</pubDate>
-      <author>redfreek2c@gmail.com (kimkc)</author>
-      <guid>https://www.devkuma.com/docs/kotest/proptest/introduction/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;프로퍼티-기반-테스트&#34;&gt;프로퍼티 기반 테스트&lt;/h2&gt;
-&lt;p&gt;Kotest는 독립적으로 사용할 수 있는 여러 하위 프로젝트로 나눠진다. 이러한 하위 프로젝트 중 하나가 프로퍼티 테스트 프레임워크(Property-based Testing)이다. 당연하겠지만, 프로퍼티 테스트 지원의 이점을 누리기 위해 Kotest를 테스트 프레임워크로 사용할 필요는 없다.&lt;/p&gt;
-&lt;h3 id=&#34;프로퍼티-테스트란-무엇인가요&#34;&gt;프로퍼티 테스트란 무엇인가요?&lt;/h3&gt;
-&lt;p&gt;개발자는 일반적으로 예제 기반 테스트를 작성한다. 이는 여러분이 잘 알고 있고 좋아하는 다양한 단위 테스트이다. 몇 가지 입력값과 예상 결과를 제공하면 Kotest 또는 JUnit과 같은 테스트 프레임워크가 실제 결과가 예상에 부합하는지 확인한다.&lt;/p&gt;
-&lt;p&gt;이 접근 방식의 한 가지 문제점은 개발자가 미처 생각하지 못한 에지 케이스 또는 선택한 입력의 커버리지 부족으로 인해 오류를 놓치기 쉽다는 것이다. 대신 프로퍼티 테스트를 사용하면 수백 또는 수천 개의 값이 동일한 테스트에 입력되며, 값은 (일반적으로) 프로퍼티 테스트 프레임워크에서 임의로 생성된다.&lt;/p&gt;
-&lt;p&gt;예를 들어, 좋은 프로퍼티 테스트 프레임워크에는 음수 무한대, 빈 목록, ASCII가 아닌 문자가 포함된 문자열 등과 같은 값이 포함된다. 예제 기반 테스트를 작성할 때 우리가 종종 잊어버리는 것들이다.&lt;/p&gt;
-&lt;p&gt;프로퍼티 테스트는 원래 퀵체크(Quickcheck)와 같은 프레임워크에서 어떤 객체에 대한 프로퍼티, 즉 모든 입력에 대해 참이어야 하는 프로퍼티을 테스트하는 개념으로 고안된 것이다. 다른 말로 하면 불변성이다. 불변성의 예를 들어, 두 개의 문자열 a와 b가 주어진다면, &lt;code&gt;length(a + b)&lt;/code&gt;는 항상 &lt;code&gt;length(a) + length(b)&lt;/code&gt;와 같아야 한다.&lt;/p&gt;
-&lt;p&gt;여기서 &lt;em&gt;프로퍼티 테스트&lt;/em&gt;라는 용어가 유래하였다.&lt;/p&gt;
-&lt;p&gt;그러나 모나드 법칙(monad laws)이나 기본 숫자 함수 같은 것만 테스트하기 위해 프로퍼티 테스트를 사용할 필요는 없다. 다양한 입력 값을 활용할 수 있는 모든 테스트가 좋은 후보이다. 예를 들어, 사용자 이름의 유효성을 검사하는 함수가 있는데 유효한 이메일이 수락되는지 테스트하고 싶을 수 있다. 여기서 프로퍼티 테스트는 유효성 검사 로직을 강화하는 데 도움이 되는 수천 개의 조합을 생성하는 데 유용할 것이다.&lt;/p&gt;
-&lt;h2 id=&#34;시작하기&#34;&gt;시작하기&lt;/h2&gt;
-&lt;p&gt;프로퍼티 테스트 프레임워크는 모든 대상에서 지원됩니다.&lt;/p&gt;
-&lt;h3 id=&#34;jvmgradle&#34;&gt;JVM/Gradle&lt;/h3&gt;
-&lt;p&gt;빌드에 다음 종속성을 추가한다:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;jvmmaven&#34;&gt;JVM/Maven&lt;/h3&gt;
-&lt;p&gt;빌드에 다음 종속성을 추가한다:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;io.kotest&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;kotest-property-jvm&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;${version}&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;multiplatform&#34;&gt;Multiplatform&lt;/h3&gt;
-&lt;p&gt;&lt;code&gt;commonTest&lt;/code&gt; 소스 집합에 다음 종속성을 추가한다:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;kotlin&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;sourceSets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;commonTest&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;by&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;getting&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;또는 특정 대상에 종속성을 추가할 수도 있다. 예를 들어 Javascript 대상에 &lt;code&gt;jsTest&lt;/code&gt; 소스 집합만 사용하는 종속성을 추가할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;kotlin&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;targets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000&#34;&gt;js&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;browser&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;nodejs&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000&#34;&gt;sourceSets&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;jsTest&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;by&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;getting&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;io.kotest:kotest-property:&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$version&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;다음-단계&#34;&gt;다음 단계&lt;/h2&gt;
-&lt;p&gt;테스트에 대한 입력 값을 생성하기 위해 Kotest는 제너레이터(generator)라는 용어를 사용한다. 입력 인수당 하나의 제너레이터가 테스트 함수에 전달되고 테스트는 설정된 반복 횟수 동안 실행된다.&lt;/p&gt;
-&lt;p&gt;자세히 알아보기&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;테스트 함수가 사용되는 방법.&lt;/li&gt;
-&lt;li&gt;다양한 유형의 제너레이터와 그에 대한 연산.&lt;/li&gt;
-&lt;li&gt;사용자 지정 생성기를 작성하는 방법.&lt;/li&gt;
-&lt;li&gt;시드를 포함하여 테스트에 대한 구성을 지정하는 방법.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://kotest.io/docs/proptest/property-based-testing.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Property-based Testing | Kotest&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
       </description>
       
