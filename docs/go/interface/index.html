@@ -17,21 +17,21 @@
 <link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
 <link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
 
-<title>Go 인터페이스(interface) | devkuma</title>
-<meta name="description" content="Go Goto 문(goto)">
-<meta property="og:title" content="Go 인터페이스(interface)" />
-<meta property="og:description" content="Go Goto 문(goto)" />
+<title>Go 포인터(pointer) | devkuma</title>
+<meta name="description" content="Go 포인터(pointer)">
+<meta property="og:title" content="Go 포인터(pointer)" />
+<meta property="og:description" content="Go 포인터(pointer)" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://www.devkuma.com/docs/go/interface/" /><meta property="article:section" content="180_Programming_Etc" />
-<meta property="article:published_time" content="2023-03-26T18:31:00+09:00" />
-<meta property="article:modified_time" content="2023-03-26T18:31:00+09:00" />
-<meta itemprop="name" content="Go 인터페이스(interface)">
-<meta itemprop="description" content="Go Goto 문(goto)"><meta itemprop="datePublished" content="2023-03-26T18:31:00+09:00" />
-<meta itemprop="dateModified" content="2023-03-26T18:31:00+09:00" />
-<meta itemprop="wordCount" content="424">
+<meta property="article:published_time" content="2023-03-26T20:53:00+09:00" />
+<meta property="article:modified_time" content="2023-03-26T20:53:00+09:00" />
+<meta itemprop="name" content="Go 포인터(pointer)">
+<meta itemprop="description" content="Go 포인터(pointer)"><meta itemprop="datePublished" content="2023-03-26T20:53:00+09:00" />
+<meta itemprop="dateModified" content="2023-03-26T20:53:00+09:00" />
+<meta itemprop="wordCount" content="316">
 <meta itemprop="keywords" content="Go," /><meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Go 인터페이스(interface)"/>
-<meta name="twitter:description" content="Go Goto 문(goto)"/>
+<meta name="twitter:title" content="Go 포인터(pointer)"/>
+<meta name="twitter:description" content="Go 포인터(pointer)"/>
 
 
 
@@ -1149,8 +1149,8 @@ if (!doNotTrack) {
             <div class="td-toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#인터페이스interface">인터페이스(interface)</a></li>
-    <li><a href="#interface-형">interface {}형</a></li>
+    <li><a href="#포인터pointer">포인터(pointer)</a></li>
+    <li><a href="#영역-확보new">영역 확보(new)</a></li>
   </ul>
 </nav>
       </div>
@@ -1258,8 +1258,8 @@ if (!doNotTrack) {
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jwt/" data-taxonomy-term="jwt"><span class="taxonomy-label">JWT</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
-        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">50</span></a></li>
-        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">115</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">52</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">117</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">21</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
@@ -1372,13 +1372,13 @@ if (!doNotTrack) {
   <li class="breadcrumb-item">
     <a href="/docs/go/">Go 언어</a></li>
   <li class="breadcrumb-item active" aria-current="page">
-    Go 인터페이스</li>
+    Go 포인터</li>
   </ol>
 </nav>
             
 <div class="td-content">
-	<h1>Go 인터페이스(interface)</h1>
-	<div class="lead">Go Goto 문(goto)</div>
+	<h1>Go 포인터(pointer)</h1>
+	<div class="lead">Go 포인터(pointer)</div>
 	<header class="article-meta">
 		
 		
@@ -1395,148 +1395,103 @@ if (!doNotTrack) {
 		
 	</header>
 	
-	<h2 id="인터페이스interface">인터페이스(interface)</h2>
-<p>인터페이스(interface)는 다형성(Polymorphism)을 구현하기 위한 기능이다.</p>
-<p>아래의 예에서는 구조체 <code>Person</code>도 구조체 <code>Book</code>도 <code>ToString()</code>이라는 메소드와 <code>PrintOut()</code>라는 메소드를 구현하고 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Person</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">name</span> <span style="color:#204a87;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">name</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Book</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">title</span> <span style="color:#204a87;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span> <span style="color:#000">Book</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">title</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span> <span style="color:#000">Book</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;devkuma&#34;</span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a2</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">Book</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">title</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Go 공부합시다.&#34;</span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a2</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">()</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>실행 결과:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>devkuma
-</span></span><span style="display:flex;"><span>Go 공부합시다.
-</span></span></code></pre></div><p><code>ToString()</code> 은 내용이 다르기 때문에 어쩔 수 없지만, <code>PrintOut()</code>는 내용도 동일하므로, 인터페이스를 이용해 하나의 함수에 정리할 수 있다.</p>
-<p><code>Printable</code>라는 인터페이스는 <code>ToString()</code>라고 하는 메소드를 서포트하고 있는 구조체이면, 자동적으로 적용하는 것이 가능해진다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Printable</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span> <span style="color:#000">Printable</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Person</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">name</span> <span style="color:#204a87;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">p</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">p</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">name</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Book</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">title</span> <span style="color:#204a87;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">b</span> <span style="color:#000">Book</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#204a87;font-weight:bold">string</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">return</span> <span style="color:#000">b</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">title</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;devkuma&#34;</span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">a2</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">Book</span><span style="color:#000;font-weight:bold">{</span><span style="color:#000">title</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;Go 공부합시다.&#34;</span><span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">PrintOut</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a2</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><h2 id="interface-형">interface {}형</h2>
-<p>go 는 제네릭이 없다. 대신 interface{} 를 활용하여 비슷하게 구현 할 수 있다.</p>
-<p>함수가 없는 인터페이스 <code>interface {}</code>는 <code>any</code>형과 같이 사용할 수 있다.</p>
-<p>다음 함수는 모든 유형의 인수를 받을 수 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">funcA</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{})</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#8f5902;font-style:italic">// ...
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p><code>.(유형)</code>은 <code>interface{}</code> 형의 변수를 다른 형태로 변환한다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">funcA</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{})</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;%d\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.(</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">))</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>형식 변환의 두 번째 반환 값은 형식 변환 가능 여부를 반환한다.
-객체가 interface { &hellip; } 로 정의한 인터페이스를 구현하고 있을지 어떨지를 조사할 수가 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">PrintOut</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{})</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>     <span style="color:#8f5902;font-style:italic">// a를 Printable 인터페이스를 구현 한 객체로 변환해 본다.
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>    <span style="color:#000">q</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">ok</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.(</span><span style="color:#000">Printable</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">if</span> <span style="color:#000">ok</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#8f5902;font-style:italic">// 변환 할 수 있으면 인터페이스를 호출한다.
-</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">q</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">ToString</span><span style="color:#000;font-weight:bold">())</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span> <span style="color:#204a87;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Not printable.&#34;</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p><code>switch 변수.(type) { ... }</code>을 사용하여 유형을 결정할 수도 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">funcA</span> <span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span> <span style="color:#204a87;font-weight:bold">interface</span> <span style="color:#000;font-weight:bold">{})</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">switch</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">.(</span><span style="color:#204a87;font-weight:bold">type</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">case</span> <span style="color:#204a87;font-weight:bold">bool</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;%t\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">case</span> <span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;%d\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">case</span> <span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">:</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Printf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;%s\n&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p><code>interface {}</code>는 <code>any</code>와 같이 사용할 수 있다는 특징을 살려, 임의의 형태의 값을 가지는 맵을 정의할 수도 있다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000">p1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;name&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;devkuma&#34;</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#4e9a06">&#34;age&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#0000cf;font-weight:bold">23</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>아래와 같이 하면 계층 구조를 가지는 Python의 <code>dict</code>와 같이 정의할 수 있다.</p>
+	<h2 id="포인터pointer">포인터(pointer)</h2>
+<p>포인터는 변수가 저장된 메모리의 주소이다.
+C 언어와 마찬가지로 객체의 포인터를 참조하려면 <code>&amp;</code>를, 포인터의 내용을 참조하려면 <code>*</code>를 사용한다.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">any</span> <span style="color:#204a87;font-weight:bold">interface</span><span style="color:#000;font-weight:bold">{}</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">dict</span> <span style="color:#204a87;font-weight:bold">map</span><span style="color:#000;font-weight:bold">[</span><span style="color:#204a87;font-weight:bold">string</span><span style="color:#000;font-weight:bold">]</span><span style="color:#000">any</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">p1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">dict</span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#4e9a06">&#34;name&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;devkuma&#34;</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#4e9a06">&#34;age&#34;</span><span style="color:#000;font-weight:bold">:</span>  <span style="color:#0000cf;font-weight:bold">23</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#4e9a06">&#34;address&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000">dict</span><span style="color:#000;font-weight:bold">{</span>
-</span></span><span style="display:flex;"><span>			<span style="color:#4e9a06">&#34;zip&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;01234&#34;</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>			<span style="color:#4e9a06">&#34;tel&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#4e9a06">&#34;012-3456-7890&#34;</span><span style="color:#000;font-weight:bold">,</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">},</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">name</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">p1</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;name&#34;</span><span style="color:#000;font-weight:bold">]</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">tel</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">p1</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;address&#34;</span><span style="color:#000;font-weight:bold">].(</span><span style="color:#000">dict</span><span style="color:#000;font-weight:bold">)[</span><span style="color:#4e9a06">&#34;tel&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#8f5902;font-style:italic">// any를 dict로 변환한 후 참조
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">a1</span> <span style="color:#204a87;font-weight:bold">int</span>  <span style="color:#8f5902;font-style:italic">// int 타입 변수 a1 정의
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">p1</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#204a87;font-weight:bold">int</span> <span style="color:#8f5902;font-style:italic">// int에 대한 포인터 변수 p1 정의
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">)</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">tel</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">p1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">a1</span>  <span style="color:#8f5902;font-style:italic">// p1에 a1의 포인터를 설정
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">p1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">123</span> <span style="color:#8f5902;font-style:italic">// 포인터의 내용(즉, a1)에 123을 대입.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p1</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">p1</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div><p>실행 결과:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>123
+</span></span><span style="display:flex;"><span>0xc00001c030
+</span></span><span style="display:flex;"><span>123
+</span></span></code></pre></div><p>변수의 값을 전달하는 것을 &ldquo;값 전달한다&quot;고 하고, 변수의 포인터를 전달하는 것을 &ldquo;참조 전달한다&quot;고 한다.<br>
+값을 전달하면 값의 복사본만 전달하므로 원래 변수를 변경할 수는 없지만, 포인터를 전달하면 함수에서 변수의 값을 변경할 수 있다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">a1</span> <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">123</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">var</span> <span style="color:#000">a2</span> <span style="color:#204a87;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">123</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">fn</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">a2</span><span style="color:#000;font-weight:bold">)</span>         <span style="color:#8f5902;font-style:italic">// a1은 값을 전달하고, a2는 참조 전달한다.
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">a2</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">fn</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">b1</span> <span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">b2</span> <span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">b1</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">456</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">b2</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#0000cf;font-weight:bold">456</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>실행 결과:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>123 456
+</span></span></code></pre></div><p>연산자 <code>.</code>는 구조체의 멤버 변수나 포인터가 가리키는 구조체의 멤버 변에서 액세스할 수 있습니다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Person</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">name</span> <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">age</span>  <span style="color:#204a87;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">a1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000">Person</span><span style="color:#000;font-weight:bold">{</span><span style="color:#4e9a06">&#34;devkuma&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#0000cf;font-weight:bold">23</span><span style="color:#000;font-weight:bold">}</span> <span style="color:#8f5902;font-style:italic">// 구조체 Person의 객체 a1을 확보하고 초기화
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">p1</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#ce5c00;font-weight:bold">&amp;</span><span style="color:#000">a1</span>                   <span style="color:#8f5902;font-style:italic">// 구조체 a1에 대한 포인터를 p1에 저장
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">)</span>        <span style="color:#8f5902;font-style:italic">// 멤버 변수에는 왼쪽과 같이 액세스
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">((</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">p1</span><span style="color:#000;font-weight:bold">).</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">)</span>     <span style="color:#8f5902;font-style:italic">// 포인터 p의 내용(structure)의 멤버 변수에는 왼쪽과 같이 액세스
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>	<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">p1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">)</span>        <span style="color:#8f5902;font-style:italic">// 다만, Go 언어에서는 이를 왼쪽 같이도 기술할 수 있다
+</span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>실행 결과:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>devkuma
-</span></span><span style="display:flex;"><span>012-3456-7890
-</span></span></code></pre></div><p><code>p1[&quot;address&quot;][&quot;tel&quot;]</code>와 같이 참조할 수 없는 것은 아쉽다.</p>
-
+</span></span><span style="display:flex;"><span>devkuma
+</span></span><span style="display:flex;"><span>devkuma
+</span></span></code></pre></div><h2 id="영역-확보new">영역 확보(new)</h2>
+<p><code>new()</code>를 사용해 영역을 동적으로 확보하여, 그 영역에의 포인터를 얻을 수가 있다.
+확보된 영역은 참조되지 않게 된 후에는 가비지 콜렉션에 의해 자동적으로 해제된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#4e9a06">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">type</span> <span style="color:#000">Book</span> <span style="color:#204a87;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">title</span> <span style="color:#204a87;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">func</span> <span style="color:#000">main</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000">bookList</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">[]</span><span style="color:#ce5c00;font-weight:bold">*</span><span style="color:#000">Book</span><span style="color:#000;font-weight:bold">{}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">i</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#0000cf;font-weight:bold">0</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">i</span> <span style="color:#000;font-weight:bold">&lt;</span> <span style="color:#0000cf;font-weight:bold">10</span><span style="color:#000;font-weight:bold">;</span> <span style="color:#000">i</span><span style="color:#ce5c00;font-weight:bold">++</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">book</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87">new</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">Book</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">book</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">title</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Sprintf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Title#%d&#34;</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">i</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">bookList</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#204a87">append</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">bookList</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">book</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#204a87;font-weight:bold">for</span> <span style="color:#000">_</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">book</span> <span style="color:#ce5c00;font-weight:bold">:=</span> <span style="color:#204a87;font-weight:bold">range</span> <span style="color:#000">bookList</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000">fmt</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">book</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">title</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>실행 결과:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>Title#0
+</span></span><span style="display:flex;"><span>Title#1
+</span></span><span style="display:flex;"><span>Title#2
+</span></span><span style="display:flex;"><span>Title#3
+</span></span><span style="display:flex;"><span>Title#4
+</span></span><span style="display:flex;"><span>Title#5
+</span></span><span style="display:flex;"><span>Title#6
+</span></span><span style="display:flex;"><span>Title#7
+</span></span><span style="display:flex;"><span>Title#8
+</span></span><span style="display:flex;"><span>Title#9
+</span></span></code></pre></div>
 	<br>
 
 <br>
