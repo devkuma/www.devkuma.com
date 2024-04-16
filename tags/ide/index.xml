@@ -436,5 +436,677 @@
       
     </item>
     
+    <item>
+      <title>Makefile</title>
+      <link>https://www.devkuma.com/docs/makefile/</link>
+      <pubDate>Sat, 02 Dec 2023 22:48:00 +0900</pubDate>
+      <author>redfreek2c@gmail.com (kimkc)</author>
+      <guid>https://www.devkuma.com/docs/makefile/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;개요&#34;&gt;개요&lt;/h2&gt;
+&lt;p&gt;make는 개발자가 작성한 소스 코드에서 최종 실행파일을 얻기 위해 컴파일, 링크 등 일련의 단계를 연속적으로 자동으로 수행해주는 &amp;lsquo;빌드 도구&amp;rsquo;의 하나로, 오래전부터 리눅스 등 유닉스 계열 OS에서 표준으로 사용되고 있다.&lt;/p&gt;
+&lt;p&gt;make에서는 개발자가 수행하고자 하는 일련의 절차를 Makefile에 기술하고, make 명령어에 이를 주면 내용을 해석하여 명령어 실행 등을 연속적으로 자동으로 수행하며, make 명령어 한 번 실행으로 실행파일 생성이 완료된다.&lt;/p&gt;
+&lt;h2 id=&#34;makefile이란&#34;&gt;Makefile이란?&lt;/h2&gt;
+&lt;p&gt;Makefile에는 컴파일러, 소스 파일, 생성물, 빌드 순서, 빌드 순서, 종속성 등을 기술하고, &lt;code&gt;make&lt;/code&gt; 명령을 실행만 하면 빌드할 수 있다. 그 내용을 보면 프로그램 빌드 방법을 알 수 있다. 또한 make는 업데이트가 필요한 파일을 자동으로 판단해 컴파일 횟수를 최소화해 개발 시간을 단축할 수 있다.&lt;/p&gt;
+&lt;p&gt;유명한 GNU에서 제공하는 GNU Make의 Home Page에 따르면 Make는 다음과 같은 Tool이라고 한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GNU Make is a tool which controls the generation of executables and other non-source files of a program from the program&amp;rsquo;s source files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이에 따르면 다음과 같은 장점이 있는 것 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;앤드유저는 그 방법을 자세히 몰라도 패키지를 빌드하고 설치할 수 있다.&lt;/li&gt;
+&lt;li&gt;변경된 소스 파일을 기반으로 업데이트가 필요한 파일을 자동으로 파악하고, 적절한 순서를 자동으로 결정한다.&lt;/li&gt;
+&lt;li&gt;Make는 C 언어뿐만 아니라 다른 컴파일 언어도 지원한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.gnu.org/software/make/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Make - GNU Project - Free Software Foundation&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;makefile-기본-작성법&#34;&gt;Makefile 기본 작성법&lt;/h2&gt;
+&lt;p&gt;많은 라이브러리를 사용하는 C/ C++을 빌드할 때 make를 사용하면 유용하다. make를 사용하려면 대상 Makefile이 필요한데, 이번에는 그 작성법을 소개한다.&lt;/p&gt;
+&lt;p&gt;Makefile의 기본 구문은 두 줄로 한 단위이며, 윗줄에 &amp;lsquo;Target: SourceFile&amp;rsquo;, 아랫줄에 &amp;lsquo;실행할 명령어(맨 앞에 탭 문자)&amp;lsquo;를 각각 기술한다. 줄 바꿈을 &amp;lsquo;;&amp;rsquo;(세미콜론)으로 대체하여 한 줄로 묶을 수도 있다. &amp;lsquo;변수명=값&amp;rsquo; 형태로 변수를 정의할 수도 있으며, 파일명 등의 지정에 변수를 사용할 수 있다.&lt;/p&gt;
+&lt;p&gt;의존 관계를 기록하는 부분이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Target : [Prerequisites]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	Recipe
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Target
+&lt;ul&gt;
+&lt;li&gt;프로그램에 의해 생성되는 파일의 이름이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Prerequisites
+&lt;ul&gt;
+&lt;li&gt;전제 조건&lt;/li&gt;
+&lt;li&gt;타겟을 생성하기 위한 입력으로 사용되는 파일이다.&lt;/li&gt;
+&lt;li&gt;여러 파일도 가능하고, 생략할 수도 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Recipe
+&lt;ul&gt;
+&lt;li&gt;recipe가 성립하기 위해서는 prerequisites가 필요하다.&lt;/li&gt;
+&lt;li&gt;make가 실행할 액션이다.&lt;/li&gt;
+&lt;li&gt;여러 줄 가능하다. (행을 분할할 경우 &lt;code&gt;\&lt;/code&gt;를 사용한다)&lt;/li&gt;
+&lt;li&gt;열 앞에는 Tab 입력은 필수이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;빌드할 때 사용하는 명령어를 다음과 같은 규칙에 따라 작성한다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Target: SourceFile
+	Command
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;간단한 예로 들면 아래와 같이 작성할 수 있다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hello: hello.c
+	gcc -o hello hello.c
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;그러고, 생성된 파일을 삭제하거나 복사하는 명령도 추가로 작성할 수도 있다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;clean:
+	rm -f *~ hello 
+install: hello 
+	install -s hello.exe Path
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;make&lt;/code&gt;를 실행할 때에 아무런 인자를 지정하지 않으면 맨 위에 있는 Target이 실행된다.
+위의 &lt;code&gt;clean&lt;/code&gt;이나 &lt;code&gt;install&lt;/code&gt;을 실행하고 싶다면 아래와 같이 인수를 지정한다.
+``shell
+make clean
+make install&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;
+Makefile이 아닌 다른 파일을 Makefile로 지정하고 싶다면, `-f` 옵션으로 다음과 같이 실행할 수 있다.
+``shell
+make -f sample.mk
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;또한, 요소를 변수로 취급할 수 있다. 간단한 예는 다음과 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;CXX&lt;/span&gt;            &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; g++
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;OPTIMIZE&lt;/span&gt;       &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; -O3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;CFLAGS&lt;/span&gt;         &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; -IC:/Users/include &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&lt;/span&gt;	-IC:/Python/include 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;DEST&lt;/span&gt;           &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; C:/Users/Local
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;LDFLAGS&lt;/span&gt;        &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; -LC:/Users/Local/libs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;LIBS&lt;/span&gt;           &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; -lpython
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;OBJS&lt;/span&gt;           &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; hello
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all: clean &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;PROGRAM&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; install
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;PROGRAM&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;: &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;CXX&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; -o &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;.cpp &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;CFLAGS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;LDFLAGS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;LIBS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;clean: rm -f *~ &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;install: &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;PROGRAM&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	install -s &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;.exe &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;DEST&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;makefile-변수&#34;&gt;Makefile 변수&lt;/h2&gt;
+&lt;p&gt;Makefile의 변수는 두 가지가 있다. 암묵적 변수와 새로 정의되는 변수이다.
+암묵적 변수는 암묵적 규칙에서 사용되는 특정 사전 정의된 변수를 말한다.&lt;/p&gt;
+&lt;h3 id=&#34;암묵적-규칙이란&#34;&gt;암묵적 규칙이란?&lt;/h3&gt;
+&lt;p&gt;다양화되는 규칙은 굳이 설명하지 않아도 미리 암묵적인 정의된 변수가 있다.&lt;/p&gt;
+&lt;p&gt;C 소스 파일의 컴파일에 사용되는 레시피는 실제로 &lt;code&gt;$（CC） -c $（CFLAGS） $（CPPFLAGS）&lt;/code&gt;라는 코드가 실행되고 있다.
+&lt;code&gt;CC&lt;/code&gt;, &lt;code&gt;CFLAGS&lt;/code&gt;, &lt;code&gt;CPPFLAGS&lt;/code&gt;는 미리 변수로 정의되어 있으며, 이 내용을 덮어써서 컴파일 레시피를 다시 작성할 수도 있다.&lt;/p&gt;
+&lt;h3 id=&#34;암묵적-변수-목록&#34;&gt;암묵적 변수 목록&lt;/h3&gt;
+&lt;p&gt;주요한 변수 항목은 아래와 같다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수 이름&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;th&gt;default&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;AR&lt;/td&gt;
+&lt;td&gt;아카이브 메인테넌스 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ar&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;AS&lt;/td&gt;
+&lt;td&gt;어셈블리 실행 프로그램&lt;/td&gt;
+&lt;td&gt;as&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CC&lt;/td&gt;
+&lt;td&gt;C 프로그램 컴파일 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;cc&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CXX&lt;/td&gt;
+&lt;td&gt;C++ 프로그램 컴파일 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;g++&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CO&lt;/td&gt;
+&lt;td&gt;RCS의 배포 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;co&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CPP&lt;/td&gt;
+&lt;td&gt;C 전처리 프로그램, 표준 출력에 결과&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;$(CC) -E&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;FC&lt;/td&gt;
+&lt;td&gt;Fortranr과 Ratfor 프로그램을 위한 컴파일 또는 전처리기 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;f77&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GET&lt;/td&gt;
+&lt;td&gt;SCCS의 배포 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;get&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;LEX&lt;/td&gt;
+&lt;td&gt;Lex 문법을 C 또는 Ratfor로 변환하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;lex&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PC&lt;/td&gt;
+&lt;td&gt;Pascal 프로그램 컴파일 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;pc&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YACC&lt;/td&gt;
+&lt;td&gt;Yacc 문법을 C 또는 Ratfor로 변환하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;yacc&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YACCR&lt;/td&gt;
+&lt;td&gt;Yacc 문법을 Ratfor로 변환하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;yacc -r&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MAKEINFO&lt;/td&gt;
+&lt;td&gt;Texinfo 소스 파일을 Info 파일로 변환하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;makeinfo&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TEX&lt;/td&gt;
+&lt;td&gt;TeX 소스에서 TeX DVI 파일을 만드는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;tex&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TEXI2DVI&lt;/td&gt;
+&lt;td&gt;Texinfo 소스에서 TeX DVI 파일을 만드는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;texi2dvi&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;WEAVE&lt;/td&gt;
+&lt;td&gt;웹을 TeX로 번역하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;weave&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CWEAVE&lt;/td&gt;
+&lt;td&gt;C Web을 TeX로 번역하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;cweave&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TANGLE&lt;/td&gt;
+&lt;td&gt;웹을 파스칼로 번역하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;tangle&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CTANGLE&lt;/td&gt;
+&lt;td&gt;C 웹을 C로 번역하는 프로그램&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ctangle&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RM&lt;/td&gt;
+&lt;td&gt;파일을 삭제하는 명령&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;rm -f&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ARFLAGS&lt;/td&gt;
+&lt;td&gt;아카이브 유지 보수 프로그램에 제공하는 플래그&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;rv&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;ASFLAGS&lt;/td&gt;
+&lt;td&gt;어셈블러에 주는 플래그(.s 또는 .S 파일에 대해 명시적으로 호출되는 경우)&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CFLAGS&lt;/td&gt;
+&lt;td&gt;C 컴파일러에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CXXFLAGS&lt;/td&gt;
+&lt;td&gt;C++ 컴파일러에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;COFLAGS&lt;/td&gt;
+&lt;td&gt;RCS co 프로그램에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CPPFLAGS&lt;/td&gt;
+&lt;td&gt;C 프리프로세서 및 프로그램에 제공하는 플래그(C 및 Fortran 컴파일러)&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;FFLAG&lt;/td&gt;
+&lt;td&gt;Fortran 컴파일러에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;GFLAG&lt;/td&gt;
+&lt;td&gt;SCCS get 프로그램에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;LDFLAGS&lt;/td&gt;
+&lt;td&gt;링커 ld를 호출할 때 컴파일러에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;LFLAGS&lt;/td&gt;
+&lt;td&gt;Lex에게 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PFLAGS&lt;/td&gt;
+&lt;td&gt;Pascal 컴파일러에 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RFLAGS&lt;/td&gt;
+&lt;td&gt;Ratfor 프로그램에 대한 Fortran 컴파일러에 제공하는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YFLAGS&lt;/td&gt;
+&lt;td&gt;Yacc에게 주는 플래그&lt;/td&gt;
+&lt;td&gt;없음&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.gnu.org/software/make/manual/make.html#Implicit-Variables&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.gnu.org/software/make/manual/make.html#Implicit-Variables&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;변수-정의&#34;&gt;변수 정의&lt;/h3&gt;
+&lt;p&gt;Makefile 내에서 변수를 정의하는 방법에는 두 가지가 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;기호&lt;/th&gt;
+&lt;th&gt;상세&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;=&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;재귀적으로 확장되는 변수&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;:=&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;단순하게 전개되는 변수&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;bar&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;bar&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;ugh&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;ugh&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; Huh?
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;foo&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; Hub?&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;변수-호출&#34;&gt;변수 호출&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;$(name)&lt;/code&gt;, 또는 &lt;code&gt;${name}&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;objects&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; program.o foo.o utils.o &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; program.o foo.o utils.o&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;program : &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;objects&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        cc -o program &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;objects&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;objects&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; : defs.h
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;규칙-내에서-작동하는-자동-변수&#34;&gt;규칙 내에서 작동하는 자동 변수&lt;/h3&gt;
+&lt;p&gt;자동변수는 타겟과 전제조건을 호출할 때 사용할 수 있는 표기법이다. 약어로 사용할 수 있을 뿐만 아니라, 조건에 따라 필요한 것만 참조하는 기능을 가진 것도 있다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;자동 변수&lt;/th&gt;
+&lt;th&gt;기능&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$@&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상 이름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$&amp;lt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;종속성의 첫 번째 이름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$^&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 모든 종속성 이름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$?&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 타임스탬프가 새로운 종속성의 이름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$+&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 모든 종속성 이름&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$*&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 패턴 매칭과 일치하는 부분&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;heading&#34;&gt;&lt;code&gt;$@&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;현재 타켓 이름.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$@&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;규칙의 타겟 이름이다. &lt;code&gt;$(@)&lt;/code&gt;로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;(@D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;규칙 타겟의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;(@F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;규칙 타겟의 파일 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;aaa/bbb/foo:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$@&lt;/span&gt;     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; aaa/bbb/foo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;@D&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; aaa/bbb&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;@F&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; foo&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;heading-1&#34;&gt;&lt;code&gt;$&amp;lt;&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;전제 조건의 첫 번째 이름이다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$&amp;lt;&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;전제 조건의 첫 번째 이름이다. &lt;code&gt;$(&amp;lt;)&lt;/code&gt;로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(&amp;lt;D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;전제 조건의 첫 번째 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(&amp;lt;F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;전제 조건의 첫 번째 파일 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;output/foo: input/bar input/baz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; $&amp;lt;     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input/bar&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;&amp;lt;D&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;&amp;lt;F&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; bar&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;heading-2&#34;&gt;&lt;code&gt;$^&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;대상의 모든 전제 조건의 이름이다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$^&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 전제 조건의 이름이다. &lt;code&gt;$(^)&lt;/code&gt;로 써도 같은 의미를 갖는다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(^D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상 전제 조건의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(^F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상 전제 조건의 파일 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;output/foo: input/bar input/baz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; $^     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input/bar input/baz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;^D&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input input&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;^F&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; bar baz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;heading-3&#34;&gt;&lt;code&gt;$?&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;대상보다 타임스탬프가 새로운 전제 조건의 이름이다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$?&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 이름이다. &lt;code&gt;$(+)&lt;/code&gt;로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;(?D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;(?F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 파일 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;output/foo: input/bar input/baz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$?&lt;/span&gt;     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input/bar&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;?D&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;?F&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; bar&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;heading-4&#34;&gt;&lt;code&gt;$?&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;타겟보다 타임스탬프가 새로운 전제 조건의 이름이다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$?&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 이름이다. (?) 로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(?D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(?F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상보다 새로운 모든 전제 조건의 파일 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;output/foo: input/bar input/baz
+	echo $?     # =&amp;gt; input/bar
+	echo $(?D)  # =&amp;gt; input
+	echo $(?F)  # =&amp;gt; bar
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;heading-5&#34;&gt;&lt;code&gt;$+&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;대상의 모든 전제 조건의 이름(중복이 있어도 생략하지 않음). 일반적으로 $^가 더 많이 사용된다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$+&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;중복이 포함된 대상의 전제 조건의 이름이다. &lt;code&gt;$(+)&lt;/code&gt;로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(+D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;중복이 포함된 대상 전제 조건의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(+F&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;) 중복이 포함된 대상 전제조건의 파일명.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;output/foo: input/baz input/baz input/baz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; $+     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input/baz input/baz input/baz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;+D&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; input input input&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;+F&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; baz baz baz&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;heading-6&#34;&gt;&lt;code&gt;$*&lt;/code&gt;&lt;/h4&gt;
+&lt;p&gt;대상의 패턴과 일치하는 부분이다. 관련 파일을 생성할 때 등에 유용하다.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;변수&lt;/th&gt;
+&lt;th&gt;설명&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$*&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 패턴과 일치하는 부분이다. &lt;code&gt;$(*)&lt;/code&gt;로 써도 같은 의미를 가진다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(*D)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 패턴과 일치하는 부분의 디렉토리 이름.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;$(*F)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;대상의 패턴과 일치하는 부분의 파일명.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;makefile의-함수&#34;&gt;Makefile의 함수&lt;/h2&gt;
+&lt;p&gt;Make에는 Makefile 내에서 문자열 처리와 조건부 분기를 위한 함수가 있다. 주요 함수는 다음과 같다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.gnu.org/software/make/manual/html_node/Functions.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Functions (GNU make)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;텍스트-변환을-위한-함수&#34;&gt;텍스트 변환을 위한 함수&lt;/h3&gt;
+&lt;p&gt;함수는 makefile에서 변수를 정의할 때, 텍스트 조작을 하기 위해 사용된다. 여기서는 주요 함수를 소개한다.&lt;/p&gt;
+&lt;p&gt;함수는 다음과 같은 구문으로 호출된다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$(function arguments)
+${function arguments}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;참고: &lt;a href=&#34;https://www.gnu.org/software/make/manual/make.html#Text-Functions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.gnu.org/software/make/manual/make.html#Text-Functions&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;shell-함수&#34;&gt;shell 함수&lt;/h4&gt;
+&lt;p&gt;쉘을 실행합니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;files :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;shell &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; *.c&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;INCLUDE :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;shell find &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;INCDIRS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; -type d&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;SRCDIR&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; ./srcs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;SRCS :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;shell find &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;SRCDIR&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; -name *.c&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;files&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; hoge.c foo.c&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;INCLUDE&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; include&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;SRCDIR&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; ./srcs&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;SRCS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; hoge.c foo.c&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;RESULT&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;shell seq &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; 10&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;RESULT&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; 1 2 3 4 5 6 7 8 9 10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;addprefix-함수&#34;&gt;addprefix 함수&lt;/h4&gt;
+&lt;p&gt;앞에 문자열을 추가합니다. -l 옵션 등을 사용할 때 유용할 것 같다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;$(addprefix prefix,names...)&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;FILES :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; foo bar
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;addprefix src/,&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;FILES&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; src/foo src/bar&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;dir-함수&#34;&gt;dir 함수&lt;/h4&gt;
+&lt;p&gt;파일 이름에 대한 함수. 디렉토리만 추출한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;dir names...&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;names의 파일명에서 디렉토리 부분을 추출한다.
+파일명의 디렉토리 부분은 마지막 슬래시 이전의 모든 부분이다.
+슬래시를 포함하지 않으면 디렉토리 부분은 문자열 &lt;code&gt;./&lt;/code&gt;가 된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;FILES :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; src/hoge.c src/hoge.h index.html
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;dir &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;FILES&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; src/ src/ ./&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;notdir&#34;&gt;notdir&lt;/h4&gt;
+&lt;p&gt;파일명 검색하는 함수&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;FILES :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; ./dir/hoge.txt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;notdir &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;FILES&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; hoge.txt&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;대체-참조&#34;&gt;대체 참조&lt;/h4&gt;
+&lt;p&gt;바꾸기 참조는 변수의 값을 지정된 변경 사항으로 대체한다.
+이는 &lt;code&gt;$(var: 대체전 = 대체후)&lt;/code&gt; (또는 &lt;code&gt;${var: 대체전 = 대체후}&lt;/code&gt;)의 형태로 변수 var의 값을 가져와 단어 끝에 있는 모든 a를 b로 대체하고 결과 문자열을 대체한다.&lt;/p&gt;
+&lt;p&gt;그러고, 단어 내 임의의 수의 문자와 일치하는 와일드카드 역할을 한다.
+대체 참조는 &lt;code&gt;patsubst&lt;/code&gt; 함수의 약어이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;foo :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; a.o b.o c.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bar :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;foo:%.o&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;%.c&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;bar&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; a.c b.c c.c&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;patsubst&lt;/code&gt; 함수를 지정한 경우&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;patsubst pattern&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;대체전&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;, replacement&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;대체후&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, text&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;대상&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;foo :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; a.o b.o c.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bar :&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;patsubst %.o,%.c,&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;foo&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;all:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;bar&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; a.c b.c c.c&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;realpath&#34;&gt;realpath&lt;/h4&gt;
+&lt;p&gt;존재하는 전체 경로 가져오기&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;realpath ./dir/hoge.txt&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;//C:users/hoge/bin/hoge.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;suffix&#34;&gt;suffix&lt;/h4&gt;
+&lt;p&gt;확장자 가져오기&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;suffix ./dir/hoge.txt&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;//.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;wildcard&#34;&gt;wildcard&lt;/h4&gt;
+&lt;p&gt;와일드카드를 사용하여 존재하는 파일명 검색&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;suffix ./dir/*.txt&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;//hoge.txt hogehoge.txt
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;조건부-분기를-위한-함수&#34;&gt;조건부 분기를 위한 함수&lt;/h3&gt;
+&lt;h4 id=&#34;if&#34;&gt;if&lt;/h4&gt;
+&lt;p&gt;조건부 분기&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;#34;$(if $(VAR1),$(exist),$(none))&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;ifeq&#34;&gt;ifeq&lt;/h4&gt;
+&lt;p&gt;조건부 분기별 작성법&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ifeq ($(CC),gcc)
+  libs=$(libs_for_gcc)
+else
+  libs=$(normal_libs)
+endif
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;makefile-디버깅-방법&#34;&gt;Makefile 디버깅 방법&lt;/h2&gt;
+&lt;p&gt;GNU Make의 &lt;code&gt;-n&lt;/code&gt; 옵션은 Makefile의 명령을 실행하지 않고 출력한다.&lt;/p&gt;
+&lt;p&gt;Makefile이 아래와 같이 정의되어 있을 때,&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;CC&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; gcc
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;OBJ&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; hoge.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;CFLAGS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; -c &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;OBJ&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;처리-출력&#34;&gt;처리 출력&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;make&lt;/code&gt; 명령어 &lt;code&gt;-n&lt;/code&gt; 옵션을 아래와 같이 넣어 실행하면, make가 어떤 처리를 하는지 출력할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ make -n
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcc -c hoge.c -o hoge
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;어떻게 작성되는 확인 할때, 유용하게 사용할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;warning-함수&#34;&gt;warning 함수&lt;/h3&gt;
+&lt;p&gt;make 실행 시 내용을 출력해 준다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;warning &lt;span style=&#34;color:#000&#34;&gt;MAKE&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;MAKE&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt;  &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; Makefile:18: MAKE = /Library/Developer/CommandLineTools/usr/bin/make&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;warning &lt;span style=&#34;color:#000&#34;&gt;CC&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;CC&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; Makefile:19: CC = gcc&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;warning &lt;span style=&#34;color:#000&#34;&gt;CFLAGS&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;CFLAGS&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# =&amp;gt; Makefile:20: CFLAGS =  -Wall -Wextra -Werror&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;g와-make와-cmake의-install-방법&#34;&gt;g++와 make와 cmake의 install 방법&lt;/h2&gt;
+&lt;h3 id=&#34;windows에서-설치&#34;&gt;Windows에서 설치&lt;/h3&gt;
+&lt;p&gt;Windows OS에서 &lt;strong&gt;g++/gcc&lt;/strong&gt;는 &lt;strong&gt;MinGW&lt;/strong&gt;를, &lt;strong&gt;make&lt;/strong&gt;는 &lt;strong&gt;GnuWin&lt;/strong&gt;을, &lt;strong&gt;cmake&lt;/strong&gt;는 &lt;strong&gt;cmake.zipinstall&lt;/strong&gt;을 통해 사용할 수 있다.&lt;/p&gt;
+&lt;h4 id=&#34;gui로-g-install&#34;&gt;GUI로 g++ install&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://sourceforge.net/projects/mingw-w64/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MinGW-w64 - for 32 and 64 bit Windows download | SourceForge.net&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 installer를 Download하여 설치한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;gui로-make-install&#34;&gt;GUI로 make install&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://gnuwin32.sourceforge.net/packages/make.htm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Make for Windows&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 installer를 Download하여 설치한다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;C:Program Files (x86)\GnuWin32\bin&lt;/code&gt;으로 경로를 지정한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;gui로-cmake를-install&#34;&gt;GUI로 cmake를 install&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://cmake.org/download/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Download CMake&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 installer를 Download하여 설치한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;cui에서-g--make를-install한다&#34;&gt;CUI에서 g++ &amp;amp; make를 install한다.&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;choco install mingw
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;choco install make
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;환경-변수-설정&#34;&gt;환경 변수 설정&lt;/h4&gt;
+&lt;p&gt;아래의 path 등에 설치되므로 path를 통해 설치한다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;C:\Program Files (x86)\MinGW\bin
+C:\Program Files (x86)\GnuWin32\bin
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;리눅스에서-설치&#34;&gt;리눅스에서 설치&lt;/h3&gt;
+&lt;p&gt;일괄적으로 install&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;sudo apt install build-essential
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;개별적으로 install&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;sudo apt install g++
+sudo apt install make
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;Makefile 작성 방법에 대해 정리해 보았다. 비망록으로 업데이트해 나갈 것이다.&lt;/p&gt;
+
+      </description>
+      
+      <category>IDE</category>
+      
+      <category>VSCode</category>
+      
+    </item>
+    
   </channel>
 </rss>
