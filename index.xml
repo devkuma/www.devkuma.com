@@ -22,6 +22,199 @@
     
     
     <item>
+      <title>MCP Server</title>
+      <link>https://www.devkuma.com/docs/ai/mcp-server/</link>
+      <pubDate>Sat, 30 Aug 2025 14:55:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/mcp-server/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;mcp-서버란&#34;&gt;MCP 서버란?&lt;/h2&gt;
+&lt;p&gt;MCP 서버는 &lt;strong&gt;AI 모델이 외부 리소스(도구, 데이터, API 등)에 접근할 수 있도록 연결해주는 표준화된 인터페이스를 제공하는 역할&lt;/strong&gt;을 한다.&lt;br&gt;
+쉽게 말하면, &lt;strong&gt;AI가 쓸 수 있는 도구 모음집을 제공하는 서버&lt;/strong&gt;라고 할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;구조&#34;&gt;구조&lt;/h2&gt;
+&lt;p&gt;MCP는 크게 &lt;strong&gt;클라이언트(Client)&lt;/strong&gt; 와 &lt;strong&gt;서버(Server)&lt;/strong&gt; 로 나뉘는데:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM 환경에 붙어 있는 애플리케이션 (예: IDE, Chat UI, Notebook 등)&lt;/li&gt;
+&lt;li&gt;사용자의 프롬프트를 받아 모델을 실행시키고, 필요하면 MCP 서버에 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 서버&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 &lt;strong&gt;리소스/도구/함수&lt;/strong&gt;를 관리하고 제공&lt;/li&gt;
+&lt;li&gt;표준화된 프로토콜(JSON-RPC 기반)을 통해 클라이언트와 통신&lt;/li&gt;
+&lt;li&gt;예: DB 조회 서버, 파일 시스템 서버, API 호출 서버&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/images/mcp-client-server.png&#34; alt=&#34;MCP Client Server&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;서버가-제공하는-것&#34;&gt;서버가 제공하는 것&lt;/h2&gt;
+&lt;p&gt;MCP 서버는 크게 네 가지 기능을 제공한다:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;리소스(Resources)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데이터베이스, 파일, 문서, API 응답 등&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;resource://db/customers&lt;/code&gt;, &lt;code&gt;resource://filesystem/project/README.md&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도구(Tools)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;호출 가능한 함수/액션&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;searchCustomer(name)&lt;/code&gt;, &lt;code&gt;sendEmail(to, subject, body)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프롬프트(Prompts)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;미리 정의된 템플릿을 제공&lt;/li&gt;
+&lt;li&gt;예: &amp;ldquo;SQL 쿼리 생성용 프롬프트&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이벤트(Events)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;서버에서 발생하는 알림이나 변경 이벤트를 실시간으로 전달&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;동작-흐름-예시&#34;&gt;동작 흐름 예시&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;사용자가 IDE 안에서: “DB에서 고객 ‘홍길동’ 검색해줘” 입력&lt;/li&gt;
+&lt;li&gt;LLM이 판단 → MCP 클라이언트를 통해 “searchCustomer” 도구 호출 요청&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트 → MCP 서버&lt;/strong&gt; 요청 전달&lt;/li&gt;
+&lt;li&gt;MCP 서버가 실제 DB 조회 수행 후 결과 반환&lt;/li&gt;
+&lt;li&gt;결과를 LLM이 사용자 친화적 문장으로 정리해서 보여줌&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;mcp-서버-예시&#34;&gt;MCP 서버 예시&lt;/h2&gt;
+&lt;p&gt;예를 들어, 파일 시스템 MCP 서버라면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Resource&lt;/strong&gt;: 프로젝트 폴더 내 파일들 (&lt;code&gt;/src/main.kt&lt;/code&gt;, &lt;code&gt;/README.md&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tools&lt;/strong&gt;: 파일 읽기, 쓰기, 검색 기능 (&lt;code&gt;readFile&lt;/code&gt;, &lt;code&gt;writeFile&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Prompts&lt;/strong&gt;: “이 코드를 리팩토링 해줘” 같은 템플릿&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;→ 이렇게 구성된 서버를 붙이면, AI는 프로젝트 파일을 직접 탐색/수정 가능해짐.&lt;/p&gt;
+&lt;h2 id=&#34;비유&#34;&gt;비유&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCP 서버&lt;/strong&gt; = “호텔 컨시어지”
+&lt;ul&gt;
+&lt;li&gt;손님(LLM)이 “관광지 추천해줘” 하면, 컨시어지가 여러 API/DB를 뒤에서 다뤄서 정리된 정보 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트&lt;/strong&gt; = “호텔 프런트”
+&lt;ul&gt;
+&lt;li&gt;손님과 직접 대화하며, 요청을 받아서 컨시어지에게 전달&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;MCP 서버는 LLM이 외부 도구와 데이터를 안전하고 일관된 방식으로 활용할 수 있도록 표준화된 인터페이스를 제공하는 백엔드 역할&lt;/strong&gt;을 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Function Calling (Tools)</title>
+      <link>https://www.devkuma.com/docs/ai/function-calling/</link>
+      <pubDate>Sat, 30 Aug 2025 14:50:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/function-calling/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;function-calling-도구-호출-이란&#34;&gt;Function Calling (도구 호출) 이란?&lt;/h2&gt;
+&lt;p&gt;LLM이 단순히 텍스트만 생성하는 게 아니라, &lt;strong&gt;외부 함수(Function)나 API를 직접 호출&lt;/strong&gt;할 수 있도록 하는 기능이다.&lt;br&gt;
+예를 들어, OpenAI API에서 제공하는 &lt;code&gt;function_call&lt;/code&gt; 기능이 대표적이다.&lt;/p&gt;
+&lt;h3 id=&#34;동작-원리&#34;&gt;동작 원리&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;사용자 입력&lt;/strong&gt;: “오늘 서울 날씨 알려줘”&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LLM 판단&lt;/strong&gt;: &amp;ldquo;이건 날씨 API를 호출해야 하는구나&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도구 호출&lt;/strong&gt;: 미리 정의된 함수(예: &lt;code&gt;getWeather(location: string)&lt;/code&gt;) 실행&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;결과 수신&lt;/strong&gt;: &lt;code&gt;{ &amp;quot;location&amp;quot;: &amp;quot;Seoul&amp;quot;, &amp;quot;temp&amp;quot;: 28, &amp;quot;condition&amp;quot;: &amp;quot;Sunny&amp;quot; }&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;최종 응답 생성&lt;/strong&gt;: &amp;ldquo;오늘 서울은 맑고 28도입니다 ☀️&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;즉, LLM은 &lt;strong&gt;자연어 → 함수 입력 변환&lt;/strong&gt; 역할을 하고, 실제 계산·검색은 외부 함수/도구가 맡는다.&lt;/p&gt;
+&lt;h3 id=&#34;장점&#34;&gt;장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;실시간 데이터 활용&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM 자체는 훈련 시점 이후 지식을 모름. Function Call로 최신 API 연결 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정확한 계산&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM은 수학 연산에 약함. 대신 계산기 API를 호출하면 정확한 결과 반환.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;업무 자동화&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;“메일 보내줘” → 이메일 API 호출&lt;/li&gt;
+&lt;li&gt;“DB에서 고객 목록 가져와” → DB 쿼리 실행&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;mcp와-function-calling의-차이&#34;&gt;MCP와 Function Calling의 차이&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Function Calling&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;개별 도구를 LLM이 직접 호출하는 방식&lt;/li&gt;
+&lt;li&gt;API나 함수 단위의 호출 정의 필요&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;getWeather()&lt;/code&gt;, &lt;code&gt;searchStockPrice()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;MCP (Model Context Protocol)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 도구(Function/Resource)를 &lt;strong&gt;표준화된 방식으로 연결&lt;/strong&gt;하는 프로토콜&lt;/li&gt;
+&lt;li&gt;각 도구를 “Provider”로 추상화하여, LLM이 일관된 방법으로 접근 가능&lt;/li&gt;
+&lt;li&gt;Function Call을 포함해서 “도구 호출”을 체계적으로 관리하는 상위 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;실제-예시&#34;&gt;실제 예시&lt;/h2&gt;
+&lt;h3 id=&#34;1-function-calling-단독-사용&#34;&gt;1. Function Calling 단독 사용&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;OpenAI Function Call 예제:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;getWeather&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;현재 날씨 조회&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parameters&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;object&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;properties&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;string&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;required&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;👉 모델이 &lt;code&gt;&amp;quot;서울&amp;quot;&lt;/code&gt;을 location에 매핑해 API 실행&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-mcp-기반-function-calling&#34;&gt;2. MCP 기반 Function Calling&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;MCP는 Function들을 &lt;strong&gt;Resource Registry&lt;/strong&gt;로 묶어 관리&lt;/li&gt;
+&lt;li&gt;LLM이 “날씨 API”를 직접 알 필요 없이, MCP가 추상화된 &lt;code&gt;tools.weather&lt;/code&gt; 같은 인터페이스 제공&lt;/li&gt;
+&lt;li&gt;여러 도구를 &lt;strong&gt;표준 프로토콜&lt;/strong&gt;로 연결 → Function Call 혼란/중복 줄여줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;비유로-정리&#34;&gt;비유로 정리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Function Calling&lt;/strong&gt; = 개별 “도구 사용법” (드라이버: 가위, 망치, 드라이버 같은 단일 도구)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP&lt;/strong&gt; = “공구함/작업대” (도구를 표준화된 방식으로 정리해 둔 시스템)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Function Calling은 개별 API를 호출하는 기술&lt;/strong&gt;이고, &lt;strong&gt;MCP는 여러 Function(도구)들을 표준화된 방식으로 관리하고 연결해주는 상위 레이어&lt;/strong&gt;라고 이해하면 된다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
       <title>AI Agent</title>
       <link>https://www.devkuma.com/docs/ai/agent/</link>
       <pubDate>Sat, 30 Aug 2025 13:49:00 +0900</pubDate>
@@ -33,7 +226,7 @@
         &lt;h2 id=&#34;ai-agent란&#34;&gt;AI Agent란?&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;AI Agent&lt;/strong&gt;는 단순히 답변만 생성하는 LLM(대규모 언어모델)과 달리, &lt;strong&gt;환경(Environment)과 상호작용하며 특정 목표를 달성하도록 설계된 지능형 시스템&lt;/strong&gt;이다.&lt;/li&gt;
-&lt;li&gt;즉, **“스스로 판단하고 → 필요한 도구를 쓰고 → 행동하며 → 결과를 개선하는 AI”**라고 할 수 있다.&lt;/li&gt;
+&lt;li&gt;즉, &lt;strong&gt;스스로 판단하고 → 필요한 도구를 쓰고 → 행동하며 → 결과를 개선하는 AI&lt;/strong&gt;라고 할 수 있다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;ai-agent의-핵심-요소&#34;&gt;AI Agent의 핵심 요소&lt;/h2&gt;
 &lt;ol&gt;
@@ -98,6 +291,141 @@
       </description>
       
       <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Multi-Model</title>
+      <link>https://www.devkuma.com/docs/ai/multi-model/</link>
+      <pubDate>Sat, 30 Aug 2025 13:14:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/multi-model/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;multi-model이란&#34;&gt;Multi-Model이란?&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;하나의 AI 시스템에서 여러 개의 모델을 함께 사용하는 접근 방식&lt;/strong&gt;을 말한다.&lt;br&gt;
+즉, 단일 모델에 모든 걸 맡기지 않고, &lt;strong&gt;각 모델의 강점을 조합&lt;/strong&gt;해서 더 나은 성능이나 다양한 기능을 얻는 방법이다.&lt;/p&gt;
+&lt;p&gt;예들 들어, 텍스트뿐 아니라 이미지, 오디오, 비디오까지 함께 처리할 수 있는 모델이다.&lt;/p&gt;
+&lt;h2 id=&#34;왜-필요한가&#34;&gt;왜 필요한가?&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;한 모델로는 부족한 경우&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 이미지도 다루고 텍스트도 다뤄야 하는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;전문화된 모델 활용&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;대규모 범용 모델 + 도메인 특화 모델을 같이 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;성능 최적화&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;무겁고 느린 모델은 핵심 추론에만, 가벼운 모델은 전처리·간단한 작업에 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;비용 절감&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;항상 GPT-4 같은 초거대 모델을 쓰면 비쌈 → 일부는 작은 모델에게 맡기고, 어려운 부분만 큰 모델 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;multi-model의-종류&#34;&gt;Multi-Model의 종류&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;멀티 모달(Multi-Modal)과는 다름&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Multi-Model ≠ Multi-Modal&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Multi-Modal&lt;/em&gt;: 이미지+텍스트+음성 등 &lt;strong&gt;여러 입력 형태&lt;/strong&gt;를 처리하는 하나의 모델&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Multi-Model&lt;/em&gt;: &lt;strong&gt;여러 개의 모델을 조합&lt;/strong&gt;해서 시스템 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;구성 방식&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;병렬(Ensemble)&lt;/strong&gt;: 여러 모델이 동시에 답을 내고, 결과를 합쳐서 최종 결정&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 투표(Voting), 평균(Blending), 가중치 조합(Weighted Sum)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;직렬(Pipeline)&lt;/strong&gt;: 한 모델의 출력을 다른 모델의 입력으로 전달&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 이미지 캡션 모델 → 텍스트 요약 모델 → 질의응답 모델&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;하이브리드&lt;/strong&gt;: 상황에 따라 모델 선택 (Router 모델)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;예시&#34;&gt;예시&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;검색 + 생성 (RAG)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;검색 모델(벡터 검색) + 생성 모델(LLM)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Copilot류&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;코드 보조: 빠른 코드 완성은 작은 모델, 정교한 버그 수정은 GPT-4&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자율주행&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;영상 인식 CNN + 행동 계획 RL 모델&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;헬스케어&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;의학적 지식 모델 + 일반 LLM 조합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;multi-model-vs-single-model&#34;&gt;Multi-Model vs Single Model&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;구분&lt;/th&gt;
+          &lt;th&gt;Single Model&lt;/th&gt;
+          &lt;th&gt;Multi-Model&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;구성&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;하나의 모델이 모든 걸 수행&lt;/td&gt;
+          &lt;td&gt;여러 모델이 역할 분담&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;장점&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;단순, 관리 쉬움&lt;/td&gt;
+          &lt;td&gt;정확도↑, 유연성↑, 최신 기술 활용 가능&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;단점&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;범용 모델은 성능 한계&lt;/td&gt;
+          &lt;td&gt;시스템 복잡, 조율 필요&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Multi-Model은 여러 모델을 결합해, 각자의 장점을 살려 더 나은 결과를 내는 시스템 설계 방식&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;예: “검색 모델 + 생성 모델”, “작은 모델 + 큰 모델”, “특화 모델 + 범용 모델”을 조합하는 식이다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+      <category>LLM</category>
       
     </item>
     
@@ -327,6 +655,7 @@
 &lt;p&gt;Model Context Protocol(MCP)는 &lt;strong&gt;AI, 특히 대규모 언어 모델(LLM)이 외부 데이터 소스 및 도구와 효과적으로 상호작용하도록 돕는 오픈 표준 프로토콜&lt;/strong&gt;이다.&lt;/p&gt;
 &lt;p&gt;이 프로토콜은 애플리케이션이 LLM에 컨텍스트(Context)를 일관된 방식으로 전달할 수 있도록 설계되었다. 한마디로, &lt;strong&gt;AI용 USB-C 포트&lt;/strong&gt;라는 은유로 설명되기도 한다. 이는 USB-C가 여러 장치를 통일된 포맷으로 연결하듯, MCP도 AI 모델과 다양한 리소스를 표준화된 방식으로 연결해 준다.&lt;/p&gt;
 &lt;p&gt;즉, &lt;strong&gt;AI 모델이 다양한 외부 시스템과 연결될 수 있도록 해주는 공용 인터페이스&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/images/mcp-architecture.png&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
 &lt;h3 id=&#34;주요-특징&#34;&gt;주요 특징&lt;/h3&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -369,6 +698,10 @@
 &lt;h3 id=&#34;도입-배경과-필요성&#34;&gt;도입 배경과 필요성&lt;/h3&gt;
 &lt;p&gt;AI 모델은 본질적으로 &lt;strong&gt;텍스트 기반&lt;/strong&gt;으로만 입출력을 한다. 그러나 실제 활용에서는 DB 조회, API 호출, 파일 입출력 등 다양한 작업이 필요하다. 지금까지는 &lt;strong&gt;플러그인, LangChain, 자체 API 브릿지&lt;/strong&gt; 같은 개별 솔루션을 써야 했는데, 이들을 &lt;strong&gt;표준화된 프로토콜&lt;/strong&gt;로 묶은 것이 MCP이다.&lt;/p&gt;
 &lt;p&gt;기존에는 AI 애플리케이션이 외부 시스템과 상호작용하기 위해, &lt;strong&gt;모델마다, 도구마다 각각 맞춤형 통합 구현이 필요&lt;/strong&gt;했다. 이로 인해 개발 및 유지보수의 복잡성이 크게 증가했고, 이를 &lt;strong&gt;M×N 문제&lt;/strong&gt;라고 표현했다. MCP는 이를 &lt;strong&gt;M＋N 구조로 단순화&lt;/strong&gt;하여, AI 애플리케이션이 다양한 도구와 표준화된 방식으로 연결될 수 있도록 지원한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/images/mcp-before-after.webp&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이미지 출처: &lt;a href=&#34;https://www.descope.com/learn/post/mcp&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.descope.com/learn/post/mcp&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&#34;아키텍처-및-작동-원리&#34;&gt;아키텍처 및 작동 원리&lt;/h2&gt;
 &lt;h3 id=&#34;클라이언트-서버-구조&#34;&gt;클라이언트-서버 구조&lt;/h3&gt;
 &lt;p&gt;MCP는 &lt;strong&gt;클라이언트-서버 아키텍처&lt;/strong&gt;를 채택하고 있으며,&lt;/p&gt;
@@ -390,7 +723,6 @@
 &lt;p&gt;AI 애플리케이션은 서버에 &amp;ldquo;사용 가능한 도구 목록&amp;quot;을 요청하고, 이를 바탕으로 적절한 툴을 선택하고 활용할 수 있다.&lt;/p&gt;
 &lt;h2 id=&#34;개발자-친화성과-확장성&#34;&gt;개발자 친화성과 확장성&lt;/h2&gt;
 &lt;p&gt;Anthropic은 MCP를 &lt;strong&gt;오픈소스 표준&lt;/strong&gt;으로 공개하였으며, &lt;strong&gt;Python, TypeScript, Java, Kotlin, C# 등 주요 언어용 SDK&lt;/strong&gt;도 제공하고 있다. 이를 통해 &lt;strong&gt;클라이언트 및 서버 구현이 대체로 간단하다&lt;/strong&gt;는 장점을 얻을 수 있다&lt;/p&gt;
-&lt;hr&gt;
 &lt;h2 id=&#34;활용-효과-및-이점&#34;&gt;활용 효과 및 이점&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;명확한 지시&lt;/strong&gt;: LLM이 어떤 데이터를 취급할지 명확히 지정 가능&lt;/li&gt;
@@ -6246,407 +6578,6 @@ Kotest 5.6.0부터 현재 인스턴트 리스너는 `io.kotest:kotest-extensions
 &lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://kotest.io/docs/assertions/arrow.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Arrow | Kotest&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-      
-      <category>Kotlin</category>
-      
-      <category>Kotest</category>
-      
-    </item>
-    
-    <item>
-      <title>Visual Studio Code에서 두 파일의 내용을 비교하여 차이점 표시하기</title>
-      <link>https://www.devkuma.com/docs/vscode/file-diff/</link>
-      <pubDate>Sat, 06 Apr 2024 23:34:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/vscode/file-diff/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;두-파일의-차이점-표시하기&#34;&gt;두 파일의 차이점 표시하기&lt;/h2&gt;
-&lt;p&gt;먼저 비교하고자 하는 두 파일을 열고 둘 중 하나를 활성화한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-1.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&amp;lsquo;보기&amp;rsquo; 메뉴에서 &amp;lsquo;명령 팔레트&amp;rsquo;를 클릭하여, 명령 팔레트 연다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-2.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;명령 팔레트가 열리면, &amp;lsquo;비교&amp;rsquo; 또는 &amp;lsquo;Compare&amp;rsquo;를 입력한다. 표시된 명령어 중 &amp;lsquo;파일: 활성 파일을 다음과 비교&amp;hellip;&amp;lsquo;를 클릭한다. (영어로 &amp;lsquo;File: Compare Active File With&amp;hellip;&amp;rsquo; 를 클릭한다).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-3.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;비교할 두 번째 파일을 클릭한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-4.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;비교할 두 파일이 좌우로 나뉘어 표시되며, 서로 다른 부분과 해당 라인이 강조 표시된다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-5.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;이렇게 지정한 두 파일의 차이를 표시하여 확인할 수 있다.&lt;/p&gt;
-&lt;h2 id=&#34;인라인-뷰로-보기&#34;&gt;인라인 뷰로 보기&lt;/h2&gt;
-&lt;p&gt;파일의 차이를 표시하면 두 파일이 좌우로 나뉘어 표시되지만, 서로 다른 부분만 나란히 표시하는 인라인뷰 형식으로도 표시할 수 있다. 화면 오른쪽 상단에 표시되는 &amp;lsquo;&amp;hellip;&amp;lsquo;를 클릭한 후, 표시되는 메뉴 중 &amp;lsquo;인라인 보기&amp;rsquo;을 클릭한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-6.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;두 파일의 서로 다른 부분이 위아래로 나란히 표시되며, 이를 비교할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-7.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;h2 id=&#34;명령-터미널에서-두-파일의-차이점-표시하기&#34;&gt;명령 터미널에서 두 파일의 차이점 표시하기&lt;/h2&gt;
-&lt;p&gt;Visual Studio Code는 명령 터미널에서 실행할 수도 있지만, &lt;code&gt;-d&lt;/code&gt; 옵션을 지정하여 Visual Studio Code를 실행한 후 두 파일의 비교 결과를 표시할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;code -d &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;파일1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;파일2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그럼 명령을 실행보자. 명령 터미널를 실행하고 비교할 파일이 포함된 디렉토리로 이동한 후 다음과 같이 실행한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;code -d sum1.java sum2.java
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-8.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Visual Studio Code가 실행되어 지정한 두 파일의 차이점을 표시되었다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/vscode/vscode-file-diff-7.png&#34; alt=&#34;Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;Visual Studio Code를 사용하여 두 파일의 내용을 비교하고 그 차이를 표시하는 방법에 대해 알아보았다.&lt;/p&gt;
-
-      </description>
-      
-      <category>IDE</category>
-      
-      <category>VSCode</category>
-      
-    </item>
-    
-    <item>
-      <title>Kotest Extra Arbs</title>
-      <link>https://www.devkuma.com/docs/kotest/proptest/extra-arbs/</link>
-      <pubDate>Sat, 06 Apr 2024 20:40:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/kotest/proptest/extra-arbs/</guid>
-      <description>
-        
-        
-        &lt;p&gt;범용 데이터 생성을 위한 Arbs 컬렉션을 찾고 있다면,
-그러한 &lt;a href=&#34;https://github.com/kotest/kotest-property-arbs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;컬렉션&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;이 있다.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;NOTE&lt;/div&gt;
-
-
-사용하려면 빌드에 `io.kotest.extensions:kotest-property-arbs:version`을 추가한다.
-&lt;/div&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://search.maven.org/search?q=g:io.kotest.extensions&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;img src=&#34;https://img.shields.io/maven-central/v/io.kotest.extensions/kotest-property-arbs?label=latest%20release&#34;/&gt;&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;임의&lt;/th&gt;
-          &lt;th&gt;세부정보&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.firstName()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 영어 또는 히스패닉 이름을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.lastName()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;미국 인구 조사 데이터를 기반으로 임의의 성을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.name()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 이름과 성을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.stockExchanges()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 증권 거래소 생성(예: &lt;code&gt;New York Stock Exchange / NYSE / US&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.domin()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 도메인 이름을 생성한다.(예: &lt;code&gt;www.wibble.co.uk&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.contry()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 국가 객체를 생성한다.(예: &lt;code&gt;Botswana / BW / Africa&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.continent()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;7개 대륙 목록에서 임의의 대륙을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.zipcode()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;존재 여부를 확인하지 않고 01000에서 99999까지의 무작위 우편번호&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.harryPotterCharacter()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;Harry Potter 시리즈에서 임의의 이름과 성을 생성&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.color()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 이름이 지정된 색상을 생성한다.(예: 미드나잇 블루&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.brand()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 브랜드 이름을 생성한다.(예: Betty Crocker&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.products()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 Google 제품 카테고리를 생성한다.(예: &lt;code&gt;Furniture &amp;gt; Office Furniture &amp;gt; Desks&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.vineyards()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 포도밭 이름을 생성한다.(예: &lt;code&gt;Château Montus Prestige&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.wineRegions()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 와인 생산지(예: &lt;code&gt;Chassagne-Montrachet&lt;/code&gt;)를 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.wines()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;전체 와인 개체를 반환하기 위해 여러 와인 세부 정보 생산자를 결합한다&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.wineReviews()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;와인 생산자를 결합하고 무작위 리뷰 점수와 사용자 이름을 추가한다&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.iceCreamFlavors()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&amp;lsquo;피스타치오&amp;rsquo; 또는 &amp;lsquo;포도 탈출&amp;rsquo;과 같은 임의의 아이스크림 맛&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.iceCreams()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;하나 이상의 맛, 콘 유형 및 크기를 갖춘 무작위 아이스크림 제공&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.tubeStation()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;무작위로 선택된 런던 지하철 역 생산&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.tubeJourney()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;무작위로 선택된 시작 및 끝 지하철역에서 무작위 여행을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.공항()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;IATA 코드가 있는 임의의 실제 공항&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.airline()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 실제 항공사&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.airJourney()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;항공사와 시간을 통해 두 공항 간 무작위 항공 여행&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.cluedo용의자()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;단서/단서 용의자, 예: &lt;code&gt;Professor Plum&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.cluedoWeapons()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;단서/단서 무기(예: &lt;code&gt;Lead piping&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.cluedoLocations()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;단서/단서 위치(예: &lt;code&gt;Ballroom&lt;/code&gt;)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.cluedoAccusation()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;단서/단서 비난, 예: &lt;code&gt;Mrs White / Billiards Room / Rope&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.monopolyProperty()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임대료, 가격 및 색상이 포함된 임의(미국 버전) 독점 부동산&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.chessPiece()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;포인트 체스 조각&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.chessSquare()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;파일 AH 및 순위 1-8이 포함된 체스 광장&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.chessMove()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;체스는 캡처한 조각이 있으면 정사각형에서 정사각형으로 이동한다. 이동이 합법적인지 확인하기 위한 유효성 검사는 수행되지 않는다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.transactions()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;카드번호, 카드종류, 금액, 거래종류에 따른 거래&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.cars()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;임의의 자동차 제조업체&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://localhost:1313/docs/kotest/proptest/extra-arbs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Extra Arbs | Kotest&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-      
-      <category>Kotlin</category>
-      
-      <category>Kotest</category>
-      
-    </item>
-    
-    <item>
-      <title>Kotest Arrow Generators</title>
-      <link>https://www.devkuma.com/docs/kotest/proptest/arrow-generators/</link>
-      <pubDate>Sat, 06 Apr 2024 19:25:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/kotest/proptest/arrow-generators/</guid>
-      <description>
-        
-        
-        &lt;p&gt;Kotest는 &lt;a href=&#34;https://arrow-kt.io&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Arrow&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에 대한 생성기를 제공하는 옵션 모듈을 제공한다.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;NOTE&lt;/div&gt;
-
-
-사용하려면 빌드에 `io.kotest.extensions:kotest-property-arrow:version`, `io.arrow-kt:arrow-core:arrow-version`을 추가한다.  
-광학 모듈 `kotest-property-arrow-optics`의 경우에도 `io.arrow-kt:arrow-optics:arrow-version`을 추가하면 된다.
-&lt;/div&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://search.maven.org/search?q=kotest-property-arrow&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;img src=&#34;https://img.shields.io/maven-central/v/io.kotest.extensions/kotest-property-arrow?label=latest%20release&#34;/&gt;&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;Either&lt;/th&gt;
-          &lt;th&gt;설명&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.either(arbL, arbR)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;기본 제너레이터에서 왼쪽과 오른쪽의 약 50/50을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.right(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 arb를 사용하여 [Either.Right]의 인스턴스를 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.left(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 arb를 사용하여 [Either.Left]의 인스턴스를 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;NonEmptyList&lt;/th&gt;
-          &lt;th&gt;설명&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.nel(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 수호에서 채워진 요소로 1에서 100 사이에서 임의로 선택된 크기의 NonEmptyList 인스턴스를 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.nel(arb, range)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 범위에서 임의로 선택된 크기를 가진 비어있는 목록 인스턴스를 생성하며, 주어진 범위에서 채워진 요소를 사용한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;Option&lt;/td&gt;
-          &lt;td&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&amp;ndash;&lt;/td&gt;
-          &lt;td&gt;&amp;ndash;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Exhaustive.option(a)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 값에 None과 Some을 포함하는 Exhaustive를 반환한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Exhaustive.none(a)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;None을 포함하는 Exhaustive를 반환한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.option(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 arb의 값으로 채워진 일부가 포함된 None과 Some을 모두 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.some(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;주어진 arb의 값으로 채워진 Some을 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.none()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;None을 반환하는 상수 arb이다. Exhaustive.None과 동일하며 Arb가 필요할 때만 사용할 수 있도록 제공된다.&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;Endo&lt;/th&gt;
-          &lt;th&gt;설명&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.endo(arb)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;기본 arb의 값을 &lt;code&gt;Endo&lt;/code&gt; 인스턴스로 래핑한다.&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;Eval&lt;/th&gt;
-          &lt;th&gt;설명&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb&amp;lt;A&amp;gt;.evalNow()&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;수신자의 값을 &lt;code&gt;Eval.now&lt;/code&gt;로 래핑한다.&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;Validated&lt;/th&gt;
-          &lt;th&gt;설명&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.validated(invalid, valid)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;값에 대해 제공된 arb를 사용하여 유효하고 유효하지 않은 &lt;code&gt;Validated&lt;/code&gt; 인스턴스를 약 50/50으로 생성한다.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;Arb.validatedNel(invalid, valid)&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;값에 대해 제공된 arbs를 사용하여 유효하고 유효하지 않은 &lt;code&gt;ValidatedNel&lt;/code&gt; 인스턴스를 약 50/50으로 생성한다&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;참조&#34;&gt;참조&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://kotest.io/docs/proptest/property-test-generators-arrow.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Arrow Generators | Kotest&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
       </description>
