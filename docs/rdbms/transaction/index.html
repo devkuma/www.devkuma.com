@@ -27,7 +27,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="320_data-science_rdbms">
     <meta property="article:published_time" content="2021-12-19T01:05:00+09:00">
-    <meta property="article:modified_time" content="2021-12-19T01:05:00+09:00">
+    <meta property="article:modified_time" content="2025-08-30T15:58:10+09:00">
     <meta property="article:tag" content="Database">
     <meta property="article:tag" content="RDBMS">
     <meta property="article:tag" content="Transaction">
@@ -35,7 +35,7 @@
   <meta itemprop="name" content="Database Transaction (트랜잭션)">
   <meta itemprop="description" content="Database Transaction(트랜잭션)이란? 데이터베이스의 상태를 변화시키기 위해 수행하는 논리적인 작업의 단위이다. 데이터베이스의 데이터를 조작하는 작업 단위(Unit of work)이다. 트랜잭션에는 여러가지의 연산이 수행될 수 있다. 트랜재션은 수행 중에 한 작업이라도 실패를 하면 전부 롤백이 이루어지고, 모두 성공하면 commit을 수행한다. Transaction ACID란? 원자성(Atomicity) 하나의 트랜잭션이 작업이 그중에 일부분만 실행되거나 중단되지 않는 것을 보장해주는 것을 말한다. 일관성(Consistency) 트랜잭션이 작업이 성공적으로 완료가 되더라도 작업 이전과 같이 같은 상태를 유지하는 것을 말한다. 격리성(Isolation) Trasaction 작업이 수행되고 있을 때 다른 작업이 끼어들지 못하도록 보장해주는 것을 말한다. 지속성(Durability) 성공적으로 수행된 트랜잭션이 대해서는 영구히(Persistent) 반영되어야 함을 말한다. Transaction을 사용시 주의할 점 트랜잭션의 범위는 최소화한다. 트랜잭션의 범위를 최소화 하는 것이 중요하다. 데이터베이스의 커넥션의 수는 한정적이기 때문에 커넥션을 보유하는 시간을 최소화해야할 필요가 있다. 그렇지 않으면, 다른 서비스들은 해당 커넥션 사용을 위해 대기해야 할 상황이 발생한다. Transaction isolation level의 종류 및 특징은 무엇인가? READ UNCOMMITTED SELECT 쿼리 실행시에 다른 트랜잭션에서 COMMIT 되지 않은 데이터를 읽어올 수 있다. COMMIT 되지 않은 데이터를 읽는 현상을 Dirty read라고 말한다. INSERT만 진행되고 ROLLBACK 될 수 있는, 즉 COMMIT이 되지 않은 데이터를 읽을 수 있어 유의해야 한다. READ COMMITTED COMMITTED에서는 COMMIT이 완료된 데이터만 SELECT시에 보이는 수준을 보장하는 Level이며, 대부분 DBMS에서 Read Committed를 기본으로 설정한다. Read Committed에서는 Read Uncommitted에서 발생하는 Dirty read가 발생하지 않도록 보장해 준다. 트랜잭션에서 COMMIT을 수행하지 않더라도 DB에 이미 값이 반영이 되어있는 상태인데 COMMIT 이전의 데이터를 보장 받기 위해서는 COMMIT 되지 않은 쿼리를 복구하는 과정이 필요하게 된다. 즉, 이 시점에서는 Consistent Read를 수행해야 함을 의미한다. Read Committed의 문제는 하나의 트랜잭션 안에서 SELECT를 수행 할 때마다 데이터가 동일하다는 보장을 해주지 않는다. 그 이유는 다른 트랜젝션에서 해당 데이터를 COMMIT 했을 경우에는 COMMIT된 데이터를 반환해 주는게 Read Committed의 특징이기 때문이다. 위와 같은 이유로 Read Committed를 Non-repeatable Read라고도 한다. REPEATABLE READ Read Committed와는 다르게 Repeatable Read는 한 트랜잭션 안에서 반복해서 SELECT를 수행하더라도 읽어 들이는 값이 변하지 않음을 보장한다. Repeatable Read 트랙잭션은 처음 SELECT를 수행한 시간을 기록한 뒤 그 이후에는 모든 SELECT마다 해당 시점을 기분으로 Consistent Read를 수행하여 준다. 그러므로 트랜잭션 도중 다른 트랜잭션이 COMMIT되더라도 새로이 COMMIT된 데이터는 보이지 않게 된다. 그 이유는 첫 SELECT 시에 생성된 SNAPSHOT을 읽기 때문이다. SERIALIZABLE Serializable은 모든 작업을 하나의 트랜잭션에서 처리하는 것과 같은 가장 높은 고립수준을 제공한다. Read Committed, Repeatable Read 두개의 공통적인 이슈는 Phantom Read가 발생한다는 점이다. Phantom Read란? 하나의 트랜잭션에서 UPDATE 명령이 유실되거나 덮어써질수 있는 즉, UPDATE후 COMMIT하고 다시 조회를 했을때 예상과는 다른 값이 보이거나 데이터가 유실된 경우를 Phantom Read라고 한다. 그와 다르게 SERIALIZABLE에서는 SELECT 쿼리가 전부 SELECT … FOR SHARE로 자동으로 변경되어 Repeatable Read에서 막을 수 없는 몇 가지 상황을 방지할 수 있게됩니다. Commit과 Rollback Commit 하나의 트랜잭션이 끝났을 때, 완료된 것을 트랙잭션 관리자에게 알려준다. Rollback 하나의 트랜잭션 처리가 비정상적으로 종료되어 DB의 일괄성을 깨트렸을 때, 모든 연산을 취소시키는 것을 말한다.">
   <meta itemprop="datePublished" content="2021-12-19T01:05:00+09:00">
-  <meta itemprop="dateModified" content="2021-12-19T01:05:00+09:00">
+  <meta itemprop="dateModified" content="2025-08-30T15:58:10+09:00">
   <meta itemprop="wordCount" content="429">
   <meta itemprop="keywords" content="Database,RDBMS,Transaction">
   <meta name="twitter:card" content="summary">
@@ -1261,7 +1261,7 @@
             <div class="taxonomy taxonomy-terms-cloud taxo-tags">
       <h5 class="taxonomy-title">Tags</h5>
       <ul class="taxonomy-terms">
-        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">19</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">Android</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
