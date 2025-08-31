@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>D3 v5 force simulation</title>
+</head>
+
+<body>
+  <div id="d3Graph4me" style="border: lightgray solid 1px;display: inline-block;width: 100%;"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>{
+      var svg = d3.select("#d3Graph4me")
+        .append("svg");
+
+      var vhRatio = 3 / 4;
+      var width = document.querySelector("#d3Graph4me").clientWidth;
+      document.querySelector("#d3Graph4me").style.height = parseInt(width * vhRatio) + "px";
+      var height = document.querySelector("#d3Graph4me").clientHeight;
+      var basesize = 150;
+      var rRatio = width / basesize;
+      svg.attr("width", width).attr("height", height);
+
+      // 1. 그리려는 데이터 준비
+      var nodesData = [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+
+      var linksData = [
+        { source: 0, target: 1 },
+        { source: 1, target: 4 },
+        { source: 2, target: 3 },
+        { source: 2, target: 5 },
+        { source: 5, target: 1 }
+      ];
+
+
+      // 2. svg 요소 추가
+      var link = d3.select("svg")
+        .selectAll("line")
+        .data(linksData)
+        .enter()
+        .append("line")
+        .attr("stroke-width", 1 * rRatio)
+        .attr("stroke", "black");
+
+      var node = d3.select("svg")
+        .selectAll("circle")
+        .data(nodesData)
+        .enter()
+        .append("circle")
+        .attr("r", 7 * rRatio)
+        .attr("fill", "LightSalmon")
+        .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
+
+
+      // 3. forceSimulation 설정
+      var d3_forceCenter = d3.forceCenter(width / 2, height / 2);
+      var simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().distance(20 * rRatio))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3_forceCenter);
+
+      simulation.nodes(nodesData)
+        .on("tick", ticked);
+      simulation.force("link")
+        .links(linksData);
+
+      // 4. forceSimulation 그림 업데이트 함수
+      function ticked() {
+        link
+          .attr("x1", function (a) { return a.source.x })
+          .attr("y1", function (a) { return a.source.y })
+          .attr("x2", function (a) { return a.target.x })
+          .attr("y2", function (a) { return a.target.y });
+
+        node
+          .attr("cx", function (a) { return a.x })
+          .attr("cy", function (a) { return a.y })
+      }
+
+      // 5. 드래그 이벤트 함수
+      function dragstarted(a) {
+        if (!d3.event.active) {
+          simulation.alphaTarget(0.3).restart()
+        }
+        a.fx = a.x;
+        a.fy = a.y
+      }
+
+      function dragged(a) {
+        a.fx = d3.event.x;
+        a.fy = d3.event.y
+      }
+      function dragended(a) {
+        if (!d3.event.active) {
+          simulation.alphaTarget(0)
+        }
+        a.fx = null;
+        a.fy = null
+      }
+      
+      (window.onload = function () {
+        width = document.querySelector("#d3Graph4me").clientWidth;
+        document.querySelector("#d3Graph4me").style.height = parseInt(width * 3 / 4) + "px";
+        height = document.querySelector("#d3Graph4me").clientHeight;
+        simulation
+          .force("center", d3_forceCenter.x(width / 2).y(height / 2));
+        rRatio = width / 200;
+        svg.attr("width", width)
+          .attr("height", height);
+      });
+
+      (window.addEventListener("resize", function (a) {
+        width = document.querySelector("#d3Graph4me").clientWidth;
+        document.querySelector("#d3Graph4me").style.height = parseInt(width * 3 / 4) + "px";
+        height = document.querySelector("#d3Graph4me").clientHeight;
+        simulation.force("center", d3_forceCenter.x(width / 2).y(height / 2));
+        rRatio = width / 200;
+        svg.attr("width", width)
+          .attr("height", height);
+      }));
+
+
+    }
+  </script>
+
+</body>
+
+</html>

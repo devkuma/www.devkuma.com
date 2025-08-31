@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>drag</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
+  <div id="d3Graph" style="border: lightgray solid 1px;display: inline-block;width: 100%;"></div>
+
+  <script>
+    var divWidth = document.querySelector("#d3Graph").clientWidth;
+    var vhWindowRatio = 420 / 590;
+
+    document.querySelector("#d3Graph").style.height = parseInt(divWidth * vhWindowRatio) + "px";
+    var divHeight = document.querySelector("#d3Graph").clientHeight;
+    
+    d3.select("#d3Graph").append("canvas");
+
+    var canvas = document.querySelector("canvas");
+    var context = canvas.getContext("2d");
+    canvas.width = divWidth;
+    canvas.height = divHeight;
+
+    var width = canvas.width;
+    var height = canvas.height;
+    var rRatio = width / 590;
+    var radius = 20 * rRatio;
+    var circles = d3.range(165).map(function (a) {
+      return { x: (a % 15) * (radius + 1) * 2, y: Math.floor(a / 15) * (radius + 1) * 2 }
+    });
+
+    var simulation = d3.forceSimulation(circles)
+      .force("collide", d3.forceCollide(radius + 1)
+                          .iterations(4))
+      .on("tick", drawCircles);
+
+    d3.select(canvas)
+      .call(d3.drag()
+      .container(canvas)
+      .subject(dragsubject)
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
+
+    function drawCircles() {
+      context.clearRect(0, 0, width, height);
+      context.save();
+      context.beginPath();
+      circles.forEach(drawCircle);
+
+      context.fill();
+      context.strokeStyle = "Gold";
+      context.stroke()
+    }
+
+    function drawCircle(a) {
+      context.moveTo(a.x + radius, a.y);
+      context.arc(a.x, a.y, radius, 0, 2 * Math.PI)
+    }
+
+    function dragsubject(event) {
+      return simulation.find(event.x, event.y, radius)
+    }
+
+    function dragstarted(event) {
+      if (!event.active) {
+        simulation.alphaTarget(0.3).restart()
+      }
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y
+    }
+
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y
+    }
+
+    function dragended() {
+      if (!event.active) {
+        simulation.alphaTarget(0)
+      }
+
+      event.subject.fx = null;
+      event.subject.fy = null
+    }
+    
+    (window.onload = function () {
+      width = document.querySelector("#d3Graph").clientWidth;
+      document.querySelector("#d3Graph").style.height = parseInt(width * vhWindowRatio) + "px";
+      height = document.querySelector("#d3Graph").clientHeight;
+
+      canvas.width = width;
+      canvas.height = height
+    });
+  </script>
+
+</body>
+
+</html>

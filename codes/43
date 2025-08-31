@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue.js 예제</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.4/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.min.js"></script>
+</head>
+<body>
+  
+<h2>app</h2>
+<div id="app">
+	<button @click="increment('sub1')">sub1</button>
+	<button @click="increment('sub2')">sub2</button>
+</div>
+<h2>#sub1</h2>
+<div id="sub1"></div>
+<h2>#sub2</h2>
+<div id="sub2"></div>
+
+  
+<script>
+var store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment: function(state) {
+      state.count++
+    }
+  }
+})
+
+/* 하위 영역용 컴포넌트 */
+var ChildComp = Vue.extend({
+  data: function() {
+    return {
+      count: 0
+    }
+  },
+  template: '<div :id="$el.id"> Store:{{ $store.state.count }} Local:{{ count }}</div>',
+  created: function() {
+    this.$on('increment', function() {
+      this.count++
+    })
+  }
+})
+
+/* 부모의 루트 생성자 */
+var app = new Vue({
+  el: '#app',
+  store: store,
+  data: {
+    sub1: null,
+    sub2: null
+  },
+  methods: {
+    increment: function(key) {
+      this[key].$emit('increment')
+      this.$store.commit('increment')
+    }
+  },
+  created: function() {
+     // store를 그대로 사용하기 위해 parent를 설정하거나 store을 전달
+    this.sub1 = new ChildComp({ el: '#sub1', parent: this })
+    this.sub2 = new ChildComp({ el: '#sub2', store: store })
+  }
+})
+</script>
+  
+</body>
+</html>

@@ -1,0 +1,2217 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – AI</title>
+    <link>https://www.devkuma.com/tags/ai/</link>
+    <image>
+      <url>https://www.devkuma.com/tags/ai/logo/180x180.jpg</url>
+      <title>AI</title>
+      <link>https://www.devkuma.com/tags/ai/</link>
+    </image>
+    <description>Recent content in AI on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ko-kr</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>AI 모델에 GPU를 사용하는 이유</title>
+      <link>https://www.devkuma.com/docs/ai/gpu/</link>
+      <pubDate>Sat, 30 Aug 2025 17:35:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/gpu/</guid>
+      <description>
+        
+        
+        &lt;p&gt;AI(특히 딥러닝) 모델은 방대한 데이터를 학습하고 추론하기 위해 &lt;strong&gt;막대한 양의 연산&lt;/strong&gt;을 수행해야 한다. 이때 CPU만으로는 속도가 너무 느려 비효율적이기 때문에, &lt;strong&gt;대규모 병렬 연산에 특화된 GPU&lt;/strong&gt;가 필수적으로 사용된다.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;gpu란-무엇인가&#34;&gt;GPU란 무엇인가?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GPU(Graphic Processing Unit)&lt;/strong&gt; 는 원래 &lt;strong&gt;그래픽 연산&lt;/strong&gt;(픽셀 렌더링, 3D 그래픽 처리)을 빠르게 수행하기 위해 만들어진 장치이다.&lt;/li&gt;
+&lt;li&gt;게임이나 영상에서 그래픽이 끊기지 않고 부드럽게 표현되는 것도 GPU의 빠른 병렬 연산 덕분이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;cpu-vs-gpu-구조-비교&#34;&gt;CPU vs GPU 구조 비교&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;구분&lt;/th&gt;
+          &lt;th&gt;CPU&lt;/th&gt;
+          &lt;th&gt;GPU&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;코어 개수&lt;/td&gt;
+          &lt;td&gt;수 개(4 ~ 32개) 고성능 코어&lt;/td&gt;
+          &lt;td&gt;수천 ~ 수만 개의 소형 코어&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;처리 방식&lt;/td&gt;
+          &lt;td&gt;직렬 처리(Sequential)&lt;/td&gt;
+          &lt;td&gt;병렬 처리(Parallel)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;강점&lt;/td&gt;
+          &lt;td&gt;일반적인 로직 수행, 복잡한 분기 처리&lt;/td&gt;
+          &lt;td&gt;대량의 단순 반복 연산, 행렬/벡터 연산&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;AI 적합성&lt;/td&gt;
+          &lt;td&gt;낮음&lt;/td&gt;
+          &lt;td&gt;매우 높음&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;딥러닝 학습에 필요한 &lt;strong&gt;행렬 곱셈, 벡터 연산&lt;/strong&gt;이 GPU의 병렬 처리 방식과 딱 맞아떨어진다.&lt;/p&gt;
+&lt;h2 id=&#34;gpu가-ai에-꼭-필요한-이유&#34;&gt;GPU가 AI에 꼭 필요한 이유&lt;/h2&gt;
+&lt;h3 id=&#34;병렬-연산-능력&#34;&gt;병렬 연산 능력&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;딥러닝 모델은 수많은 파라미터와 뉴런 간 연결을 동시에 계산해야 한다.&lt;/li&gt;
+&lt;li&gt;GPU는 이를 한꺼번에 병렬 처리해 속도를 비약적으로 향상시킨다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;행렬벡터-연산-최적화&#34;&gt;행렬/벡터 연산 최적화&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;신경망(Neural Network)은 수많은 &lt;strong&gt;행렬(Matrix)&lt;/strong&gt;, &lt;strong&gt;벡터(Vector)&lt;/strong&gt; 곱셈으로 구성된다.&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;y = Wx + b&lt;/code&gt; (가중치 행렬 × 입력 벡터 + 편향)&lt;/li&gt;
+&lt;li&gt;GPU는 본래 **그래픽 처리(픽셀 계산, 3D 렌더링)**를 위해 행렬 연산 최적화되어 있어, AI 연산과 잘 맞는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;학습-속도-단축&#34;&gt;학습 속도 단축&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;모델 학습 시 &lt;strong&gt;수백만 ~ 수십억 개 파라미터&lt;/strong&gt; 업데이트 필요하다.&lt;/li&gt;
+&lt;li&gt;CPU만 사용하면 수 주 ~ 수 개월 걸릴 학습이 GPU를 사용하면 &lt;strong&gt;수 시간~~수 일&lt;/strong&gt;로 단축된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;대규모-데이터-처리&#34;&gt;대규모 데이터 처리&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;AI는 이미지, 음성, 텍스트 등 &lt;strong&gt;고차원 데이터&lt;/strong&gt;를 다룬다.&lt;/li&gt;
+&lt;li&gt;GPU는 대규모 데이터(batch) 연산을 동시에 처리할 수 있어 학습·추론 속도가 빠르다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;추론inference-성능-강화&#34;&gt;추론(Inference) 성능 강화&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;학습뿐 아니라 &lt;strong&gt;실시간 서비스&lt;/strong&gt;(챗봇 응답, 이미지/음성 인식, 자율주행 센서 데이터 분석 등)에서도 빠른 응답을 제공한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;생태계-지원&#34;&gt;생태계 지원&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;PyTorch, TensorFlow&lt;/strong&gt; 같은 대표적인 딥러닝 프레임워크가 &lt;strong&gt;CUDA(NVIDIA 라이브러리)&lt;/strong&gt; 기반으로 GPU에 최적화되어 있다.&lt;/li&gt;
+&lt;li&gt;GPU 사용 시 자동으로 최적화된 커널을 활용할 수 있어 추가 성능 확보 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;gpu와-ai의-관계&#34;&gt;GPU와 AI의 관계&lt;/h2&gt;
+&lt;p&gt;초기 AI 연구자들은 대량의 데이터를 학습시킬 때 CPU만으로는 한계가 있다는 것을 깨달았다. 이때 &lt;strong&gt;그래픽 연산용 GPU를 딥러닝 학습에 적용&lt;/strong&gt;했는데, 병렬 연산 구조가 AI와 완벽히 맞아떨어졌다.
+이후로 &lt;strong&gt;AI와 GPU는 떼려야 뗄 수 없는 관계&lt;/strong&gt;가 되었으며, 현재 진행되는 대부분의 AI 연구와 서비스는 GPU 기반에서 이루어진다.&lt;/p&gt;
+&lt;h2 id=&#34;gpu-외-ai-전용-하드웨어&#34;&gt;GPU 외 AI 전용 하드웨어&lt;/h2&gt;
+&lt;p&gt;최근에는 GPU 외에도 &lt;strong&gt;AI 특화 칩&lt;/strong&gt;들이 개발되어 활용되고 있다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;TPU (Tensor Processing Unit)&lt;/strong&gt;: Google 개발, 텐서 연산 최적화&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NPU (Neural Processing Unit)&lt;/strong&gt;: 모바일 기기용, 에너지 효율 최적화&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FPGA, ASIC&lt;/strong&gt;: 특정 AI 연산에 특화된 맞춤형 칩&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;하지만 여전히 &lt;strong&gt;범용성·성능·생태계 측면에서 GPU가 가장 널리 사용&lt;/strong&gt;되고 있다.&lt;/p&gt;
+&lt;h1 id=&#34;정리&#34;&gt;정리&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CPU = 직렬 처리 강점 (범용 프로세서)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GPU = 병렬 연산 특화 (AI·딥러닝 최적화)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AI 모델에 GPU를 사용하는 이유 = 대규모 행렬/벡터 연산을 동시에 빠르게 처리하기 위해서&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Google Gemini</title>
+      <link>https://www.devkuma.com/docs/ai/gemini/</link>
+      <pubDate>Sat, 30 Aug 2025 17:05:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/gemini/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;google-gemini란&#34;&gt;Google Gemini란?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Gemini&lt;/strong&gt;는 Google에서 &lt;strong&gt;DeepMind&lt;/strong&gt;와 &lt;strong&gt;Brain&lt;/strong&gt; 팀의 역량을 통합해 개발한 다중 모드(multimodal) 대형 언어 모델(LLM)이다.&lt;/li&gt;
+&lt;li&gt;텍스트뿐만 아니라 오디오, 이미지, 동영상 등 다양한 형태의 정보를 이해하고 처리할 수 있는 것이 특징이다.&lt;/li&gt;
+&lt;li&gt;처음 공개된 것은 2023년 12월로, &lt;strong&gt;Gemini 1.0&lt;/strong&gt;은 &lt;strong&gt;Ultra&lt;/strong&gt;, &lt;strong&gt;Pro&lt;/strong&gt;, &lt;strong&gt;Nano&lt;/strong&gt; 등 세 가지 버전으로 출시되었다. 각각 복잡한 작업, 범용 작업, 장치 내 처리(On-device)를 목표로 했다.&lt;/li&gt;
+&lt;li&gt;이후 빠르게 발전을 거듭했으며, &lt;strong&gt;Gemini 2.5 Flash&lt;/strong&gt;와 &lt;strong&gt;2.5 Pro&lt;/strong&gt;가 현재 주요 버전으로 사용 중이다. Flash는 응답 속도 중심, Pro는 고도 추론과 코드 생성 기능을 제공하며, Audio 출력 및 보안 기능도 강화되었다.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gemini.google.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://gemini.google.com/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google_gemini.jpg&#34; alt=&#34;Google Gemini&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;gemini의-주요-특징&#34;&gt;Gemini의 주요 특징&lt;/h2&gt;
+&lt;h3 id=&#34;다중-모드multimodality&#34;&gt;&lt;strong&gt;다중 모드(Multimodality)&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;기존의 AI 모델들이 주로 텍스트에 한정된 것과 달리, Gemini는 텍스트, 이미지, 오디오, 동영상의 다양한 형태의 데이터를 동시에 이해하고 통합적으로 처리할 수 있다.&lt;/li&gt;
+&lt;li&gt;예를 들어, 동영상을 보면서 내용에 대해 질문하거나, 이미지와 텍스트를 함께 제공하며 특정 작업을 요청할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;이미지-편집-nano-banana--gemini-25-flash-image&#34;&gt;이미지 편집 (Nano-Banana / Gemini 2.5 Flash Image)&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;&lt;strong&gt;Nano‑Banana&lt;/strong&gt;&amp;ldquo;라 불리는 &lt;strong&gt;Gemini 2.5 Flash Image&lt;/strong&gt; 모델은 사용자가 자연어로 이미지를 수정하거나 합성할 수 있도록 해서, 얼굴·사물 등의 특징을 일관되게 유지하면서 수정해주는 고급 기능을 제공한다.&lt;/li&gt;
+&lt;li&gt;예를 들어, 여러 이미지를 합치거나 배경 변경, 스타일·의상 수정 등의 작업이 가능하며, AI 생성 이미지에는 눈에 보이거나 보이지 않는 워터마크가 포함되어 있어 생성 여부를 확인할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;음성-및-보이스-인터랙션&#34;&gt;음성 및 보이스 인터랙션&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Gemini Live&lt;/strong&gt; 기능은 음성을 이용한 실시간 대화형 인터페이스로, 특히 Pixel 9에서 화면 및 카메라 공유와 함께 사용할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;다양한-모델&#34;&gt;다양한 모델&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Gemini는 사용 목적에 따라 여러 가지 모델로 나뉜다.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Gemini Ultra:&lt;/strong&gt; 가장 강력하고 복잡한 작업에 최적화된 모델이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Gemini Pro:&lt;/strong&gt; 광범위한 작업에 사용할 수 있는 균형 잡힌 성능의 모델이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Gemini Flash:&lt;/strong&gt; 비용 효율성과 빠른 응답 속도가 중요한 작업에 적합한 모델이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;뛰어난-성능&#34;&gt;뛰어난 성능&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Gemini는 복잡한 추론, 코딩, 수학 문제 해결 등 다양한 벤치마크에서 뛰어난 성능을 보여줍니다. 특히, 대규모 다중작업 언어 이해(MMLU) 벤치마크에서 인간 전문가의 점수를 능가하는 결과를 보여주기도 했다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;일상-비서-역할-강화&#34;&gt;일상 비서 역할 강화&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Gemini for Home&lt;/strong&gt;은 구글 어시스턴트를 대체하는 새로운 AI 기반 생활 도우미로, 일상 루틴 관리, 더 자연스러운 대화 및 스마트홈 기기 제어 기능을 포함합니다. 2025년 10월부터 초기 액세스 제공 예정이다.&lt;/li&gt;
+&lt;li&gt;또한 &lt;strong&gt;Android Auto&lt;/strong&gt;에도 Gemini가 통합되어, 운전 중 음성 명령으로 메시지 전송, 이메일 확인 등 다양한 기능을 수행할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;google-workspace-통합-및-다국어-대응&#34;&gt;Google Workspace 통합 및 다국어 대응&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Gemini는 &lt;strong&gt;Gmail&lt;/strong&gt;, &lt;strong&gt;Calendar&lt;/strong&gt;, &lt;strong&gt;Maps&lt;/strong&gt;, &lt;strong&gt;Photos&lt;/strong&gt;, &lt;strong&gt;YouTube&lt;/strong&gt; 등을 연결해 여러 앱 사이를 오가며 작업을 도와준다. 일정 관리, 알람 설정, 통화, 발표 연습 같은 기능도 제공돼된다.&lt;/li&gt;
+&lt;li&gt;현재 40개 이상의 언어를 지원하며, 모바일 앱(Android, iOS)과 웹을 통해 이용할 수 있다. 또한 &lt;strong&gt;Gemini 2.5 Flash&lt;/strong&gt;와 &lt;strong&gt;2.5 Pro&lt;/strong&gt;는 과금 기반의 유료 모델로도 제공된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;활용-분야&#34;&gt;&lt;strong&gt;활용 분야&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Gemini는 다음과 같은 다양한 분야에서 활용될 수 있다.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;창의적인 작업:&lt;/strong&gt; 글쓰기, 이미지 생성, 아이디어 브레인스토밍 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;학습 및 연구:&lt;/strong&gt; 복잡한 주제 요약, 논문 분석, 학습 계획 수립 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;코딩:&lt;/strong&gt; 코드 생성, 디버깅, 최적화 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;고객 서비스:&lt;/strong&gt; 질문에 대한 정확하고 유익한 답변 제공 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Gemini는 Google AI Studio, Vertex AI 등 다양한 Google 클라우드 서비스와 연동되어 사용될 수 있으며, Google의 AI 어시스턴트인 Gemini에도 탑재되어 있다.&lt;/p&gt;
+&lt;h2 id=&#34;경쟁력--비교-포인트&#34;&gt;경쟁력 &amp;amp; 비교 포인트&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;구글은 Gemini가 OpenAI의 GPT‑4와 유사하거나 더 높은 벤치마크 성능을 낸다고 발표했지만, 실제 사용 경험은 용도에 따라 다를 수 있다.&lt;/li&gt;
+&lt;li&gt;Gemini는 특히 &lt;strong&gt;멀티모달 설계&lt;/strong&gt;, &lt;strong&gt;긴 컨텍스트 창&lt;/strong&gt;, &lt;strong&gt;강화된 이미지 및 음성 처리 능력&lt;/strong&gt;에서 차별점을 보이고 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;요약&#34;&gt;요약&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;영역&lt;/th&gt;
+          &lt;th&gt;특징 요약&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;멀티모달 처리&lt;/td&gt;
+          &lt;td&gt;텍스트, 이미지, 오디오, 영상, 코드 모두 이해/생성 가능&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;모델 구성&lt;/td&gt;
+          &lt;td&gt;Gemini 1.0 (Ultra/Pro/Nano) → 2.5 Flash / Pro 등 최신 버전&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;이미지 편집&lt;/td&gt;
+          &lt;td&gt;Nano‑Banana: 자연어 기반 편집, 특징 일관성 유지&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;음성 인터페이스&lt;/td&gt;
+          &lt;td&gt;Gemini Live: 음성 기반 실시간 대화&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;일상 비서 기능&lt;/td&gt;
+          &lt;td&gt;Gemini for Home, Android Auto 음성 지원&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Workspace 연동&lt;/td&gt;
+          &lt;td&gt;Gmail, Calendar 등과 통합, 다양한 앱 연결 가능&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;경쟁력&lt;/td&gt;
+          &lt;td&gt;GPT‑4 대비 멀티모달 설계, 긴 컨텍스트, 높은 벤치마크&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;과금 모델&lt;/td&gt;
+          &lt;td&gt;무료 + 프리미엄 플랜 (예: Gemini 2.5 Pro 등)&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;향후-흐름&#34;&gt;향후 흐름&lt;/h2&gt;
+&lt;p&gt;Gemini는 앞으로 &lt;strong&gt;스마트홈&lt;/strong&gt;, &lt;strong&gt;차량&lt;/strong&gt;, &lt;strong&gt;생산성 도구&lt;/strong&gt;, &lt;strong&gt;멀티미디어 생성&lt;/strong&gt; 등 다양한 분야에 깊숙이 통합될 예정이며, 계속해서 새로운 기능 및 버전이 출시되고 있다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>TypeScript 얕은 복사와 깊은 복사</title>
+      <link>https://www.devkuma.com/docs/typescript/shallow-deep-copy/</link>
+      <pubDate>Sat, 16 Aug 2025 23:26:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/typescript/shallow-deep-copy/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;복사-copying&#34;&gt;복사 (Copying)&lt;/h2&gt;
+&lt;p&gt;프로그래밍에서 &lt;strong&gt;복사&lt;/strong&gt;에는 크게 두 가지 방식이 있다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;깊은 복사(Deep Copy)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;얕은 복사(Shallow Copy)&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;깊은-복사-deep-copy&#34;&gt;깊은 복사 (Deep Copy)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;깊은 복사는 &lt;strong&gt;복사한 값이 바뀌더라도 원본 값은 영향을 받지 않는 복사 방식&lt;/strong&gt;이다&lt;/li&gt;
+&lt;li&gt;TypeScript에서는 **원시 타입(primitive type)**인 &lt;code&gt;number&lt;/code&gt;, &lt;code&gt;boolean&lt;/code&gt;은 기본적으로 깊은 복사 방식으로 동작한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-ts&#34; data-lang=&#34;ts&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;let&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;original&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;let&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;copied&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;original&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;copied&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;original&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;copied&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 1 3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;원본 &lt;code&gt;original&lt;/code&gt;은 변하지 않고, &lt;code&gt;copied&lt;/code&gt;만 변경된다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h3 id=&#34;얕은-복사-shallow-copy&#34;&gt;얕은 복사 (Shallow Copy)&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;얕은 복사는 &lt;strong&gt;복사본과 원본이 같은 참조(reference)를 공유하는 복사 방식&lt;/strong&gt;이다.&lt;/li&gt;
+&lt;li&gt;TypeScript에서 **객체(Object)와 배열(Array)**는 기본적으로 얕은 복사 방식으로 동작한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-ts&#34; data-lang=&#34;ts&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;originalArray&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;9&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;shallowCopiedArray&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;originalArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;shallowCopiedArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;originalArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;shallowCopiedArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// [0, 3, 9, 7] [0, 3, 9, 7]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;배열 &lt;code&gt;originalArray&lt;/code&gt;가 &lt;code&gt;shallowCopiedArray&lt;/code&gt;와 같은 참조를 공유하기 때문에, 하나를 수정하면 다른 하나도 영향을 받는다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h3 id=&#34;전개-연산자를-활용한-복사&#34;&gt;전개 연산자(&amp;hellip;)를 활용한 복사&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;**전개 연산자(&lt;code&gt;...&lt;/code&gt;)**를 사용하면 &lt;strong&gt;1차원 배열에 한해 깊은 복사처럼 사용할 수 있다.&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-ts&#34; data-lang=&#34;ts&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;oArray&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;deepCopiedArray&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[...&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;oArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;];&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;deepCopiedArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;log&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;oArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;deepCopiedArray&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// [1, 2, 3, 4] [0, 2, 3, 4]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;원본 배열은 그대로 유지되고, 복사본만 변경된다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;주의:&lt;/strong&gt; 객체가 중첩된 배열이나 중첩 객체까지 완전히 복사하려면 전개 연산자만으로는 &lt;strong&gt;깊은 복사&lt;/strong&gt;가 되지 않다.&lt;br&gt;
+이 경우 &lt;code&gt;JSON.parse(JSON.stringify(obj))&lt;/code&gt; 등을 사용한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;타입/방법&lt;/th&gt;
+          &lt;th&gt;복사 방식&lt;/th&gt;
+          &lt;th&gt;특징&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;number, boolean&lt;/td&gt;
+          &lt;td&gt;깊은 복사&lt;/td&gt;
+          &lt;td&gt;원본과 복사본 독립&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;객체(Object), 배열(Arra)&lt;/td&gt;
+          &lt;td&gt;얕은 복사&lt;/td&gt;
+          &lt;td&gt;원본과 복사본 참조 공유&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;전개 연산자 &lt;code&gt;...&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;1차원 깊은 복사&lt;/td&gt;
+          &lt;td&gt;1차원 배열/객체에 대해 원본 보존&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>인공지능 이해와 활용</title>
+      <link>https://www.devkuma.com/docs/ai/overview/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/overview/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;서문&#34;&gt;서문&lt;/h2&gt;
+&lt;p&gt;인공지능(AI: Artificial Intelligence)은 더 이상 미래의 기술이 아니라 현재 우리의 삶 속에 깊이 들어와 있는 핵심 기술이다. 여기서는 인공지능의 기본 개념에서부터 최신 응용 사례까지를 체계적으로 설명하여, 독자들이 AI의 본질을 이해하고 실제로 활용할 수 있도록 돕는 것을 목표로 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Ollama</title>
+      <link>https://www.devkuma.com/docs/ai/ollama/</link>
+      <pubDate>Sat, 30 Aug 2025 17:05:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/ollama/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;ollama란&#34;&gt;Ollama란?&lt;/h2&gt;
+&lt;p&gt;Ollama는 최근 AI/LLM 개발자들 사이에서 많이 쓰이는 도구이다.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Ollama&lt;/strong&gt;는 &lt;strong&gt;로컬 환경에서 대형 언어 모델(LLM)을 간편하게 실행하고 관리할 수 있게 해주는 오픈소스 플랫폼&lt;/strong&gt;이다.&lt;br&gt;
+즉, OpenAI API 같은 클라우드 모델을 쓰지 않고도 &lt;strong&gt;내 PC(Mac/Linux/Windows)&lt;/strong&gt; 에서 Llama·Mistral·Gemma·CodeLlama 같은 모델을 불러와 사용할 수 있게 해준다.&lt;/p&gt;
+&lt;h2 id=&#34;ollama의-주요-특징&#34;&gt;Ollama의 주요 특징&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;로컬 실행 지원&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;인터넷 연결 없이도 모델을 실행 가능&lt;/li&gt;
+&lt;li&gt;기업 보안이나 개인 프라이버시에 유리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;간단한 모델 배포&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ollama run llama3&lt;/code&gt; 같은 명령어 한 줄로 모델 실행&lt;/li&gt;
+&lt;li&gt;Docker처럼 &lt;strong&gt;모델 패키지 관리&lt;/strong&gt;를 지원 (&lt;code&gt;Modelfile&lt;/code&gt;이라는 설정 파일로 관리)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;여러 모델 지원&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Meta LLaMA, Mistral, Gemma, Code Llama, Phi 등 다양한 모델 다운로드 및 실행 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API 제공&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;REST API 형식으로 로컬 서버(&lt;code&gt;http://localhost:11434/api/generate&lt;/code&gt;)를 열어서 다른 앱에서 호출 가능&lt;/li&gt;
+&lt;li&gt;즉, 로컬 OpenAI API 서버처럼 활용 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GPU 최적화&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;MPS(Mac), CUDA(NVIDIA GPU) 지원 → 속도 빠름&lt;/li&gt;
+&lt;li&gt;CPU에서도 실행 가능하지만 속도는 떨어짐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;ollama-사용&#34;&gt;Ollama 사용&lt;/h2&gt;
+&lt;h3 id=&#34;설치&#34;&gt;설치&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;macOS/Linux/Windows도 패키지 제공
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ollama.com/download&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://ollama.com/download&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;macOS
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;brew install ollama&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;macOS 설치 완료 후 실행하면 메뉴 바에 ollama 아이콘 표시된다.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/ai/ollama-macos.png&#34; alt=&#34;Ollama&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;모델-실행&#34;&gt;모델 실행&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ollama run llama3
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;처음 실행하면 모델을 자동 다운로드 후 실행 (llama3 모델 용량 4.7GB)&lt;/p&gt;
+&lt;h4 id=&#34;모델-다운로드&#34;&gt;모델 다운로드&lt;/h4&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.ollama.com/search&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;공식 사이트&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 사용할 model 검색후 마음에 드는 모델 설치&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;추천 모델
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.ollama.com/library/gpt-oss&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.ollama.com/library/gpt-oss&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;chatgpt 수준의 채팅이나 분석, 업무등을 원한다면 사용. 맥북에서 조금 느리지만 동작은 잘 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.ollama.com/library/phi4-mini&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.ollama.com/library/phi4-mini&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;단순 mcp server 호출 대상 탐색등의 간단한 작업에 어울림, tools 지원하는 경량 모델이면 어느것이어도 상관없음. qwen, deepseek는 사용 금지.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;api-호출-예-curl&#34;&gt;API 호출 (예: curl)&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl http://localhost:11434/api/generate -d &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;{
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  &amp;#34;model&amp;#34;: &amp;#34;llama3&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;  &amp;#34;prompt&amp;#34;: &amp;#34;Explain quantum computing in simple terms&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;모델-관리&#34;&gt;모델 관리&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ollama list&lt;/code&gt; → 설치된 모델 확인&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ollama pull mistral&lt;/code&gt; → 새로운 모델 다운로드&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ollama create mymodel -f Modelfile&lt;/code&gt; → 커스텀 모델 생성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;ollama와-다른-llm-실행-프레임워크-비교&#34;&gt;Ollama와 다른 LLM 실행 프레임워크 비교&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;도구&lt;/th&gt;
+          &lt;th&gt;특징&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;Ollama&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;가장 간단한 설치/실행, 로컬 API 제공, 모델 패키지 관리&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;LM Studio&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;GUI 기반, 모델 선택과 실행 직관적&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;vLLM&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;고성능 서버 실행 최적화, 주로 대규모 배포에 사용&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;Text Generation WebUI&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;다양한 모델 실행 + Web UI 제공&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;OpenAI API&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;클라우드 기반, 최신 모델 사용 가능, 하지만 비용/프라이버시 이슈&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;활용-사례&#34;&gt;활용 사례&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;개발 환경에서 &lt;strong&gt;로컬 AI 어시스턴트&lt;/strong&gt; 구축&lt;/li&gt;
+&lt;li&gt;사내 보안 데이터와 연결한 &lt;strong&gt;내부 챗봇&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LangChain, LlamaIndex&lt;/strong&gt; 같은 프레임워크와 연동해 RAG 시스템 구축&lt;/li&gt;
+&lt;li&gt;프로토타이핑: OpenAI API 비용 안 쓰고 빠르게 실험&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Ollama는 로컬에서 쉽게 LLM을 실행할 수 있게 해주는 &amp;ldquo;Docker for LLMs&amp;rdquo; 같은 플랫폼&lt;/strong&gt;이다. 개인 연구부터 기업용 챗봇까지 다양하게 쓸 수 있다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>AI 용어</title>
+      <link>https://www.devkuma.com/docs/ai/term/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/term/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;헷갈리고-어려운-ai-관련-최근-용어들&#34;&gt;헷갈리고 어려운 AI 관련 최근 용어들&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;AI(Artificial Intelligence)
+&lt;ul&gt;
+&lt;li&gt;컴퓨터가 사람의 지능을 모방하여 학습하고 문제를 해결하는 기술&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ML(Machine Learning)
+&lt;ul&gt;
+&lt;li&gt;AI가 데이터를 통해 자동 학습하고 예측하는 기술&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;DL(Deep Learning)
+&lt;ul&gt;
+&lt;li&gt;ML의 한 종류로 &amp;lsquo;인공신경망&amp;rsquo;을 활용해 복잡한 패턴을 학습하는 기술&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;AX(AI Transformation)
+&lt;ul&gt;
+&lt;li&gt;DX를 넘어 AI를 중심으로 기업의 변화를 추구&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;AGI(Artificial General Intelligence)
+&lt;ul&gt;
+&lt;li&gt;특정 작업에 국한되지 않고, 사람처럼 여러 분야에서 지능적으로 문제를 해결할 수 있는 인공지능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Gen(Generative) AI
+&lt;ul&gt;
+&lt;li&gt;Text, Image, Music, Video 등을 생성하는 인공지능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Prompting
+&lt;ul&gt;
+&lt;li&gt;Gen AI에게 필요한 답을 얻도록, 질문하는 방법&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;LLM(Large Language Model)
+&lt;ul&gt;
+&lt;li&gt;빅데이터를 기반으로 언어와 유사한 텍스트를 이해하고 만들어 내는 기술&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;FM(Foundation Model)
+&lt;ul&gt;
+&lt;li&gt;다양하고 방대한 양의 데이터로 사전 학습된 모델 (언어 처리, 이미지 인식, Audio/Video 생성 등에 기초 모델로 사용)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Hallucination(환각현상)
+&lt;ul&gt;
+&lt;li&gt;AI가 잘못된 결론에 도달하여, 현실에 없는 결과물(콘텐츠)를 생성해 내는 현상&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>GitHub Copilot</title>
+      <link>https://www.devkuma.com/docs/ai/copilot/</link>
+      <pubDate>Sat, 30 Aug 2025 14:50:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/copilot/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;copilot이란&#34;&gt;Copilot이란?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Copilot&lt;/strong&gt;은 GitHub와 OpenAI가 공동 개발한 &lt;strong&gt;AI 기반 코드 자동 완성 도구&lt;/strong&gt;이다.&lt;/li&gt;
+&lt;li&gt;개발자가 코드를 작성할 때, &lt;strong&gt;주석이나 함수 시그니처, 맥락(Context)&lt;/strong&gt; 을 분석하여 가장 적절한 코드를 자동으로 제안한다.&lt;/li&gt;
+&lt;li&gt;흔히 &lt;strong&gt;AI 페어 프로그래머(AI Pair Programmer)&lt;/strong&gt; 라고 불린다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;주요-특징&#34;&gt;주요 특징&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;자동 코드 제안&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;한 줄, 함수 전체, 심지어 테스트 코드까지 자동 생성&lt;/li&gt;
+&lt;li&gt;반복되는 패턴을 빠르게 채워줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;주석 기반 개발&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;// 두 숫자를 더하는 함수 작성&lt;/code&gt; 같은 자연어 주석을 입력하면 코드를 생성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;맥락 이해&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;현재 파일, 프로젝트 내 다른 파일들을 참고해 더 자연스러운 제안 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;다양한 언어/프레임워크 지원&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;Python, JavaScript, TypeScript, Go, Java, C#, C++ 등 광범위한 언어 지원&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;IDE 통합&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;VS Code, JetBrains IDE, Neovim 등 주요 개발 환경에 플러그인으로 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;활용-사례&#34;&gt;활용 사례&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;반복 작업 단축&lt;/strong&gt;:  boilerplate 코드, CRUD API, 테스트 코드 작성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;신규 언어 학습&lt;/strong&gt;:  생소한 언어/프레임워크 문법을 빠르게 습득&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;알고리즘 구현&lt;/strong&gt;:  주석으로 요구사항 작성 후 코드 자동 생성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;리팩터링 보조&lt;/strong&gt;:  더 나은 구현 방식 제안&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;장점&#34;&gt;장점&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;개발 속도 향상:  일상적인 반복 코딩을 크게 줄여줌&lt;/li&gt;
+&lt;li&gt;학습 효과:  모르는 API나 문법을 예시로 보여줌&lt;/li&gt;
+&lt;li&gt;코드 일관성 유지:  팀 규칙에 맞게 보일러플레이트 자동화&lt;/li&gt;
+&lt;li&gt;테스트 작성 보조:  TDD 사이클 가속화&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;한계단점&#34;&gt;한계/단점&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정확성 불완전&lt;/strong&gt;:  항상 올바른/최적의 코드가 나오지 않음&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;보안 위험&lt;/strong&gt;:  취약점 포함 가능 (예: SQL 인젝션 방어 누락)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;라이선스 문제&lt;/strong&gt;:  공개 코드에서 학습했기에 일부 코드가 저작권 이슈 될 수 있음&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;맥락 제한&lt;/strong&gt;:  프로젝트 전체를 깊게 이해하기엔 한계 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;비용&#34;&gt;비용&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;유료 구독제&lt;/strong&gt; (2025년 현재 기준)
+&lt;ul&gt;
+&lt;li&gt;개인: 월 약 &lt;strong&gt;$10 (USD)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;기업: 월 약 &lt;strong&gt;$19 (USD) / 사용자&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;학생/오픈소스 기여자는 무료 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;copilot과-바이브-코딩의-차이&#34;&gt;Copilot과 바이브 코딩의 차이&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Copilot&lt;/strong&gt;:  개발자가 주도, AI는 제안 (보조 도구)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;바이브 코딩&lt;/strong&gt;:  AI가 주도, 개발자는 목표와 피드백만 (창작 스타일)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;비슷한-ai-코딩-도구&#34;&gt;비슷한 AI 코딩 도구&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Amazon CodeWhisperer&lt;/strong&gt; (AWS)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tabnine&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Cursor IDE (ChatGPT 내장 IDE)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Replit Ghostwriter&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GitHub Copilot은 &amp;ldquo;AI 페어 프로그래머&amp;quot;로, 주석·코드 맥락을 기반으로 실시간 코드 제안을 해주는 도구&lt;/strong&gt;이다.&lt;/li&gt;
+&lt;li&gt;반복적이고 생산성 낮은 작업을 줄여주고, 초안 코드를 빨리 만들 수 있지만, 반드시 &lt;strong&gt;검증·리뷰·테스트&lt;/strong&gt;가 필요하다.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>AI 도구</title>
+      <link>https://www.devkuma.com/docs/ai/tool/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/tool/</guid>
+      <description>
+        
+        
+        &lt;p&gt;AI 도구&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>AI Q&amp;A</title>
+      <link>https://www.devkuma.com/docs/ai/qna/</link>
+      <pubDate>Sat, 30 Aug 2025 18:38:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/qna/</guid>
+      <description>
+        
+        
+        &lt;p&gt;AI에 대해 궁금한 점은 뭐든 정리한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>인공지능의 개념과 역사</title>
+      <link>https://www.devkuma.com/docs/ai/concept-and-history/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/concept-and-history/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;인공지능의-정의&#34;&gt;인공지능의 정의&lt;/h2&gt;
+&lt;p&gt;인공지능은 인간의 학습, 추론, 문제 해결 능력을 컴퓨터가 수행할 수 있도록 구현한 기술을 의미한다. 단순한 규칙 기반의 자동화에서 출발하여, 현재는 스스로 학습하고 적응하는 기계학습 및 딥러닝 기술로 발전하였다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/apple-siri-goolgle-assistant.png&#34; alt=&#34;Siri, Google Assistant&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사례: 마트폰 음성 비서(예: Siri, Google Assistant)는 단순 명령 수행을 넘어 사용자의 언어 패턴을 학습하여 점차 정교한 대화를 지원한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;인공지능의-역사&#34;&gt;인공지능의 역사&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;1950년대: 앨런 튜링의 &amp;ldquo;튜링 테스트&amp;rdquo; 제안&lt;/li&gt;
+&lt;li&gt;1960~70년대: 규칙 기반 전문가 시스템 등장&lt;/li&gt;
+&lt;li&gt;1980~90년대: 신경망 연구 재개 및 머신러닝 발전&lt;/li&gt;
+&lt;li&gt;2000년대 이후: 빅데이터와 GPU의 발전으로 딥러닝이 급성장&lt;/li&gt;
+&lt;li&gt;현재: 자연어 처리, 자율주행, 의료 진단 등 다양한 분야로 확산&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/ai-history.png&#34; alt=&#34;인공지능의 역사&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;도표 1: 인공지능 역사 연대표 (연도별 주요 기술 발전 흐름)&lt;/li&gt;
+&lt;li&gt;이미지 출처: &lt;a href=&#34;https://spri.kr/posts/view/21643?code=industry_trend&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://spri.kr/posts/view/21643?code=industry_trend&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>인공지능의 핵심 기술</title>
+      <link>https://www.devkuma.com/docs/ai/core-technologies/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/core-technologies/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;머신러닝&#34;&gt;머신러닝&lt;/h2&gt;
+&lt;p&gt;머신러닝(ML, Machine Learning)은 &lt;strong&gt;컴퓨터가 명시적으로 프로그래밍되지 않아도, 데이터에서 패턴을 학습하고 예측이나 결정을 내릴 수 있는 기술&lt;/strong&gt;이다. 즉, 사람이 일일이 규칙을 작성하지 않아도, 데이터를 통해 스스로 규칙과 연관성을 찾아내는 능력을 말한다. 대표적으로 지도학습, 비지도학습, 강화학습이 있다.&lt;/p&gt;
+&lt;h3 id=&#34;머신러닝의-종류&#34;&gt;머신러닝의 종류&lt;/h3&gt;
+&lt;p&gt;머신러닝은 주로 &lt;strong&gt;학습 방식&lt;/strong&gt;에 따라 세 가지로 나눈다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;지도학습(Supervised Learning)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 입력 데이터와 그에 대응하는 정답(Label)을 함께 제공하여 모델을 학습시킨다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;목적&lt;/strong&gt;: 입력 데이터로부터 정답을 예측&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;이메일 스팸 분류 (스팸/정상)&lt;/li&gt;
+&lt;li&gt;집 가격 예측 (면적, 위치 → 가격)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;알고리즘&lt;/strong&gt;: 선형회귀, 로지스틱 회귀, 결정트리, 랜덤포레스트, 서포트 벡터 머신 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;비지도학습(Unsupervised Learning)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;정의&lt;/strong&gt;: 정답 없이 입력 데이터만으로 학습하여 숨겨진 패턴이나 구조를 찾습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;목적&lt;/strong&gt;: 데이터 군집화, 차원 축소&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;예시&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;고객 세분화 (구매 패턴 기반 군집)&lt;/li&gt;
+&lt;li&gt;이상치 탐지 (사기 거래 발견)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;알고리즘&lt;/strong&gt;: K-평균 클러스터링, 계층적 군집화, PCA(주성분 분석) 등&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;강화학습(Reinforcement Learning)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;정의&lt;/strong&gt;: 행동에 따른 보상(Reward)과 벌점(Penalty)을 이용해 최적의 전략을 학습한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;목적&lt;/strong&gt;: 순차적 의사결정 최적화&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예시&lt;/strong&gt;:
+&lt;ul&gt;
+&lt;li&gt;알파고 바둑&lt;/li&gt;
+&lt;li&gt;자율주행 자동차 경로 학습&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;알고리즘&lt;/strong&gt;: Q-러닝, 딥 Q-네트워크(DQN), 정책 경사법 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;머신러닝의-작동-원리&#34;&gt;머신러닝의 작동 원리&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;데이터 수집&lt;/strong&gt;: 학습할 데이터를 모음 (예: 이미지, 텍스트, 센서 데이터)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 전처리&lt;/strong&gt;: 결측치 제거, 정규화, 특징(Feature) 추출&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;모델 선택&lt;/strong&gt;: 문제 유형에 맞는 ML 알고리즘 선택&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;학습(Training)&lt;/strong&gt;: 데이터를 통해 모델이 규칙/패턴을 학습&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;평가(Evaluation)&lt;/strong&gt;: 테스트 데이터를 통해 모델 정확도 측정&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;예측(Prediction)&lt;/strong&gt;: 새로운 데이터에 대한 결과를 예측&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;머신러닝의-실제-사례&#34;&gt;머신러닝의 실제 사례&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;의료&lt;/strong&gt;: MRI, CT 영상 분석을 통한 질병 진단 보조&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;금융&lt;/strong&gt;: 신용 점수 예측, 사기 거래 탐지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;전자상거래&lt;/strong&gt;: 개인 맞춤형 상품 추천&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자율주행&lt;/strong&gt;: 도로 객체 인식, 경로 결정&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자연어 처리&lt;/strong&gt;: 기계 번역, 챗봇 대화 생성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;머신러닝의-장점&#34;&gt;머신러닝의 장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;데이터 기반 의사결정 가능&lt;/li&gt;
+&lt;li&gt;대규모 데이터 처리와 복잡한 패턴 학습에 효율적&lt;/li&gt;
+&lt;li&gt;반복 학습으로 성능 개선 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;머신러닝의-한계&#34;&gt;머신러닝의 한계&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;데이터 의존성&lt;/strong&gt;: 품질 좋은 데이터가 반드시 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;과적합(Overfitting)&lt;/strong&gt;: 학습 데이터에만 특화되어 일반화 능력 부족&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;설명력 부족&lt;/strong&gt;: 모델이 왜 그런 결정을 내렸는지 이해하기 어려운 경우가 있음&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;윤리 문제&lt;/strong&gt;: 편향된 데이터로 인해 불공정한 결과가 발생할 수 있음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;딥러닝&#34;&gt;딥러닝&lt;/h2&gt;
+&lt;p&gt;딥러닝(Deep Learning)은 인공지능 분야에서 &lt;strong&gt;인간의 뇌 구조를 모방한 인공신경망(Artificial Neural Network)을 기반으로, 다층 구조를 통해 데이터의 복잡한 패턴과 특징을 학습하는 기술&lt;/strong&gt;을 의미한다. 단순한 머신러닝 모델이 데이터의 기본적 관계를 학습하는 것에 비해, 딥러닝은 여러 층(Layer)을 거치며 점점 추상화된 특징을 학습함으로써 고차원적 문제 해결에 강점을 가진다. 이미지 인식, 음성 인식, 자연어 처리 등에서 탁월한 성능을 보여주고 있다.&lt;/p&gt;
+&lt;h3 id=&#34;딥러닝의-핵심-원리&#34;&gt;딥러닝의 핵심 원리&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;인공신경망 구조&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;입력층(Input Layer): 데이터가 처음 들어오는 층&lt;/li&gt;
+&lt;li&gt;은닉층(Hidden Layer): 입력 데이터를 처리하고 특징을 추출하는 층&lt;/li&gt;
+&lt;li&gt;출력층(Output Layer): 최종 예측이나 분류 결과를 출력하는 층&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;학습 과정&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;순전파(Forward Propagation)&lt;/strong&gt;: 입력 데이터를 통해 출력값을 계산&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;손실 함수(Loss Function)&lt;/strong&gt;: 출력값과 실제값의 차이를 측정&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;역전파(Backpropagation)&lt;/strong&gt;: 오차를 기반으로 가중치(Weight)를 조정&lt;/li&gt;
+&lt;li&gt;반복적 학습을 통해 모델의 예측 정확도를 점차 향상&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;활성화 함수(Activation Function)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;신경망의 각 노드에서 출력값을 변환하여 비선형성을 부여&lt;/li&gt;
+&lt;li&gt;대표적 함수: 시그모이드(Sigmoid), 렐루(ReLU), 하이퍼볼릭 탄젠트(Tanh)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;딥러닝의-특징&#34;&gt;딥러닝의 특징&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;자동 특징 추출&lt;/strong&gt;: 데이터에서 유용한 특징을 사람이 일일이 정의하지 않아도 학습 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;다층 구조&lt;/strong&gt;: 은닉층이 많을수록 복잡한 패턴 학습 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;대규모 데이터 적합&lt;/strong&gt;: 빅데이터와 GPU 연산을 통해 효율적 학습&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;딥러닝의-주요-응용-분야&#34;&gt;딥러닝의 주요 응용 분야&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;이미지 인식&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;자율주행차의 도로 객체 인식, 의료 영상 진단 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;음성 인식&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;음성 비서, 실시간 통역 시스템&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자연어 처리&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;기계 번역, 챗봇, 문서 요약&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;추천 시스템&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;전자상거래 맞춤형 상품 추천, 동영상 추천 알고리즘&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;딥러닝의-장점&#34;&gt;딥러닝의 장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;복잡하고 고차원적인 데이터에서도 높은 정확도 달성 가능&lt;/li&gt;
+&lt;li&gt;특징 추출 자동화로 데이터 전처리 부담 감소&lt;/li&gt;
+&lt;li&gt;다양한 분야에서 기존 방법보다 월등한 성능 발휘&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;딥러닝의-한계&#34;&gt;딥러닝의 한계&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;학습에 많은 데이터 필요&lt;/strong&gt;: 충분한 데이터가 없으면 성능 저하&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;설명력 부족&lt;/strong&gt;: 모델의 결정 과정이 불투명, ‘블랙박스’ 문제&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;연산 비용과 시간 소모&lt;/strong&gt;: GPU 및 대규모 연산 자원 필요&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;과적합 위험&lt;/strong&gt;: 학습 데이터에만 최적화되어 일반화 능력 부족&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;자연어-처리nlp&#34;&gt;자연어 처리(NLP)&lt;/h2&gt;
+&lt;p&gt;자연어 처리(NLP, Natural Language Processing)는 &lt;strong&gt;인간이 사용하는 언어, 즉 자연어를 컴퓨터가 이해하고 분석하며 생성할 수 있도록 하는 인공지능 기술 분야&lt;/strong&gt;를 의미한다. 이를 통해 기계는 텍스트와 음성 형태의 언어 데이터를 처리하고, 의미를 파악하거나 적절한 응답을 생성할 수 있다. 번역, 질의응답, 챗봇, 문서 요약 등 다양한 응용 사례를 갖고 있으며, 최근 GPT 계열 모델이 큰 성과를 거두고 있다.&lt;/p&gt;
+&lt;h3 id=&#34;자연어-처리의-주요-목표&#34;&gt;자연어 처리의 주요 목표&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;언어 이해(Language Understanding)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;입력된 문장의 의미, 문맥, 의도 등을 파악&lt;/li&gt;
+&lt;li&gt;예: 질문 답변 시스템, 감정 분석&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;언어 생성(Language Generation)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;기계가 사람이 이해할 수 있는 자연스러운 문장을 생성&lt;/li&gt;
+&lt;li&gt;예: 챗봇 대화, 자동 문서 요약, 기계 번역&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;자연어-처리의-핵심-기술&#34;&gt;자연어 처리의 핵심 기술&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;형태소 분석(Morphological Analysis)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문장을 구성하는 최소 의미 단위(형태소)로 분리&lt;/li&gt;
+&lt;li&gt;예: &amp;ldquo;나는 학교에 간다&amp;rdquo; → [나/는, 학교/에, 가/ㄴ다]&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;품사 태깅(Part-of-Speech Tagging)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;각 단어에 명사, 동사, 형용사 등 품사를 부착&lt;/li&gt;
+&lt;li&gt;문장의 구조와 의미 분석 기반 마련&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;의미 분석(Semantic Analysis)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문장이나 단어의 의미를 컴퓨터가 이해하도록 변환&lt;/li&gt;
+&lt;li&gt;예: &amp;ldquo;은행&amp;rdquo; → 금융 기관인지 강가인지 판별&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;구문 분석(Syntactic Parsing)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문장의 문법적 구조를 분석하여 주어, 목적어, 동사 관계 확인&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;텍스트 임베딩(Text Embedding)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;단어, 문장, 문서 등을 수치 벡터로 변환&lt;/li&gt;
+&lt;li&gt;기계 학습 모델이 자연어 데이터를 처리할 수 있게 함&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;언어 모델(Language Model)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;문맥과 패턴을 학습하여 다음 단어 예측&lt;/li&gt;
+&lt;li&gt;GPT, BERT 등 최신 모델이 대표적&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;자연어-처리의-응용-사례&#34;&gt;자연어 처리의 응용 사례&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;기계 번역&lt;/strong&gt;: Google 번역, DeepL 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;챗봇 및 대화형 AI&lt;/strong&gt;: 고객 상담 자동화, 개인 튜터 AI&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;텍스트 요약&lt;/strong&gt;: 뉴스 기사, 논문, 보고서 자동 요약&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;감정 분석&lt;/strong&gt;: SNS, 리뷰 데이터를 기반으로 긍정·부정 분석&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;음성 인식 및 음성 합성&lt;/strong&gt;: Siri, Alexa, TTS(Text-to-Speech) 시스템&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;자연어-처리의-장점&#34;&gt;자연어 처리의 장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;인간과 기계 간 자연스러운 상호작용 가능&lt;/li&gt;
+&lt;li&gt;방대한 텍스트 데이터를 자동으로 분석하고 활용 가능&lt;/li&gt;
+&lt;li&gt;번역, 검색, 추천 등 다양한 서비스 고도화 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;자연어-처리의-한계&#34;&gt;자연어 처리의 한계&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;문맥 이해 한계&lt;/strong&gt;: 복잡한 문맥이나 중의적 표현 이해 어려움&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;언어 및 문화 편향 문제&lt;/strong&gt;: 특정 언어·문화 데이터에 의존 시 편향 발생&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;데이터 의존성&lt;/strong&gt;: 품질 높은 학습 데이터 없이는 정확도 저하&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;연산 자원 필요&lt;/strong&gt;: 대규모 언어 모델 학습 시 막대한 연산 비용 필요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;강화학습&#34;&gt;강화학습&lt;/h2&gt;
+&lt;p&gt;강화학습은 보상과 벌점을 기반으로 최적의 행동 전략을 학습하는 기술이다. 알파고의 바둑 대국 승리 사례가 대표적이다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/alphago-leesedol.png&#34; alt=&#34;알파고와 이세돌의 대국&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사례: 알파고와 이세돌의 대국은 강화학습의 실제적 성과를 전 세계에 각인시킨 사건이었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;강화학습은 에이전트(Agent)가 환경과 상호작용하면서 경험을 통해 최적의 행동 전략을 학습하는 인공지능 기술을 의미한다. 에이전트는 현재의 상태(State)를 관찰하고, 가능한 여러 행동(Action) 중 하나를 선택하며, 그 선택에 대한 보상(Reward)이나 벌점(Penalty)을 받는다. 이러한 피드백을 통해 에이전트는 장기적으로 최대 보상을 얻을 수 있는 행동 정책(Policy)을 점진적으로 개선한다. 강화학습의 핵심은 정답을 명시적으로 알려주지 않아도, 반복적인 시행착오를 통해 스스로 최적 전략을 발견한다는 점에 있다. 대표적 사례로는 **알파고(AlphaGo)**가 있다. 알파고는 수많은 바둑 대국 시뮬레이션과 강화학습을 반복하여 바둑의 최적 수를 학습하였으며, 이 과정에서 인간 챔피언인 이세돌을 상대로 승리하는 성과를 이루어냈다. 이를 통해 강화학습이 복잡한 문제 해결에서도 효과적임을 입증하였다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>ChatGPT와 생성형 AI</title>
+      <link>https://www.devkuma.com/docs/ai/chat-gpt/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/chat-gpt/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;gpt의-개념&#34;&gt;GPT의 개념&lt;/h2&gt;
+&lt;p&gt;GPT(Generative Pre-trained Transformer)는 사전 학습을 통해 방대한 언어 패턴을 습득한 후, 새로운 문장을 생성할 수 있는 인공지능 모델이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Generative(생성형)&lt;/strong&gt;: 새로운 문장을 생성할 수 있음을 의미한다. 질문에 대한 답변을 산출하거나 글쓰기를 요청받으면 새로운 문장을 만들어낼 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pre-trained(사전 학습된)&lt;/strong&gt;: 방대한 데이터로 미리 학습된 모델을 뜻한다. 책, 웹사이트, 뉴스 등 다양한 텍스트를 기반으로 언어의 규칙과 표현을 습득하였다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Transformer(트랜스포머)&lt;/strong&gt;: 문장의 의미를 효과적으로 이해하고 처리하기 위해 설계된 모델 구조의 명칭이다. 이는 구글에서 개발한 기술이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;작동-방식&#34;&gt;작동 방식&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;사전 학습(Pre-training)&lt;/strong&gt;
+GPT는 인터넷에 존재하는 방대한 텍스트 데이터를 학습하여 언어의 패턴, 문법, 의미 등을 습득한다. 예를 들어, &amp;ldquo;하늘이 파란 이유는&amp;quot;이라는 문장이 주어지면, 그 뒤에 &amp;ldquo;햇빛이 산란되기 때문이다&amp;quot;라는 서술이 자주 등장한다는 사실을 학습한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;추론(Inference)&lt;/strong&gt;
+사전 학습이 완료된 GPT는 사용자로부터 질문을 입력받으면, 그에 적합하고 자연스러운 답변을 생성한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;문맥 이해(Context Understanding)&lt;/strong&gt;
+GPT는 이전 문맥을 참조하여 상황에 맞는 응답을 하려고 한다. 예컨대, 대화 중 앞에서 &amp;ldquo;봄&amp;quot;에 관한 언급이 있었다면, 꽃이나 날씨와 같은 주제를 더 잘 연상하여 활용할 수 있다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;gpt의-장점&#34;&gt;GPT의 장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;다양한 언어 작업 수행 가능&lt;/strong&gt;
+질문 응답, 글쓰기, 번역, 요약, 문법 교정 등 여러 언어 처리 작업을 수행할 수 있다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;자연스러운 표현 생성&lt;/strong&gt;
+GPT 기반 챗봇은 대화체 문장을 자연스럽게 산출할 수 있어, 사람과 대화하는 듯한 경험을 제공한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;신속한 반응&lt;/strong&gt;
+원하는 정보를 수 초 내에 생성하여 제공한다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;chatgpt의-등장&#34;&gt;ChatGPT의 등장&lt;/h2&gt;
+&lt;p&gt;ChatGPT는 OpenAI가 개발한 &lt;strong&gt;대규모 언어 모델(LLM, Large Language Model)&lt;/strong&gt; 기반의 대화형 인공지능 서비스이다. GPT(Generative Pre-trained Transformer) 기술을 바탕으로 인간과 유사한 자연스러운 대화를 수행하며, 질의응답, 문서 작성, 번역, 요약 등 다양한 언어 처리 작업을 지원한다. 자연스러운 문맥 이해와 다언어 지원 능력이 강점이다.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://chatgpt.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://chatgpt.com/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;명칭의-의미&#34;&gt;명칭의 의미&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Chat&lt;/strong&gt;: 사용자와의 대화 인터페이스를 의미한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;GPT&lt;/strong&gt;: 문장 생성 능력을 갖추고 사전 학습된 트랜스포머 아키텍처 기반 모델이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;ldquo;GPT 기술을 기반으로 한 대화형 서비스&amp;quot;이라는 의미를 내포한다.&lt;/p&gt;
+&lt;h3 id=&#34;특징-및-기능&#34;&gt;특징 및 기능&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;다양한 활용성
+&lt;ul&gt;
+&lt;li&gt;질문 응답, 문장 작성, 번역, 요약, 프로그램 작성(코드 지원) 등이 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;자연스러운 대화 능력
+&lt;ul&gt;
+&lt;li&gt;사람과 대화하는 듯한 자연스러운 응답을 생성할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;다언어 대응&lt;/li&gt;
+&lt;li&gt;한글을 포함한 다양한 언어로 의사소통이 가능하다.&lt;/li&gt;
+&lt;li&gt;기술적 유연성
+&lt;ul&gt;
+&lt;li&gt;다양한 형식의 출력—텍스트, 코드, 표, JSON 등—생성 가능하며, 노코드 환경에서도 활용할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;주요-특징&#34;&gt;주요 특징&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;다양한 언어 작업 수행 가능&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;질문 응답, 글쓰기, 번역, 요약, 문법 교정, 코드 작성 등 폭넓은 활용이 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자연스러운 대화 생성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;사람과 대화하는 듯한 자연스러운 언어 표현을 산출할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;다언어 지원&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;한국어를 포함한 다수의 언어로 의사소통이 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;출력 형식의 유연성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;텍스트뿐 아니라 코드, 표, JSON 등 다양한 형식으로 결과를 제공할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;기술적-기반&#34;&gt;기술적 기반&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;사전 학습(Pre-training)&lt;/strong&gt;: 웹, 도서, 논문, 소스 코드 등 방대한 텍스트 데이터를 기반으로 언어의 구조와 의미를 학습하였다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Transformer 아키텍처&lt;/strong&gt;: 문맥 이해와 문장 생성을 위한 핵심 기술로, Self-Attention 메커니즘을 활용하여 단어 간 관계를 효과적으로 파악한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;활용-사례&#34;&gt;활용 사례&lt;/h2&gt;
+&lt;p&gt;ChatGPT의 활용 범위는 매우 다양하며, 여러 산업과 분야에서 실제로 적용되고 있다. 대표적인 활용 사례를 살펴보면 다음과 같다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;고객 서비스 자동화&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;기업의 고객 지원 부서에서는 ChatGPT를 활용하여 24시간 온라인 상담 서비스를 제공하고 있다. 이를 통해 고객의 기본적인 문의를 신속히 처리할 수 있으며, 상담원이 복잡한 문제에 집중할 수 있도록 지원한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;교육 및 학습 지원&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;교육 현장에서 ChatGPT는 학생 개개인의 학습 속도와 수준에 맞춘 맞춤형 학습을 제공한다. 학생이 질문을 입력하면 AI가 이해하기 쉬운 답변을 제공하고, 추가 학습 자료를 추천함으로써 학습 효율을 높인다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;프로그래밍 코드 보조&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;프로그래머들은 ChatGPT를 활용하여 코드 작성 및 디버깅을 보조받을 수 있다. 반복적인 코드 작성 작업이나 함수 템플릿 생성, 오류 검토 등을 자동화함으로써 개발 속도를 향상시키고, 생산성을 높인다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;콘텐츠 생성 및 요약&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ChatGPT는 기사 요약, 광고 문구 작성, 보고서 작성 등 다양한 콘텐츠 생성 업무를 수행할 수 있다. 또한, 방대한 문서를 요약하여 핵심 정보를 빠르게 전달함으로써 정보 처리 효율을 높인다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;한계와-과제&#34;&gt;한계와 과제&lt;/h2&gt;
+&lt;p&gt;ChatGPT의 활용에는 분명한 장점이 존재하지만, 동시에 다음과 같은 한계와 과제가 있다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;사실 오류 발생 가능성&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;ChatGPT는 학습된 데이터에 기반하여 답변을 생성하므로, 때때로 잘못된 정보나 오류가 포함될 수 있다. 따라서 중요한 의사결정에 활용할 때는 추가 검증이 필요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;최신 정보 반영의 한계&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모델이 학습된 시점 이후의 최신 정보나 사건은 반영되지 않을 수 있다. 실시간 정보가 필요한 분야에서는 보조적 도구로 활용하는 것이 적절하다.&lt;/li&gt;
+&lt;li&gt;다만, 최신 GPT 모델은 인터넷 검색 기능과 연동되어 이를 보완하기도 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;데이터 사용과 저작권 문제&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ChatGPT가 학습한 데이터에는 저작권이 존재할 수 있으며, 생성된 콘텐츠 또한 지적 재산권 문제와 연결될 수 있다. 따라서 상업적 활용 시 법적 문제에 주의해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;예측 기반의 작동 원리&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;GPT는 단어의 다음 위치를 확률적으로 예측하는 방식으로 작동한다. 따라서 인간과 같은 심층적 이해나 감정을 지니는 것은 아니며, 의미를 &amp;ldquo;이해&amp;quot;한다기보다는 패턴을 &amp;ldquo;예측&amp;quot;한다고 보는 것이 타당하다.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+    </item>
+    
+    <item>
+      <title>LLM(Large Language Model)</title>
+      <link>https://www.devkuma.com/docs/ai/llm/</link>
+      <pubDate>Sun, 24 Aug 2025 13:14:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/llm/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;llm-개요&#34;&gt;LLM 개요&lt;/h2&gt;
+&lt;p&gt;LLM(Large Language Models, 대규모 언어 모델)은 방대한 양의 텍스트 데이터를 학습하여 &lt;strong&gt;자연어를 이해하고 생성할 수 있는 인공지능 모델&lt;/strong&gt;이다. 이들은 주로 &lt;strong&gt;딥러닝 기반의 트랜스포머 구조&lt;/strong&gt;를 활용하는데, 따라서 인간의 언어 특성을 통계적으로 파악하여 높은 수준의 텍스트 생성 및 처리 능력을 갖추고 있다.&lt;/p&gt;
+&lt;p&gt;LLM은 오늘날 AI의 중추로서, 언어 기반 애플리케이션과 시스템 설계에서 매우 중요한 역할을 수행하고 있다.&lt;/p&gt;
+&lt;h2 id=&#34;llm-작동-원리&#34;&gt;LLM 작동 원리&lt;/h2&gt;
+&lt;h3 id=&#34;학습-방식-및-트랜스포머-아키텍처&#34;&gt;학습 방식 및 트랜스포머 아키텍처&lt;/h3&gt;
+&lt;p&gt;LLM은 수천억 개의 텍스트 예시를 통해 &lt;strong&gt;비지도 학습&lt;/strong&gt; 방식으로 사전 학습(pre-training)을 수행한다.&lt;br&gt;
+특히, &lt;strong&gt;트랜스포머 구조&lt;/strong&gt;는 셀프 어텐션(self-attention)을 통해 문맥의 관계를 이해하며, 이전의 순환신경망(RNN)보다 병렬 처리가 가능하여 학습 효율이 매우 높다&lt;/p&gt;
+&lt;h3 id=&#34;파라미터와-임베딩&#34;&gt;파라미터와 임베딩&lt;/h3&gt;
+&lt;p&gt;‘대규모’라는 명칭은 수십억에서 수천억 개에 이르는 &amp;ldquo;파라미터(parameter)&amp;ldquo;의 크기를 의미한다. 이러한 방대한 매개변수를 통해 언어의 복잡한 맥락과 뉘앙스를 포착할 수 있다.
+또한, &amp;ldquo;임베딩(embedding)&amp;ldquo;은 단어를 다차원 벡터로 변환하여 의미적 유사성을 수치적으로 표현함으로써 문맥 이해를 돕는다.&lt;/p&gt;
+&lt;h2 id=&#34;응용-분야&#34;&gt;응용 분야&lt;/h2&gt;
+&lt;p&gt;LLM은 매우 유연하게 활용될 수 있으며, 대표적인 응용 예시는 다음과 같다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;생성형 AI&lt;/strong&gt;: 사용자 프롬프트에 따라 에세이, 번역, 요약 등의 텍스트 생성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;코드 생성&lt;/strong&gt;: GitHub Copilot, AWS CodeWhisperer 등 자연어로부터 코드 작성 지원&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;텍스트 분류 및 감정 분석&lt;/strong&gt;: 고객 피드백 분류, 문서 클러스터링 등&lt;/li&gt;
+&lt;li&gt;기타: 지식 기반 질의 응답(KI-NLP), 챗봇, 고객 서비스 자동화 등&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;학습-방법의-종류&#34;&gt;학습 방법의 종류&lt;/h2&gt;
+&lt;p&gt;LLM을 특정 용도에 맞추어 활용하는 방법에는 다음 세 가지가 있다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;제로샷 학습 (Zero-Shot)&lt;/strong&gt;: 추가 학습 없이 일반적인 프롬프트만으로 다양한 작업 수행 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;퓨샷 학습 (Few-Shot)&lt;/strong&gt;: 소량의 예제를 제공함으로써 성능을 향상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;미세 조정 (Fine-Tuning)&lt;/strong&gt;: 특정 데이터로 파라미터를 추가 학습시켜 특화된 적용이 가능&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;중요성-및-기대-효과&#34;&gt;중요성 및 기대 효과&lt;/h2&gt;
+&lt;p&gt;LLM의 도입은 기업과 조직에 다양한 이점을 가져다줄 수 있다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;업무 자동화&lt;/strong&gt;: 고객 지원, 문서 요약, 콘텐츠 생성 등 언어 기반 작업의 자동화로 생산성 향상&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;확장성 및 유연성&lt;/strong&gt;: 하나의 모델이 번역, 요약, 질의 응답 등 여러 작업에 유연하게 대응&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;혁신 유도&lt;/strong&gt;: 지식 추출, 창작 보조, 대화형 인터페이스 등 다양한 미래 가능성에 기반 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;한계-및-고려-사항&#34;&gt;한계 및 고려 사항&lt;/h2&gt;
+&lt;p&gt;LLM 활용 시에는 다음과 같은 한계도 고려해야 한다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;높은 자원 요구&lt;/strong&gt;: 수십억 개 파라미터 기반 모델의 학습 및 서비스 운영에는 상당한 컴퓨팅 자원이 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;잠재적 편향 및 오류&lt;/strong&gt;: 학습 데이터의 한계 또는 편향이 모델 출력에 반영될 수 있으며, 정확성에 대한 지속적인 개선이 필요하다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프라이버시 및 보안 우려&lt;/strong&gt;: 사적이거나 민감한 데이터와의 연관 가능성에 대비해야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;요약&#34;&gt;요약&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;항목&lt;/th&gt;
+          &lt;th&gt;설명&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;정의&lt;/td&gt;
+          &lt;td&gt;방대한 텍스트 기반 딥러닝 모델로 자연어 이해·생성 가능&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;작동 원리&lt;/td&gt;
+          &lt;td&gt;트랜스포머 기반, 셀프 어텐션·임베딩·수십억 파라미터&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;응용 분야&lt;/td&gt;
+          &lt;td&gt;텍스트 생성, 코드 생성, 분류, 요약, 챗봇 등&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;학습 방식&lt;/td&gt;
+          &lt;td&gt;Zero-Shot, Few-Shot, Fine-Tuning&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;장점&lt;/td&gt;
+          &lt;td&gt;자동화, 확장성, 창의적 활용 가능성&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;한계&lt;/td&gt;
+          &lt;td&gt;자원 요구, 편향·정확도 문제, 보안 위험 등&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+      <category>LLM</category>
+      
+    </item>
+    
+    <item>
+      <title>MCP (Model Context Protocol)</title>
+      <link>https://www.devkuma.com/docs/ai/mcp/</link>
+      <pubDate>Sun, 24 Aug 2025 13:14:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/mcp/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;mcp-개요&#34;&gt;MCP 개요&lt;/h2&gt;
+&lt;p&gt;Model Context Protocol(MCP)는 &lt;strong&gt;AI, 특히 대규모 언어 모델(LLM)이 외부 데이터 소스 및 도구와 효과적으로 상호작용하도록 돕는 오픈 표준 프로토콜&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;이 프로토콜은 애플리케이션이 LLM에 컨텍스트(Context)를 일관된 방식으로 전달할 수 있도록 설계되었다. 한마디로, &lt;strong&gt;AI용 USB-C 포트&lt;/strong&gt;라는 은유로 설명되기도 한다. 이는 USB-C가 여러 장치를 통일된 포맷으로 연결하듯, MCP도 AI 모델과 다양한 리소스를 표준화된 방식으로 연결해 준다.&lt;/p&gt;
+&lt;p&gt;즉, &lt;strong&gt;AI 모델이 다양한 외부 시스템과 연결될 수 있도록 해주는 공용 인터페이스&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/mcp-architecture.png&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;주요-특징&#34;&gt;주요 특징&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;표준화된 인터페이스&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모델이 &amp;ldquo;데이터 소스 / 도구 / 애플리케이션&amp;quot;에 접근할 수 있는 공용 규약 제공.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;플러그형 구조&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;특정 애플리케이션에 종속되지 않고, 어떤 모델이든 MCP를 지원하면 같은 방식으로 확장 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;보안 &amp;amp; 제어&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;모델이 접근할 수 있는 범위를 제한하고, 사용자가 허용한 리소스에만 접근하도록 설계.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;개발자 친화적&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenAI, Anthropic 같은 여러 AI 모델에서 공용으로 사용 가능 → &amp;ldquo;한번 만든 MCP 도구는 어디서든 사용&amp;rdquo;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;예시&#34;&gt;예시&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;모델이 &amp;ldquo;데이터베이스 질의&amp;quot;가 필요할 때:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;모델 → MCP → DB Adapter → Database
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;모델이 &amp;ldquo;웹 API 호출&amp;quot;을 해야 할 때:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;모델 → MCP → HTTP Adapter → 외부 REST API
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;즉, MCP는 &lt;strong&gt;AI의 플러그인 생태계를 표준화&lt;/strong&gt;하는 기반 기술이라고 볼 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;도입-배경과-필요성&#34;&gt;도입 배경과 필요성&lt;/h3&gt;
+&lt;p&gt;AI 모델은 본질적으로 &lt;strong&gt;텍스트 기반&lt;/strong&gt;으로만 입출력을 한다. 그러나 실제 활용에서는 DB 조회, API 호출, 파일 입출력 등 다양한 작업이 필요하다. 지금까지는 &lt;strong&gt;플러그인, LangChain, 자체 API 브릿지&lt;/strong&gt; 같은 개별 솔루션을 써야 했는데, 이들을 &lt;strong&gt;표준화된 프로토콜&lt;/strong&gt;로 묶은 것이 MCP이다.&lt;/p&gt;
+&lt;p&gt;기존에는 AI 애플리케이션이 외부 시스템과 상호작용하기 위해, &lt;strong&gt;모델마다, 도구마다 각각 맞춤형 통합 구현이 필요&lt;/strong&gt;했다. 이로 인해 개발 및 유지보수의 복잡성이 크게 증가했고, 이를 &lt;strong&gt;M×N 문제&lt;/strong&gt;라고 표현했다. MCP는 이를 &lt;strong&gt;M＋N 구조로 단순화&lt;/strong&gt;하여, AI 애플리케이션이 다양한 도구와 표준화된 방식으로 연결될 수 있도록 지원한다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/mcp-before-after.webp&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;이미지 출처: &lt;a href=&#34;https://www.descope.com/learn/post/mcp&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.descope.com/learn/post/mcp&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;아키텍처-및-작동-원리&#34;&gt;아키텍처 및 작동 원리&lt;/h2&gt;
+&lt;h3 id=&#34;클라이언트-서버-구조&#34;&gt;클라이언트-서버 구조&lt;/h3&gt;
+&lt;p&gt;MCP는 &lt;strong&gt;클라이언트-서버 아키텍처&lt;/strong&gt;를 채택하고 있으며,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트&lt;/strong&gt;는 AI 애플리케이션(예: Claude Desktop)이다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 서버&lt;/strong&gt;는 파일 시스템, 데이터베이스, API 등 외부 리소스를 제공한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;통신-방식&#34;&gt;통신 방식&lt;/h3&gt;
+&lt;p&gt;MCP는 &lt;strong&gt;JSON-RPC 2.0&lt;/strong&gt; 기반으로 요청(Request)과 응답(Response)을 교환하며, 이는 &lt;strong&gt;표준화된 메시지 교환 방식을 통해 상호운용성을 향상&lt;/strong&gt;시킨다.
+또한, **로컬 프로세스 간 통신(stdio 기반)**과 &lt;strong&gt;HTTP + SSE(서버 전송 이벤트) 기반&lt;/strong&gt; 통신을 모두 지원한다.&lt;/p&gt;
+&lt;h3 id=&#34;서버의-역할&#34;&gt;서버의 역할&lt;/h3&gt;
+&lt;p&gt;MCP 서버는 다음과 같은 기능을 수행한다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Tool Registry&lt;/strong&gt;: 사용 가능한 툴 및 기능의 목록 관리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Authentication&lt;/strong&gt;: 접근 권한 검증&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Request Handler&lt;/strong&gt;: 클라이언트의 요청 처리&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Response Formatter&lt;/strong&gt;: 결과를 AI 모델이 이해할 수 있는 형식으로 가공&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;AI 애플리케이션은 서버에 &amp;ldquo;사용 가능한 도구 목록&amp;quot;을 요청하고, 이를 바탕으로 적절한 툴을 선택하고 활용할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;개발자-친화성과-확장성&#34;&gt;개발자 친화성과 확장성&lt;/h2&gt;
+&lt;p&gt;Anthropic은 MCP를 &lt;strong&gt;오픈소스 표준&lt;/strong&gt;으로 공개하였으며, &lt;strong&gt;Python, TypeScript, Java, Kotlin, C# 등 주요 언어용 SDK&lt;/strong&gt;도 제공하고 있다. 이를 통해 &lt;strong&gt;클라이언트 및 서버 구현이 대체로 간단하다&lt;/strong&gt;는 장점을 얻을 수 있다&lt;/p&gt;
+&lt;h2 id=&#34;활용-효과-및-이점&#34;&gt;활용 효과 및 이점&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;명확한 지시&lt;/strong&gt;: LLM이 어떤 데이터를 취급할지 명확히 지정 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;불명확성 제거&lt;/strong&gt;: 여러 정보원을 명확히 구분하여 참조 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;특화된 처리 지원 가능&lt;/strong&gt;: 특정 데이터 형식에 맞춘 전용 처리가 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;컨텍스트 예시&lt;/strong&gt;: 파일 시스템, DB, 클라우드 서비스 등 다양한 컨텍스트를 함께 활용 가능&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;이러한 이점 덕분에, &lt;strong&gt;AI의 활동 범위가 확장되고, 더 정확하고 문맥에 맞는 응답&lt;/strong&gt;을 제공할 수 있게 된다.&lt;/p&gt;
+&lt;h2 id=&#34;도입-시기-및-생태계-동향&#34;&gt;도입 시기 및 생태계 동향&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;MCP는 &lt;strong&gt;2024년 11월에 Anthropic이 오픈소스로 공개&lt;/strong&gt;하였으며, &lt;strong&gt;2025년 초부터 개발자 커뮤니티와 주요 AI 도구들에서의 채택이 급속히 증가&lt;/strong&gt;하였다.&lt;/li&gt;
+&lt;li&gt;C#용 공식 SDK의 출시에 관한 언급도 있으며, 현재 수많은 MCP 서버가 운영 중이며, &lt;strong&gt;보안 아키텍처 및 데이터 보호&lt;/strong&gt;도 중요한 관심사로 자리 잡고 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;요약-표&#34;&gt;요약 표&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;항목&lt;/th&gt;
+          &lt;th&gt;설명&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;정의&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;AI 모델과 외부 데이터/도구를 연결하는 오픈 표준 프로토콜&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;도입 배경&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;개별 통합의 복잡성을 해소하고 더 유연한 확장성 확보&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;구조&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;클라이언트-서버 구조, JSON-RPC, 표준 메시지 교환&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;SDK&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;Python, TS, Java, Kotlin, C# 등 제공&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;이점&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;명확성, 확장성, 자동화, 보안성 강화 등&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;현재 동향&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;공개 이후 급성장 중이며 보안 및 실용성 확대 중&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;p&gt;궁금하신 부분이 더 있다면 언제든지 말씀해 주세요. 예를 들어, MCP 서버 직접 구축 사례나 기술 활용 흐름 등도 설명드릴 수 있습니다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+      <category>MCP</category>
+      
+    </item>
+    
+    <item>
+      <title>MCP Server</title>
+      <link>https://www.devkuma.com/docs/ai/mcp-server/</link>
+      <pubDate>Sat, 30 Aug 2025 14:55:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/mcp-server/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;mcp-서버란&#34;&gt;MCP 서버란?&lt;/h2&gt;
+&lt;p&gt;MCP 서버는 &lt;strong&gt;AI 모델이 외부 리소스(도구, 데이터, API 등)에 접근할 수 있도록 연결해주는 표준화된 인터페이스를 제공하는 역할&lt;/strong&gt;을 한다.&lt;br&gt;
+쉽게 말하면, &lt;strong&gt;AI가 쓸 수 있는 도구 모음집을 제공하는 서버&lt;/strong&gt;라고 할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;구조&#34;&gt;구조&lt;/h2&gt;
+&lt;p&gt;MCP는 크게 &lt;strong&gt;클라이언트(Client)&lt;/strong&gt; 와 &lt;strong&gt;서버(Server)&lt;/strong&gt; 로 나뉘는데:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM 환경에 붙어 있는 애플리케이션 (예: IDE, Chat UI, Notebook 등)&lt;/li&gt;
+&lt;li&gt;사용자의 프롬프트를 받아 모델을 실행시키고, 필요하면 MCP 서버에 요청&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 서버&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 &lt;strong&gt;리소스/도구/함수&lt;/strong&gt;를 관리하고 제공&lt;/li&gt;
+&lt;li&gt;표준화된 프로토콜(JSON-RPC 기반)을 통해 클라이언트와 통신&lt;/li&gt;
+&lt;li&gt;예: DB 조회 서버, 파일 시스템 서버, API 호출 서버&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/mcp-client-server.png&#34; alt=&#34;MCP Client Server&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;서버가-제공하는-것&#34;&gt;서버가 제공하는 것&lt;/h2&gt;
+&lt;p&gt;MCP 서버는 크게 네 가지 기능을 제공한다:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;리소스(Resources)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;데이터베이스, 파일, 문서, API 응답 등&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;resource://db/customers&lt;/code&gt;, &lt;code&gt;resource://filesystem/project/README.md&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도구(Tools)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;호출 가능한 함수/액션&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;searchCustomer(name)&lt;/code&gt;, &lt;code&gt;sendEmail(to, subject, body)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프롬프트(Prompts)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;미리 정의된 템플릿을 제공&lt;/li&gt;
+&lt;li&gt;예: &amp;ldquo;SQL 쿼리 생성용 프롬프트&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;이벤트(Events)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;서버에서 발생하는 알림이나 변경 이벤트를 실시간으로 전달&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;동작-흐름-예시&#34;&gt;동작 흐름 예시&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;사용자가 IDE 안에서: &amp;ldquo;DB에서 고객 ‘홍길동’ 검색해줘&amp;rdquo; 입력&lt;/li&gt;
+&lt;li&gt;LLM이 판단 → MCP 클라이언트를 통해 &amp;ldquo;searchCustomer&amp;rdquo; 도구 호출 요청&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트 → MCP 서버&lt;/strong&gt; 요청 전달&lt;/li&gt;
+&lt;li&gt;MCP 서버가 실제 DB 조회 수행 후 결과 반환&lt;/li&gt;
+&lt;li&gt;결과를 LLM이 사용자 친화적 문장으로 정리해서 보여줌&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;mcp-서버-예시&#34;&gt;MCP 서버 예시&lt;/h2&gt;
+&lt;p&gt;예를 들어, 파일 시스템 MCP 서버라면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Resource&lt;/strong&gt;: 프로젝트 폴더 내 파일들 (&lt;code&gt;/src/main.kt&lt;/code&gt;, &lt;code&gt;/README.md&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Tools&lt;/strong&gt;: 파일 읽기, 쓰기, 검색 기능 (&lt;code&gt;readFile&lt;/code&gt;, &lt;code&gt;writeFile&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Prompts&lt;/strong&gt;: &amp;ldquo;이 코드를 리팩토링 해줘&amp;rdquo; 같은 템플릿&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;→ 이렇게 구성된 서버를 붙이면, AI는 프로젝트 파일을 직접 탐색/수정 가능해짐.&lt;/p&gt;
+&lt;h2 id=&#34;비유&#34;&gt;비유&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCP 서버&lt;/strong&gt; = &amp;ldquo;호텔 컨시어지&amp;rdquo;
+&lt;ul&gt;
+&lt;li&gt;손님(LLM)이 &amp;ldquo;관광지 추천해줘&amp;rdquo; 하면, 컨시어지가 여러 API/DB를 뒤에서 다뤄서 정리된 정보 제공&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP 클라이언트&lt;/strong&gt; = &amp;ldquo;호텔 프런트&amp;rdquo;
+&lt;ul&gt;
+&lt;li&gt;손님과 직접 대화하며, 요청을 받아서 컨시어지에게 전달&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;MCP 서버는 LLM이 외부 도구와 데이터를 안전하고 일관된 방식으로 활용할 수 있도록 표준화된 인터페이스를 제공하는 백엔드 역할&lt;/strong&gt;을 한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>RAG(Retrieval-Augmented Generation)</title>
+      <link>https://www.devkuma.com/docs/ai/rag/</link>
+      <pubDate>Sat, 30 Aug 2025 13:09:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/rag/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;rag-retrieval-augmented-generation-개념&#34;&gt;RAG (Retrieval-Augmented Generation) 개념&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;RAG = 검색(Retrieval) + 생성(Generation)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;LLM(대규모 언어모델)이 자기 내부 지식만으로 답을 생성하는 것이 아니라, 외부 데이터베이스(예: 문서, 벡터 DB, 위키, 사내 자료 등)에서 관련 정보를 검색한 후, 그 결과를 바탕으로 답변을 생성한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;즉, 단순히 &amp;ldquo;모델이 아는 것&amp;quot;만 쓰는 게 아니라, &amp;ldquo;필요할 때 외부에서 찾아보고 답하는&amp;rdquo; 똑똑한 비서 같은 개념이다&lt;/p&gt;
+&lt;h2 id=&#34;왜-필요한가&#34;&gt;왜 필요한가?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM의 지식 한계 극복
+&lt;ul&gt;
+&lt;li&gt;LLM은 학습 시점 이후의 최신 정보를 알지 못한다.&lt;/li&gt;
+&lt;li&gt;예를 들어, GPT 같은 모델은 학습 시점 이후의 최신 정보는 모른다.&lt;/li&gt;
+&lt;li&gt;RAG를 사용하면 DB/웹에서 찾아온 자료를 활용 가능하게 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;환각(Hallucination) 줄이기
+&lt;ul&gt;
+&lt;li&gt;LLM은 모르는 것도 지어낼 때가 있다.&lt;/li&gt;
+&lt;li&gt;외부 근거 자료를 활용하면 답변 신뢰도를 높일 수 있다.&lt;/li&gt;
+&lt;li&gt;근거 없는 답변 대신, 실제 문서/DB를 근거로 답변 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;맞춤형 지식 활용
+&lt;ul&gt;
+&lt;li&gt;기업 내부 문서, 보고서, 고객 FAQ, 논문, 코드베이스 등의 &lt;strong&gt;전용 데이터&lt;/strong&gt;를 LLM이 사용할 수 있음.&lt;/li&gt;
+&lt;li&gt;사내 비밀 문서를 학습시키지 않고도 활용 가능하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rag의-동작-구조&#34;&gt;RAG의 동작 구조&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;질의(Query) 입력
+&lt;ul&gt;
+&lt;li&gt;사용자가 질문을 입력한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;검색(Retrieval) 단계
+&lt;ul&gt;
+&lt;li&gt;질문을 벡터화(임베딩) 후, 벡터 데이터베이스에서 관련 문서를 검색한다.&lt;/li&gt;
+&lt;li&gt;대표 DB: Pinecone, Weaviate, Milvus, FAISS 등.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;생성(Generation) 단계
+&lt;ul&gt;
+&lt;li&gt;LLM이 검색된 문서를 참고하여 답변을 생성하여 함께 전달한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/rag.png&#34; alt=&#34;RAG&#34;&gt;&lt;/p&gt;
+&lt;p&gt;즉, &lt;strong&gt;&amp;ldquo;찾아서 → 참고해서 → 답변하는&amp;rdquo; 구조&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;h2 id=&#34;예시&#34;&gt;예시&lt;/h2&gt;
+&lt;p&gt;예를 들어, &amp;ldquo;우리 회사의 2023년 매출은 얼마야?&amp;ldquo;라는 질문이 들어오면:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM 단독: &amp;ldquo;2023년 매출은 1억 달러입니다.&amp;rdquo; (근거 없음, 틀릴 수 있음)&lt;/li&gt;
+&lt;li&gt;RAG 활용: 회사 내부 재무 보고서를 검색 → 관련 데이터 가져옴 → &amp;ldquo;2023년 당사의 매출은 9,200억 원으로, 전년 대비 8% 성장했습니다.&amp;rdquo; (근거 있는 답변)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;비유로-이해하기&#34;&gt;비유로 이해하기&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;LLM 단독&lt;/strong&gt;: 기억력 좋은 사람, 하지만 최신 정보는 모를 수 있다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RAG 사용&lt;/strong&gt;: 기억력 좋은 사람이 &lt;strong&gt;사전·검색 엔진&lt;/strong&gt;을 참고해서 답변하는 것이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rag와-fine-tuning의-비교&#34;&gt;RAG와 Fine-tuning의 비교&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Fine-tuning: 모델 자체를 추가 학습 → 새로운 지식을 &amp;ldquo;내재화&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;RAG: 모델은 그대로 두고, 외부 자료를 검색해서 활용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;방법&lt;/th&gt;
+          &lt;th&gt;장점&lt;/th&gt;
+          &lt;th&gt;단점&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Fine-tuning&lt;/td&gt;
+          &lt;td&gt;응답이 빠르고 자연스러움&lt;/td&gt;
+          &lt;td&gt;데이터 업데이트할 때마다 재학습 필요&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;RAG&lt;/td&gt;
+          &lt;td&gt;항상 최신/맞춤 정보 반영 가능, 빠른 구축&lt;/td&gt;
+          &lt;td&gt;검색 품질에 따라 답변 품질 좌우&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;실무에서는 RAG + 필요시 일부 Fine-tuning을 섞어서 많이 사용된다.&lt;/p&gt;
+&lt;h2 id=&#34;rag-구현에-쓰이는-기술-스택&#34;&gt;RAG 구현에 쓰이는 기술 스택&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;임베딩 모델: OpenAI Embeddings, Sentence-BERT 등&lt;/li&gt;
+&lt;li&gt;벡터 DB: Pinecone, Weaviate, Milvus, FAISS&lt;/li&gt;
+&lt;li&gt;LLM: GPT, Claude, LLaMA, Gemini 등&lt;/li&gt;
+&lt;li&gt;프레임워크: LangChain, LlamaIndex, Haystack&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;RAG는 LLM이 검색 시스템을 함께 사용해, 신뢰할 수 있고 최신 정보를 반영하는 답변을 생성하는 방식이다.&lt;/li&gt;
+&lt;li&gt;즉, 지식의 확장 &amp;amp; 신뢰성 보강을 위한 핵심 기술이다.&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>RAG</category>
+      
+    </item>
+    
+    <item>
+      <title>AI Agent</title>
+      <link>https://www.devkuma.com/docs/ai/agent/</link>
+      <pubDate>Sat, 30 Aug 2025 13:49:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/agent/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;ai-agent란&#34;&gt;AI Agent란?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AI Agent&lt;/strong&gt;는 단순히 답변만 생성하는 LLM(대규모 언어모델)과 달리, &lt;strong&gt;환경(Environment)과 상호작용하며 특정 목표를 달성하도록 설계된 지능형 시스템&lt;/strong&gt;이다.&lt;/li&gt;
+&lt;li&gt;즉, &lt;strong&gt;스스로 판단하고 → 필요한 도구를 쓰고 → 행동하며 → 결과를 개선하는 AI&lt;/strong&gt;라고 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ai-agent의-핵심-요소&#34;&gt;AI Agent의 핵심 요소&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;목표(Goal)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;에이전트가 수행해야 할 임무. (예: 고객 질문 답변, 보고서 작성, 코드 수정 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;지각(Perception)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;환경이나 입력을 이해하는 단계. (사용자 입력, 센서 데이터, API 응답 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;행동(Action)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;목표를 달성하기 위해 취하는 조치. (검색, 계산, 외부 API 호출, DB 업데이트 등)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;피드백 루프(Feedback Loop)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;결과를 평가하고 필요 시 다음 행동을 수정하는 과정.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;ai-agent와-단순-llm의-차이&#34;&gt;AI Agent와 단순 LLM의 차이&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;LLM&lt;/strong&gt;: 질문 → 답변 (단순 Q&amp;amp;A)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AI Agent&lt;/strong&gt;: 질문 → 계획 세움 → 검색/도구 사용 → 여러 단계 실행 → 최종 답변&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;예를 들어,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM은 &amp;ldquo;서울 날씨 알려줘&amp;quot;에 대해 과거 학습 데이터를 기반으로 답할 수 있지만,&lt;/li&gt;
+&lt;li&gt;AI Agent는 &lt;strong&gt;실시간 API를 호출&lt;/strong&gt;해 현재 기온과 날씨를 가져와 답할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ai-agent가-사용하는-기술&#34;&gt;AI Agent가 사용하는 기술&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;LLM (Large Language Model)&lt;/strong&gt; → 자연어 이해 및 추론&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RAG (Retrieval-Augmented Generation)&lt;/strong&gt; → 외부 지식 검색&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도구 사용(Plugins, APIs)&lt;/strong&gt; → 계산기, 브라우저, 데이터베이스 등&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;플래너(Planner)&lt;/strong&gt; → 복잡한 작업을 여러 단계로 쪼개어 실행&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;메모리(Memory)&lt;/strong&gt; → 과거 대화/상태를 기억하여 연속적인 작업 수행&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;대표적인-ai-agent-예시&#34;&gt;대표적인 AI Agent 예시&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ChatGPT + Tools (OpenAI)&lt;/strong&gt; → 코드 실행, 웹 브라우징, 데이터 분석 가능&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AutoGPT, BabyAGI&lt;/strong&gt; → 오픈소스 자율형 에이전트&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LangChain Agents&lt;/strong&gt; → 여러 툴을 연결해 워크플로우 자동화&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Microsoft Copilot, Google Gemini Agents&lt;/strong&gt; → 생산성 툴과 통합된 AI 비서&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ai-agent의-활용-분야&#34;&gt;AI Agent의 활용 분야&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;업무 자동화&lt;/strong&gt;: 이메일 요약, 일정 관리, 문서 생성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;고객 지원&lt;/strong&gt;: FAQ 답변, 상담 업무 보조&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;연구·분석&lt;/strong&gt;: 논문 검색, 데이터 분석, 보고서 작성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;개발 보조&lt;/strong&gt;: 코드 생성, 테스트, 디버깅&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;로보틱스&lt;/strong&gt;: 자율주행, 드론, 스마트 팩토리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;AI Agent는 단순히 답변만 하는 LLM을 넘어, 목표를 세우고 도구를 활용하며 환경과 상호작용하는 지능형 시스템&lt;/strong&gt;이다.&lt;br&gt;
+즉, &amp;ldquo;&lt;strong&gt;실행 가능한 AI&lt;/strong&gt;&amp;ldquo;라고 이해하면 된다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Multi-Model</title>
+      <link>https://www.devkuma.com/docs/ai/multi-model/</link>
+      <pubDate>Sat, 30 Aug 2025 13:14:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/multi-model/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;multi-model이란&#34;&gt;Multi-Model이란?&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;하나의 AI 시스템에서 여러 개의 모델을 함께 사용하는 접근 방식&lt;/strong&gt;을 말한다.&lt;br&gt;
+즉, 단일 모델에 모든 걸 맡기지 않고, &lt;strong&gt;각 모델의 강점을 조합&lt;/strong&gt;해서 더 나은 성능이나 다양한 기능을 얻는 방법이다.&lt;/p&gt;
+&lt;p&gt;예들 들어, 텍스트뿐 아니라 이미지, 오디오, 비디오까지 함께 처리할 수 있는 모델이다.&lt;/p&gt;
+&lt;h2 id=&#34;왜-필요한가&#34;&gt;왜 필요한가?&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;한 모델로는 부족한 경우&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 이미지도 다루고 텍스트도 다뤄야 하는 경우&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;전문화된 모델 활용&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;대규모 범용 모델 + 도메인 특화 모델을 같이 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;성능 최적화&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;무겁고 느린 모델은 핵심 추론에만, 가벼운 모델은 전처리·간단한 작업에 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;비용 절감&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;항상 GPT-4 같은 초거대 모델을 쓰면 비쌈 → 일부는 작은 모델에게 맡기고, 어려운 부분만 큰 모델 사용&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;multi-model의-종류&#34;&gt;Multi-Model의 종류&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;멀티 모달(Multi-Modal)과는 다름&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Multi-Model ≠ Multi-Modal&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Multi-Modal&lt;/em&gt;: 이미지+텍스트+음성 등 &lt;strong&gt;여러 입력 형태&lt;/strong&gt;를 처리하는 하나의 모델&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Multi-Model&lt;/em&gt;: &lt;strong&gt;여러 개의 모델을 조합&lt;/strong&gt;해서 시스템 구성&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;구성 방식&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;병렬(Ensemble)&lt;/strong&gt;: 여러 모델이 동시에 답을 내고, 결과를 합쳐서 최종 결정&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 투표(Voting), 평균(Blending), 가중치 조합(Weighted Sum)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;직렬(Pipeline)&lt;/strong&gt;: 한 모델의 출력을 다른 모델의 입력으로 전달&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;예: 이미지 캡션 모델 → 텍스트 요약 모델 → 질의응답 모델&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;하이브리드&lt;/strong&gt;: 상황에 따라 모델 선택 (Router 모델)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;예시&#34;&gt;예시&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;검색 + 생성 (RAG)&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;검색 모델(벡터 검색) + 생성 모델(LLM)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Copilot류&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;코드 보조: 빠른 코드 완성은 작은 모델, 정교한 버그 수정은 GPT-4&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;자율주행&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;영상 인식 CNN + 행동 계획 RL 모델&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;헬스케어&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;의학적 지식 모델 + 일반 LLM 조합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;multi-model-vs-single-model&#34;&gt;Multi-Model vs Single Model&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;구분&lt;/th&gt;
+          &lt;th&gt;Single Model&lt;/th&gt;
+          &lt;th&gt;Multi-Model&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;구성&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;하나의 모델이 모든 걸 수행&lt;/td&gt;
+          &lt;td&gt;여러 모델이 역할 분담&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;장점&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;단순, 관리 쉬움&lt;/td&gt;
+          &lt;td&gt;정확도↑, 유연성↑, 최신 기술 활용 가능&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;단점&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;범용 모델은 성능 한계&lt;/td&gt;
+          &lt;td&gt;시스템 복잡, 조율 필요&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Multi-Model은 여러 모델을 결합해, 각자의 장점을 살려 더 나은 결과를 내는 시스템 설계 방식&lt;/strong&gt;이다.&lt;/p&gt;
+&lt;p&gt;예: &amp;ldquo;검색 모델 + 생성 모델&amp;rdquo;, &amp;ldquo;작은 모델 + 큰 모델&amp;rdquo;, &amp;ldquo;특화 모델 + 범용 모델&amp;quot;을 조합하는 식이다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+      <category>LLM</category>
+      
+    </item>
+    
+    <item>
+      <title>Function Calling (Tools)</title>
+      <link>https://www.devkuma.com/docs/ai/function-calling/</link>
+      <pubDate>Sat, 30 Aug 2025 14:50:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/function-calling/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;function-calling-도구-호출-이란&#34;&gt;Function Calling (도구 호출) 이란?&lt;/h2&gt;
+&lt;p&gt;LLM이 단순히 텍스트만 생성하는 게 아니라, &lt;strong&gt;외부 함수(Function)나 API를 직접 호출&lt;/strong&gt;할 수 있도록 하는 기능이다.&lt;br&gt;
+예를 들어, OpenAI API에서 제공하는 &lt;code&gt;function_call&lt;/code&gt; 기능이 대표적이다.&lt;/p&gt;
+&lt;h3 id=&#34;동작-원리&#34;&gt;동작 원리&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;사용자 입력&lt;/strong&gt;: &amp;ldquo;오늘 서울 날씨 알려줘&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LLM 판단&lt;/strong&gt;: &amp;ldquo;이건 날씨 API를 호출해야 하는구나&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도구 호출&lt;/strong&gt;: 미리 정의된 함수(예: &lt;code&gt;getWeather(location: string)&lt;/code&gt;) 실행&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;결과 수신&lt;/strong&gt;: &lt;code&gt;{ &amp;quot;location&amp;quot;: &amp;quot;Seoul&amp;quot;, &amp;quot;temp&amp;quot;: 28, &amp;quot;condition&amp;quot;: &amp;quot;Sunny&amp;quot; }&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;최종 응답 생성&lt;/strong&gt;: &amp;ldquo;오늘 서울은 맑고 28도입니다 ☀️&amp;rdquo;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;즉, LLM은 &lt;strong&gt;자연어 → 함수 입력 변환&lt;/strong&gt; 역할을 하고, 실제 계산·검색은 외부 함수/도구가 맡는다.&lt;/p&gt;
+&lt;h3 id=&#34;장점&#34;&gt;장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;실시간 데이터 활용&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM 자체는 훈련 시점 이후 지식을 모름. Function Call로 최신 API 연결 가능.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정확한 계산&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;LLM은 수학 연산에 약함. 대신 계산기 API를 호출하면 정확한 결과 반환.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;업무 자동화&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;메일 보내줘&amp;rdquo; → 이메일 API 호출&lt;/li&gt;
+&lt;li&gt;&amp;ldquo;DB에서 고객 목록 가져와&amp;rdquo; → DB 쿼리 실행&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;mcp와-function-calling의-차이&#34;&gt;MCP와 Function Calling의 차이&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Function Calling&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;개별 도구를 LLM이 직접 호출하는 방식&lt;/li&gt;
+&lt;li&gt;API나 함수 단위의 호출 정의 필요&lt;/li&gt;
+&lt;li&gt;예: &lt;code&gt;getWeather()&lt;/code&gt;, &lt;code&gt;searchStockPrice()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;MCP (Model Context Protocol)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;여러 도구(Function/Resource)를 &lt;strong&gt;표준화된 방식으로 연결&lt;/strong&gt;하는 프로토콜&lt;/li&gt;
+&lt;li&gt;각 도구를 &amp;ldquo;Provider&amp;quot;로 추상화하여, LLM이 일관된 방법으로 접근 가능&lt;/li&gt;
+&lt;li&gt;Function Call을 포함해서 &amp;ldquo;도구 호출&amp;quot;을 체계적으로 관리하는 상위 개념&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;실제-예시&#34;&gt;실제 예시&lt;/h2&gt;
+&lt;h3 id=&#34;1-function-calling-단독-사용&#34;&gt;1. Function Calling 단독 사용&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;OpenAI Function Call 예제:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;getWeather&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;description&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;현재 날씨 조회&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;parameters&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;object&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;properties&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;string&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;required&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;👉 모델이 &lt;code&gt;&amp;quot;서울&amp;quot;&lt;/code&gt;을 location에 매핑해 API 실행&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-mcp-기반-function-calling&#34;&gt;2. MCP 기반 Function Calling&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;MCP는 Function들을 &lt;strong&gt;Resource Registry&lt;/strong&gt;로 묶어 관리&lt;/li&gt;
+&lt;li&gt;LLM이 &amp;ldquo;날씨 API&amp;quot;를 직접 알 필요 없이, MCP가 추상화된 &lt;code&gt;tools.weather&lt;/code&gt; 같은 인터페이스 제공&lt;/li&gt;
+&lt;li&gt;여러 도구를 &lt;strong&gt;표준 프로토콜&lt;/strong&gt;로 연결 → Function Call 혼란/중복 줄여줌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;비유로-정리&#34;&gt;비유로 정리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Function Calling&lt;/strong&gt; = 개별 &amp;ldquo;도구 사용법&amp;rdquo; (드라이버: 가위, 망치, 드라이버 같은 단일 도구)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCP&lt;/strong&gt; = &amp;ldquo;공구함/작업대&amp;rdquo; (도구를 표준화된 방식으로 정리해 둔 시스템)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Function Calling은 개별 API를 호출하는 기술&lt;/strong&gt;이고, &lt;strong&gt;MCP는 여러 Function(도구)들을 표준화된 방식으로 관리하고 연결해주는 상위 레이어&lt;/strong&gt;라고 이해하면 된다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>바이브 코딩(Vibe Coding)</title>
+      <link>https://www.devkuma.com/docs/ai/vibe-coding/</link>
+      <pubDate>Sat, 30 Aug 2025 17:55:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/vibe-coding/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;바이브-코딩vibe-coding-정의&#34;&gt;바이브 코딩(Vibe Coding) 정의&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;바이브 코딩&lt;/strong&gt;은 공식적인 학술 용어라기보다는, 최근 개발자 커뮤니티에서 쓰이는 표현으로, &lt;strong&gt;프로그래밍을 감각적으로, 흐름(Vibe, 바이브)에 맞춰 즐기면서 하는 코딩 방식&lt;/strong&gt;을 뜻한다.&lt;/li&gt;
+&lt;li&gt;특히 AI 시대에 맞춰, 개발자가 코드 한 줄 한 줄을 직접 짜기보다 &lt;strong&gt;자연어로 목표/피드백을 주고 LLM이 코드를 생성·수정하도록 이끄는 개발 방식&lt;/strong&gt;을 강조한다.
+&lt;ul&gt;
+&lt;li&gt;사람은 ‘무엇을 만들지’에 집중하고, 구현 세부는 AI가 맡는다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;용어는 2025년 2월 &lt;strong&gt;Andrej Karpathy&lt;/strong&gt;가 &amp;ldquo;코드는 잊고, 완전히 바이브에 맡긴다&amp;quot;는 취지로 언급하면서 대중화되었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;개념적-특징&#34;&gt;개념적 특징&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;몰입 &amp;amp; 즉흥성&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;정해진 설계 없이, 떠오르는 아이디어나 감각에 따라 바로 코딩&lt;/li&gt;
+&lt;li&gt;음악의 &lt;strong&gt;즉흥 연주(jam session)&lt;/strong&gt; 같은 느낌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;흐름(Vibe, 바이브) 중심&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;재밌어 보이는 것&amp;rdquo;, &amp;ldquo;지금 하고 싶은 것&amp;rdquo; 위주로 자유롭게 구현&lt;/li&gt;
+&lt;li&gt;코드의 완벽함보다 &lt;strong&gt;즐거움과 흐름&lt;/strong&gt;이 중요&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;빠른 프로토타이핑&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;작동하는 최소 기능을 빠르게 만들고 실행&lt;/li&gt;
+&lt;li&gt;완벽한 아키텍처보다 &lt;strong&gt;일단 돌아가는 것&lt;/strong&gt;을 목표&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;바이브-코딩의-활용-맥락&#34;&gt;바이브 코딩의 활용 맥락&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;코딩 학습 초기&lt;/strong&gt; → 자유롭게 실험하며 동기 유지&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;해커톤/프로토타입 제작&lt;/strong&gt; → 아이디어를 빠르게 구현해야 할 때&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;창의적인 작업&lt;/strong&gt; → 음악, 아트, 게임 등에서 실험적 구현&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;AI 활용 코딩&lt;/strong&gt; → ChatGPT 같은 AI와 대화하며 흐름대로 구현&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;워크플로-일반적인-진행-단계&#34;&gt;워크플로 (일반적인 진행 단계)&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;목표 서술&lt;/strong&gt; → &amp;ldquo;슬랙 봇으로 휴가 승인/거절 처리&amp;quot;처럼 결과 중심 설명&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;초안 생성&lt;/strong&gt; → LLM이 프로젝트 뼈대 작성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;실행·피드백&lt;/strong&gt; → 에러/누락된 기능을 자연어로 지적, 반복 수정&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;기능 확장/리팩터링&lt;/strong&gt; → 테스트 기준을 제시해 수렴&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;→ 핵심은 &lt;strong&gt;대화형 지시·피드백&lt;/strong&gt;을 기반으로 개발이 진행된다는 점.&lt;/p&gt;
+&lt;h2 id=&#34;장단점&#34;&gt;장단점&lt;/h2&gt;
+&lt;h3 id=&#34;장점&#34;&gt;장점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;창의성 발휘와 몰입 용이&lt;/li&gt;
+&lt;li&gt;빠른 결과 확인 가능 → 프로토타이핑 최적&lt;/li&gt;
+&lt;li&gt;학습/실험 동기 부여 (재미있어 오래 지속 가능)&lt;/li&gt;
+&lt;li&gt;비개발자도 진입 장벽 낮음 (AI와 함께 개발 가능)&lt;/li&gt;
+&lt;li&gt;개발자는 세밀 구현보다 &lt;strong&gt;설계·품질 관리 역할&lt;/strong&gt;로 이동&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;단점&#34;&gt;단점&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;구조적 완성도/안정성 부족&lt;/li&gt;
+&lt;li&gt;버그·보안 취약점 발생 위험&lt;/li&gt;
+&lt;li&gt;내가 직접 안 짠 코드 → 유지보수/디버깅 어려움&lt;/li&gt;
+&lt;li&gt;다파일·레거시 연동 같은 복잡한 시스템엔 부적합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ai-보조-코딩과의-차이&#34;&gt;AI 보조 코딩과의 차이&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;AI 보조 코딩 (예: Copilot)&lt;/strong&gt; → 내가 코드를 작성하면 AI가 보완·추천&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;바이브 코딩&lt;/strong&gt; → &lt;strong&gt;AI가 대부분의 코드를 작성&lt;/strong&gt;, 인간은 목표·제약·테스트만 제시&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;실무에서의-가드레일-안전-장치&#34;&gt;실무에서의 가드레일 (안전 장치)&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;테스트 우선&lt;/strong&gt; → 단위·통합·E2E 테스트 먼저 정의&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;정적 분석/보안 점검&lt;/strong&gt; → Linter, SAST, 의존성 취약점 자동 검사&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;리뷰 &amp;amp; 기록&lt;/strong&gt; → 요구사항·수용 기준·리스크를 문서화하고 최종 승인&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;샌드박스 환경&lt;/strong&gt; → 안전한 실행 공간, 민감 정보 차단&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;프로덕션 이전 리팩터링&lt;/strong&gt; → 별도 스프린트 편성&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;도메인 지식 고정&lt;/strong&gt; → API 스펙, 에러 케이스, 성능 기준을 지속 주입&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;적합부적합-사례&#34;&gt;적합/부적합 사례&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;적합&lt;/strong&gt; → 해커톤, PoC, 개인 툴, UI/프론트엔드 프로토타입&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;주의 필요&lt;/strong&gt; → 금융, 의료, 임베디드 등 고신뢰/규제 환경&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;시작용-프롬프트-템플릿&#34;&gt;시작용 프롬프트 템플릿&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;목표&lt;/strong&gt;: 무엇을, 누가, 왜 쓰는지&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;기능&lt;/strong&gt;: 필수·선택 요구사항 목록&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;제약/기준&lt;/strong&gt;: 보안, 성능, 접근성, 라이선스&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;테크스택&lt;/strong&gt;: 언어·프레임워크·DB·배포 방식&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;수용 기준&lt;/strong&gt;: 통과해야 할 테스트 시나리오&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;작업 방식&lt;/strong&gt;: 작은 단위 PR, 단계별 테스트, 커밋 규칙 준수&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;예시&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;Next.js + SQLite로 ‘개인 할 일 공유 보드’를 만들어줘. 필수 기능 5개와 E2E 테스트 3개를 먼저 제안하고, 각 기능을 TDD 사이클로 구현하자. 보안은 OAuth, XSS 방지, rate limit 포함.&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;정리&#34;&gt;정리&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;바이브 코딩은 정석적 설계보다는 영감과 흐름에 맞춰, 특히 AI를 활용해 즉흥적으로 실험하고 빠르게 결과를 내는 개발 스타일&lt;/strong&gt;이다.&lt;/li&gt;
+&lt;li&gt;프로토타입, 해커톤, 개인 프로젝트에 강력하지만, 프로덕션 수준에는 보안/테스트/리팩터링이 반드시 필요하다&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>인공지능의 응용 분야</title>
+      <link>https://www.devkuma.com/docs/ai/applications/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/applications/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;의료&#34;&gt;의료&lt;/h2&gt;
+&lt;p&gt;의료 영상 분석, 신약 개발, 환자 맞춤형 치료&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/eye.png&#34; alt=&#34;망막 이미지&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사례: 구글의 딥마인드(DeepMind)가 개발한 AI는 안과 질환을 조기 발견하는 데 활용되고 있다.&lt;/li&gt;
+&lt;li&gt;이미지 출처: &lt;a href=&#34;https://www.irobotnews.com/news/articleView.html?idxno=8041&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;로봇신문&amp;quot; 구글 딥마인드, 인공지능 활용해 안과질환 조기 진단&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;의료-ai의-실제-사례&#34;&gt;의료 AI의 실제 사례&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;영상 진단: AI가 엑스레이와 MRI 이미지를 판독해 초기 암을 조기 발견. 미국의 한 병원에서는 판독 오류율이 20% 감소.&lt;/li&gt;
+&lt;li&gt;신약 개발: 기존에는 10년 이상 걸리던 후보 물질 탐색을 AI 기반으로 수개월 내 단축.&lt;/li&gt;
+&lt;li&gt;맞춤형 치료: 환자의 유전자 정보를 분석해 가장 효과적인 항암제를 추천.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/new-drug-development.png&#34; alt=&#34;망막 이미지&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;그림 3: AI 활용 전통적 신약 개발 프로세스 vs AI 기반 프로세스 비교&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;자율주행&#34;&gt;자율주행&lt;/h2&gt;
+&lt;p&gt;자율주행 기술은 도로 상황을 실시간으로 인식하고, 이를 기반으로 최적의 주행 전략을 결정하며 교통 흐름을 효율적으로 관리하는 것을 목표로 한다. 카메라, 레이더, 라이다(LiDAR) 등의 센서를 통해 주변 환경을 탐지하고, AI 알고리즘이 이를 분석하여 차량의 속도, 방향, 차간 거리 등을 자동으로 조절한다. 이를 통해 교통사고를 줄이고, 도로 효율성을 높이며, 운전자와 보행자의 안전을 강화할 수 있다.&lt;/p&gt;
+&lt;h2 id=&#34;금융&#34;&gt;금융&lt;/h2&gt;
+&lt;p&gt;금융 분야에서 AI는 사기 거래 탐지, 투자 전략 자동화, 리스크 관리 등 다양한 영역에 적용되고 있다. 사기 탐지에서는 비정상적인 거래 패턴을 실시간으로 분석하여 의심 거래를 식별하며, 투자 전략 자동화에서는 시장 데이터를 기반으로 포트폴리오 최적화를 수행한다. 또한 AI는 금융 기관이 신용 위험, 시장 위험 등을 예측하고 관리하는 데 활용되어 금융 안정성과 운영 효율성을 동시에 높인다.&lt;/p&gt;
+&lt;h2 id=&#34;제조업&#34;&gt;제조업&lt;/h2&gt;
+&lt;p&gt;제조업에서는 스마트 공장 구현, 예지 보수, 품질 관리 자동화 등에 AI가 적용된다. 스마트 공장은 생산 설비와 물류 시스템을 AI로 연결하여 효율적인 공정 관리를 가능하게 한다. 예지 보수(Predictive Maintenance)는 센서 데이터를 분석하여 장비 고장을 사전에 예측하고, 유지보수 계획을 최적화함으로써 비용과 시간을 절감한다. 품질 관리 자동화는 생산 과정에서 발생할 수 있는 결함을 실시간으로 감지하여 제품 품질을 향상시킨다.&lt;/p&gt;
+&lt;h2 id=&#34;교육&#34;&gt;교육&lt;/h2&gt;
+&lt;p&gt;교육 분야에서는 AI를 활용하여 맞춤형 학습, 자동 채점, 지능형 튜터링 시스템 등을 제공한다. 학생 개개인의 학습 수준과 속도를 분석하여 개인화된 학습 콘텐츠를 추천하고, 과제와 시험을 자동으로 채점하여 교사의 업무 부담을 경감시킨다. 또한 지능형 튜터링 시스템은 학생의 학습 패턴을 분석하여 취약한 영역을 보완하고, 실시간 피드백을 제공함으로써 학습 효과를 극대화한다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>윤리와 미래 전망</title>
+      <link>https://www.devkuma.com/docs/ai/ethics-and-future-prospects/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/ethics-and-future-prospects/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;윤리적-고려-사항&#34;&gt;윤리적 고려 사항&lt;/h2&gt;
+&lt;p&gt;인공지능 기술의 발전과 확산은 다양한 윤리적 문제를 동반한다. 주요 고려 사항은 다음과 같다.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;개인정보 보호&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AI 시스템은 대량의 데이터에 의존하여 학습하고 작동한다. 이 과정에서 개인의 민감한 정보가 수집, 처리될 수 있으며, 정보 유출이나 오남용 위험이 존재한다. 따라서 AI 개발과 활용 시에는 개인정보 보호법 준수와 안전한 데이터 관리가 필수적이다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;알고리즘 편향&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AI 모델은 학습 데이터에 포함된 편향을 그대로 학습할 수 있다. 이는 특정 집단이나 개인에 대한 불공정한 판단, 차별적 결과를 초래할 수 있으며, 사회적 신뢰를 저해할 수 있다. 이를 방지하기 위해서는 데이터 편향성을 검토하고, 공정성을 고려한 알고리즘 설계가 필요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;인간 노동 대체 문제&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AI의 자동화 능력은 생산성과 효율성을 높이는 동시에 일부 직업의 역할을 대체할 수 있다. 이는 고용 구조 변화와 사회적 불평등 문제를 야기할 수 있으며, 이에 대한 정책적 대비와 재교육 프로그램 마련이 중요하다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;저작권 문제&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AI는 콘테츠를 학습하고 생성하기 때문에 누군가의 콘텐츠 권리와 충돌할 가능성 있다. 이는 저작물을 저작권자의 허락 없이 복제하거나 무단으로 변경하면 저작권 침해가 될 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;지브리-스타일은-저작권-문제가-될까&#34;&gt;지브리 스타일은 저작권 문제가 될까?&lt;/h3&gt;
+&lt;p&gt;구체적인 &lt;strong&gt;표현&lt;/strong&gt;은 보호되지만, 추상적인 &lt;strong&gt;아이디어&lt;/strong&gt;는 보호되지 않는다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;사상과 감정의 창적표현
+&lt;ul&gt;
+&lt;li&gt;예: 케릭터, 영화의 장면&lt;/li&gt;
+&lt;li&gt;저작권에 보호됨&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;아이디어 기법, 방법
+&lt;ul&gt;
+&lt;li&gt;예: 작풍, 터치&lt;/li&gt;
+&lt;li&gt;저작권에 보호되지 않음&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;그러면, &amp;ldquo;지브리 스타일&amp;quot;은 인터넷에 올려도 되는가?
+법적으로는 문제가 없더라도 AI 윤리의 괌점에서는 적절한 이용이라고 할 수 없다.&lt;/p&gt;
+&lt;h2 id=&#34;인공지능의-미래&#34;&gt;인공지능의 미래&lt;/h2&gt;
+&lt;p&gt;인공지능은 단순한 도구를 넘어 인간과 협력하며 지능적 결정을 지원하는 동반자로 진화할 것으로 전망된다. 미래 사회에서 AI는 의료, 교육, 산업 등 다양한 분야에서 인간의 역량을 보조하고 효율성을 극대화하는 역할을 수행할 것이다. 그러나 기술 발전의 속도가 매우 빠른 만큼, 사회적·법적 제도와 규범의 정비가 병행되지 않으면, 개인정보 침해, 불공정한 판단, 고용 불안 등 다양한 문제를 야기할 수 있다. 따라서 AI의 잠재적 이점을 최대화하고 부작용을 최소화하기 위해서는 기술적 혁신과 함께 윤리적, 법적, 사회적 준비가 필수적이다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+    </item>
+    
+    <item>
+      <title>맺음말</title>
+      <link>https://www.devkuma.com/docs/ai/conclusion/</link>
+      <pubDate>Sat, 16 Aug 2025 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/conclusion/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;맺음말&#34;&gt;맺음말&lt;/h2&gt;
+&lt;p&gt;인공지능은 이미 우리 사회 전반에 걸쳐 필수적인 기술로 자리잡았다. 본 도서를 통해 독자들이 AI의 개념과 원리를 올바르게 이해하고, 각자의 분야에서 효과적으로 활용할 수 있기를 기대한다.&lt;/p&gt;
+&lt;h2 id=&#34;인공지능-학습&#34;&gt;인공지능 학습&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.linkedin.com/learning/what-is-generative-ai/generative-ai-is-a-tool-in-service-of-humanity&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LinkedIn Learning | Generative AI is a tool in service of humanity&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;생성형 AI 기초에 대해 학습 과정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.linkedin.com/learning/paths/applying-generative-ai-as-a-creative-professional&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;LinkedIn Learning | Applying Generative AI as a Creative Professional&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;창작자를 위한 생성형 AI 과정&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.gseek.kr/user/popular/popularTheme/course?p_prgrm_group_sn=18&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;경기도평생학습포털 | 생성한 AI 강좌&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;생성형 AI 강좌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+    </item>
+    
+  </channel>
+</rss>

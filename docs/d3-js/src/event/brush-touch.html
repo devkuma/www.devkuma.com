@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>D3 Brush Touch</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+  <!-- 1. 선택 시 스타일 설정 -->
+  <style>
+    .selected {
+      fill: red;
+      stroke: brown;
+    }
+  </style>
+  <script>
+    // 2. 산점도 표시
+    var width = 800; // 그래프 넓이
+    var height = 600; // 그래프 높이
+    var margin = { "top": 30, "bottom": 30, "right": 30, "left": 30 };
+
+    var randomX = d3.randomUniform(0.5, 10);
+    var randomY = d3.randomNormal(0.5, 0.12);
+    var data = d3.range(500).map(function () { return [randomX(), randomY()]; });
+
+    var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xScale = d3.scaleLinear()
+      .domain([0, 10])
+      .range([0, width - margin.right - margin.left]);
+
+    var yScale = d3.scaleLinear()
+      .domain([0, 1])
+      .range([height - margin.bottom - margin.top, 0]);
+
+    var dot = g.append("g")
+      .attr("fill-opacity", 0.2)
+      .selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("cx", function (d) { return xScale(d[0]) })
+      .attr("cy", function (d) { return yScale(d[1]) })
+      .attr("r", 5);
+
+    svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + (height - margin.bottom) + ")")
+      .call(d3.axisBottom(xScale));
+
+    svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(d3.axisLeft(yScale));
+
+    // 3. brush 설정
+    var brush = d3.brush()
+      .extent([
+        [0, 0],
+        [width - margin.left - margin.right, height - margin.top - margin.bottom]
+      ])
+      .on("start brush", brushed)
+
+    var g2 = g.append("g")
+      .call(brush)
+      .call(brush.move, [
+        [xScale(2), yScale(0.8)],
+        [xScale(5), yScale(0.3)]
+      ])
+      // 여기부터 중요 -----------------------------
+      .selectAll(".overlay")
+      .each(function (d) { d.type = "selection"; })
+      .on("mousedown touchstart", brushcentered);
+    // 여기까지 중요 -----------------------------
+
+    function brushed() {
+      var x0 = xScale.invert(d3.event.selection[0][0]);
+      var y1 = yScale.invert(d3.event.selection[0][1]);
+      var x1 = xScale.invert(d3.event.selection[1][0]);
+      var y0 = yScale.invert(d3.event.selection[1][1]);
+      dot.classed("selected",
+        function (d) {
+          return (x0 <= d[0] && d[0] <= x1) && (y0 <= d[1] && d[1] <= y1);
+        }
+      );
+    }
+
+    // 여기부터 중요 -----------------------------
+    function brushcentered() {
+      var mouse = d3.mouse(this);
+
+      var dx = xScale(2) - xScale(0);
+      var dy = yScale(0.2) - yScale(0);
+
+      var x0 = mouse[0] - dx / 2;
+      var x1 = mouse[0] + dx / 2;
+      var y0 = mouse[1] - dy / 2;
+      var y1 = mouse[1] + dy / 2; //
+
+      var xMax = xScale.range()[1];
+      var yMax = yScale.range()[0];
+      var x = x1 > xMax ? [xMax - dx, xMax] : x0 < 0 ? [0, dx] : [x0, x1];
+      var y = y1 > yMax ? [yMax - dy, yMax] : y0 < 0 ? [0, dy] : [y0, y1];
+      d3.select(this.parentNode).call(brush.move, [
+        [x[0], y[1]],
+        [x[1], y[0]]
+      ]);
+    }
+    // 여기까지 중요 -----------------------------
+  </script>
+</body>
+
+<html>

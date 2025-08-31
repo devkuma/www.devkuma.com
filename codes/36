@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue.js 예제</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.4/vue.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script></head>
+<body>
+  
+<h1>app</h1>
+<section id="app">
+  <p>{{ message }}</p>
+  <input type="text" v-model="message" id="message">
+  <h2>jQuery Button</h2>
+  <button data-update="jQuery Text1">Text1</button>
+  <button data-update="jQuery Text2">Text2</button>
+  <h2>Vue Button</h2>
+  <button @click="update('Vue Text1')">Text1</button>
+  <button @click="update('Vue Text2')">Text2</button>
+</section>
+  
+<script>
+  // IE를 제외하면 Event 객체도 OK！
+  var eventInput = document.createEvent('UIEvents')
+  eventInput.initEvent('input', false, false);
+
+  $(document).on('click', '[data-update]', function() {
+    $('#message').val($(this).data('update'))
+    // 외부에서 갱신되면, 이벤트를 호출한다.
+    $('#message')[0].dispatchEvent(eventInput)
+  });
+
+  new Vue({
+    el: '#app',
+    data: {
+      message: 'Message'
+    },
+    methods: {
+      update(message) {
+        this.message = message
+      }
+    }
+  });
+</script>
+  
+</body>
+</html>
