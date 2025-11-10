@@ -123,29 +123,33 @@
       <description>
         
         
-        &lt;h2 id=&#34;mcp-server&#34;&gt;MCP Server&lt;/h2&gt;
+        &lt;h2 id=&#34;시작하기&#34;&gt;시작하기&lt;/h2&gt;
 &lt;p&gt;MCP Server는 AI 모델이 외부 리소스(도구, 데이터, API 등)에 접근할 수 있도록 연결해주는 표준화된 인터페이스를 제공하는 역할을 한다.&lt;/p&gt;
+&lt;blockquote&gt;
 &lt;p&gt;MCP 서버에 대한 개념은 아래의 문서를 참고 바란다.&lt;br&gt;
-&lt;a href=&#34;https://www.devkuma.com/docs/ai/mcp-server/&#34;&gt;AI 용어 | MCP Server&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://www.devkuma.com/docs/ai/mcp-server/&#34;&gt;AI 용어 | MCP Server&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
 &lt;p&gt;이 문서에선 Spring를 활용하여 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/spring-ai/images/spring-ai-mcp-server-architect.png&#34; alt=&#34;MCP architect&#34;&gt;&lt;/p&gt;
 &lt;p&gt;물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 말 그대로 모델 컨텐츠 규약을 대로 따르기에 가능한 것이다.&lt;/p&gt;
 &lt;p&gt;MCP Server에서 연결되는 Resoures는 DB, API 등 다양하게 활용될 수 있다. 여기 문서는 Resoures는 연결까지는 다루지 않았다.&lt;/p&gt;
-&lt;p&gt;Spring에서의 MCP Server은 서버 전송에 따라 아래 3가지를 지원한다.&lt;/p&gt;
+&lt;p&gt;Spring-AI의 MCP Server 프레임워크는 서버 전송에 따라 아래 3가지 스타타터를 지원한다.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Standard MCP Server
 &lt;ul&gt;
 &lt;li&gt;STDIO서버 전송을 지원&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;org.springframework.ai:spring-ai-starter-mcp-server&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;WebMVC Server 전송
 &lt;ul&gt;
 &lt;li&gt;Spring MVC 기반 SSE(Server-Sent Events) 서버 전송과 옵션으로 STDIO 전송을 지원&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;org.springframework.ai:spring-ai-starter-mcp-server-webmvc&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;WebFlux Server 표준
 &lt;ul&gt;
 &lt;li&gt;Spring WebFlux 기반 SSE(Server-Sent Events) 서버 전송과 옵션으로 STDIO 전송을 지원&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;org.springframework.ai:spring-ai-starter-mcp-server-webflux&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
@@ -4372,7 +4376,39 @@ r1: 1881949787, r2: -221323214, r3: 1532292428
       <description>
         
         
-        &lt;p&gt;앞에서는 Spring으로 &lt;a href=&#34;https://www.devkuma.com/docs/spring-ai/mcp-server/&#34;&gt;STDIO 방식의 MCP Server&lt;/a&gt;를 만들었다면, 여기서는 WebMVC 전송 방식의 서버를 만들어 보도록 하겠다.&lt;/p&gt;
+        &lt;h2 id=&#34;webmvc-mcp-server&#34;&gt;WebMVC MCP Server&lt;/h2&gt;
+&lt;p&gt;앞에서는 Spring으로 &lt;a href=&#34;https://www.devkuma.com/docs/spring-ai/mcp-server/&#34;&gt;STDIO 방식의 MCP Server&lt;/a&gt;를 만들었다면, 여기서는 WebMVC 전송 방식의 서버를 만들어 보도록 하겠다.&lt;/p&gt;
+&lt;h3 id=&#34;mvp-프로토콜과-실행-모드&#34;&gt;MVP 프로토콜과 실행 모드&lt;/h3&gt;
+&lt;p&gt;Spring-AI의 MCP Server 프레임워크는 다음과 같은 서버 프로토콜을 제공한다:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;STDIO
+&lt;ul&gt;
+&lt;li&gt;Standard Input/Output library&lt;/li&gt;
+&lt;li&gt;프로세스 내부에서 표준 입출력으로 통신&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SSE
+&lt;ul&gt;
+&lt;li&gt;Server-Sent Events(실시간 서버-클라이언트 통신 기술)&lt;/li&gt;
+&lt;li&gt;실시간 서버-클라이언트 통신&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Streamable-HTTP
+&lt;ul&gt;
+&lt;li&gt;전통적인 HTTP 통신을 확장해서 스트리밍처럼 작동하도록 만든 방식&lt;/li&gt;
+&lt;li&gt;HTTP POST/GET 요청으로 서버에서 여러 클라이언트 연결 처리&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Stateless Streamable-HTTP
+&lt;ul&gt;
+&lt;li&gt;AI 모델과 같은 애플리케이션을 위한 통신 프로토콜&lt;/li&gt;
+&lt;li&gt;단일 HTTP 엔드포인트를 통해 요청 전송과 응답 스트리밍을 동시에 수행&lt;/li&gt;
+&lt;li&gt;요청 간 세션 메모리를 유지하지 않음으로써 무상태성을 구현&lt;/li&gt;
+&lt;li&gt;요청 간 세션 상태를 유지하지 않아 MSA 환경에 적합&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;이 문서에서는 Stateless Streamable-HTTP 방식으로 구현하려고 한다.&lt;/p&gt;
 &lt;h2 id=&#34;mcp-server을-webmvc-방식으로-변경&#34;&gt;MCP Server을 WebMVC 방식으로 변경&lt;/h2&gt;
 &lt;p&gt;기존 만들었던 STDIO 방식의 MCP Server 코드를 그대로 사용하도록 하겠다.&lt;/p&gt;
 &lt;h3 id=&#34;기존-코드-복사&#34;&gt;기존 코드 복사&lt;/h3&gt;
