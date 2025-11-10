@@ -34,7 +34,7 @@
 &lt;p&gt;앞에서는 &lt;a href=&#34;https://www.devkuma.com/docs/spring-ai/mcp-server-webmvc/&#34;&gt;WebMVC 전송 방식의 MCP Server&lt;/a&gt;를 만들었다면, 여기서는 서버에 인증 기능을 추가헤 보도록 하겠다.&lt;/p&gt;
 &lt;p&gt;Spring-AI에서는 Spring Security으로 서버 인증으로 OAuth2와 ApiKey 인증 방식을 제공하고 있다.&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;2025-11-10 기준으로 아직 MCP Security은 구현중에 있으며, 안정적이지 않다고 한다고 한다.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;2025-11-10 기준으로 아직 MCP Security은 구현중에 있으며, 안정적이지 않다고 한다.&lt;/p&gt;&lt;/blockquote&gt;
 &lt;p&gt;여기에서는 WebMVC MCP Server에 ApiKey 인증 방식을 적용해 보겠다.&lt;/p&gt;
 &lt;h2 id=&#34;webmvc-mcp-server에-인증-추가&#34;&gt;WebMVC MCP Server에 인증 추가&lt;/h2&gt;
 &lt;p&gt;이번에도 기존 만들었던 WebMVC 방식의 MCP Server 코드를 그대로 사용하도록 하겠다.&lt;/p&gt;
@@ -561,7 +561,7 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;h3 id=&#34;프로젝트-생성&#34;&gt;프로젝트 생성&lt;/h3&gt;
 &lt;p&gt;먼저, &lt;a href=&#34;https://start.spring.io/#!type=gradle-project-kotlin&amp;amp;language=kotlin&amp;amp;platformVersion=3.5.7&amp;amp;packaging=jar&amp;amp;configurationFileFormat=yaml&amp;amp;jvmVersion=21&amp;amp;groupId=com.devkuma&amp;amp;artifactId=spring-ai-mcp-server&amp;amp;name=spring-ai-mcp-server&amp;amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;amp;packageName=com.devkuma.ai.mcp.server&amp;amp;dependencies=spring-ai-mcp-server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Spirng ininitializr&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 신규 프로젝트를 생성한다.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/spring-ai/images/spring-ai-mcp-server-initializr.png&#34; alt=&#34;Spirng ininitializr&#34;&gt;&lt;/p&gt;
-&lt;p&gt;화면 아래 부근에 &amp;ldquo;GENERATE&amp;rdquo; 버튼을 누르면, 프로젝트 파일을 다운을 수 있다.&lt;/p&gt;
+&lt;p&gt;화면 아래 부근에 &amp;ldquo;GENERATE&amp;rdquo; 버튼을 누르면, 프로젝트 파일을 다운로드를 받을 수 있다.&lt;/p&gt;
 &lt;p&gt;또는, 다음과 같이 &lt;code&gt;curl&lt;/code&gt; 명령어를 사용하여 Spring Boot 초기 프로젝트를 생성할 수도 있다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl https://start.spring.io/starter.tgz &lt;span style=&#34;color:#4e9a06&#34;&gt;\
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&lt;/span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;bootVersion&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;3.5.7 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
@@ -647,7 +647,7 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;file&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;./log/spring-ai-starter-mcp-server.log&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8;text-decoration:underline&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;여기서 주의점은 &lt;code&gt;banner-mode&lt;/code&gt;로 진정해야 한다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;여기서 주의점은 &lt;code&gt;banner-mode&lt;/code&gt;를 &lt;code&gt;off&lt;/code&gt;로 설정해야 한다.&lt;/p&gt;
 &lt;h3 id=&#34;빌드-및-실행-파일-생성&#34;&gt;빌드 및 실행 파일 생성&lt;/h3&gt;
 &lt;p&gt;이제 완료되었다면 빌드를 해야 하는데, IDEA로 gradle 빌드로 &lt;code&gt;boorJar&lt;/code&gt;를 실행한다.&lt;/p&gt;
 &lt;p&gt;또는, 다음과 같이 터미널에서 커멘드로 다음과 같이 실행한다.&lt;/p&gt;
@@ -693,7 +693,7 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
 &lt;li&gt;코드 내용을 보면 &lt;code&gt;java&lt;/code&gt; 명령어로 jar를 실행하는 &lt;code&gt;stdioParams&lt;/code&gt;를 설정하여, &lt;code&gt;StdioClientTransport&lt;/code&gt; 생성시에 인자로 넣도 있다.&lt;/li&gt;
-&lt;li&gt;클라이언트를 하면 stdio로 MCP Sever가 실행이 된다.&lt;/li&gt;
+&lt;li&gt;클라이언트를 하면 STDIO로 MCP Sever가 실행이 된다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Output:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;... 생략 ...
