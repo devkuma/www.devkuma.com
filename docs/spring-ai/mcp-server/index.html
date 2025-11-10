@@ -27,7 +27,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="231_programming_spring">
     <meta property="article:published_time" content="2025-11-07T10:30:00+09:00">
-    <meta property="article:modified_time" content="2025-11-09T16:11:24+09:00">
+    <meta property="article:modified_time" content="2025-11-09T22:44:11+09:00">
     <meta property="article:tag" content="Java">
     <meta property="article:tag" content="Spring">
     <meta property="article:tag" content="AI">
@@ -35,8 +35,8 @@
   <meta itemprop="name" content="Spring, Kotlin를 활용하여 간단한 Standard MCP Server(STDIO) 만들기">
   <meta itemprop="description" content="Spring, Kotlin으로 MCP Server를 만들고, Claude에 연결해 보도록 한다.">
   <meta itemprop="datePublished" content="2025-11-07T10:30:00+09:00">
-  <meta itemprop="dateModified" content="2025-11-09T16:11:24+09:00">
-  <meta itemprop="wordCount" content="836">
+  <meta itemprop="dateModified" content="2025-11-09T22:44:11+09:00">
+  <meta itemprop="wordCount" content="861">
   <meta itemprop="keywords" content="Java,Spring,AI">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Spring, Kotlin를 활용하여 간단한 Standard MCP Server(STDIO) 만들기">
@@ -819,9 +819,9 @@
         <li><a href="#mcp-서버-설정-객체-생성">MCP 서버 설정 객체 생성</a></li>
         <li><a href="#어플리케이션-설정-파일">어플리케이션 설정 파일</a></li>
         <li><a href="#빌드-및-실행-파일-생성">빌드 및 실행 파일 생성</a></li>
-        <li><a href="#테스트용-클라이언트-생성">테스트용 클라이언트 생성</a></li>
       </ul>
     </li>
+    <li><a href="#테스트를-위한-mcp-client-구현">테스트를 위한 MCP Client 구현</a></li>
     <li><a href="#claude에서-mcp-server에-연결">Claude에서 MCP Server에 연결</a>
       <ul>
         <li><a href="#연결-설정">연결 설정</a></li>
@@ -1207,9 +1207,9 @@
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% ./gradlew clean bootJar
 </span></span></code></pre></div><p>그러면, jar 파일이 아래 경로에 생성된다.<br>
 <code>build/libs/spring-ai-mcp-server-0.0.1-SNAPSHOT.jar</code></p>
-<h3 id="테스트용-클라이언트-생성">테스트용 클라이언트 생성</h3>
-<p>서버 코드는 완성이 되었고, 이제 클라이언트를 전송을 시도해 보겠다.</p>
-<p><code>/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt</code> 파일명으로 클라이언트 생성한다.</p>
+<h2 id="테스트를-위한-mcp-client-구현">테스트를 위한 MCP Client 구현</h2>
+<p>MCP Server는 완성이 되었고, 이제 클라이언트를 구현해 보겠다.</p>
+<p>신규로 <code>/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt</code> 파일을 생성한다.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">com.devkuma.ai.mcp.client</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.modelcontextprotocol.client.McpClient</span>
@@ -1244,14 +1244,20 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000">client</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">closeGracefully</span><span style="color:#000;font-weight:bold">()</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>Output:</p>
+</span></span></code></pre></div><ul>
+<li>코드 내용을 보면 <code>java</code> 명령어로 jar를 실행하는 <code>stdioParams</code>를 설정하여, <code>StdioClientTransport</code> 생성시에 인자로 넣도 있다.</li>
+<li>클라이언트를 하면 stdio로 MCP Sever가 실행이 된다.</li>
+</ul>
+<p>Output:</p>
 <pre tabindex="0"><code>... 생략 ...
 
 Available Tools = ListToolsResult[tools=[Tool[name=get_weather, title=null, description=Return the weather of a given city., inputSchema=JsonSchema[type=object, properties={city={type=string, description=The city for which to get the weather}}, required=[city], additionalProperties=false, defs=null, definitions=null], outputSchema=null, annotations=null, meta=null]], nextCursor=null, meta=null]
 get_weather Response = CallToolResult[content=[TextContent[annotations=null, text=&#34;The weather in seoul is good.&#34;, meta=null]], isError=false, structuredContent=null, meta=null]
 
 ... 생략 ...
-</code></pre><p>사용 가능한 Tool 목록이 표시되고, <code>get_weather</code> 도구를 호출하여 응답을 받은 값을 표시되는 것을 확인할 수 있다.</p>
+</code></pre><ul>
+<li>실행 결과 출력에는 사용 가능한 Tool 목록이 표시되고, <code>get_weather</code> 도구를 호출하여 응답을 받은 값을 표시되는 것을 확인할 수 있다.</li>
+</ul>
 <h2 id="claude에서-mcp-server에-연결">Claude에서 MCP Server에 연결</h2>
 <p>빌드까지 완료가 되었다면 클로드 데스크탑에 MCP Server에 연결해 보고, 적용이 잘되어 있는지 확인해보도록 하겠다.</p>
 <h3 id="연결-설정">연결 설정</h3>

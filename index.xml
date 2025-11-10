@@ -125,8 +125,8 @@ Spring Security 로그 레벨만 추가 되었을 뿐 다른건 수정 된 것�
 &lt;/ul&gt;
 &lt;blockquote&gt;
 &lt;p&gt;여기서는 임시로 어플리케이션 기동시에 메모리에 담기도록 저장고를 만들었지만, 실제에서는 다른 DB나, API 등 다른 방식으로 하기를 권한다.&lt;/p&gt;&lt;/blockquote&gt;
-&lt;h3 id=&#34;테스트용-클라이언트-생성&#34;&gt;테스트용 클라이언트 생성&lt;/h3&gt;
-&lt;p&gt;서버 코드는 완성이 되었고, 이제 클라이언트를 전송을 시도해 보겠다.&lt;/p&gt;
+&lt;h2 id=&#34;테스트를-위한-mcp-client-구현&#34;&gt;테스트를 위한 MCP Client 구현&lt;/h2&gt;
+&lt;p&gt;MCP Server는 완성이 되었고, 이제 클라이언트를 구현해 보겠다.&lt;/p&gt;
 &lt;p&gt;기존에 작성하였던 &lt;code&gt;/test/kotlin/com/devkuma/ai/mcp/client/HttpClient.kt&lt;/code&gt; 클라이언트 파일에 인증을 추가한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.devkuma.ai.mcp.client&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
@@ -161,7 +161,11 @@ Spring Security 로그 레벨만 추가 되었을 뿐 다른건 수정 된 것�
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;client&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;closeGracefully&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Output:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Request에 Header에 key는 &lt;code&gt;X-API-key&lt;/code&gt;으로 설정하고, value은&lt;code&gt;api01.mycustomapikey&lt;/code&gt;로 설정하였다.&lt;/li&gt;
+&lt;li&gt;설정된 Request에 Header는 &lt;code&gt;transport&lt;/code&gt;에 &lt;code&gt;requestBuilder&lt;/code&gt;로 설정이 되었다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Output:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;... 생략 ...
 
 Available Tools = ListToolsResult[tools=[Tool[name=get_weather, title=null, description=Return the weather of a given city., inputSchema=JsonSchema[type=object, properties={city={type=string, description=The city for which to get the weather}}, required=[city], additionalProperties=false, defs=null, definitions=null], outputSchema=null, annotations=null, meta=null]], nextCursor=null, meta=null]
@@ -169,8 +173,6 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 
 ... 생략 ...
 &lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
-&lt;li&gt;헤더키는 &lt;code&gt;X-API-key&lt;/code&gt;으로 설정하고 헤더 값은&lt;code&gt;api01.mycustomapikey&lt;/code&gt;로 설정한 것을 확인할 수 있다.&lt;/li&gt;
-&lt;li&gt;설정된 요청 헤더는 &lt;code&gt;transport&lt;/code&gt;에 &lt;code&gt;requestBuilder&lt;/code&gt;로 설정이 되었다.&lt;/li&gt;
 &lt;li&gt;실행을 해보면 이전에 했던 결과와 동일하게, 사용 가능한 Tool 목록이 표시되고, &lt;code&gt;get_weather&lt;/code&gt; 도구를 호출하여 응답을 받은 값을 표시되는 것을 확인할 수 있다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
@@ -251,9 +253,9 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#c4a000&#34;&gt;pattern&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#c4a000&#34;&gt;console&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 설정을 제거하게 되면, 데몬 웹 프로세스가 기동되고, 콘솔에서 로그도 보이게 설정한 것이다.&lt;/p&gt;
-&lt;h3 id=&#34;테스트용-클라이언트-생성&#34;&gt;테스트용 클라이언트 생성&lt;/h3&gt;
-&lt;p&gt;서버 코드는 완성이 되었고, 이제 클라이언트를 전송을 시도해 보겠다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;/test/kotlin/com/devkuma/ai/mcp/client/HttpClient.kt&lt;/code&gt; 파일명으로 클라이언트 생성한다.&lt;/p&gt;
+&lt;h2 id=&#34;테스트를-위한-mcp-client-구현&#34;&gt;테스트를 위한 MCP Client 구현&lt;/h2&gt;
+&lt;p&gt;MCP Server는 완성이 되었고, 이제 클라이언트를 구현해 보겠다.&lt;/p&gt;
+&lt;p&gt;신규로 &lt;code&gt;/test/kotlin/com/devkuma/ai/mcp/client/HttpClient.kt&lt;/code&gt; 파일명으로 클라이언트 생성한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.devkuma.ai.mcp.client&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;io.modelcontextprotocol.client.McpClient&lt;/span&gt;
@@ -280,7 +282,11 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;client&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;closeGracefully&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Output:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;코드 내용을 보면 &lt;code&gt;HttpClientStreamableHttpTransport&lt;/code&gt; 생성시 인자로 http 주소를 넣고 있다.&lt;/li&gt;
+&lt;li&gt;클라이언트 전에, MCP Sever를 먼저 실행해서 프로세스로 켜놔야 한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Output:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;... 생략 ...
 
 Available Tools = ListToolsResult[tools=[Tool[name=get_weather, title=null, description=Return the weather of a given city., inputSchema=JsonSchema[type=object, properties={city={type=string, description=The city for which to get the weather}}, required=[city], additionalProperties=false, defs=null, definitions=null], outputSchema=null, annotations=null, meta=null]], nextCursor=null, meta=null]
@@ -606,9 +612,9 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% ./gradlew clean bootJar
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그러면, jar 파일이 아래 경로에 생성된다.&lt;br&gt;
 &lt;code&gt;build/libs/spring-ai-mcp-server-0.0.1-SNAPSHOT.jar&lt;/code&gt;&lt;/p&gt;
-&lt;h3 id=&#34;테스트용-클라이언트-생성&#34;&gt;테스트용 클라이언트 생성&lt;/h3&gt;
-&lt;p&gt;서버 코드는 완성이 되었고, 이제 클라이언트를 전송을 시도해 보겠다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt&lt;/code&gt; 파일명으로 클라이언트 생성한다.&lt;/p&gt;
+&lt;h2 id=&#34;테스트를-위한-mcp-client-구현&#34;&gt;테스트를 위한 MCP Client 구현&lt;/h2&gt;
+&lt;p&gt;MCP Server는 완성이 되었고, 이제 클라이언트를 구현해 보겠다.&lt;/p&gt;
+&lt;p&gt;신규로 &lt;code&gt;/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt&lt;/code&gt; 파일을 생성한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.devkuma.ai.mcp.client&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;io.modelcontextprotocol.client.McpClient&lt;/span&gt;
@@ -643,14 +649,20 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;client&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;closeGracefully&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Output:&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;코드 내용을 보면 &lt;code&gt;java&lt;/code&gt; 명령어로 jar를 실행하는 &lt;code&gt;stdioParams&lt;/code&gt;를 설정하여, &lt;code&gt;StdioClientTransport&lt;/code&gt; 생성시에 인자로 넣도 있다.&lt;/li&gt;
+&lt;li&gt;클라이언트를 하면 stdio로 MCP Sever가 실행이 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Output:&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;... 생략 ...
 
 Available Tools = ListToolsResult[tools=[Tool[name=get_weather, title=null, description=Return the weather of a given city., inputSchema=JsonSchema[type=object, properties={city={type=string, description=The city for which to get the weather}}, required=[city], additionalProperties=false, defs=null, definitions=null], outputSchema=null, annotations=null, meta=null]], nextCursor=null, meta=null]
 get_weather Response = CallToolResult[content=[TextContent[annotations=null, text=&amp;#34;The weather in seoul is good.&amp;#34;, meta=null]], isError=false, structuredContent=null, meta=null]
 
 ... 생략 ...
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;사용 가능한 Tool 목록이 표시되고, &lt;code&gt;get_weather&lt;/code&gt; 도구를 호출하여 응답을 받은 값을 표시되는 것을 확인할 수 있다.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;실행 결과 출력에는 사용 가능한 Tool 목록이 표시되고, &lt;code&gt;get_weather&lt;/code&gt; 도구를 호출하여 응답을 받은 값을 표시되는 것을 확인할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h2 id=&#34;claude에서-mcp-server에-연결&#34;&gt;Claude에서 MCP Server에 연결&lt;/h2&gt;
 &lt;p&gt;빌드까지 완료가 되었다면 클로드 데스크탑에 MCP Server에 연결해 보고, 적용이 잘되어 있는지 확인해보도록 하겠다.&lt;/p&gt;
 &lt;h3 id=&#34;연결-설정&#34;&gt;연결 설정&lt;/h3&gt;
