@@ -36,7 +36,7 @@
   <meta itemprop="description" content="Spring, Kotlin으로 MCP Server를 만들고, Claude에 연결해 보도록 한다.">
   <meta itemprop="datePublished" content="2025-11-07T10:30:00+09:00">
   <meta itemprop="dateModified" content="2025-11-10T11:31:49+09:00">
-  <meta itemprop="wordCount" content="901">
+  <meta itemprop="wordCount" content="924">
   <meta itemprop="keywords" content="Java,Spring,AI">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Spring, Kotlin를 활용하여 간단한 Standard MCP Server(STDIO) 만들기">
@@ -1091,7 +1091,7 @@
 <p>이 문서에서는 Spring를 활용하여  간단한 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.<br>
 <img src="/docs/spring-ai/images/spring-ai-mcp-server-architect.png" alt="MCP architect"></p>
 <p>물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 단어 그대로 Model Content Protocol(모델 컨텐츠 규약)으로 이를 따르고 있어서 가능한 것이다.</p>
-<p>MCP Server에서 연결되는 Resoures는 DB, API 등 다양하게 활용될 수 있다. 여기 문서는 Resoures는 연결까지는 다루지 않았다.</p>
+<p>MCP Server에서 연결되는 Resoures는 DB, API 등 다양하게 활용될 수 있다. 여기 문서에서는 Resoures는 연결까지는 다루지 않았다.</p>
 <p>Spring-AI의 MCP Server 프레임워크는 서버 전송에 따라 아래 3가지 스타타터를 지원한다.</p>
 <ul>
 <li>Standard MCP Server
@@ -1118,7 +1118,7 @@
 <h3 id="프로젝트-생성">프로젝트 생성</h3>
 <p>프로젝트 생성은 <a href="https://start.spring.io/#!type=gradle-project-kotlin&amp;language=kotlin&amp;platformVersion=3.5.7&amp;packaging=jar&amp;configurationFileFormat=yaml&amp;jvmVersion=21&amp;groupId=com.devkuma&amp;artifactId=spring-ai-mcp-server&amp;name=spring-ai-mcp-server&amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;packageName=com.devkuma.ai.mcp.server&amp;dependencies=spring-ai-mcp-server" target="_blank" rel="noopener">Spirng ininitializr<i class="fas fa-external-link-alt"></i></a>으로 생성할 수 있다.</p>
 <p><img src="/docs/spring-ai/images/spring-ai-mcp-server-initializr.png" alt="Spirng ininitializr"></p>
-<p>화면 아래 부근에 &ldquo;GENERATE&rdquo; 버튼을 누르면, 프로젝트 파일을 다운로드를 받을 수 있다.</p>
+<p>화면 아래 부근에 &ldquo;GENERATE&rdquo; 버튼을 누르면, 설정한 프로젝트 파일을 다운로드를 받을 수 있다.</p>
 <p>또는, 다음과 같이 <code>curl</code> 명령어를 사용하여 Spring Boot 초기 프로젝트를 생성할 수도 있다.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zsh" data-lang="zsh"><span style="display:flex;"><span>curl https://start.spring.io/starter.tgz <span style="color:#4e9a06">\
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>-d <span style="color:#000">bootVersion</span><span style="color:#ce5c00;font-weight:bold">=</span>3.5.7 <span style="color:#4e9a06">\
@@ -1142,7 +1142,7 @@
 </span></span><span style="display:flex;"><span>	<span style="color:#000">implementation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;org.springframework.ai:spring-ai-starter-mcp-server&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>Spring ai 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.</p>
+</span></span></code></pre></div><p>Spring AI 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">extra</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;springAiVersion&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;1.1.0-M4&#34;</span>
 </span></span></code></pre></div><blockquote>
 <p>최신 버전은 <a href="https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server" target="_blank" rel="noopener">여기<i class="fas fa-external-link-alt"></i></a>에서 확인하면 된다.</p></blockquote>
@@ -1166,8 +1166,11 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div><ul>
-<li>여기서는 페리미터로 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &ldquo;good&quot;이라고 응답하게 만들었다.</li>
-<li>응답을 여기에서는 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.</li>
+<li>getWeather(..) 함수에서는 페리미터로 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &ldquo;good&quot;이라고 응답하도록 만들었다.
+<ul>
+<li>여기에서는 응답값을 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.</li>
+</ul>
+</li>
 <li><code>@Tool</code>에 넣는 Tool에 대한 설명과 <code>@ToolParam</code>에 넣은 페라미터 설명은 나중에 MCP 클라이언트가 서버에 접속을 했을 때, 어떤 도구가 있고 사용 방법은 어떻게 되는지 클라이언트에서 알려줄 수 있다.</li>
 </ul>
 <h3 id="mcp-서버-설정-객체-생성">MCP 서버 설정 객체 생성</h3>
@@ -1189,8 +1192,8 @@
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div><h3 id="어플리케이션-설정-파일">어플리케이션 설정 파일</h3>
-<p><code>src/main/resources/application.yml</code>를 다음과 같이 작성한다.<br>
-(기존에 <code>application.properties</code>은 있다면 yml 파일로 변경한다.)</p>
+<p><code>application.yml</code>를 다음과 같이 작성한다. (기존에 <code>application.properties</code>은 있다면 yml 파일로 변경한다.)</p>
+<p><strong>/src/main/resources/application.yml</strong></p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yml" data-lang="yml"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">spring</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">main</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">web-application-type</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">none</span><span style="color:#f8f8f8;text-decoration:underline">
@@ -1207,16 +1210,19 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">console</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#204a87;font-weight:bold">file</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8;text-decoration:underline">    </span><span style="color:#204a87;font-weight:bold">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#000">./log/spring-ai-starter-mcp-server.log</span><span style="color:#f8f8f8;text-decoration:underline">
-</span></span></span></code></pre></div><p>여기서 주의점은 <code>banner-mode</code>를 <code>off</code>로 설정해야 한다.</p>
+</span></span></span></code></pre></div><ul>
+<li>여기서 주의점은 <code>banner-mode</code>를 <code>off</code>로 설정해야 한다.</li>
+</ul>
 <h3 id="빌드-및-실행-파일-생성">빌드 및 실행 파일 생성</h3>
-<p>이제 완료되었다면 빌드를 해야 하는데, IDEA로 gradle 빌드로 <code>boorJar</code>를 실행한다.</p>
-<p>또는, 다음과 같이 터미널에서 커멘드로 다음과 같이 실행한다.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>% ./gradlew clean bootJar
-</span></span></code></pre></div><p>그러면, jar 파일이 아래 경로에 생성된다.<br>
-<code>build/libs/spring-ai-mcp-server-0.0.1-SNAPSHOT.jar</code></p>
-<h2 id="테스트를-위한-mcp-client-구현">테스트를 위한 MCP Client 구현</h2>
+<p>코드 작성이 완료되었다면 빌드하고 jar 파일을 생성을 해야 하는데, IDEA로 gradle 빌드로 <code>boorJar</code>를 실행한다.</p>
+<p>또는, 다음과 같이 터미널에서 명령어로 다음과 같이 실행한다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zsh" data-lang="zsh"><span style="display:flex;"><span>% ./gradlew clean bootJar
+</span></span></code></pre></div><p>그러면, jar 파일이 아래 경로에 생성된다.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-zsh" data-lang="zsh"><span style="display:flex;"><span>build/libs/spring-ai-mcp-server-0.0.1-SNAPSHOT.jar
+</span></span></code></pre></div><h2 id="테스트를-위한-mcp-client-구현">테스트를 위한 MCP Client 구현</h2>
 <p>MCP Server는 완성이 되었고, 이제 클라이언트를 구현해 보겠다.</p>
-<p>신규로 <code>/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt</code> 파일을 생성한다.</p>
+<p>신규로 <code>StdioClient.kt</code> 파일을 생성한다.</p>
+<p><strong>/test/kotlin/com/devkuma/ai/mcp/client/StdioClient.kt</strong></p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span> <span style="color:#000">com.devkuma.ai.mcp.client</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">import</span> <span style="color:#000">io.modelcontextprotocol.client.McpClient</span>
@@ -1269,8 +1275,7 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 <p>빌드까지 완료가 되었다면 클로드 데스크탑에 MCP Server에 연결해 보고, 적용이 잘되어 있는지 확인해보도록 하겠다.</p>
 <h3 id="연결-설정">연결 설정</h3>
 <p>MCP Server 연결 설정은 json 파일에 등록해야 한다.</p>
-<p>MacOS인 경우에는 <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>에 설정을 하면된다.<br>
-(파일이 없다면 새로 생성을 하고, 기존에 있다면 추가한다.)</p>
+<p>MacOS인 경우에는 <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>에 설정을 하면된다. (파일이 없다면 새로 생성을 하고, 이미 있다면 추가한다.)</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>  <span style="color:#204a87;font-weight:bold">&#34;mcpServers&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">&#34;spring-ai-mcp-weather&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">{</span>
@@ -1287,7 +1292,8 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></div><p>생성한 어플리케이션은 java 명령어로 실행이 되고, 실행된 서버는 stdio를 통해서 클로드 데스크탑과 연결이 된다.</p>
 <h3 id="연결-설정-확인">연결 설정 확인</h3>
-<p>메뉴에서 &ldquo;Claude &gt; 설정 &gt; 개발자&quot;을 확인해 보면, 로컬 MCP 서버가 추가되어 있는 것을 확인 할 수 있다.
+<p>Claude를 실행하고 메뉴에서 &ldquo;Claude &gt; 설정 &gt; 개발자&quot;을 확인해 보면, 로컬 MCP 서버가 추가되어 있는 것을 확인 할 수 있다.<br>
+(혹시 여기서 에러가 발생한다면 로그 버튼이 보이는데, 그 버튼을 클릭해서 내용을 확인하면 된다.) 
 <img src="/docs/spring-ai/images/spring-ai-mcp-server-claude-1.png" alt="Spring AI MCP Server Claude"></p>
 <p>채팅 창에서는 설정 버튼을 누르면 &ldquo;spring-ai-mcp-wearther&quot;가 활성화 되어 있는 것을 볼 수 있다.
 <img src="/docs/spring-ai/images/spring-ai-mcp-server-claude-2.png" alt="Spring AI MCP Server Claude"></p>
