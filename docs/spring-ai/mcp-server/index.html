@@ -27,7 +27,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="231_programming_spring">
     <meta property="article:published_time" content="2025-11-07T10:30:00+09:00">
-    <meta property="article:modified_time" content="2025-11-10T09:53:31+09:00">
+    <meta property="article:modified_time" content="2025-11-10T10:38:57+09:00">
     <meta property="article:tag" content="Java">
     <meta property="article:tag" content="Spring">
     <meta property="article:tag" content="AI">
@@ -35,8 +35,8 @@
   <meta itemprop="name" content="Spring, Kotlin를 활용하여 간단한 Standard MCP Server(STDIO) 만들기">
   <meta itemprop="description" content="Spring, Kotlin으로 MCP Server를 만들고, Claude에 연결해 보도록 한다.">
   <meta itemprop="datePublished" content="2025-11-07T10:30:00+09:00">
-  <meta itemprop="dateModified" content="2025-11-10T09:53:31+09:00">
-  <meta itemprop="wordCount" content="867">
+  <meta itemprop="dateModified" content="2025-11-10T10:38:57+09:00">
+  <meta itemprop="wordCount" content="898">
   <meta itemprop="keywords" content="Java,Spring,AI">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Spring, Kotlin를 활용하여 간단한 Standard MCP Server(STDIO) 만들기">
@@ -1088,9 +1088,9 @@
 <blockquote>
 <p>MCP 서버에 대한 개념은 아래의 문서를 참고 바란다.<br>
 <a href="/docs/ai/mcp-server/">AI 용어 | MCP Server</a></p></blockquote>
-<p>이 문서에선 Spring를 활용하여 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.<br>
+<p>이 문서에서는 Spring를 활용하여  간단한 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.<br>
 <img src="/docs/spring-ai/images/spring-ai-mcp-server-architect.png" alt="MCP architect"></p>
-<p>물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 말 그대로 모델 컨텐츠 규약을 대로 따르기에 가능한 것이다.</p>
+<p>물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 말 그대로 모델 컨텐츠 규약을 따르고 있어서 가능한 것이다.</p>
 <p>MCP Server에서 연결되는 Resoures는 DB, API 등 다양하게 활용될 수 있다. 여기 문서는 Resoures는 연결까지는 다루지 않았다.</p>
 <p>Spring-AI의 MCP Server 프레임워크는 서버 전송에 따라 아래 3가지 스타타터를 지원한다.</p>
 <ul>
@@ -1116,7 +1116,7 @@
 <h2 id="spring을-활용한-mcp-server-구현">Spring을 활용한 MCP Server 구현</h2>
 <p>먼저 Spring와 Kotlin를 활용한 간단한 Standard MCP Server(STDIO)를 생성해 보겠다.</p>
 <h3 id="프로젝트-생성">프로젝트 생성</h3>
-<p>먼저, <a href="https://start.spring.io/#!type=gradle-project-kotlin&amp;language=kotlin&amp;platformVersion=3.5.7&amp;packaging=jar&amp;configurationFileFormat=yaml&amp;jvmVersion=21&amp;groupId=com.devkuma&amp;artifactId=spring-ai-mcp-server&amp;name=spring-ai-mcp-server&amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;packageName=com.devkuma.ai.mcp.server&amp;dependencies=spring-ai-mcp-server" target="_blank" rel="noopener">Spirng ininitializr<i class="fas fa-external-link-alt"></i></a>에서 신규 프로젝트를 생성한다.</p>
+<p>프로젝트 생성은 <a href="https://start.spring.io/#!type=gradle-project-kotlin&amp;language=kotlin&amp;platformVersion=3.5.7&amp;packaging=jar&amp;configurationFileFormat=yaml&amp;jvmVersion=21&amp;groupId=com.devkuma&amp;artifactId=spring-ai-mcp-server&amp;name=spring-ai-mcp-server&amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;packageName=com.devkuma.ai.mcp.server&amp;dependencies=spring-ai-mcp-server" target="_blank" rel="noopener">Spirng ininitializr<i class="fas fa-external-link-alt"></i></a>으로 생성할 수 있다.</p>
 <p><img src="/docs/spring-ai/images/spring-ai-mcp-server-initializr.png" alt="Spirng ininitializr"></p>
 <p>화면 아래 부근에 &ldquo;GENERATE&rdquo; 버튼을 누르면, 프로젝트 파일을 다운로드를 받을 수 있다.</p>
 <p>또는, 다음과 같이 <code>curl</code> 명령어를 사용하여 Spring Boot 초기 프로젝트를 생성할 수도 있다.</p>
@@ -1135,14 +1135,14 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#4e9a06"></span>-d <span style="color:#000">type</span><span style="color:#ce5c00;font-weight:bold">=</span>gradle-project-kotlin <span style="color:#000;font-weight:bold">|</span> tar -xzvf -
 </span></span></code></pre></div><h3 id="생성된-프로젝트-확인">생성된 프로젝트 확인</h3>
 <h4 id="빌드-스크립트">빌드 스크립트</h4>
+<p>의존성 라이브러리에 Spring MVC Server(<code>spring-ai-starter-mcp-server</code>) 라이브러리가 포함되어 있는 것을 볼 수 있다.</p>
 <p><strong>/build.gradle.kts</strong></p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">dependencies</span> <span style="color:#000;font-weight:bold">{</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#000">implementation</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;org.springframework.ai:spring-ai-starter-mcp-server&#34;</span><span style="color:#000;font-weight:bold">)</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#ce5c00;font-weight:bold">..</span><span style="color:#000;font-weight:bold">.</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>의존성 라이브러리에 Spring MVC Server(<code>spring-ai-starter-mcp-server</code>) 라이브러리가 포함되어 있는 것을 볼 수 있다.</p>
-<p>Spring ai 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.</p>
+</span></span></code></pre></div><p>Spring ai 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#000">extra</span><span style="color:#000;font-weight:bold">[</span><span style="color:#4e9a06">&#34;springAiVersion&#34;</span><span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#4e9a06">&#34;1.1.0-M4&#34;</span>
 </span></span></code></pre></div><blockquote>
 <p>최신 버전은 <a href="https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server" target="_blank" rel="noopener">여기<i class="fas fa-external-link-alt"></i></a>에서 확인하면 된다.</p></blockquote>
@@ -1165,8 +1165,11 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#8f5902;font-style:italic"></span>        <span style="color:#204a87;font-weight:bold">return</span> <span style="color:#4e9a06">&#34;The weather in </span><span style="color:#4e9a06">$city</span><span style="color:#4e9a06"> is good.&#34;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
 </span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
-</span></span></code></pre></div><p>여기서는 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &ldquo;good&quot;이라고 응답하게 만들었다.<br>
-여기서는 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.</p>
+</span></span></code></pre></div><ul>
+<li>여기서는 페리미터로 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &ldquo;good&quot;이라고 응답하게 만들었다.</li>
+<li>응답을 여기에서는 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.</li>
+<li><code>@Tool</code>에 넣는 Tool에 대한 설명과 <code>@ToolParam</code>에 넣은 페라미터 설명은 나중에 MCP 클라이언트가 서버에 접속을 했을 때, 어떤 도구가 있고 사용 방법은 어떻게 되는지 클라이언트에서 알려줄 수 있다.</li>
+</ul>
 <h3 id="mcp-서버-설정-객체-생성">MCP 서버 설정 객체 생성</h3>
 <p>생성된 Service를 Spring 설정으로 AI Tool로 추가한다.</p>
 <p><strong>/src/main/kotlin/com/devkuma/ai/mcp/server/McpConfig.kt</strong></p>

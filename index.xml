@@ -531,9 +531,9 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;blockquote&gt;
 &lt;p&gt;MCP 서버에 대한 개념은 아래의 문서를 참고 바란다.&lt;br&gt;
 &lt;a href=&#34;https://www.devkuma.com/docs/ai/mcp-server/&#34;&gt;AI 용어 | MCP Server&lt;/a&gt;&lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;이 문서에선 Spring를 활용하여 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.&lt;br&gt;
+&lt;p&gt;이 문서에서는 Spring를 활용하여  간단한 MCP Server를 만들고, Claude에서 MCP Server에 연결하는 방법에 대해서 설명한다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/spring-ai/images/spring-ai-mcp-server-architect.png&#34; alt=&#34;MCP architect&#34;&gt;&lt;/p&gt;
-&lt;p&gt;물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 말 그대로 모델 컨텐츠 규약을 대로 따르기에 가능한 것이다.&lt;/p&gt;
+&lt;p&gt;물론, Claude 외에 다른 AI 도구를 활용할 수도 있고, MCP Server도 Spring이 아니어도 된다. MCP는 말 그대로 모델 컨텐츠 규약을 따르고 있어서 가능한 것이다.&lt;/p&gt;
 &lt;p&gt;MCP Server에서 연결되는 Resoures는 DB, API 등 다양하게 활용될 수 있다. 여기 문서는 Resoures는 연결까지는 다루지 않았다.&lt;/p&gt;
 &lt;p&gt;Spring-AI의 MCP Server 프레임워크는 서버 전송에 따라 아래 3가지 스타타터를 지원한다.&lt;/p&gt;
 &lt;ul&gt;
@@ -559,7 +559,7 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;h2 id=&#34;spring을-활용한-mcp-server-구현&#34;&gt;Spring을 활용한 MCP Server 구현&lt;/h2&gt;
 &lt;p&gt;먼저 Spring와 Kotlin를 활용한 간단한 Standard MCP Server(STDIO)를 생성해 보겠다.&lt;/p&gt;
 &lt;h3 id=&#34;프로젝트-생성&#34;&gt;프로젝트 생성&lt;/h3&gt;
-&lt;p&gt;먼저, &lt;a href=&#34;https://start.spring.io/#!type=gradle-project-kotlin&amp;amp;language=kotlin&amp;amp;platformVersion=3.5.7&amp;amp;packaging=jar&amp;amp;configurationFileFormat=yaml&amp;amp;jvmVersion=21&amp;amp;groupId=com.devkuma&amp;amp;artifactId=spring-ai-mcp-server&amp;amp;name=spring-ai-mcp-server&amp;amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;amp;packageName=com.devkuma.ai.mcp.server&amp;amp;dependencies=spring-ai-mcp-server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Spirng ininitializr&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 신규 프로젝트를 생성한다.&lt;/p&gt;
+&lt;p&gt;프로젝트 생성은 &lt;a href=&#34;https://start.spring.io/#!type=gradle-project-kotlin&amp;amp;language=kotlin&amp;amp;platformVersion=3.5.7&amp;amp;packaging=jar&amp;amp;configurationFileFormat=yaml&amp;amp;jvmVersion=21&amp;amp;groupId=com.devkuma&amp;amp;artifactId=spring-ai-mcp-server&amp;amp;name=spring-ai-mcp-server&amp;amp;description=Demo%20project%20for%20Spring%20AI%20MCP%20Server&amp;amp;packageName=com.devkuma.ai.mcp.server&amp;amp;dependencies=spring-ai-mcp-server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Spirng ininitializr&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;으로 생성할 수 있다.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/spring-ai/images/spring-ai-mcp-server-initializr.png&#34; alt=&#34;Spirng ininitializr&#34;&gt;&lt;/p&gt;
 &lt;p&gt;화면 아래 부근에 &amp;ldquo;GENERATE&amp;rdquo; 버튼을 누르면, 프로젝트 파일을 다운로드를 받을 수 있다.&lt;/p&gt;
 &lt;p&gt;또는, 다음과 같이 &lt;code&gt;curl&lt;/code&gt; 명령어를 사용하여 Spring Boot 초기 프로젝트를 생성할 수도 있다.&lt;/p&gt;
@@ -578,14 +578,14 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&lt;/span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;gradle-project-kotlin &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; tar -xzvf -
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;생성된-프로젝트-확인&#34;&gt;생성된 프로젝트 확인&lt;/h3&gt;
 &lt;h4 id=&#34;빌드-스크립트&#34;&gt;빌드 스크립트&lt;/h4&gt;
+&lt;p&gt;의존성 라이브러리에 Spring MVC Server(&lt;code&gt;spring-ai-starter-mcp-server&lt;/code&gt;) 라이브러리가 포함되어 있는 것을 볼 수 있다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;/build.gradle.kts&lt;/strong&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;org.springframework.ai:spring-ai-starter-mcp-server&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;의존성 라이브러리에 Spring MVC Server(&lt;code&gt;spring-ai-starter-mcp-server&lt;/code&gt;) 라이브러리가 포함되어 있는 것을 볼 수 있다.&lt;/p&gt;
-&lt;p&gt;Spring ai 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Spring ai 라이브러리 버전은 따로 변경하지 않으면 디폴트로 예전 버전이 설정되는데, 여기서는 최신 버전으로 수정한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;extra&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;springAiVersion&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1.1.0-M4&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
 &lt;p&gt;최신 버전은 &lt;a href=&#34;https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;여기&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 확인하면 된다.&lt;/p&gt;&lt;/blockquote&gt;
@@ -608,8 +608,11 @@ get_weather Response = CallToolResult[content=[TextContent[annotations=null, tex
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;The weather in &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;$city&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt; is good.&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;여기서는 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &amp;ldquo;good&amp;quot;이라고 응답하게 만들었다.&lt;br&gt;
-여기서는 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;여기서는 페리미터로 도시(city)를 전달 받고, 날씨의 상태를 고정으로 &amp;ldquo;good&amp;quot;이라고 응답하게 만들었다.&lt;/li&gt;
+&lt;li&gt;응답을 여기에서는 고정으로 넣었지만, 실제로는 다른 리소스(DB, API 등)에서 정보를 가져와서 응답하게 하면 된다.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;@Tool&lt;/code&gt;에 넣는 Tool에 대한 설명과 &lt;code&gt;@ToolParam&lt;/code&gt;에 넣은 페라미터 설명은 나중에 MCP 클라이언트가 서버에 접속을 했을 때, 어떤 도구가 있고 사용 방법은 어떻게 되는지 클라이언트에서 알려줄 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3 id=&#34;mcp-서버-설정-객체-생성&#34;&gt;MCP 서버 설정 객체 생성&lt;/h3&gt;
 &lt;p&gt;생성된 Service를 Spring 설정으로 AI Tool로 추가한다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;/src/main/kotlin/com/devkuma/ai/mcp/server/McpConfig.kt&lt;/strong&gt;&lt;/p&gt;
