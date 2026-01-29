@@ -22,6 +22,219 @@
     
     
     <item>
+      <title>Gemini API</title>
+      <link>https://www.devkuma.com/docs/ai/gemini/api/</link>
+      <pubDate>Wed, 28 Jan 2026 18:08:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/gemini/api/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;gemini-key-발급&#34;&gt;Gemini Key 발급&lt;/h2&gt;
+&lt;p&gt;Google Gemini API를 사용하기 위해서는 API Key를 발급받아야 한다.&lt;/p&gt;
+&lt;h3 id=&#34;1-gemini-developer-api-사이트에-접속&#34;&gt;1. Gemini Developer API 사이트에 접속&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ai.google.dev/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://ai.google.dev/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 에 접속해서 &lt;strong&gt;Explore models in Google AI Studio&lt;/strong&gt; 버튼을 클릭한다.&lt;/li&gt;
+&lt;li&gt;이용 약관을 확인하고, &amp;ldquo;Continue&amp;rdquo; 버튼을 클릭하여&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google-gemini-api-1.png&#34; alt=&#34;Gemini Developer API&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-get-api-key-발급&#34;&gt;2. Get API Key 발급&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Get API Key&lt;/strong&gt; 메뉴를 선택하면, Key를 발급 받을 수 있다.&lt;/li&gt;
+&lt;li&gt;이미 발급을 받았다면 목록에 표시가 되었을 것이고, 발급 받은 적이 없다면 &amp;ldquo;API 키 만들기&amp;rdquo; 버튼을 발급 받을 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google-gemini-api-2.png&#34; alt=&#34;Gemini API Key&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;무료-등급&#34;&gt;무료 등급&lt;/h3&gt;
+&lt;p&gt;무료 등급은 모델별로 사용량에 제한이 있다.
+gemini-3-flash 기준으로 일일 최대 요청 수(RPD)가 최대 20번 밖에 되지 않는다.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google-gemini-api-3.png&#34; alt=&#34;Gemini API Key Free&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;라이브러리를-활용한-클라이언트-개발&#34;&gt;라이브러리를 활용한 클라이언트 개발&lt;/h2&gt;
+&lt;p&gt;여기서는 Kotlin 언어로 Google GenAI SDK를 활용해서 API를 호출하는 방법을 알아보겠다.&lt;/p&gt;
+&lt;h3 id=&#34;프로젝트-생성&#34;&gt;프로젝트 생성&lt;/h3&gt;
+&lt;p&gt;IDE 도구를 이용해서 프로젝트를 생성한다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;.
+├── build.gradle.kts
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── settings.gradle.kts
+└── src
+    ├── main
+    │   ├── kotlin
+    │   │   └── Main.kt
+    │   └── resources
+    └── test
+        ├── kotlin
+        └── resources
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;라이브러리-추가&#34;&gt;라이브러리 추가&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;/build.gradle.kts&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;com.google.genai:google-genai:1.36.0&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;버전은 GitHub 저장소(&lt;a href=&#34;https://github.com/googleapis/java-genai&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;googleapis/java-genai&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;) 확인하여 최신 버전을 넣으면 된다.&lt;/p&gt;
+&lt;h3 id=&#34;클라이언트-개발&#34;&gt;클라이언트 개발&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;GenerateTextFromTextInput.kt&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.devkuma&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;com.google.genai.Client&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;fun&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;client&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Client&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;builder&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;apiKey&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GEMINI_API_KEY&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;response&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000&#34;&gt;client&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;models&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;generateContent&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;gemini-3-flash-preview&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;인공지능에 대해 한 문장으로 설명하세요.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;response&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;text&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Output:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;인공지능은 인간의 학습, 추론, 지각 능력을 컴퓨터 시스템으로 구현하여 기계가 지능적인 작업을 수행할 수 있게 하는 기술입니다.
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;GEMINI_API_KEY&lt;/strong&gt; 는 발급 받은 키를 넣으면 된다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rest&#34;&gt;REST&lt;/h2&gt;
+&lt;p&gt;Gemini API는 REST API로도 호출 할 수도 있다.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;curl &amp;#34;https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent&amp;#34; \
+  -H &amp;#34;x-goog-api-key: $GEMINI_API_KEY&amp;#34; \
+  -H &amp;#39;Content-Type: application/json&amp;#39; \
+  -X POST \
+  -d &amp;#39;{
+    &amp;#34;contents&amp;#34;: [
+      {
+        &amp;#34;parts&amp;#34;: [
+          {
+            &amp;#34;text&amp;#34;: &amp;#34;인공지능에 대해 한 문장으로 설명하세요.&amp;#34;
+          }
+        ]
+      }
+    ]
+  }&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;output:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;{
+  &amp;#34;candidates&amp;#34;: [
+    {
+      &amp;#34;content&amp;#34;: {
+        &amp;#34;parts&amp;#34;: [
+          {
+            &amp;#34;text&amp;#34;: &amp;#34;인공지능은 인간의 학습, 추론, 지각 능력을 컴퓨터 시스템으로 구현하여 지적인 작업을 수행할 수 있도록 만든 기술입니다.&amp;#34;,
+            &amp;#34;thoughtSignature&amp;#34;: &amp;#34;Er8OCrwOAXLI2nzqxL3K8LCAB020BPaY+sv89....&amp;#34;
+          }
+        ],
+        &amp;#34;role&amp;#34;: &amp;#34;model&amp;#34;
+      },
+      &amp;#34;finishReason&amp;#34;: &amp;#34;STOP&amp;#34;,
+      &amp;#34;index&amp;#34;: 0
+    }
+  ],
+  &amp;#34;usageMetadata&amp;#34;: {
+    &amp;#34;promptTokenCount&amp;#34;: 13,
+    &amp;#34;candidatesTokenCount&amp;#34;: 32,
+    &amp;#34;totalTokenCount&amp;#34;: 415,
+    &amp;#34;promptTokensDetails&amp;#34;: [
+      {
+        &amp;#34;modality&amp;#34;: &amp;#34;TEXT&amp;#34;,
+        &amp;#34;tokenCount&amp;#34;: 13
+      }
+    ],
+    &amp;#34;thoughtsTokenCount&amp;#34;: 370
+  },
+  &amp;#34;modelVersion&amp;#34;: &amp;#34;gemini-3-flash-preview&amp;#34;,
+  &amp;#34;responseId&amp;#34;: &amp;#34;5rh6afO6NYb22roPsKr06Ao&amp;#34;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;참고-문서&#34;&gt;참고 문서&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ai.google.dev/gemini-api/docs&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Gemini API | Google AI for Developers&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;위에 예제 코드는 &lt;a href=&#34;https://github.com/devkuma/kotlin-tutorial/tree/main/gemini-api-tutorial&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;에서 확인해 볼 수 있다.&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>kotlin</category>
+      
+    </item>
+    
+    <item>
+      <title>AI 개발</title>
+      <link>https://www.devkuma.com/docs/ai/develop/</link>
+      <pubDate>Wed, 28 Jan 2026 18:06:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/ai/develop/</guid>
+      <description>
+        
+        
+        &lt;p&gt;AI 개발&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+    </item>
+    
+    <item>
+      <title>Kotlin Exposed</title>
+      <link>https://www.devkuma.com/docs/kotlin/exposed/</link>
+      <pubDate>Wed, 24 Dec 2025 10:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/kotlin/exposed/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;개요&#34;&gt;개요&lt;/h2&gt;
+&lt;p&gt;Exposed는 JetBrains가 개발한 Kotlin용 경량 SQL 라이브러리로이다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jetbrains.com/ko-kr/exposed/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.jetbrains.com/ko-kr/exposed/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;특징&#34;&gt;특징&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;타입 안정적인 DSL(Domain Specific Language)을 제공한다.&lt;/li&gt;
+&lt;li&gt;ORM(Object-Relational Mapping) 스타일로 쿼리를 작성할 수 있다.&lt;/li&gt;
+&lt;li&gt;JDBC 및 R2DBC 드라이버를 지원한다.&lt;/li&gt;
+&lt;li&gt;트랜잭션 관리, 마이그레이션 등 다양한 기능을 제공한다.&lt;/li&gt;
+&lt;li&gt;공식적으로 H2, MySQL, MariaDB, Oracle, PostgreSQL, SQL Server, SQLite 데이터베이스를 지원한다.&lt;/li&gt;
+&lt;li&gt;kotlin 타입 활용 가능하여 컴파일 시점에 타입 오류를 알 수 있다.&lt;/li&gt;
+&lt;li&gt;DSL, DAO 를 모두 제공해서 용도에 맞게 적합한 것을 선택할 수 있다.&lt;/li&gt;
+&lt;li&gt;코루틴 호환성: 비동기 프로그래밍을 지원해서 블로킹 작업을 효율적으로 처리할 수 있다.
+&lt;ul&gt;
+&lt;li&gt;Exposed는 내부적으로 JDBC를 사용해서 DB와 통신하고, JDBC는 전통적인 blocking API 이므로 DB 작업을 수행할 때 해당 작업이 완료될 때까지 스레드가 블로킹된다. 따라서 Exposed 자체는 non-blocking API를 제공하지 않지만 코루틴과 함께 사용할 경우 코루틴의 Dispatcher를 활용해서 블로킹 작업을 적절한 스레드 풀에서 실행하도록 관리할 수 있고, 이를 통해 메인 스레드를 차단하지 않고도 DB 작업을 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;데이터베이스-접근-방식&#34;&gt;데이터베이스 접근 방식&lt;/h2&gt;
+&lt;p&gt;Exposed는 두 가지 레벨의 데이터베이스 access를 제공한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SQL을 매핑 한 DSL(Domain Specific Language) 방식
+&lt;ul&gt;
+&lt;li&gt;SQL 과 유사한 형태로 쿼리를 작성할 수 있어서 익숙한 SQL 개념을 사용하면서도 kotlin 이 제공하는 타입 안정성의 이점을 얻을 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;경량화한 DAO(Data Access Object) 방식
+&lt;ul&gt;
+&lt;li&gt;전통적인 ORM 프레임워크인 Hibernate와 유사하게 객체지향적 접근 방식을 제공한다.&lt;/li&gt;
+&lt;li&gt;객체 중심으로 DB 엔티티를 다루고, 테이블을 클래스로 표현하므로 DB 레코드를 직접 객체로 매핑할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-kolin&#34; data-lang=&#34;kolin&#34;&gt;// DSL 방식
+val users = UsersTable.select { UsersTable.age greater 20 }
+
+// DAO 방식
+val user = User.findById(1)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;프로젝트의 요구사항에 가장 적합한 방식을 선택할 수 있다.&lt;/p&gt;
+
+      </description>
+      
+    </item>
+    
+    <item>
       <title>Spring에 적용하는 gRPC 라이브러리 비교</title>
       <link>https://www.devkuma.com/docs/spring-grpc/3rd-party-vs-spring-project/</link>
       <pubDate>Sat, 15 Nov 2025 21:37:00 +0900</pubDate>
@@ -2247,7 +2460,7 @@ E --&amp;gt; F[정확하고 맥락 있는 답변 생성]&lt;/pre&gt;
 &lt;li&gt;이후 빠르게 발전을 거듭했으며, &lt;strong&gt;Gemini 2.5 Flash&lt;/strong&gt;와 &lt;strong&gt;2.5 Pro&lt;/strong&gt;가 현재 주요 버전으로 사용 중이다. Flash는 응답 속도 중심, Pro는 고도 추론과 코드 생성 기능을 제공하며, Audio 출력 및 보안 기능도 강화되었다.&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://gemini.google.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://gemini.google.com/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google_gemini.jpg&#34; alt=&#34;Google Gemini&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/google-gemini.jpg&#34; alt=&#34;Google Gemini&#34;&gt;&lt;/p&gt;
 &lt;h2 id=&#34;gemini의-주요-특징&#34;&gt;Gemini의 주요 특징&lt;/h2&gt;
 &lt;h3 id=&#34;다중-모드multimodality&#34;&gt;&lt;strong&gt;다중 모드(Multimodality)&lt;/strong&gt;&lt;/h3&gt;
 &lt;ul&gt;
@@ -6019,584 +6232,6 @@ piyo :25 type :number
       </description>
       
       <category>Lua</category>
-      
-    </item>
-    
-    <item>
-      <title>Lua 변수</title>
-      <link>https://www.devkuma.com/docs/lua/variable/</link>
-      <pubDate>Sun, 21 Apr 2024 22:08:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/lua/variable/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;변수의-타입&#34;&gt;변수의 타입&lt;/h2&gt;
-&lt;p&gt;Lua에는 C언어처럼 변수의 타입이 존재하지만, 변수의 타입을 의식하지 않아도 되도록 설계되어 있다.&lt;/p&gt;
-&lt;p&gt;예를 들어, &lt;code&gt;hoge&lt;/code&gt;라는 변수를 선언하면, 그 변수에는 어떤 값이라도 대입할 수 있다. 정수도 대입할 수 있고, 소수나 문자열도 대입할 수도 있다.&lt;/p&gt;
-&lt;p&gt;여기서 대입이란 변수, 즉, 상자 안에 값을 넣는 것을 말한다(이 표현은 정확하지 않지만, 지금 단계에서는 그렇게 생각해도 무방하다).&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;C 언어와의 차이점&lt;/div&gt;
-
-
-- 변수의 타입을 의식하지 않아도 된다
-&lt;/div&gt;
-
-&lt;h2 id=&#34;변수-만들기&#34;&gt;변수 만들기&lt;/h2&gt;
-&lt;p&gt;이제 실제로 변수를 만들어 보자. 변수를 생성하려면 다음과 같이 한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이는 hoge라는 이름의 변수를 만들라는 의미이다. 상자에 이름을 붙일 수 있다. 그리고 이 hoge에는 10이라는 값이 들어간다.&lt;/p&gt;
-&lt;p&gt;C언어와 달리 초기화하지 않은 변수는 만들 수 없다. 예를 들어, 다음과 같은 코드는 에러가 발생한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--error&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변수를 여러 개 선언하는 경우 다음과 같이 작성할 수도 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bar&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 선언은 아래와 같은 의미이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;bar&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그리고, 아래와 같은 경우도 같은 의미이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;bar&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;C 언어와 달리 변수는 어디서나 선언할 수 있다. 또한, 한 줄에 여러 개의 값을 한 줄에 재작성하는 다중 대입이 가능하다.&lt;/p&gt;
-&lt;p&gt;또한, 이 또한 중요한데, Lua의 변수는 특별한 지정이 없는 한 전역 변수가 된다. 전역 변수의 의미는 변수의 범위에서 설명한다.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;C 언어와의 차이점&lt;/div&gt;
-
-
-- 변수는 어느 곳에서나 정의할 수 있다.
-- 변수는 특별한 지정이 없는 한 전역 변수가 된다.
-&lt;/div&gt;
-
-&lt;h2 id=&#34;변수-이름-지정-시-주의-사항&#34;&gt;변수 이름 지정 시 주의 사항&lt;/h2&gt;
-&lt;p&gt;변수 이름을 지을 때 다음과 같은 규칙이 있다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;시작은 영문자 또는 &lt;code&gt;_&lt;/code&gt;(밑줄)로 시작해야 한다. 숫자는 안된다.&lt;/li&gt;
-&lt;li&gt;기본적으로 같은 이름의 변수가 두 개 존재할 수 없다. 단, 변수의 범위가 다르면 같은 이름의 변수를 여러 개 만들 수 있다. 범위에 대한 설명은 생략한다.&lt;/li&gt;
-&lt;li&gt;예약어는 사용할 수 없다&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;예약어(&lt;strong&gt;표 3.3&lt;/strong&gt;)는 &lt;code&gt;if&lt;/code&gt;, &lt;code&gt;while&lt;/code&gt; 등 Lua 언어 문법의 일부이다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;표 3.3: 예약어 목록&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;&lt;code&gt;and&lt;/code&gt;&lt;/th&gt;
-          &lt;th&gt;&lt;code&gt;break&lt;/code&gt;&lt;/th&gt;
-          &lt;th&gt;&lt;code&gt;do&lt;/code&gt;&lt;/th&gt;
-          &lt;th&gt;&lt;code&gt;else&lt;/code&gt;&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;elseif&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;end&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;for&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;function&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;if&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;in&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;local&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;nil&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;not&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;or&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;repeat&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;then&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;until&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;while&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h2 id=&#34;변수에-값-대입하기&#34;&gt;변수에 값 대입하기&lt;/h2&gt;
-&lt;p&gt;변수에 값을 대입해 보자. 예를 들어, 10이라는 값을 상자에 넣으려면 다음과 같이 한다.&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hoge = 10
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이 &lt;code&gt;=&lt;/code&gt; 기호는 식의 오른쪽에 있는 값을 왼쪽에 대입하라는 의미이다. 수학의 등호를 의미하지 않으므로 주의해야 한다.&lt;/p&gt;
-&lt;p&gt;그렇다면, 수학에서 흔히 쓰이는 &lt;code&gt;x = 10&lt;/code&gt;(x는 10이다)과 같이 정말 등호의 의미를 사용하고 싶을 때는 어떻게 해야 할까? 이것은 &lt;code&gt;if&lt;/code&gt;문이라는 곳에서 자세히 설명하겠지만, 일단 간단히 설명하자면 &lt;code&gt;==&lt;/code&gt;라는 기호를 사용한다. 두 개의 등호를 연결하여 쓰면 수학에서 말하는 등호의 의미가 된다.&lt;/p&gt;
-&lt;p&gt;Lua에서는 다중 대입도 가능하다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;hoge&lt;/code&gt;에 10을 대입하고 &lt;code&gt;piyo&lt;/code&gt;에 5를 대입하고 있다.&lt;/p&gt;
-&lt;h2 id=&#34;변수-값-표시하기&#34;&gt;변수 값 표시하기&lt;/h2&gt;
-&lt;p&gt;변수를 화면에 출력하고 싶다면 어떻게 하면 될까? 예를 들어, &lt;code&gt;int&lt;/code&gt; 타입의 &lt;code&gt;hoge&lt;/code&gt;라는 상자에 &lt;code&gt;10&lt;/code&gt;이라는 값을 대입하여 상자의 내용을 화면에 표시해 보자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 프로그램을 실행하면 다음과 같이 화면에 표시될 것이다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;10
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;여러 개의 값을 표시할 수도 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이렇게 쉼표로 구분하여 여러 값을 표시할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;10	20
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;또한, 문자와 숫자 등도 함께 표시할 수 있다. 문자열과 숫자, 또는 문자열과 문자열을 결합하여 표시하려면 연결 연산자 &lt;code&gt;..&lt;/code&gt; 를 사용한다.&lt;/p&gt;
-&lt;p&gt;Lua에는 C 언어의 printf 함수와 비슷한 것이 존재한다. 바로 &lt;code&gt;string.format()&lt;/code&gt; 함수이다.&lt;/p&gt;
-&lt;p&gt;이 함수는 문자열의 서식을 지정하여 화면에 표시한다. 서식 지정자 목록은 &lt;strong&gt;표 3.2&lt;/strong&gt;와 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;표 3.2: 서식 지정자&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;기호&lt;/th&gt;
-          &lt;th&gt;의미&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%d&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;정수를 10진수로 출력&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%u&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;부호 없는 정수를 10진법으로 출력&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%o&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;정수의 8진법으로 출력&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%x&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;정수를 16진수로 출력&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%f&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;소수점 표시&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%c&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;1문자 출력&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;%%&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;% 출력&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;code&gt;string.format()&lt;/code&gt; 함수를 사용하여 숫자를 출력해 보자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 10진수 값은 %d이다&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 16진수 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;...&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;%x&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 10진수 값은 10이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 16진수 값은 a이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 외에도 다양한 시도를 해보자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30.256&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 %d이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;piyo의 값은 %d이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;값은 %d이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge는 %d piyo는 %d이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;foo의 값은 %f이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 %f이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;string.format&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;foo의 값은 %d이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;math.floor&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;foo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)))&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;여기서 &lt;code&gt;math.floor(x)&lt;/code&gt; 함수는 버림 함수이다.
-&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 값은 10이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;piyo의 값은 20이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;값은 50이다.
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge는 10 piyo는 20이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;foo의 값은 30.256000이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 값은 10.000000이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;foo의 값은 30이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;연산&#34;&gt;연산&lt;/h2&gt;
-&lt;h3 id=&#34;사칙연산&#34;&gt;사칙연산&lt;/h3&gt;
-&lt;p&gt;수학에서 익숙한 사칙연산, 즉 &amp;lsquo;덧셈&amp;rsquo;, &amp;lsquo;뺄셈&amp;rsquo;, &amp;lsquo;곱셈&amp;rsquo;, &amp;lsquo;나눗셈&amp;rsquo;을 Lua 언어에서도 할 수 있다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;표3.3: 사칙연산&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;기호&lt;/th&gt;
-          &lt;th&gt;의미&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;+&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;덧셈&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;-&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;뺄셈&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;*&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;곱셈&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;/&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;나누셈&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;strong&gt;간단한 계산 예시&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;x + y는 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;y의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 프로그램의 실행 결과는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;x + y는 30이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;y의 값은 10이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;기타-연산&#34;&gt;기타 연산&lt;/h3&gt;
-&lt;p&gt;값의 부호를 반전시키려면 다음과 같이 한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;반전된 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;반전된 값은 -10이다
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;나눗셈의 나머지, 즉 나눗셈의 나머지를 구하려면 다음과 같이 하면 된다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;나머지는 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;x&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;%&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;y&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;나머지는&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;이다&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;제곱-계산&#34;&gt;제곱 계산&lt;/h3&gt;
-&lt;p&gt;제곱은 예를 들어 &lt;code&gt;x&lt;/code&gt;의 2 제곱, 즉 &lt;code&gt;x*x&lt;/code&gt;을 말한다. Lua에서 제곱을 계산하려면 &lt;code&gt;2^3&lt;/code&gt;처럼 &lt;code&gt;^&lt;/code&gt;를 사용하여 표현한다. &lt;code&gt;2^3&lt;/code&gt;은 2의 3제곱을 의미한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;2의 제곱은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;^&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2의 제곱은 8.0이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;동적-변수의-타입&#34;&gt;동적 변수의 타입&lt;/h2&gt;
-&lt;p&gt;Lua는 변수의 타입을 의식하지 않아도 된다고 설명했다. 하지만 변수의 타입은 존재한다. 표 3.7에 표시된 8가지 기본 타입이 그것이다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;표3.7: 변수의 타입&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;유형&lt;/th&gt;
-          &lt;th&gt;의미&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;nil&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;code&gt;nil&lt;/code&gt;&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;boolean&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;논리형&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;number&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;숫자 값&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;문자열&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;function&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;함수&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;userdata&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;사용자 정의형&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;thread&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;스레드&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;table&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;테이블&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;code&gt;nil&lt;/code&gt;은 아무것도 없는 값이라는 뜻으로, C 언어나 JAVA에서 말하는 &lt;code&gt;null&lt;/code&gt;과 같은 의미이다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;boolean&lt;/code&gt;은 논리형, 즉 &lt;code&gt;true&lt;/code&gt;와 &lt;code&gt;false&lt;/code&gt;의 두 가지 값을 가지는 것이다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;number&lt;/code&gt;는 숫자를 담을 수 있는 것이다.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;string&lt;/code&gt;은 문자열을 나타낸다. 다른 타입에 대해서는 현재로서는 설명하지 않는다.&lt;/p&gt;
-&lt;p&gt;Lua의 경우 변수가 타입을 가지는 것이 아니라 값이 타입을 가진다.&lt;/p&gt;
-&lt;p&gt;즉, 변수에 넣는 값에 따라 타입이 동적으로 변화하는 것이다. 이제 현재 변수가 어떤 타입인지 알아보기 위해 &lt;code&gt;type()&lt;/code&gt; 함수를 사용하여 타입을 알아보자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;nil&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 현재 타입은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 현재 타입은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;33&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 현재 타입은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 현재 타입은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 현재 타입은 nil이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 현재 타입은 string이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 현재 타입은 number이다
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 현재 타입은 boolean이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이렇게 입력하는 값에 따라 타입이 동적으로 변한다.&lt;/p&gt;
-&lt;h2 id=&#34;키보드에서-값-불러오기&#34;&gt;키보드에서 값 불러오기&lt;/h2&gt;
-&lt;p&gt;키보드에서 어떤 값을 입력하여 변수에 대입하고 싶은 경우가 있을 수 있습니다. 이럴 때 사용하는 것이 io.read() 함수이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;nil&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;문자열을 입력하세요:&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;io.read&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;입력된 문자는 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
-&lt;p&gt;이 프로그램은 Visual Studio으로 실행 시키면, 입력이 되지 않는데, 커멘트(또는 터미널)을 켜고 아래과 같이 집접 입력하길 바란다.&lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% lua HelloWorld.lua
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;문자열을 입력하세요:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;devkuma
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;입력된 문자는 devkuma이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% lua HelloWorld.lua
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;문자열을 입력하세요:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;33
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;입력된 문자는 33이다
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;예제&#34;&gt;예제&lt;/h2&gt;
-&lt;h3 id=&#34;미터를-피트로-변환하는-프로그램&#34;&gt;미터를 피트로 변환하는 프로그램&lt;/h3&gt;
-&lt;p&gt;미터를 피트로 변환하는 프로그램을 작성해보자. 미터에 3.2를 곱하여 피트를 구할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;io.write&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;미터 값을 입력하세요:&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;meter&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;io.read&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;answer&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;meter&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3.2&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;meter&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;미터는&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;answer&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;피트이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;io.write()&lt;/code&gt; 함수는 &lt;code&gt;print&lt;/code&gt; 함수와 사용법은 동일하다. 단, &lt;code&gt;io.write()&lt;/code&gt; 함수는 문장 끝에 줄바꿈이 자동으로 추가되지 않는다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% lua HelloWorld.lua
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;미터 값을 입력하세요:25
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;25미터는80.0피트이다.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;두-값을-교환하는-프로그램&#34;&gt;두 값을 교환하는 프로그램&lt;/h3&gt;
-&lt;p&gt;변수 hoge에는 10이, piyo에는 5가 할당되어 있다. 이 두 값을 교환하라.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이고,  piyo의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;tmp&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;tmp&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이고,  piyo의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;해결 방법은 한 가지가 아니다. 다중 대입을 사용하면 &lt;code&gt;tmp&lt;/code&gt; 변수를 사용하지 않아도 된다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이고, piyo의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hoge의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;hoge&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이고, piyo의 값은 &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;piyo&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;이다.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 값은 10 piyo의 값은 5이다.
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hoge의 값은 5 piyo의 값은 10이다.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;연습문제&#34;&gt;연습문제&lt;/h2&gt;
-&lt;h3 id=&#34;문제1&#34;&gt;문제1&lt;/h3&gt;
-&lt;p&gt;분을 시간으로 변환하는 프로그램을 작성하시오. 예를 들어, 사용자가 180을 입력하면 3으로 표시하는 프로그램이다.&lt;/p&gt;
-&lt;h3 id=&#34;문제-2&#34;&gt;문제 2&lt;/h3&gt;
-&lt;p&gt;섭씨 온도를 화씨 온도로 변환하는 프로그램을 작성하시오. 섭씨 온도(F)와 화씨 온도(C)에는 도(C)는 다음과 같은 관계가 있다.&lt;/p&gt;
-&lt;p&gt;\(F = {9 \over c}C + 32\)&lt;/p&gt;
-
-      </description>
-      
-      <category>Lua</category>
-      
-    </item>
-    
-    <item>
-      <title>Lua 언어의 기초</title>
-      <link>https://www.devkuma.com/docs/lua/basic/</link>
-      <pubDate>Sun, 21 Apr 2024 20:52:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/lua/basic/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;화면에-문자-표시하기&#34;&gt;화면에 문자 표시하기&lt;/h2&gt;
-&lt;p&gt;다음 소스 코드&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; 를 에디터에 붙여넣기 한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello World!&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;C 언어와 달리 &lt;code&gt;main&lt;/code&gt; 함수는 없으며, 프로그램은 단 한 줄로 구성되어 있다. 이 프로그램의 실행 결과는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hello World!
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;화면에 문자를 표시할 때는 &lt;code&gt;print&lt;/code&gt; 함수를 사용한다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;형식:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;뭔가 표시하고 싶은 문장은 여기에 적는다&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;print&lt;/code&gt; 함수는 다음과 같이 작성할 수도 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello World!&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;Hello World!&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello World!&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;[[Hello World!]]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 3가지 코드는 모두 같은 의미이다.&lt;/p&gt;
-&lt;p&gt;문자열을 큰따옴표(&lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt;)로 묶어도 작은따옴표(&lt;code&gt;&#39;&#39;&lt;/code&gt;)로 묶어도 상관없다. 다만 4번째 코드만 조금 의미가 다르다. 이는 다음 장에서 이스케이스 시퀀스에 대해서 설명한다.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;C 언어와의 차이점&lt;/div&gt;
-
-
-- 프로그램은 메인 함수에서 실행되는 것이 아니라 위에서 아래로 실행된다.
-- `printf`가 아닌 `print`
-- 코드 끝에 세미콜론(`;`)이 없다.
-&lt;/div&gt;
-
-&lt;h2 id=&#34;이스케이프-시퀀스escape-sequence&#34;&gt;이스케이프 시퀀스(escape sequence)&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;print&lt;/code&gt; 문에서 문자열을 줄바꿈하고 싶은 경우가 있을 수 있다. 줄바꿈을 할 때, 특수 문자를 사용하여 줄바꿈을 한다. 줄바꿈의 경우 &lt;code&gt;\n&lt;/code&gt;이라는 문자를 사용한다. &lt;code&gt;n&lt;/code&gt;은 &lt;code&gt;\&lt;/code&gt;와 &lt;code&gt;n&lt;/code&gt; 두 글자를 조합하여 줄바꿈이라는 의미이다.&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-&lt;p&gt;다음과 같이 작성한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;World!&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hello
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;World!
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;줄바꿈 문자 외에 이스케이프 시퀀스는 아래와 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;표 2.1: 이스케이프 시퀀스 목록&lt;/strong&gt;&lt;/p&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th&gt;기호&lt;/th&gt;
-          &lt;th&gt;의미&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\n&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;줄바꿈&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\a&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;BEEP 소리(경고음)&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\t&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;탭&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\b&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;백스페이스&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\&#39;&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;작은따옴표&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\&amp;quot;&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;큰따옴표&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td&gt;&lt;code&gt;\\&lt;/code&gt;&lt;/td&gt;
-          &lt;td&gt;백슬래시(한글인 경우, 원 표시)&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;앞에서 장에 나온 &lt;code&gt;print ([[Hello World!]])&lt;/code&gt;라는 print 함수 작성법인데, 이는 이스케이프 문자를 무시하고 문자열을 그대로 출력한다.&lt;/p&gt;
-&lt;p&gt;예를 들어 다음과 같은 코드가 있다고 하자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;[[Hello\nWorld!]]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 코드의 실행 결과는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hello\nWorld!
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;문자열을 그대로 출력하므로 줄바꿈 등도 그대로 표시된다. 예를 들어, 다음과 같은 경우dl다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;print([[Hello
-World!
-헬로 월드!
-]])
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이 프로그램의 실행 결과는 다음과 같다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Hello
-World!
-헬로 월드!
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;코멘트comment&#34;&gt;코멘트(comment)&lt;/h2&gt;
-&lt;p&gt;C 언어와 마찬가지로 프로그램 내에 주석을 작성할 수 있다. 주석은 소스 코드(자신이 C언어로 작성한 문장) 안에서 그 소스가 무엇을 의미하는지 쓰고 싶을 때 사용한다.&lt;/p&gt;
-&lt;p&gt;예를 들어, 다음과 같은 소스가 있다고 가정해보자.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello World!&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;-- Hello World! 라고 화면에 표시한다.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;-- Hello World! 라고 화면에 표시한다&lt;/code&gt;라는 부분은 주석이다. 마이너스가 두 개 겹쳐져 있다. &lt;code&gt;--&lt;/code&gt; 이후의 줄 끝까지가 주석이 된다.&lt;/p&gt;
-&lt;p&gt;여기서 여러 줄의 코멘트를 쓰고 싶은 경우도 있을 것이다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--이&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--부분은&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--주석이&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--된다.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;``&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;이대로&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;해도&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;상관&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;없지만&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Lua에서는&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;여러&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;줄의&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;코멘트를&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;작성할&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;때&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;`&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--[[`와 `]]&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;`로&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;둘러싸서&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;코멘트로&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;만들&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;수&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;있다&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;```&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lua&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--[[
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;이
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;부분이
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;주석이
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;된다.
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;]]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;예시&#34;&gt;예시&lt;/h2&gt;
-&lt;h3 id=&#34;주석이-포함된-프로그램&#34;&gt;주석이 포함된 프로그램&lt;/h3&gt;
-&lt;p&gt;이 프로그램에서는 &lt;code&gt;&amp;quot;This line is not displayed.&amp;quot;&lt;/code&gt;라는 부분이 실행 결과에 표시되지 않는다는 점이다. 주석 처리된 부분은 비록 명령어라 할지라도 무시된다.
-또한, C 언어의 &lt;code&gt;printf&lt;/code&gt;와 달리 &lt;code&gt;print&lt;/code&gt; 함수를 한 번 실행하면 문장 끝에 자동으로 줄바꿈이 추가된다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;소스:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--print 함수의 끝은 임의로 줄바꿈된다.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;This is a test program &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;without indented.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--[[
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;이 부분은 주석 처리되어 표시되지 않는다.
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;print(&amp;#34;This line is not displayed. &amp;#34;)
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;]]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;This is a test program
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;without indented.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;긴-문장을-표시하는-프로그램&#34;&gt;긴 문장을 표시하는 프로그램&lt;/h3&gt;
-&lt;p&gt;한 줄에 표시할 문자가 많은 경우, 같은 줄에 쓰면 코드가 읽기 어려워지는 경우가 있다. 이 경우 수정하는 방법을 알아보자.
-&lt;code&gt;print&lt;/code&gt; 함수를 한 번만 사용하여, &lt;code&gt;There are 10 types of people in this world. Those who understand binary and those who don&#39;t. Which one are you?&lt;/code&gt; 표시해 보도록 하자.&lt;/p&gt;
-&lt;p&gt;하지만 같은 줄에 쓰면 코드가 읽기 힘들어진다. 이 경우 다음과 같이 코드를 작성할 수도 있다.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;소스:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;-- 이를 위해 다음과 같이 코드를 작성할 수도 있다.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;There are 10 types of people in this world.&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Those who understand binary and those who don&amp;#39;t.&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;..&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Which one are you?&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;There are 10 types of people in this world.Those who understand binary and those who don&amp;#39;t.Which one are you?
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;큰따옴표를-표시하는-프로그램&#34;&gt;큰따옴표를 표시하는 프로그램&lt;/h3&gt;
-&lt;p&gt;다음과 같은 문자열을 표시하는 프로그램을 만들려고 한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;He said, &amp;#34;How dare you do to me like that!&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이럴 때 다음과 같은 코드를 작성해 봤지만 잘 되지 않는다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;He said, &amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;How&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;dare&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;you&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;to&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;me&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;like&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;that&lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; 　&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--error&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 코드는 에러가 발생하여 실행할 수 없다. 그렇다면 어떻게 하면 &lt;code&gt;&amp;quot;&lt;/code&gt;(큰따옴표)를 표시할 수 있을까? 그 해답은 앞서 소개한 이스케이프 시퀀스를 사용하면 해결할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;He said, &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;How dare you do to me like that!&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;\&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;또는 다음과 같이 작성할 수도 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;print&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;[[He said, &amp;#34;How dare you do to me like that!&amp;#34;]]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이렇게 할 수 있다는 것도 잘 기억해두자.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;실행 결과:&lt;/strong&gt;&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;He said, &amp;#34;How dare you do to me like that!&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
-&lt;hr&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn:1&#34;&gt;
-&lt;p&gt;소스 코드란 프로그래밍 언어로 작성된 문장을 말한다.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:2&#34;&gt;
-&lt;p&gt;한글인 경우에는 백슬래시는 원 마크 &lt;code&gt;₩&lt;/code&gt;를 사용한다.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;
-
-      </description>
-      
-      <category>Lua</category>
-      
-    </item>
-    
-    <item>
-      <title>Lua 개요</title>
-      <link>https://www.devkuma.com/docs/lua/overview/</link>
-      <pubDate>Sun, 21 Apr 2024 20:50:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/docs/lua/overview/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;대상-독자&#34;&gt;대상 독자&lt;/h2&gt;
-&lt;p&gt;이 글의 대상 독자는 C 언어 프로그래밍(또는 C++, C#, JAVA) 경험자이다. 언어의 기본적인 문법(&lt;code&gt;if&lt;/code&gt;, &lt;code&gt;for&lt;/code&gt;, &lt;code&gt;while&lt;/code&gt;, 함수 만드는 법)을 알고 있는 정도면 충분하다.
-하지만 가능한 한 C 언어(또는 C 언어와 유사한 언어)를 모르는 분들도 이해할 수 있도록 설명할 예정이다.&lt;/p&gt;
-&lt;h2 id=&#34;lua-언어에-대하여&#34;&gt;Lua 언어에 대하여&lt;/h2&gt;
-&lt;p&gt;이 글의 대상 독자를 C(또는 C와 유사한 언어)로 정한 데에는 이유가 있다.
-Lua 언어는 C 언어에서 호출되거나 내장되어 사용되는 언어이기 때문에 Lua 언어로만 프로그램을 작성하는 경우는 거의 없을 것으로 생각되기 때문이다.&lt;/p&gt;
-&lt;h2 id=&#34;개발-환경-구축하기&#34;&gt;개발 환경 구축하기&lt;/h2&gt;
-&lt;h3 id=&#34;windows에서-환경-만들기&#34;&gt;Windows에서 환경 만들기&lt;/h3&gt;
-&lt;p&gt;아래 링크에서 History 부근에 최신 버전을 다운 받아서 설치하면 된다.&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;https://luabinaries.sourceforge.net/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Lua Binaries&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;h3 id=&#34;mac에서-환경-만들기&#34;&gt;mac에서 환경 만들기&lt;/h3&gt;
-&lt;p&gt;Mac 환경에서 Homebrew으로 아래 명령어로 설치할 수 있다.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://formulae.brew.sh/formula/lua&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://formulae.brew.sh/formula/lua&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install lua
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;설치 후에 버전을 확인한다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% lua -v
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Lua 5.4.6  Copyright &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;C&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; 1994-2023 Lua.org, PUC-Rio
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;버전이 표시되면, 잘 설치가 된 것이다.&lt;/p&gt;
-&lt;h3 id=&#34;visual-studio-code에서-개발-환경-만들기&#34;&gt;Visual Studio Code에서 개발 환경 만들기&lt;/h3&gt;
-&lt;h4 id=&#34;확장-기능-설치&#34;&gt;확장 기능 설치&lt;/h4&gt;
-&lt;p&gt;Visual Studio Code 실행하고, Lua 와 Lua Debug extension 설치한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/lua/lua-vscode-1.png&#34; alt=&#34;Lua Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;그리고 Code Runner도 설치한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/lua/lua-vscode-2.png&#34; alt=&#34;Lua Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;h4 id=&#34;lua-실행&#34;&gt;Lua 실행&lt;/h4&gt;
-&lt;p&gt;간단히 lua 파일을 생성하고, &lt;code&gt;print(&amp;quot;Hello World!&amp;quot;)&lt;/code&gt; 입력하고, 실행 버튼을 클릭한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/lua/lua-vscode-3.png&#34; alt=&#34;Lua Visual Studio Code&#34;&gt;&lt;/p&gt;
-&lt;p&gt;그러면 위와 같이 출력되는 것을 볼 수 있다.&lt;/p&gt;
-
-      </description>
-      
-      <category>Flutter</category>
       
     </item>
     
