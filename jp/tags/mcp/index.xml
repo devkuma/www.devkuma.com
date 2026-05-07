@@ -1,0 +1,169 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – MCP</title>
+    <link>https://www.devkuma.com/jp/tags/mcp/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/mcp/logo/180x180.jpg</url>
+      <title>MCP</title>
+      <link>https://www.devkuma.com/jp/tags/mcp/</link>
+    </image>
+    <description>Recent content in MCP on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/mcp/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>MCP（Model Context Protocol）</title>
+      <link>https://www.devkuma.com/jp/docs/ai/mcp/</link>
+      <pubDate>Sun, 24 Aug 2025 13:14:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/ai/mcp/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;mcpの概要&#34;&gt;MCPの概要&lt;/h2&gt;
+&lt;p&gt;Model Context Protocol（MCP）は、&lt;strong&gt;AI、特に大規模言語モデル（LLM）が外部データソースやツールと効果的に相互作用できるようにするオープン標準プロトコル&lt;/strong&gt;である。&lt;/p&gt;
+&lt;p&gt;このプロトコルは、アプリケーションがLLMにコンテキスト（Context）を一貫した方式で渡せるように設計されている。一言でいえば、&lt;strong&gt;AI用のUSB-Cポート&lt;/strong&gt;という比喩で説明されることもある。USB-Cがさまざまな機器を統一された形式で接続するように、MCPもAIモデルと多様なリソースを標準化された方式で接続する。&lt;/p&gt;
+&lt;p&gt;つまり、&lt;strong&gt;AIモデルがさまざまな外部システムと接続できるようにする共通インターフェース&lt;/strong&gt;である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/mcp-architecture.png&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;主な特徴&#34;&gt;主な特徴&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;標準化されたインターフェース&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;モデルが「データソース / ツール / アプリケーション」にアクセスできる共通規約を提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;プラグイン型構造&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;特定のアプリケーションに依存せず、どのモデルでもMCPをサポートすれば同じ方式で拡張できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;セキュリティと制御&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;モデルがアクセスできる範囲を制限し、ユーザーが許可したリソースだけにアクセスするよう設計されている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;開発者に優しい&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenAI、Anthropicなど複数のAIモデルで共通利用できるため、「一度作ったMCPツールはどこでも使える」。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;例&#34;&gt;例&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;モデルが「データベース問い合わせ」を必要とする場合:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;モデル -&amp;gt; MCP -&amp;gt; DB Adapter -&amp;gt; Database
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;モデルが「Web API呼び出し」を行う必要がある場合:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;モデル -&amp;gt; MCP -&amp;gt; HTTP Adapter -&amp;gt; 外部REST API
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;つまり、MCPは&lt;strong&gt;AIのプラグインエコシステムを標準化&lt;/strong&gt;する基盤技術と見ることができる。&lt;/p&gt;
+&lt;h3 id=&#34;導入背景と必要性&#34;&gt;導入背景と必要性&lt;/h3&gt;
+&lt;p&gt;AIモデルは本質的に&lt;strong&gt;テキストベース&lt;/strong&gt;でのみ入出力を行う。しかし実際の活用では、DB照会、API呼び出し、ファイル入出力など多様な作業が必要である。これまでは&lt;strong&gt;プラグイン、LangChain、独自APIブリッジ&lt;/strong&gt;のような個別ソリューションを使う必要があったが、これらを&lt;strong&gt;標準化されたプロトコル&lt;/strong&gt;としてまとめたものがMCPである。&lt;/p&gt;
+&lt;p&gt;従来、AIアプリケーションが外部システムと相互作用するには、&lt;strong&gt;モデルごと、ツールごとにそれぞれカスタム統合実装が必要&lt;/strong&gt;だった。そのため開発と保守の複雑性が大きく増え、これは&lt;strong&gt;M x N問題&lt;/strong&gt;と表現された。MCPはこれを&lt;strong&gt;M + N構造に単純化&lt;/strong&gt;し、AIアプリケーションが多様なツールと標準化された方式で接続できるよう支援する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/ai/mcp-before-after.webp&#34; alt=&#34;MCP Architecture&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;画像出典: &lt;a href=&#34;https://www.descope.com/learn/post/mcp&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.descope.com/learn/post/mcp&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;アーキテクチャと動作原理&#34;&gt;アーキテクチャと動作原理&lt;/h2&gt;
+&lt;h3 id=&#34;クライアントサーバー構造&#34;&gt;クライアント・サーバー構造&lt;/h3&gt;
+&lt;p&gt;MCPは&lt;strong&gt;クライアント・サーバーアーキテクチャ&lt;/strong&gt;を採用している。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MCPクライアント&lt;/strong&gt;は、Claude DesktopなどのAIアプリケーションである。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MCPサーバー&lt;/strong&gt;は、ファイルシステム、データベース、APIなどの外部リソースを提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;通信方式&#34;&gt;通信方式&lt;/h3&gt;
+&lt;p&gt;MCPは&lt;strong&gt;JSON-RPC 2.0&lt;/strong&gt;を基盤としてリクエスト（Request）とレスポンス（Response）を交換し、これは&lt;strong&gt;標準化されたメッセージ交換方式によって相互運用性を高める&lt;/strong&gt;。
+また、&lt;strong&gt;ローカルプロセス間通信（stdioベース）&lt;strong&gt;と&lt;/strong&gt;HTTP + SSE（Server-Sent Events）ベース&lt;/strong&gt;通信の両方をサポートする。&lt;/p&gt;
+&lt;h3 id=&#34;サーバーの役割&#34;&gt;サーバーの役割&lt;/h3&gt;
+&lt;p&gt;MCPサーバーは次のような機能を実行する。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Tool Registry&lt;/strong&gt;: 利用可能なツールと機能の一覧を管理&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Authentication&lt;/strong&gt;: アクセス権限を検証&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Request Handler&lt;/strong&gt;: クライアントのリクエストを処理&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Response Formatter&lt;/strong&gt;: 結果をAIモデルが理解できる形式に加工&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;AIアプリケーションはサーバーに「利用可能なツール一覧」を要求し、それを基に適切なツールを選択して活用できる。&lt;/p&gt;
+&lt;h2 id=&#34;開発者親和性と拡張性&#34;&gt;開発者親和性と拡張性&lt;/h2&gt;
+&lt;p&gt;AnthropicはMCPを&lt;strong&gt;オープンソース標準&lt;/strong&gt;として公開し、&lt;strong&gt;Python、TypeScript、Java、Kotlin、C#など主要言語向けSDK&lt;/strong&gt;も提供している。これにより、&lt;strong&gt;クライアントおよびサーバー実装が概ね簡単である&lt;/strong&gt;という利点が得られる。&lt;/p&gt;
+&lt;h2 id=&#34;活用効果と利点&#34;&gt;活用効果と利点&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;明確な指示&lt;/strong&gt;: LLMがどのデータを扱うかを明確に指定できる&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;曖昧さの除去&lt;/strong&gt;: 複数の情報源を明確に区別して参照できる&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;特化した処理の支援&lt;/strong&gt;: 特定のデータ形式に合わせた専用処理が可能&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;コンテキスト例&lt;/strong&gt;: ファイルシステム、DB、クラウドサービスなど多様なコンテキストを一緒に活用可能&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;これらの利点により、&lt;strong&gt;AIの活動範囲が拡張され、より正確で文脈に合った応答&lt;/strong&gt;を提供できるようになる。&lt;/p&gt;
+&lt;h2 id=&#34;導入時期とエコシステム動向&#34;&gt;導入時期とエコシステム動向&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;MCPは&lt;strong&gt;2024年11月にAnthropicがオープンソースとして公開&lt;/strong&gt;し、&lt;strong&gt;2025年初めから開発者コミュニティと主要AIツールでの採用が急速に増加&lt;/strong&gt;した。&lt;/li&gt;
+&lt;li&gt;C#向け公式SDKのリリースに関する言及もあり、現在は多数のMCPサーバーが稼働しており、&lt;strong&gt;セキュリティアーキテクチャとデータ保護&lt;/strong&gt;も重要な関心事になっている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;まとめ表&#34;&gt;まとめ表&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;項目&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;定義&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;AIモデルと外部データ/ツールを接続するオープン標準プロトコル&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;導入背景&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;個別統合の複雑性を解消し、より柔軟な拡張性を確保&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;構造&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;クライアント・サーバー構造、JSON-RPC、標準メッセージ交換&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;SDK&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;Python、TS、Java、Kotlin、C#などを提供&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;利点&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;明確性、拡張性、自動化、セキュリティ強化など&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;現在の動向&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;公開後に急成長中で、セキュリティと実用性が拡大中&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;p&gt;気になる部分がさらにあれば、いつでもお知らせください。たとえば、MCPサーバーの直接構築事例や技術活用の流れなども説明できます。&lt;/p&gt;
+
+      </description>
+      
+      <category>AI</category>
+      
+      <category>ChatGPT</category>
+      
+      <category>MCP</category>
+      
+    </item>
+    
+  </channel>
+</rss>
