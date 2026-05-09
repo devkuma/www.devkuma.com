@@ -1,0 +1,104 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – CORS</title>
+    <link>https://www.devkuma.com/jp/tags/cors/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/cors/logo/180x180.jpg</url>
+      <title>CORS</title>
+      <link>https://www.devkuma.com/jp/tags/cors/</link>
+    </image>
+    <description>Recent content in CORS on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/cors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>CORS</title>
+      <link>https://www.devkuma.com/jp/docs/http/cors/</link>
+      <pubDate>Thu, 27 May 2021 10:59:45 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/http/cors/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
+&lt;p&gt;現在の Web ブラウザーでは、1 つの Web サイトが持つ情報が別の悪意ある Web サイトに悪用されることを防ぐため、&lt;a href=&#34;https://www.rfc-editor.org/info/rfc6454&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Same-Origin Policy(同一オリジンポリシー)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;が適用される。&lt;/p&gt;
+&lt;p&gt;たとえば、異なるドメインのバックエンド API とフロントエンド間で通信してリソースを要求すると、Origin(ドメイン、プロトコル、ポート番号)が異なるためエラーが発生する。&lt;code&gt;https://api.devkuma.com/&lt;/code&gt; の Web ページから XHR や Fetch API で &lt;code&gt;https://www.devkuma.com/&lt;/code&gt; のデータを HTTP(S) で読み込もうとするとエラーになる。&lt;/p&gt;
+&lt;p&gt;しかし、信頼関係のある Web サイトまで制限してしまうと不便であるため、データアクセスを許可できる Web サイトについては Origin が異なってもアクセスできるようにする CORS(Cross-Origin Resource Sharing)が必要になる。&lt;/p&gt;
+&lt;h2 id=&#34;cors-とは&#34;&gt;CORS とは？&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Cross-Origin Resource Sharing の略で、オリジン間のリソース共有を意味する。&lt;/li&gt;
+&lt;li&gt;ブラウザーは異なるオリジン間の通信を原則として禁止しているが、CORS 設定により別オリジン間でも通信できる。&lt;/li&gt;
+&lt;li&gt;ブラウザーで見ているページとは別のドメインからデータを受け取ることを許可する方式である。&lt;/li&gt;
+&lt;li&gt;セキュリティ上、クロスサイトスクリプティングを防ぐために使用される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;originオリジンとは&#34;&gt;Origin(オリジン)とは？&lt;/h3&gt;
+&lt;p&gt;Web コンテンツの Origin は、そのコンテンツへアクセスするために使われる URL のスキーム(プロトコル)、ホスト(ドメイン)、ポートによって定義される。スキーム、ホスト、ポートがすべて一致する場合にのみ、2 つは同じ Origin と言える。&lt;/p&gt;
+&lt;h4 id=&#34;同一-origin-の例&#34;&gt;同一 Origin の例&lt;/h4&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://www.devkuma.com/app1/index.html
+http://www.devkuma.com/app2/index.html
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;異なる-origin-の例&#34;&gt;異なる Origin の例&lt;/h4&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://devkuma.com/app1
+https://devkuma.com/app2
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://devkuma.com
+http://www.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://www.devkuma.com
+http://www.devkuma.com:8080
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;なぜ-cors-が必要なのか&#34;&gt;なぜ CORS が必要なのか？&lt;/h2&gt;
+&lt;p&gt;ブラウザーはセキュリティ上の理由で同一オリジンポリシーを採用している。他の出所から自分のリソースに勝手にアクセスできないようにするためである。&lt;/p&gt;
+&lt;p&gt;もし自分がサービスしていないサイトからセッションのリクエストを取得できるなら、そのサイトはセッションを奪取して悪用する可能性がある。ブラウザーはこのようなリクエストを防いでいる。&lt;/p&gt;
+&lt;h2 id=&#34;cors-はどのように動作するか&#34;&gt;CORS はどのように動作するか&lt;/h2&gt;
+&lt;p&gt;ブラウザーがリソースを要求するとき、追加ヘッダーに Origin、使用するメソッド、含めるヘッダー情報を入れてサーバーへ送信する。サーバーは応答可能な Origin をヘッダーに入れてブラウザーへ返す。ブラウザーはこのヘッダーを確認し、その Origin から要求できるならリソース転送を許可し、不可能ならエラーを発生させる。&lt;/p&gt;
+&lt;h2 id=&#34;cors-preflight-リクエスト&#34;&gt;CORS preflight リクエスト&lt;/h2&gt;
+&lt;p&gt;HTTP ヘッダーの送受信で構成される仕組みであり、ブラウザーがオリジンを越えた要求への応答にフロントエンド JavaScript コードがアクセスできるかどうかを決定する。&lt;/p&gt;
+&lt;h3 id=&#34;request-header-一覧&#34;&gt;Request Header 一覧&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Origin&lt;/code&gt;: どの Origin からアクセスしているかを示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Method&lt;/code&gt;: preflight リクエスト時に、実際のリクエストで使用するメソッドをサーバーに知らせる。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Headers&lt;/code&gt;: preflight リクエスト時に、実際のリクエストで使用するヘッダーをサーバーに知らせる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;response-header-一覧&#34;&gt;Response Header 一覧&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt;: ブラウザーが該当 Origin からリソースへアクセスできるよう許可する。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Expose-Headers&lt;/code&gt;: 応答の一部として公開してよいヘッダーを示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Max-Age&lt;/code&gt;: preflight リクエスト結果をキャッシュできる時間を示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Credentials&lt;/code&gt;: credentials が true のとき、リクエストへの応答を公開できるかを示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Methods&lt;/code&gt;: preflight リクエストへの応答として許可されるメソッドを示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt;: 実際のリクエストで使用できる HTTP ヘッダーを示す。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;cors-使用例&#34;&gt;CORS 使用例&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;https://api.devkuma.com&lt;/code&gt; に対して、別 Web サイト &lt;code&gt;https://www.devkuma.com&lt;/code&gt; からの HTTP(S) アクセスを許可する場合を例に説明する。&lt;/p&gt;
+&lt;p&gt;単純に GET と POST を許可するには、サーバーが HTTP レスポンスヘッダーに次を追加する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://www.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Cookie を許可する場合は、ブラウザーとサーバーの両方で設定が必要である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://www.devkuma.com
+Access-Control-Allow-Credentials: true
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;GET、POST、HEAD 以外のメソッドやカスタムヘッダーを使う場合は、実際の HTTP リクエスト前に OPTIONS の preflight request が行われる。&lt;/p&gt;
+&lt;h2 id=&#34;参照&#34;&gt;参照&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/ko/docs/Web/HTTP/CORS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;クロスオリジンリソース共有 (CORS)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://hannut91.github.io/blogs/infra/cors&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CORS とは何か? - Yunseok&amp;rsquo;s Dev Blog&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>HTTP</category>
+      
+      <category>CORS</category>
+      
+    </item>
+    
+  </channel>
+</rss>

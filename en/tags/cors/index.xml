@@ -1,0 +1,137 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – CORS</title>
+    <link>https://www.devkuma.com/en/tags/cors/</link>
+    <image>
+      <url>https://www.devkuma.com/en/tags/cors/logo/180x180.jpg</url>
+      <title>CORS</title>
+      <link>https://www.devkuma.com/en/tags/cors/</link>
+    </image>
+    <description>Recent content in CORS on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/en/tags/cors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>CORS</title>
+      <link>https://www.devkuma.com/en/docs/http/cors/</link>
+      <pubDate>Thu, 27 May 2021 10:59:45 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/http/cors/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Modern web browsers apply the &lt;a href=&#34;https://www.rfc-editor.org/info/rfc6454&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Same-Origin Policy&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; to prevent information held by one website from being abused by another malicious website.&lt;/p&gt;
+&lt;p&gt;For example, when a frontend communicates with a backend API on a different domain and requests resources, an error occurs because the Origin, meaning domain, protocol, and port number, is different. If a page at &lt;code&gt;https://api.devkuma.com/&lt;/code&gt; tries to read data over HTTP(S) from another website, &lt;code&gt;https://www.devkuma.com/&lt;/code&gt;, using XMLHttpRequest (XHR) or the Fetch API, an error occurs.&lt;/p&gt;
+&lt;p&gt;However, if even trusted websites used for data integration are blocked, it becomes inconvenient. CORS (Cross-Origin Resource Sharing) is needed so that websites allowed to access data can do so even when the Origin is different.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-cors&#34;&gt;What Is CORS?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;CORS stands for Cross-Origin Resource Sharing and means resource sharing between origins.&lt;/li&gt;
+&lt;li&gt;Browsers generally prohibit communication between different origins, but CORS settings allow communication between different origins.&lt;/li&gt;
+&lt;li&gt;It is a method that permits data to be received from a domain different from the page being viewed in the browser.&lt;/li&gt;
+&lt;li&gt;It is used by browsers to prevent cross-site scripting for security.&lt;/li&gt;
+&lt;li&gt;There is a restriction that communication can only occur with the origin domain&amp;rsquo;s server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;what-is-origin&#34;&gt;What Is Origin?&lt;/h3&gt;
+&lt;p&gt;To understand CORS more precisely, you need to understand origin. The origin of web content is defined by the URL scheme (protocol), host (domain), and port used to access that content. Two objects are considered to have the same origin only when all three match.&lt;/p&gt;
+&lt;p&gt;On the web, work is limited to same-origin content by the Same-Origin Policy, and this restriction can be relaxed using CORS.&lt;/p&gt;
+&lt;h4 id=&#34;same-origin-examples&#34;&gt;Same Origin Examples&lt;/h4&gt;
+&lt;p&gt;The scheme (&lt;code&gt;http&lt;/code&gt;) and host (&lt;code&gt;www.devkuma.com&lt;/code&gt;) are the same, so they are the same origin.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://www.devkuma.com/app1/index.html
+http://www.devkuma.com/app2/index.html
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The server uses the default port 80 and serves HTTP content, so it is the same origin.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://www.devkuma.com:80
+http://www.Devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;h4 id=&#34;different-origin-examples&#34;&gt;Different Origin Examples&lt;/h4&gt;
+&lt;p&gt;Different scheme:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://devkuma.com/app1
+https://devkuma.com/app2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Different host:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://devkuma.com
+http://www.devkuma.com
+http://blog.example.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Different port:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://www.devkuma.com
+http://www.devkuma.com:8080
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;why-is-cors-necessary&#34;&gt;Why Is CORS Necessary?&lt;/h2&gt;
+&lt;p&gt;Browsers adopt the same-origin policy for security reasons. It is used to prevent other origins from freely accessing your resources.&lt;/p&gt;
+&lt;p&gt;If a site you do not operate can obtain session requests, that site may hijack your session and perform malicious actions. Therefore, browsers block these requests.&lt;/p&gt;
+&lt;p&gt;Phishing sites are a representative attack example, and CORS is needed to stop such attacks and allow requests only from origins that you have permitted.&lt;/p&gt;
+&lt;h2 id=&#34;how-cors-works&#34;&gt;How CORS Works&lt;/h2&gt;
+&lt;p&gt;When the browser requests a resource, it includes additional information in headers: what the origin is, which method will be used, and which headers will be included. The server sends back the origins it can respond to in response headers. The browser checks these headers and allows the resource transfer if the request is allowed from that origin; otherwise, it raises an error.&lt;/p&gt;
+&lt;h2 id=&#34;cors-preflight-request&#34;&gt;CORS Preflight Request&lt;/h2&gt;
+&lt;p&gt;This is a system composed of HTTP header exchanges. The browser determines whether frontend JavaScript code may access the response to a cross-origin request.&lt;/p&gt;
+&lt;h3 id=&#34;request-headers&#34;&gt;Request Headers&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Origin&lt;/code&gt;: shows which origin is accessing.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Method&lt;/code&gt;: tells the server which method will be used in the actual request during a preflight request.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Headers&lt;/code&gt;: tells the server which headers will be used in the actual request during a preflight request.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;response-headers&#34;&gt;Response Headers&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt;: allows the browser to access the resource from that origin. &lt;code&gt;*&lt;/code&gt; allows access from all origins only for requests without credentials.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Expose-Headers&lt;/code&gt;: lists which headers may be exposed as part of the response.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Max-Age&lt;/code&gt;: indicates how long preflight request results can be cached.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Credentials&lt;/code&gt;: indicates whether the response to a request can be exposed when credentials are true.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Methods&lt;/code&gt;: indicates methods allowed in response to a preflight request.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt;: indicates HTTP headers that can be used in the actual request.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;cors-examples&#34;&gt;CORS Examples&lt;/h2&gt;
+&lt;p&gt;The examples describe allowing HTTP(S) access from &lt;code&gt;https://www.devkuma.com&lt;/code&gt; to &lt;code&gt;https://api.devkuma.com&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;allowing-simple-data-loading&#34;&gt;Allowing Simple Data Loading&lt;/h3&gt;
+&lt;p&gt;To allow GET and POST from XHR or Fetch API, the client declares CORS for Fetch, and the server adds appropriate information to the HTTP response headers.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;var&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;xhr&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;XMLHttpRequest&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;open&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;GET&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://api.devkuma.com&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;addEventListener&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;load&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;onLoadFunc&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;xhr&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;send&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-js&#34; data-lang=&#34;js&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;fetch&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;https://api.devkuma.com&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000&#34;&gt;mode&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;cors&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}).&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;then&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;onLoadFunc&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;GET /api HTTP/1.1
+Origin: https://www.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://www.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;For simple cases, a wildcard can be used.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;allowing-cookies&#34;&gt;Allowing Cookies&lt;/h3&gt;
+&lt;p&gt;To allow cookies to be sent and received during HTTP(S) communication, both the browser and server need configuration. In this case, wildcard values are not allowed for &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://www.devkuma.com
+Access-Control-Allow-Credentials: true
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;using-detailed-http-communication&#34;&gt;Using Detailed HTTP Communication&lt;/h3&gt;
+&lt;p&gt;If the request method is not GET, POST, or HEAD, or if special request headers or content types are used, CORS performs an OPTIONS preflight request before the actual request.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;OPTIONS /api HTTP/1.1
+Access-Control-Request-Method: {request HTTP method}
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://www.devkuma.com
+Access-Control-Allow-Methods: GET,POST,HEAD,OPTIONS
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If custom request headers such as &lt;code&gt;X-MyRequest&lt;/code&gt; and &lt;code&gt;X-MyOption&lt;/code&gt; are used, the server must allow those headers using &lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt;. If custom response headers should be readable by the browser, the server must specify them with &lt;code&gt;Access-Control-Expose-Headers&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Preflight request results can be cached using &lt;code&gt;Access-Control-Max-Age&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/ko/docs/Web/HTTP/CORS&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cross-Origin Resource Sharing (CORS)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://hannut91.github.io/blogs/infra/cors&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What is CORS? - Yunseok&amp;rsquo;s Dev Blog&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>HTTP</category>
+      
+      <category>CORS</category>
+      
+    </item>
+    
+  </channel>
+</rss>
