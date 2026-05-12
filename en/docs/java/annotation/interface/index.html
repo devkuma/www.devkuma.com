@@ -1,0 +1,923 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Defining Custom Java Annotations with @interface | devkuma</title>
+<meta name="description" content="@interface, meta-annotations, annotation attributes">
+<meta property="og:url" content="https://www.devkuma.com/en/docs/java/annotation/interface/">
+  <meta property="og:site_name" content="devkuma">
+  <meta property="og:title" content="Defining Custom Java Annotations with @interface">
+  <meta property="og:description" content="@interface, meta-annotations, annotation attributes">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="330_programming_jvm">
+    <meta property="article:published_time" content="2022-09-25T00:02:00+09:00">
+    <meta property="article:modified_time" content="2023-01-07T05:43:00+09:00">
+    <meta property="article:tag" content="Java">
+
+  <meta itemprop="name" content="Defining Custom Java Annotations with @interface">
+  <meta itemprop="description" content="@interface, meta-annotations, annotation attributes">
+  <meta itemprop="datePublished" content="2022-09-25T00:02:00+09:00">
+  <meta itemprop="dateModified" content="2023-01-07T05:43:00+09:00">
+  <meta itemprop="wordCount" content="277">
+  <meta itemprop="keywords" content="Java">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Defining Custom Java Annotations with @interface">
+  <meta name="twitter:description" content="@interface, meta-annotations, annotation attributes">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/en/docs/java/annotation/interface/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/en/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/en/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/computer/basic/">Basic computer knowledge</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">English</span>
+    <span class="td-lang-menu__title-code">EN</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/java/annotation/interface/">한국어</a></li>
+      <li><span class="dropdown-item active">English</span></li>
+      <li><a class="dropdown-item" href="/jp/docs/java/annotation/interface/">日本語</a></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-endocsjavaannotationinterface").addClass("active");
+    $("#td-section-nav #m-endocsjavaannotationinterface-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-endocsjavaannotationinterface").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-endocsjavaannotationinterface-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-endocsjavaannotationinterface-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocscategoryprogrammingjvm-li">
+    <a href="/en/docs/category/programming/jvm/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-endocscategoryprogrammingjvm"><span class="">JVM-based Programming Languages</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjava-li">
+    <input type="checkbox" id="m-endocsjava-check"/>
+    <label for="m-endocsjava-check"><a href="/en/docs/java/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjava"><span class="">Java</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavaintro-li">
+    <input type="checkbox" id="m-endocsjavaintro-check"/>
+    <label for="m-endocsjavaintro-check"><a href="/en/docs/java/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavaintro"><span class="">Java Overview</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaintro-basic-li">
+    <input type="checkbox" id="m-endocsjavaintro-basic-check"/>
+    <label for="m-endocsjavaintro-basic-check"><a href="/en/docs/java/intro-basic/" title="Java&#39;s Main Features, Editions, and History" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaintro-basic"><span class="">Introduction to Java</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavainstall-li">
+    <input type="checkbox" id="m-endocsjavainstall-check"/>
+    <label for="m-endocsjavainstall-check"><a href="/en/docs/java/install/" title="Creating a Java Installation and Development Environment" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavainstall"><span class="">Java Installation and Development Environment</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavamultiple-versions-li">
+    <input type="checkbox" id="m-endocsjavamultiple-versions-check"/>
+    <label for="m-endocsjavamultiple-versions-check"><a href="/en/docs/java/multiple-versions/" title="Installing and Using Multiple Java(JDK) Versions on Mac OS" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavamultiple-versions"><span class="">How to Change Java Versions</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavacommand-li">
+    <input type="checkbox" id="m-endocsjavacommand-check"/>
+    <label for="m-endocsjavacommand-check"><a href="/en/docs/java/command/" title="Java Commands - Development Tools in the Java SE Development Kit" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavacommand"><span class="">Java Commands</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavahello-world-li">
+    <input type="checkbox" id="m-endocsjavahello-world-check"/>
+    <label for="m-endocsjavahello-world-check"><a href="/en/docs/java/hello-world/" title="Creating Your First Java Application, Hello World! Java" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavahello-world"><span class="">Hello World</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavabasic-li">
+    <input type="checkbox" id="m-endocsjavabasic-check"/>
+    <label for="m-endocsjavabasic-check"><a href="/en/docs/java/basic/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavabasic"><span class="">Basic Java Syntax</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaidentifier-li">
+    <input type="checkbox" id="m-endocsjavaidentifier-check"/>
+    <label for="m-endocsjavaidentifier-check"><a href="/en/docs/java/identifier/" title="Java Identifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaidentifier"><span class="">Identifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavacomment-li">
+    <input type="checkbox" id="m-endocsjavacomment-check"/>
+    <label for="m-endocsjavacomment-check"><a href="/en/docs/java/comment/" title="Java Comments" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavacomment"><span class="">Comments</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavakeyword-li">
+    <input type="checkbox" id="m-endocsjavakeyword-check"/>
+    <label for="m-endocsjavakeyword-check"><a href="/en/docs/java/keyword/" title="Java Keywords" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavakeyword"><span class="">Keywords</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavavariable-li">
+    <input type="checkbox" id="m-endocsjavavariable-check"/>
+    <label for="m-endocsjavavariable-check"><a href="/en/docs/java/variable/" title="Java Variables" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavavariable"><span class="">Variables</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavacasting-li">
+    <input type="checkbox" id="m-endocsjavacasting-check"/>
+    <label for="m-endocsjavacasting-check"><a href="/en/docs/java/casting/" title="Java Casting - Converting Variable Data Types" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavacasting"><span class="">Casting</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavadata-type-li">
+    <input type="checkbox" id="m-endocsjavadata-type-check"/>
+    <label for="m-endocsjavadata-type-check"><a href="/en/docs/java/data-type/" title="Java Data Types" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavadata-type"><span class="">Data Types</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaliteral-li">
+    <input type="checkbox" id="m-endocsjavaliteral-check"/>
+    <label for="m-endocsjavaliteral-check"><a href="/en/docs/java/literal/" title="Java Literals" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaliteral"><span class="">Literals</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaoperator-li">
+    <input type="checkbox" id="m-endocsjavaoperator-check"/>
+    <label for="m-endocsjavaoperator-check"><a href="/en/docs/java/operator/" title="Java Operators" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaoperator"><span class="">Operators</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaarray-li">
+    <input type="checkbox" id="m-endocsjavaarray-check"/>
+    <label for="m-endocsjavaarray-check"><a href="/en/docs/java/array/" title="Java Arrays" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaarray"><span class="">Arrays</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavacontrol-statement-li">
+    <input type="checkbox" id="m-endocsjavacontrol-statement-check"/>
+    <label for="m-endocsjavacontrol-statement-check"><a href="/en/docs/java/control-statement/" title="Java Control Statements" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavacontrol-statement"><span class="">Control Statements</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaconditional-statement-li">
+    <input type="checkbox" id="m-endocsjavaconditional-statement-check"/>
+    <label for="m-endocsjavaconditional-statement-check"><a href="/en/docs/java/conditional-statement/" title="Conditional Statements in Java Control Statements" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaconditional-statement"><span class="">Conditional Statements</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaloop-control-li">
+    <input type="checkbox" id="m-endocsjavaloop-control-check"/>
+    <label for="m-endocsjavaloop-control-check"><a href="/en/docs/java/loop-control/" title="Loop Control in Java Control Statements" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaloop-control"><span class="">Loop Control</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavabranching-statement-li">
+    <input type="checkbox" id="m-endocsjavabranching-statement-check"/>
+    <label for="m-endocsjavabranching-statement-check"><a href="/en/docs/java/branching-statement/" title="Branching Statements in Java Control Statements" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavabranching-statement"><span class="">Branching Statements</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaoop-li">
+    <input type="checkbox" id="m-endocsjavaoop-check"/>
+    <label for="m-endocsjavaoop-check"><a href="/en/docs/java/oop/" title="Java Object-Oriented Programming (OOP)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavaoop"><span class="">Object-Oriented Programming (OOP)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsmodifier-li">
+    <input type="checkbox" id="m-endocsmodifier-check"/>
+    <label for="m-endocsmodifier-check"><a href="/en/docs/modifier/" title="Java Modifiers" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsmodifier"><span class="">Modifiers</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaaccess-modifier-li">
+    <input type="checkbox" id="m-endocsjavaaccess-modifier-check"/>
+    <label for="m-endocsjavaaccess-modifier-check"><a href="/en/docs/java/access-modifier/" title="Java Access Modifiers" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaaccess-modifier"><span class="">Access Modifiers</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaabstract-modifier-li">
+    <input type="checkbox" id="m-endocsjavaabstract-modifier-check"/>
+    <label for="m-endocsjavaabstract-modifier-check"><a href="/en/docs/java/abstract-modifier/" title="Java abstract Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaabstract-modifier"><span class="">abstract Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastatic-li">
+    <input type="checkbox" id="m-endocsjavastatic-check"/>
+    <label for="m-endocsjavastatic-check"><a href="/en/docs/java/static/" title="Java static Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastatic"><span class="">static Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavafinal-li">
+    <input type="checkbox" id="m-endocsjavafinal-check"/>
+    <label for="m-endocsjavafinal-check"><a href="/en/docs/java/final/" title="Java final Keyword - Declaring Constants" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavafinal"><span class="">final Keyword</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavatransient-modifier-li">
+    <input type="checkbox" id="m-endocsjavatransient-modifier-check"/>
+    <label for="m-endocsjavatransient-modifier-check"><a href="/en/docs/java/transient-modifier/" title="Java transient Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavatransient-modifier"><span class="">transient Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavavolatile-modifier-li">
+    <input type="checkbox" id="m-endocsjavavolatile-modifier-check"/>
+    <label for="m-endocsjavavolatile-modifier-check"><a href="/en/docs/java/volatile-modifier/" title="Java volatile Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavavolatile-modifier"><span class="">volatile Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavasynchronized-modifier-li">
+    <input type="checkbox" id="m-endocsjavasynchronized-modifier-check"/>
+    <label for="m-endocsjavasynchronized-modifier-check"><a href="/en/docs/java/synchronized-modifier/" title="Java synchronized Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavasynchronized-modifier"><span class="">synchronized Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavanative-modifier-li">
+    <input type="checkbox" id="m-endocsjavanative-modifier-check"/>
+    <label for="m-endocsjavanative-modifier-check"><a href="/en/docs/java/native-modifier/" title="Java native Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavanative-modifier"><span class="">native Modifier</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastrictfp-modifier-li">
+    <input type="checkbox" id="m-endocsjavastrictfp-modifier-check"/>
+    <label for="m-endocsjavastrictfp-modifier-check"><a href="/en/docs/java/strictfp-modifier/" title="Java strictfp Modifier" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastrictfp-modifier"><span class="">strictfp Modifier</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavastring-li">
+    <input type="checkbox" id="m-endocsjavastring-check"/>
+    <label for="m-endocsjavastring-check"><a href="/en/docs/java/string/" title="Java Strings" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavastring"><span class="">Strings</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastringbasic-li">
+    <input type="checkbox" id="m-endocsjavastringbasic-check"/>
+    <label for="m-endocsjavastringbasic-check"><a href="/en/docs/java/string/basic/" title="Java Strings" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastringbasic"><span class="">Strings</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastring-class-li">
+    <input type="checkbox" id="m-endocsjavastring-class-check"/>
+    <label for="m-endocsjavastring-class-check"><a href="/en/docs/java/string-class/" title="Java String Class" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastring-class"><span class="">String Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastring-buffer-class-li">
+    <input type="checkbox" id="m-endocsjavastring-buffer-class-check"/>
+    <label for="m-endocsjavastring-buffer-class-check"><a href="/en/docs/java/string-buffer-class/" title="StringBuffer Class in the java.lang Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastring-buffer-class"><span class="">StringBuffer Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastring-tokenizer-class-li">
+    <input type="checkbox" id="m-endocsjavastring-tokenizer-class-check"/>
+    <label for="m-endocsjavastring-tokenizer-class-check"><a href="/en/docs/java/string-tokenizer-class/" title="StringTokenizer Class in the java.util Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastring-tokenizer-class"><span class="">StringTokenizer Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastring-format-li">
+    <input type="checkbox" id="m-endocsjavastring-format-check"/>
+    <label for="m-endocsjavastring-format-check"><a href="/en/docs/java/string-format/" title="Java String.format() Method" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastring-format"><span class="">String.format() Method</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavastringequals-li">
+    <input type="checkbox" id="m-endocsjavastringequals-check"/>
+    <label for="m-endocsjavastringequals-check"><a href="/en/docs/java/string/equals/" title="Difference Between Java Operator == and equals() Method" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavastringequals"><span class="">Difference Between == and equals()</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavaclass-li">
+    <input type="checkbox" id="m-endocsjavaclass-check"/>
+    <label for="m-endocsjavaclass-check"><a href="/en/docs/java/class/" title="Java Classes" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavaclass"><span class="">Classes</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaclassbasic-li">
+    <input type="checkbox" id="m-endocsjavaclassbasic-check"/>
+    <label for="m-endocsjavaclassbasic-check"><a href="/en/docs/java/class/basic/" title="Java Classes" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaclassbasic"><span class="">Classes</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavamember-variable-li">
+    <input type="checkbox" id="m-endocsjavamember-variable-check"/>
+    <label for="m-endocsjavamember-variable-check"><a href="/en/docs/java/member-variable/" title="Java Class Member Variables" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavamember-variable"><span class="">Member Variables</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaconstructor-li">
+    <input type="checkbox" id="m-endocsjavaconstructor-check"/>
+    <label for="m-endocsjavaconstructor-check"><a href="/en/docs/java/constructor/" title="Java Class Constructors" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaconstructor"><span class="">Constructors</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavamethod-li">
+    <input type="checkbox" id="m-endocsjavamethod-check"/>
+    <label for="m-endocsjavamethod-check"><a href="/en/docs/java/method/" title="Java Class Methods" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavamethod"><span class="">Methods</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavainheritance-li">
+    <input type="checkbox" id="m-endocsjavainheritance-check"/>
+    <label for="m-endocsjavainheritance-check"><a href="/en/docs/java/inheritance/" title="Java Class Inheritance" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavainheritance"><span class="">Inheritance</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaabstract-class-li">
+    <input type="checkbox" id="m-endocsjavaabstract-class-check"/>
+    <label for="m-endocsjavaabstract-class-check"><a href="/en/docs/java/abstract-class/" title="Java Abstract Classes" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaabstract-class"><span class="">Abstract Classes</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavainterface-li">
+    <input type="checkbox" id="m-endocsjavainterface-check"/>
+    <label for="m-endocsjavainterface-check"><a href="/en/docs/java/interface/" title="Java Interfaces" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavainterface"><span class="">Interfaces</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavapackage-li">
+    <input type="checkbox" id="m-endocsjavapackage-check"/>
+    <label for="m-endocsjavapackage-check"><a href="/en/docs/java/package/" title="Java Packages" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavapackage"><span class="">Packages</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavapackageoverview-li">
+    <input type="checkbox" id="m-endocsjavapackageoverview-check"/>
+    <label for="m-endocsjavapackageoverview-check"><a href="/en/docs/java/package/overview/" title="Java Packages" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavapackageoverview"><span class="">Packages</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaimport-li">
+    <input type="checkbox" id="m-endocsjavaimport-check"/>
+    <label for="m-endocsjavaimport-check"><a href="/en/docs/java/import/" title="Java Package Imports" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaimport"><span class="">Package Imports</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaexception-li">
+    <input type="checkbox" id="m-endocsjavaexception-check"/>
+    <label for="m-endocsjavaexception-check"><a href="/en/docs/java/exception/" title="Java Exception Handling" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavaexception"><span class="">Exception Handling</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavagenerics-li">
+    <input type="checkbox" id="m-endocsjavagenerics-check"/>
+    <label for="m-endocsjavagenerics-check"><a href="/en/docs/java/generics/" title="Java Generics" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavagenerics"><span class="">Generics</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavaannotation-li">
+    <input type="checkbox" id="m-endocsjavaannotation-check"/>
+    <label for="m-endocsjavaannotation-check"><a href="/en/docs/java/annotation/" title="Java Annotations" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavaannotation"><span class="">Annotations</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaannotationstandard-li">
+    <input type="checkbox" id="m-endocsjavaannotationstandard-check"/>
+    <label for="m-endocsjavaannotationstandard-check"><a href="/en/docs/java/annotation/standard/" title="Java Standard Annotations" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaannotationstandard"><span class="">Standard Annotations</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaannotationinterface-li">
+    <input type="checkbox" id="m-endocsjavaannotationinterface-check"/>
+    <label for="m-endocsjavaannotationinterface-check"><a href="/en/docs/java/annotation/interface/" title="Defining Custom Java Annotations with @interface" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaannotationinterface"><span class="">@interface</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaannotationuse-li">
+    <input type="checkbox" id="m-endocsjavaannotationuse-check"/>
+    <label for="m-endocsjavaannotationuse-check"><a href="/en/docs/java/annotation/use/" title="Using Java Annotations" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaannotationuse"><span class="">Using Annotations</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsjavalang-package-li">
+    <input type="checkbox" id="m-endocsjavalang-package-check"/>
+    <label for="m-endocsjavalang-package-check"><a href="/en/docs/java/lang-package/" title="Java Main Classes" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsjavalang-package"><span class="">Main Classes</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaclass-class-li">
+    <input type="checkbox" id="m-endocsjavaclass-class-check"/>
+    <label for="m-endocsjavaclass-class-check"><a href="/en/docs/java/class-class/" title="Java Class Class" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaclass-class"><span class="">Class Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavawrapper-class-li">
+    <input type="checkbox" id="m-endocsjavawrapper-class-check"/>
+    <label for="m-endocsjavawrapper-class-check"><a href="/en/docs/java/wrapper-class/" title="Java Wrapper Classes" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavawrapper-class"><span class="">Wrapper Classes</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavabigdecimal-class-li">
+    <input type="checkbox" id="m-endocsjavabigdecimal-class-check"/>
+    <label for="m-endocsjavabigdecimal-class-check"><a href="/en/docs/java/bigdecimal-class/" title="Java BigDecimal Class in the java.math Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavabigdecimal-class"><span class="">BigDecimal Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaobject-class-li">
+    <input type="checkbox" id="m-endocsjavaobject-class-check"/>
+    <label for="m-endocsjavaobject-class-check"><a href="/en/docs/java/object-class/" title="Java Object Class in the java.lang Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaobject-class"><span class="">Object Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavasystem-class-li">
+    <input type="checkbox" id="m-endocsjavasystem-class-check"/>
+    <label for="m-endocsjavasystem-class-check"><a href="/en/docs/java/system-class/" title="Java System Class in the java.lang Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavasystem-class"><span class="">System Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavaruntime-class-li">
+    <input type="checkbox" id="m-endocsjavaruntime-class-check"/>
+    <label for="m-endocsjavaruntime-class-check"><a href="/en/docs/java/runtime-class/" title="Java Runtime Class in the java.lang Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavaruntime-class"><span class="">Runtime Class</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsjavamath-class-li">
+    <input type="checkbox" id="m-endocsjavamath-class-check"/>
+    <label for="m-endocsjavamath-class-check"><a href="/en/docs/java/math-class/" title="Java Math Class in the java.lang Package" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsjavamath-class"><span class="">Math Class</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsktor-li">
+    <input type="checkbox" id="m-endocsktor-check"/>
+    <label for="m-endocsktor-check"><a href="/en/docs/ktor/" title="Creating a Ktor Project" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsktor"><span class="">Ktor</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocslogback-li">
+    <input type="checkbox" id="m-endocslogback-check"/>
+    <label for="m-endocslogback-check"><a href="/en/docs/logback/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocslogback"><span class="">Logback</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmapstruct-li">
+    <input type="checkbox" id="m-endocsmapstruct-check"/>
+    <label for="m-endocsmapstruct-check"><a href="/en/docs/mapstruct/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmapstruct"><span class="">MapStruct</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocskotlinexposed-li">
+    <input type="checkbox" id="m-endocskotlinexposed-check"/>
+    <label for="m-endocskotlinexposed-check"><a href="/en/docs/kotlin/exposed/" title="Kotlin Exposed" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocskotlinexposed"><span class="">Kotlin SQL Library Exposed</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#defining-a-custom-annotation-the-interface-keyword">Defining a Custom Annotation: The @interface Keyword</a></li>
+    <li><a href="#meta-annotations">Meta-Annotations</a>
+      <ul>
+        <li><a href="#retention">@Retention</a></li>
+        <li><a href="#target">@Target</a></li>
+        <li><a href="#inherited">@Inherited</a></li>
+      </ul>
+    </li>
+    <li><a href="#annotation-attributes">Annotation Attributes</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/calibre/" data-taxonomy-term="calibre"><span class="taxonomy-label">Calibre</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/epub/" data-taxonomy-term="epub"><span class="taxonomy-label">EPub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/it-terms/" data-taxonomy-term="it-terms"><span class="taxonomy-label">IT Terms</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">88</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">76</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">82</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">Mockk</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sigil/" data-taxonomy-term="sigil"><span class="taxonomy-label">Sigil</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">Web</span><span class="taxonomy-count">4</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/en/docs/category/programming/jvm/">JVM-based Programming Languages</a></li>
+  <li class="breadcrumb-item">
+    <a href="/en/docs/java/">Java</a></li>
+  <li class="breadcrumb-item">
+    <a href="/en/docs/java/annotation/">Annotations</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    @interface</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>Defining Custom Java Annotations with @interface</h1>
+	<div class="lead">@interface, meta-annotations, annotation attributes</div>
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<h2 id="defining-a-custom-annotation-the-interface-keyword">Defining a Custom Annotation: The @interface Keyword</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@interface</span><span style="color:#f8f8f8"> </span><span style="color:#000">name</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#000">definition</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">  </span><span style="color:#000">name</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8"> </span><span style="color:#000">annotation</span><span style="color:#f8f8f8"> </span><span style="color:#000">name</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">  </span><span style="color:#000">definition</span><span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8"> </span><span style="color:#000">annotation</span><span style="color:#f8f8f8"> </span><span style="color:#000">definition</span><span style="color:#f8f8f8">
+</span></span></span></code></pre></div><p>You can define your own annotation using the <code>@interface</code> keyword. For example, the following defines a <code>Version</code> annotation.</p>
+<p><strong>Version.java</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@Retention</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">RetentionPolicy</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">RUNTIME</span><span style="color:#000;font-weight:bold">)</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@Target</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">ElementType</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">METHOD</span><span style="color:#000;font-weight:bold">)</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#5c35cc;font-weight:bold">@Inherited</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span><span style="color:#f8f8f8"> </span><span style="color:#5c35cc;font-weight:bold">@interface</span><span style="color:#f8f8f8"> </span><span style="color:#000">Version</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#204a87;font-weight:bold">double</span><span style="color:#f8f8f8"> </span><span style="color:#000">value</span><span style="color:#000;font-weight:bold">();</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span><span style="color:#f8f8f8">
+</span></span></span></code></pre></div><h2 id="meta-annotations">Meta-Annotations</h2>
+<p>In an annotation definition, annotations can be added to define information about the annotation itself. Such annotations are called meta-annotations.</p>
+<p>The types of meta-annotations are as follows.</p>
+<ul>
+<li><code>@Retention</code></li>
+<li><code>@Target</code></li>
+<li><code>@Inherited</code></li>
+</ul>
+<h3 id="retention">@Retention</h3>
+<p>The range in which annotation information is retained.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Annotation</th>
+          <th>Overview</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>@Retention(SOURCE)</code></td>
+          <td>The annotation can be used only in source code and disappears after compilation.</td>
+      </tr>
+      <tr>
+          <td><code>@Retention(CLASS)</code></td>
+          <td>The annotation exists in the <code>.class</code> file but disappears at runtime.</td>
+      </tr>
+      <tr>
+          <td><code>@Retention(RUNTIME)</code></td>
+          <td>The annotation can be used by the compiler and at runtime.</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="target">@Target</h3>
+<p>Specifies the targets to which the annotation can be applied.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Annotation</th>
+          <th>Overview</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>@Target(ElementType.TYPE)</code></td>
+          <td>Can be applied to any element of a class; default value.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.FIELD)</code></td>
+          <td>A specific field of a class.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.METHOD)</code></td>
+          <td>A method of a class.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.PARAMETER)</code></td>
+          <td>A method parameter.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.CONSTRUCTOR)</code></td>
+          <td>A constructor.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.LOCAL_VARIABLE)</code></td>
+          <td>A local variable.</td>
+      </tr>
+      <tr>
+          <td><code>@Target(ElementType.ANNOTATION_TYPE)</code></td>
+          <td>An annotation type.</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="inherited">@Inherited</h3>
+<p>Whether annotation information can be inherited by subclasses.</p>
+<h2 id="annotation-attributes">Annotation Attributes</h2>
+<p>Under the <code>@interface</code> keyword, specify attributes that can be used in the annotation. Attributes are represented as a set of type and name, like abstract methods.</p>
+<p>Attributes defined this way can generally be specified in the form <code>@AnnotationName(attributeName=value, ...)</code>. However, when the attribute name is <code>value</code>, the name can be omitted and written as <code>@AnnotationName(value)</code>.</p>
+<p>For example, the following is an example of an <code>annotationTest</code> method that specifies the <code>Version</code> annotation.</p>
+<p><strong>AnnotationSample.java</strong></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span><span style="color:#f8f8f8"> </span><span style="color:#000">com.example.mynavi.object</span><span style="color:#000;font-weight:bold">;</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8"> 
+</span></span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">AnnotationSample</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#5c35cc;font-weight:bold">@Version</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">1</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">0</span><span style="color:#000;font-weight:bold">)</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#204a87;font-weight:bold">public</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">void</span><span style="color:#f8f8f8"> </span><span style="color:#000">annotationTest</span><span style="color:#000;font-weight:bold">()</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#000">System</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;Released&#34;</span><span style="color:#000;font-weight:bold">);</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#000;font-weight:bold">}</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span><span style="color:#f8f8f8">
+</span></span></span></code></pre></div>
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
