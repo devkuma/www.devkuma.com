@@ -1,0 +1,1001 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="jp" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Kotest Koin拡張 | devkuma</title>
+<meta name="description" content="Kotest Koin拡張について紹介する。">
+<meta property="og:url" content="https://www.devkuma.com/jp/docs/kotest/extensions/koin/">
+  <meta property="og:site_name" content="devkuma">
+  <meta property="og:title" content="Kotest Koin拡張">
+  <meta property="og:description" content="Kotest Koin拡張について紹介する。">
+  <meta property="og:locale" content="jp">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="320_programming_testing">
+    <meta property="article:published_time" content="2024-04-13T10:33:00+09:00">
+    <meta property="article:modified_time" content="2024-04-13T10:33:00+09:00">
+    <meta property="article:tag" content="Kotlin">
+    <meta property="article:tag" content="Kotest">
+
+  <meta itemprop="name" content="Kotest Koin拡張">
+  <meta itemprop="description" content="Kotest Koin拡張について紹介する。">
+  <meta itemprop="datePublished" content="2024-04-13T10:33:00+09:00">
+  <meta itemprop="dateModified" content="2024-04-13T10:33:00+09:00">
+  <meta itemprop="wordCount" content="85">
+  <meta itemprop="keywords" content="Kotlin,Kotest">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Kotest Koin拡張">
+  <meta name="twitter:description" content="Kotest Koin拡張について紹介する。">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/jp/docs/kotest/extensions/koin/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/jp/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/jp/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/computer/basic/">コンピューターの基礎知識</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">日本語</span>
+    <span class="td-lang-menu__title-code">JP</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/kotest/extensions/koin/">한국어</a></li>
+      <li><a class="dropdown-item" href="/en/docs/kotest/extensions/koin/">English</a></li>
+      <li><span class="dropdown-item active">日本語</span></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-jpdocskotestextensionskoin").addClass("active");
+    $("#td-section-nav #m-jpdocskotestextensionskoin-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-jpdocskotestextensionskoin").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-jpdocskotestextensionskoin-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-jpdocskotestextensionskoin-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocscategoryprogrammingtesting-li">
+    <a href="/jp/docs/category/programming/testing/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-jpdocscategoryprogrammingtesting"><span class="">Software Testing</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotestframework-li">
+    <input type="checkbox" id="m-jpdocskotestframework-check"/>
+    <label for="m-jpdocskotestframework-check"><a href="/jp/docs/kotest/framework/" title="Kotestフレームワーク(Framework)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotestframework"><span class="">Framework</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkoverview-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkoverview-check"/>
+    <label for="m-jpdocskotestframeworkoverview-check"><a href="/jp/docs/kotest/framework/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkoverview"><span class="">Kotest概要</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkproject-setup-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkproject-setup-check"/>
+    <label for="m-jpdocskotestframeworkproject-setup-check"><a href="/jp/docs/kotest/framework/project-setup/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkproject-setup"><span class="">Kotestプロジェクト設定</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkwriting-tests-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkwriting-tests-check"/>
+    <label for="m-jpdocskotestframeworkwriting-tests-check"><a href="/jp/docs/kotest/framework/writing-tests/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkwriting-tests"><span class="">Kotestの基本的な書き方</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworktesting-styles-li">
+    <input type="checkbox" id="m-jpdocskotestframeworktesting-styles-check"/>
+    <label for="m-jpdocskotestframeworktesting-styles-check"><a href="/jp/docs/kotest/framework/testing-styles/" title="Kotestのテストスタイル(Testing Styles)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworktesting-styles"><span class="">Kotestのテストスタイル</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkconditional-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkconditional-check"/>
+    <label for="m-jpdocskotestframeworkconditional-check"><a href="/jp/docs/kotest/framework/conditional/" title="Kotestの条件付きテスト(Conditional evaluation)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkconditional"><span class="">Kotestの条件付きテスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkisolation-modes-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkisolation-modes-check"/>
+    <label for="m-jpdocskotestframeworkisolation-modes-check"><a href="/jp/docs/kotest/framework/isolation-modes/" title="Kotest分離モード(Isolation Modes)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkisolation-modes"><span class="">Kotest分離モード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworklifecycle-hooks-li">
+    <input type="checkbox" id="m-jpdocskotestframeworklifecycle-hooks-check"/>
+    <label for="m-jpdocskotestframeworklifecycle-hooks-check"><a href="/jp/docs/kotest/framework/lifecycle-hooks/" title="Kotestライフサイクルフック(Lifecycle Hooks)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworklifecycle-hooks"><span class="">Kotestライフサイクルフック</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkextensions-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkextensions-check"/>
+    <label for="m-jpdocskotestframeworkextensions-check"><a href="/jp/docs/kotest/framework/extensions/" title="Kotest基本拡張(Extensions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkextensions"><span class="">Kotest拡張</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkcoroutines-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkcoroutines-check"/>
+    <label for="m-jpdocskotestframeworkcoroutines-check"><a href="/jp/docs/kotest/framework/coroutines/" title="Kotestコルーチン(Coroutines)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkcoroutines"><span class="">Kotestコルーチン</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkexceptions-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkexceptions-check"/>
+    <label for="m-jpdocskotestframeworkexceptions-check"><a href="/jp/docs/kotest/framework/exceptions/" title="Kotest例外テスト(Testing Exceptions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkexceptions"><span class="">Kotest例外テスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkdata-driven-testing-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkdata-driven-testing-check"/>
+    <label for="m-jpdocskotestframeworkdata-driven-testing-check"><a href="/jp/docs/kotest/framework/data-driven-testing/" title="Kotestデータ駆動テスト(Data-Driven Testing)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkdata-driven-testing"><span class="">Kotestデータ駆動テスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworknon-deterministic-testing-li">
+    <input type="checkbox" id="m-jpdocskotestframeworknon-deterministic-testing-check"/>
+    <label for="m-jpdocskotestframeworknon-deterministic-testing-check"><a href="/jp/docs/kotest/framework/non-deterministic-testing/" title="Kotest非決定的テスト(Non-deterministic Testing)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworknon-deterministic-testing"><span class="">Kotest非決定的テスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkintergrations-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkintergrations-check"/>
+    <label for="m-jpdocskotestframeworkintergrations-check"><a href="/jp/docs/kotest/framework/intergrations/" title="Kotest統合(Integrations)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkintergrations"><span class="">Kotest統合</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkordering-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkordering-check"/>
+    <label for="m-jpdocskotestframeworkordering-check"><a href="/jp/docs/kotest/framework/ordering/" title="Kotestテスト順序制御(Ordering)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkordering"><span class="">Kotestテスト順序制御</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotesttags-li">
+    <input type="checkbox" id="m-jpdocskotesttags-check"/>
+    <label for="m-jpdocskotesttags-check"><a href="/jp/docs/kotest/tags/" title="Kotestタグを使用したテストのグループ化(Grouping Tests with Tags)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotesttags"><span class="">Kotestテストグループ化</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkresources-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkresources-check"/>
+    <label for="m-jpdocskotestframeworkresources-check"><a href="/jp/docs/kotest/framework/resources/" title="Kotestリソース(Resources)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkresources"><span class="">Kotestリソース</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkconfiguration-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkconfiguration-check"/>
+    <label for="m-jpdocskotestframeworkconfiguration-check"><a href="/jp/docs/kotest/framework/configuration/" title="Kotest構成(Configuration)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkconfiguration"><span class="">Kotest構成</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworktest-factories-li">
+    <input type="checkbox" id="m-jpdocskotestframeworktest-factories-check"/>
+    <label for="m-jpdocskotestframeworktest-factories-check"><a href="/jp/docs/kotest/framework/test-factories/" title="Kotestテストファクトリ(Test Factories)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworktest-factories"><span class="">Kotestテストファクトリ</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworktest-output-li">
+    <input type="checkbox" id="m-jpdocskotestframeworktest-output-check"/>
+    <label for="m-jpdocskotestframeworktest-output-check"><a href="/jp/docs/kotest/framework/test-output/" title="Kotestテスト出力(Test Output)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworktest-output"><span class="">Kotestテスト出力</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworktimeouts-li">
+    <input type="checkbox" id="m-jpdocskotestframeworktimeouts-check"/>
+    <label for="m-jpdocskotestframeworktimeouts-check"><a href="/jp/docs/kotest/framework/timeouts/" title="Kotestタイムアウト(timeouts)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworktimeouts"><span class="">Kotestタイムアウト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestframeworkother-settings-li">
+    <input type="checkbox" id="m-jpdocskotestframeworkother-settings-check"/>
+    <label for="m-jpdocskotestframeworkother-settings-check"><a href="/jp/docs/kotest/framework/other-settings/" title="Kotestその他の設定(Other settings)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestframeworkother-settings"><span class="">Kotestその他の設定</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstesting-li">
+    <input type="checkbox" id="m-jpdocstesting-check"/>
+    <label for="m-jpdocstesting-check"><a href="/jp/docs/testing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstesting"><span class="">テスト理論</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestingoverview-li">
+    <input type="checkbox" id="m-jpdocstestingoverview-check"/>
+    <label for="m-jpdocstestingoverview-check"><a href="/jp/docs/testing/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestingoverview"><span class="">テスト概要</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestingunit-li">
+    <input type="checkbox" id="m-jpdocstestingunit-check"/>
+    <label for="m-jpdocstestingunit-check"><a href="/jp/docs/testing/unit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestingunit"><span class="">ユニットテスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestingtdd-li">
+    <input type="checkbox" id="m-jpdocstestingtdd-check"/>
+    <label for="m-jpdocstestingtdd-check"><a href="/jp/docs/testing/tdd/" title="TDD(Test Driven Development、テスト駆動開発)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestingtdd"><span class="">Test Driven Development</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestingbdd-li">
+    <input type="checkbox" id="m-jpdocstestingbdd-check"/>
+    <label for="m-jpdocstestingbdd-check"><a href="/jp/docs/testing/bdd/" title="BDD(Behavior Driven Development、振る舞い駆動開発)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestingbdd"><span class="">Behavior Driven Development</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestingfirst-li">
+    <input type="checkbox" id="m-jpdocstestingfirst-check"/>
+    <label for="m-jpdocstestingfirst-check"><a href="/jp/docs/testing/first/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestingfirst"><span class="">F.I.R.S.T原則</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotestextensions-li">
+    <input type="checkbox" id="m-jpdocskotestextensions-check"/>
+    <label for="m-jpdocskotestextensions-check"><a href="/jp/docs/kotest/extensions/" title="Kotest拡張(Extensions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotestextensions"><span class="">Extensions</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsintroduction-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsintroduction-check"/>
+    <label for="m-jpdocskotestextensionsintroduction-check"><a href="/jp/docs/kotest/extensions/introduction/" title="Kotest外部拡張(Extensions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsintroduction"><span class="">Kotest外部拡張</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsspring-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsspring-check"/>
+    <label for="m-jpdocskotestextensionsspring-check"><a href="/jp/docs/kotest/extensions/spring/" title="Kotest Spring拡張(SpringExtension)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsspring"><span class="">Kotest Spring拡張</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsktor-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsktor-check"/>
+    <label for="m-jpdocskotestextensionsktor-check"><a href="/jp/docs/kotest/extensions/ktor/" title="Kotest Ktor拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsktor"><span class="">Kotest Ktor</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionssystem-extensions-li">
+    <input type="checkbox" id="m-jpdocskotestextensionssystem-extensions-check"/>
+    <label for="m-jpdocskotestextensionssystem-extensions-check"><a href="/jp/docs/kotest/extensions/system-extensions/" title="Kotestシステム拡張(System Extensions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionssystem-extensions"><span class="">Kotestシステム拡張</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotesttestcontainers-li">
+    <input type="checkbox" id="m-jpdocskotesttestcontainers-check"/>
+    <label for="m-jpdocskotesttestcontainers-check"><a href="/jp/docs/kotest/testcontainers/" title="Kotestテストコンテナ(Testcontainers)拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotesttestcontainers"><span class="">Kotestテストコンテナ</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsembedded-kafka-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsembedded-kafka-check"/>
+    <label for="m-jpdocskotestextensionsembedded-kafka-check"><a href="/jp/docs/kotest/extensions/embedded-kafka/" title="Kotest Kafka (EmbeddedKafkaListener)拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsembedded-kafka"><span class="">Kotest Kafka</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsmockserver-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsmockserver-check"/>
+    <label for="m-jpdocskotestextensionsmockserver-check"><a href="/jp/docs/kotest/extensions/mockserver/" title="Kotestモックサーバー(MockServer)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsmockserver"><span class="">Kotestモックサーバー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsjunit-xml-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsjunit-xml-check"/>
+    <label for="m-jpdocskotestextensionsjunit-xml-check"><a href="/jp/docs/kotest/extensions/junit-xml/" title="Kotest JUnit XML Format Reporter" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsjunit-xml"><span class="">Kotest JUnit XML</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionshtml-reporter-li">
+    <input type="checkbox" id="m-jpdocskotestextensionshtml-reporter-check"/>
+    <label for="m-jpdocskotestextensionshtml-reporter-check"><a href="/jp/docs/kotest/extensions/html-reporter/" title="Kotest HTMLレポート(Reporter)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionshtml-reporter"><span class="">Kotest HTMLレポート</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsallure-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsallure-check"/>
+    <label for="m-jpdocskotestextensionsallure-check"><a href="/jp/docs/kotest/extensions/allure/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsallure"><span class="">Kotest Allure拡張</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsinstant-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsinstant-check"/>
+    <label for="m-jpdocskotestextensionsinstant-check"><a href="/jp/docs/kotest/extensions/instant/" title="Kotest現在時刻インスタントリスナー(Current Instant Listeners)拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsinstant"><span class="">Kotest現在時刻インスタントリスナー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionskoin-li">
+    <input type="checkbox" id="m-jpdocskotestextensionskoin-check"/>
+    <label for="m-jpdocskotestextensionskoin-check"><a href="/jp/docs/kotest/extensions/koin/" title="Kotest Koin拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionskoin"><span class="">Kotest Koin</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionswiremock-li">
+    <input type="checkbox" id="m-jpdocskotestextensionswiremock-check"/>
+    <label for="m-jpdocskotestextensionswiremock-check"><a href="/jp/docs/kotest/extensions/wiremock/" title="Kotest WireMock拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionswiremock"><span class="">Kotest WireMock</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionstest-clock-li">
+    <input type="checkbox" id="m-jpdocskotestextensionstest-clock-check"/>
+    <label for="m-jpdocskotestextensionstest-clock-check"><a href="/jp/docs/kotest/extensions/test-clock/" title="Kotest Test Clock拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionstest-clock"><span class="">Kotest Test Clock</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionspitest-li">
+    <input type="checkbox" id="m-jpdocskotestextensionspitest-check"/>
+    <label for="m-jpdocskotestextensionspitest-check"><a href="/jp/docs/kotest/extensions/pitest/" title="Kotest Pitest拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionspitest"><span class="">Kotest Pitest</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestextensionsblockhound-li">
+    <input type="checkbox" id="m-jpdocskotestextensionsblockhound-check"/>
+    <label for="m-jpdocskotestextensionsblockhound-check"><a href="/jp/docs/kotest/extensions/blockhound/" title="Kotest BlockHound拡張" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestextensionsblockhound"><span class="">Kotest BlockHound</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjunit-li">
+    <input type="checkbox" id="m-jpdocsjunit-check"/>
+    <label for="m-jpdocsjunit-check"><a href="/jp/docs/junit/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjunit"><span class="">JUnit</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5hello-world-li">
+    <input type="checkbox" id="m-jpdocsjunit5hello-world-check"/>
+    <label for="m-jpdocsjunit5hello-world-check"><a href="/jp/docs/junit5/hello-world/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5hello-world"><span class="">JUnit 5の適用方法</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5-li">
+    <input type="checkbox" id="m-jpdocsjunit5-check"/>
+    <label for="m-jpdocsjunit5-check"><a href="/jp/docs/junit5/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5"><span class="">JUnit 5概要</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5execute-li">
+    <input type="checkbox" id="m-jpdocsjunit5execute-check"/>
+    <label for="m-jpdocsjunit5execute-check"><a href="/jp/docs/junit5/execute/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5execute"><span class="">JUnit 5テスト実行方法 - ConsoleLauncher, Gradle</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5test-li">
+    <input type="checkbox" id="m-jpdocsjunit5test-check"/>
+    <label for="m-jpdocsjunit5test-check"><a href="/jp/docs/junit5/test/" title="JUnit 5基本テスト - @Test, @DisplayName, @Disabled" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5test"><span class="">JUnit 5基本テスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5lifecycle-li">
+    <input type="checkbox" id="m-jpdocsjunit5lifecycle-check"/>
+    <label for="m-jpdocsjunit5lifecycle-check"><a href="/jp/docs/junit5/lifecycle/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5lifecycle"><span class="">JUnit 5ライフサイクル - @BeforeAll, @BeforeEach, @AfterAll, @AfterEach</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5order-execution-li">
+    <input type="checkbox" id="m-jpdocsjunit5order-execution-check"/>
+    <label for="m-jpdocsjunit5order-execution-check"><a href="/jp/docs/junit5/order-execution/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5order-execution"><span class="">JUnit 5テスト実行順序 - メソッド名、@Order、ランダム</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5condition-li">
+    <input type="checkbox" id="m-jpdocsjunit5condition-check"/>
+    <label for="m-jpdocsjunit5condition-check"><a href="/jp/docs/junit5/condition/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5condition"><span class="">JUnit 5条件付きテスト - @EnabledOnOs, @EnabledOnJre, @EnabledIfEnvironmentVariable</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5tag-li">
+    <input type="checkbox" id="m-jpdocsjunit5tag-check"/>
+    <label for="m-jpdocsjunit5tag-check"><a href="/jp/docs/junit5/tag/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5tag"><span class="">JUnit 5タグフィルタリング - @Tag</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5dynamic-test-li">
+    <input type="checkbox" id="m-jpdocsjunit5dynamic-test-check"/>
+    <label for="m-jpdocsjunit5dynamic-test-check"><a href="/jp/docs/junit5/dynamic-test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5dynamic-test"><span class="">JUnit 5動的テスト - @TestFactory</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5repeated-test-li">
+    <input type="checkbox" id="m-jpdocsjunit5repeated-test-check"/>
+    <label for="m-jpdocsjunit5repeated-test-check"><a href="/jp/docs/junit5/repeated-test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5repeated-test"><span class="">JUnit 5繰り返しテスト - @RepeatedTest</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5parameterized-test-li">
+    <input type="checkbox" id="m-jpdocsjunit5parameterized-test-check"/>
+    <label for="m-jpdocsjunit5parameterized-test-check"><a href="/jp/docs/junit5/parameterized-test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5parameterized-test"><span class="">JUnit 5パラメータ化テスト - @ParameterizedTest</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5parallel-li">
+    <input type="checkbox" id="m-jpdocsjunit5parallel-check"/>
+    <label for="m-jpdocsjunit5parallel-check"><a href="/jp/docs/junit5/parallel/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5parallel"><span class="">JUnit 5並列実行</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5extension-li">
+    <input type="checkbox" id="m-jpdocsjunit5extension-check"/>
+    <label for="m-jpdocsjunit5extension-check"><a href="/jp/docs/junit5/extension/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5extension"><span class="">JUnit 5拡張モデル</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5meta-annotation-li">
+    <input type="checkbox" id="m-jpdocsjunit5meta-annotation-check"/>
+    <label for="m-jpdocsjunit5meta-annotation-check"><a href="/jp/docs/junit5/meta-annotation/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5meta-annotation"><span class="">JUnit 5メタアノテーション</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunit5assertion-li">
+    <input type="checkbox" id="m-jpdocsjunit5assertion-check"/>
+    <label for="m-jpdocsjunit5assertion-check"><a href="/jp/docs/junit5/assertion/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunit5assertion"><span class="">JUnit 5検証 - Assertion</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunitprivate-method-test-li">
+    <input type="checkbox" id="m-jpdocsjunitprivate-method-test-check"/>
+    <label for="m-jpdocsjunitprivate-method-test-check"><a href="/jp/docs/junit/private-method-test/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunitprivate-method-test"><span class="">JUnitでprivateメソッドをテストする方法</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjunitmockito-li">
+    <input type="checkbox" id="m-jpdocsjunitmockito-check"/>
+    <label for="m-jpdocsjunitmockito-check"><a href="/jp/docs/junit/mockito/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjunitmockito"><span class="">Mockitoとは？</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmock-web-server-li">
+    <input type="checkbox" id="m-jpdocsmock-web-server-check"/>
+    <label for="m-jpdocsmock-web-server-check"><a href="/jp/docs/mock-web-server/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsmock-web-server"><span class="">WebClientテスト - MockWebServerで外部API呼び出しメソッドをテストする</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotestassertions-li">
+    <input type="checkbox" id="m-jpdocskotestassertions-check"/>
+    <label for="m-jpdocskotestassertions-check"><a href="/jp/docs/kotest/assertions/" title="Kotest アサーション(Assertions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotestassertions"><span class="">Assertions</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsoverview-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsoverview-check"/>
+    <label for="m-jpdocskotestassertionsoverview-check"><a href="/jp/docs/kotest/assertions/overview/" title="Kotestテスト検証アサーション(Assertions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsoverview"><span class="">Kotestアサーション</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionscustom-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionscustom-matchers-check"/>
+    <label for="m-jpdocskotestassertionscustom-matchers-check"><a href="/jp/docs/kotest/assertions/custom-matchers/" title="Kotestカスタムmatcher(Custom Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionscustom-matchers"><span class="">Kotestカスタムmatcher</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsclues-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsclues-check"/>
+    <label for="m-jpdocskotestassertionsclues-check"><a href="/jp/docs/kotest/assertions/clues/" title="Kotest手がかり(Clues)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsclues"><span class="">Kotest手がかり</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsexceptions-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsexceptions-check"/>
+    <label for="m-jpdocskotestassertionsexceptions-check"><a href="/jp/docs/kotest/assertions/exceptions/" title="Kotest 例外(Exceptions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsexceptions"><span class="">Kotest 例外</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionssoft-assertions-li">
+    <input type="checkbox" id="m-jpdocskotestassertionssoft-assertions-check"/>
+    <label for="m-jpdocskotestassertionssoft-assertions-check"><a href="/jp/docs/kotest/assertions/soft-assertions/" title="Kotest ソフトアサーション(Soft Assertions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionssoft-assertions"><span class="">Kotest ソフトアサーション</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsinspectors-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsinspectors-check"/>
+    <label for="m-jpdocskotestassertionsinspectors-check"><a href="/jp/docs/kotest/assertions/inspectors/" title="Kotest インスペクター(Inspectors)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsinspectors"><span class="">Kotest インスペクター</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsassertion-mode-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsassertion-mode-check"/>
+    <label for="m-jpdocskotestassertionsassertion-mode-check"><a href="/jp/docs/kotest/assertions/assertion-mode/" title="Kotest アサーションモード(Assertion Mode)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsassertion-mode"><span class="">Kotest アサーションモード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionscore-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionscore-matchers-check"/>
+    <label for="m-jpdocskotestassertionscore-matchers-check"><a href="/jp/docs/kotest/assertions/core-matchers/" title="Kotest コアマッチャー(Core Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionscore-matchers"><span class="">Kotest コアマッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionscollection-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionscollection-matchers-check"/>
+    <label for="m-jpdocskotestassertionscollection-matchers-check"><a href="/jp/docs/kotest/assertions/collection-matchers/" title="Kotest コレクションマッチャー(Collection Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionscollection-matchers"><span class="">Kotest コレクションマッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsjson-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsjson-matchers-check"/>
+    <label for="m-jpdocskotestassertionsjson-matchers-check"><a href="/jp/docs/kotest/assertions/json-matchers/" title="Kotest JSON マッチャー(JSON Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsjson-matchers"><span class="">Kotest JSON マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsktor-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsktor-matchers-check"/>
+    <label for="m-jpdocskotestassertionsktor-matchers-check"><a href="/jp/docs/kotest/assertions/ktor-matchers/" title="Kotest Ktor マッチャー(Ktor Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsktor-matchers"><span class="">Kotest Ktor マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionskotlinx-datetime-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionskotlinx-datetime-matchers-check"/>
+    <label for="m-jpdocskotestassertionskotlinx-datetime-matchers-check"><a href="/jp/docs/kotest/assertions/kotlinx-datetime-matchers/" title="Kotest Kotlinx Datetime マッチャー(Kotlinx Datetime Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionskotlinx-datetime-matchers"><span class="">Kotest Kotlinx Datetime マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsallow-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsallow-check"/>
+    <label for="m-jpdocskotestassertionsallow-check"><a href="/jp/docs/kotest/assertions/allow/" title="Kotest Arrow マッチャー(Arrow Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsallow"><span class="">Kotest Arrow マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionskonform-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionskonform-matchers-check"/>
+    <label for="m-jpdocskotestassertionskonform-matchers-check"><a href="/jp/docs/kotest/assertions/konform-matchers/" title="Kotest Konform マッチャー(Konform Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionskonform-matchers"><span class="">Kotest Konform マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsklock-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsklock-matchers-check"/>
+    <label for="m-jpdocskotestassertionsklock-matchers-check"><a href="/jp/docs/kotest/assertions/klock-matchers/" title="Kotest Klock マッチャー(Klock Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsklock-matchers"><span class="">Kotest Klock マッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionscompiler-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionscompiler-matchers-check"/>
+    <label for="m-jpdocskotestassertionscompiler-matchers-check"><a href="/jp/docs/kotest/assertions/compiler-matchers/" title="Kotest コンパイラマッチャー(Compiler Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionscompiler-matchers"><span class="">Kotest コンパイラマッチャー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestassertionsjsoup-matchers-li">
+    <input type="checkbox" id="m-jpdocskotestassertionsjsoup-matchers-check"/>
+    <label for="m-jpdocskotestassertionsjsoup-matchers-check"><a href="/jp/docs/kotest/assertions/jsoup-matchers/" title="Kotest Jsoup マッチャー(Jsoup Matchers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestassertionsjsoup-matchers"><span class="">Kotest Jsoup マッチャー</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotestproptest-li">
+    <input type="checkbox" id="m-jpdocskotestproptest-check"/>
+    <label for="m-jpdocskotestproptest-check"><a href="/jp/docs/kotest/proptest/" title="Kotest プロパティテスト(Property Testing)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotestproptest"><span class="">Property Testing</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestintroduction-li">
+    <input type="checkbox" id="m-jpdocskotestproptestintroduction-check"/>
+    <label for="m-jpdocskotestproptestintroduction-check"><a href="/jp/docs/kotest/proptest/introduction/" title="Kotest プロパティベーステスト(Property-based Testing)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestintroduction"><span class="">Kotest プロパティテスト</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptesttest-functions-li">
+    <input type="checkbox" id="m-jpdocskotestproptesttest-functions-check"/>
+    <label for="m-jpdocskotestproptesttest-functions-check"><a href="/jp/docs/kotest/proptest/test-functions/" title="Kotest プロパティテスト関数(Property Test Functions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptesttest-functions"><span class="">Kotest プロパティテスト関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestgenerators-li">
+    <input type="checkbox" id="m-jpdocskotestproptestgenerators-check"/>
+    <label for="m-jpdocskotestproptestgenerators-check"><a href="/jp/docs/kotest/proptest/generators/" title="Kotest ジェネレーター(Generators)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestgenerators"><span class="">Kotest ジェネレーター</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestgenerators-list-li">
+    <input type="checkbox" id="m-jpdocskotestproptestgenerators-list-check"/>
+    <label for="m-jpdocskotestproptestgenerators-list-check"><a href="/jp/docs/kotest/proptest/generators-list/" title="Kotest ジェネレーター一覧(Generators List)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestgenerators-list"><span class="">Kotest ジェネレーター一覧</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestgenerator-operations-li">
+    <input type="checkbox" id="m-jpdocskotestproptestgenerator-operations-check"/>
+    <label for="m-jpdocskotestproptestgenerator-operations-check"><a href="/jp/docs/kotest/proptest/generator-operations/" title="Kotest ジェネレーター操作(Generator Operations)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestgenerator-operations"><span class="">Kotest ジェネレーター操作</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestseeds-li">
+    <input type="checkbox" id="m-jpdocskotestproptestseeds-check"/>
+    <label for="m-jpdocskotestproptestseeds-check"><a href="/jp/docs/kotest/proptest/seeds/" title="Kotest シード(Seeds)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestseeds"><span class="">Kotest シード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestconfiguration-li">
+    <input type="checkbox" id="m-jpdocskotestproptestconfiguration-check"/>
+    <label for="m-jpdocskotestproptestconfiguration-check"><a href="/jp/docs/kotest/proptest/configuration/" title="Kotest 構成(Configuration)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestconfiguration"><span class="">Kotest 構成</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestshrinking-li">
+    <input type="checkbox" id="m-jpdocskotestproptestshrinking-check"/>
+    <label for="m-jpdocskotestproptestshrinking-check"><a href="/jp/docs/kotest/proptest/shrinking/" title="Kotest 縮小(Shrinking)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestshrinking"><span class="">Kotest 縮小</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestpropteststatistics-li">
+    <input type="checkbox" id="m-jpdocskotestpropteststatistics-check"/>
+    <label for="m-jpdocskotestpropteststatistics-check"><a href="/jp/docs/kotest/proptest/statistics/" title="Kotest 統計(Statistics)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestpropteststatistics"><span class="">Kotest 統計</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestglobal-configuration-li">
+    <input type="checkbox" id="m-jpdocskotestproptestglobal-configuration-check"/>
+    <label for="m-jpdocskotestproptestglobal-configuration-check"><a href="/jp/docs/kotest/proptest/global-configuration/" title="Kotest グローバル設定(Global Configuration)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestglobal-configuration"><span class="">Kotest グローバル設定</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestarrow-generators-li">
+    <input type="checkbox" id="m-jpdocskotestproptestarrow-generators-check"/>
+    <label for="m-jpdocskotestproptestarrow-generators-check"><a href="/jp/docs/kotest/proptest/arrow-generators/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestarrow-generators"><span class="">Kotest Arrow Generators</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestkotlinx-datetime-gens-li">
+    <input type="checkbox" id="m-jpdocskotestproptestkotlinx-datetime-gens-check"/>
+    <label for="m-jpdocskotestproptestkotlinx-datetime-gens-check"><a href="/jp/docs/kotest/proptest/kotlinx-datetime-gens/" title="Kotest Kotlinx DateTime Gens" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestkotlinx-datetime-gens"><span class="">Kotest Kotlinx DateTime</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestextra-arbs-li">
+    <input type="checkbox" id="m-jpdocskotestproptestextra-arbs-check"/>
+    <label for="m-jpdocskotestproptestextra-arbs-check"><a href="/jp/docs/kotest/proptest/extra-arbs/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestextra-arbs"><span class="">Kotest Extra Arbs</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestproptestreflective-arbs-li">
+    <input type="checkbox" id="m-jpdocskotestproptestreflective-arbs-check"/>
+    <label for="m-jpdocskotestproptestreflective-arbs-check"><a href="/jp/docs/kotest/proptest/reflective-arbs/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestproptestreflective-arbs"><span class="">Kotest Reflective Arbs</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsmockk-li">
+    <input type="checkbox" id="m-jpdocsmockk-check"/>
+    <label for="m-jpdocsmockk-check"><a href="/jp/docs/mockk/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmockk"><span class="">MockK</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinmockk-li">
+    <input type="checkbox" id="m-jpdocskotlinmockk-check"/>
+    <label for="m-jpdocskotlinmockk-check"><a href="/jp/docs/kotlin/mockk/" title="Kotlin MockK の使い方 (公式ドキュメント翻訳)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinmockk"><span class="">MockK の使い方</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotestintellij-plugin-li">
+    <input type="checkbox" id="m-jpdocskotestintellij-plugin-check"/>
+    <label for="m-jpdocskotestintellij-plugin-check"><a href="/jp/docs/kotest/intellij-plugin/" title="Kotest IntelliJ プラグイン(IntelliJ Plugin)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotestintellij-plugin"><span class="">IntelliJ Plugin</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestintellij-pluginintroduction-li">
+    <input type="checkbox" id="m-jpdocskotestintellij-pluginintroduction-check"/>
+    <label for="m-jpdocskotestintellij-pluginintroduction-check"><a href="/jp/docs/kotest/intellij-plugin/introduction/" title="Kotest IntelliJ Plugin 紹介" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestintellij-pluginintroduction"><span class="">IntelliJ Plugin</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestintellij-plugintest-explorer-li">
+    <input type="checkbox" id="m-jpdocskotestintellij-plugintest-explorer-check"/>
+    <label for="m-jpdocskotestintellij-plugintest-explorer-check"><a href="/jp/docs/kotest/intellij-plugin/test-explorer/" title="Kotest IntelliJ Plugin テストエクスプローラー(Test Explorer)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestintellij-plugintest-explorer"><span class="">IntelliJ Plugin テストエクスプローラー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotestintellij-pluginproperties-li">
+    <input type="checkbox" id="m-jpdocskotestintellij-pluginproperties-check"/>
+    <label for="m-jpdocskotestintellij-pluginproperties-check"><a href="/jp/docs/kotest/intellij-plugin/properties/" title="Kotest IntelliJ Plugin プロパティ(Properties)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotestintellij-pluginproperties"><span class="">IntelliJ Plugin プロパティ</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstestcontainers-li">
+    <input type="checkbox" id="m-jpdocstestcontainers-check"/>
+    <label for="m-jpdocstestcontainers-check"><a href="/jp/docs/testcontainers/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstestcontainers"><span class="">Testcontainers</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestcontainersoverview-li">
+    <input type="checkbox" id="m-jpdocstestcontainersoverview-check"/>
+    <label for="m-jpdocstestcontainersoverview-check"><a href="/jp/docs/testcontainers/overview/" title="Testcontainers について紹介" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestcontainersoverview"><span class="">Testcontainers 紹介</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstestcontainerscolima-macos-m1-li">
+    <input type="checkbox" id="m-jpdocstestcontainerscolima-macos-m1-check"/>
+    <label for="m-jpdocstestcontainerscolima-macos-m1-check"><a href="/jp/docs/testcontainers/colima-macos-m1/" title="Apple M1 チップの macOS 環境で Colima を活用して Testcontainers を実行する方法" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstestcontainerscolima-macos-m1"><span class="">macOS 環境で実行</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#参照">参照</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/it%E7%94%A8%E8%AA%9E/" data-taxonomy-term="it%E7%94%A8%E8%AA%9E"><span class="taxonomy-label">IT用語</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">40</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">76</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">82</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">Mockk</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">Web</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0/" data-taxonomy-term="%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="taxonomy-label">アルゴリズム</span><span class="taxonomy-count">55</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/category/programming/testing/">Software Testing</a></li>
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/kotest/extensions/">Extensions</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Kotest Koin</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>Kotest Koin拡張</h1>
+	<div class="lead">Kotest Koin拡張について紹介する。</div>
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<p><a href="https://insert-koin.io/" target="_blank" rel="noopener">Koin DI Framework<i class="fas fa-external-link-alt"></i></a>は、<code>KoinExtension</code>拡張を通じてKotestと一緒に使用できる。</p>
+<p>プロジェクトで拡張を使用するには、プロジェクトに依存関係を追加する。
+<a href="https://search.maven.org/artifact/io.kotest.extensions/kotest-extensions-koin" target="_blank" rel="noopener"><img src="https://img.shields.io/maven-central/v/io.kotest.extensions/kotest-extensions-koin.svg?label=latest%20release"/><i class="fas fa-external-link-alt"></i></a>
+<a href="https://oss.sonatype.org/content/repositories/snapshots/io/kotest/extensions/kotest-extensions-koin/" target="_blank" rel="noopener"><img src="https://img.shields.io/nexus/s/https/oss.sonatype.org/io.kotest.extensions/kotest-extensions-koin.svg?label=latest%20snapshot"/><i class="fas fa-external-link-alt"></i></a></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>io.kotest.extensions:kotest-extensions-koin:${version}
+</span></span></code></pre></div><p>依存関係が追加されると、テストでKoinを簡単に使用できる。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">KotestAndKoin</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">FunSpec</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#000">KoinTest</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">override</span> <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">extensions</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">KoinExtension</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">myKoinModule</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">userService</span> <span style="color:#204a87;font-weight:bold">by</span> <span style="color:#000">inject</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">UserService</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">init</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">test</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;use userService&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000">userService</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">getUser</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">username</span> <span style="color:#000">shouldBe</span> <span style="color:#4e9a06">&#34;LeoColman&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>デフォルトでは、拡張はリーフテスト(leaf test)間でKoinコンテキストを開始/停止する。<code>DescribeSpec</code>のようなネストされたSpecスタイルを使用し、ルートテストのすべてのリーフにわたってKoinコンテキストを維持したい場合、たとえばテスト間でモック宣言を共有するためには、<code>KoinExtension</code>コンストラクタでライフサイクルモードを<code>KoinLifecycleMode.Root</code>に指定できる。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">KotestAndKoin</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000">DescribeSpec</span><span style="color:#000;font-weight:bold">(),</span> <span style="color:#000">KoinTest</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">override</span> <span style="color:#204a87;font-weight:bold">fun</span> <span style="color:#000">extensions</span><span style="color:#000;font-weight:bold">()</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">listOf</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">KoinExtension</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">module</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">myKoinModule</span><span style="color:#000;font-weight:bold">,</span> <span style="color:#000">mode</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000">KoinLifecycleMode</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">Root</span><span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">val</span> <span style="color:#000">userService</span> <span style="color:#204a87;font-weight:bold">by</span> <span style="color:#000">inject</span><span style="color:#000;font-weight:bold">&lt;</span><span style="color:#000">UserService</span><span style="color:#000;font-weight:bold">&gt;()</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#204a87;font-weight:bold">init</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000">describe</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;use userService&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">it</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;inside a leaf test&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000">userService</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">getUser</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">username</span> <span style="color:#000">shouldBe</span> <span style="color:#4e9a06">&#34;LeoColman&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#204a87;font-weight:bold">it</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;this shares the same context&#34;</span><span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#000">userService</span><span style="color:#000;font-weight:bold">.</span><span style="color:#000">getUser</span><span style="color:#000;font-weight:bold">().</span><span style="color:#000">username</span> <span style="color:#000">shouldBe</span> <span style="color:#4e9a06">&#34;LeoColman&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><hr>
+<h2 id="参照">参照</h2>
+<ul>
+<li><a href="https://kotest.io/docs/extensions/koin.html" target="_blank" rel="noopener">Koin | Kotest<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
