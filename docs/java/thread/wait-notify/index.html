@@ -44,11 +44,11 @@
 <link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
 
 <title>Java Thread wait notify | devkuma</title>
-<meta name="description" content="Object 클래스의 동기 제어 final void wait() 다른 스레드는 notify() 또는 notifyAll()가 호출 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set영역 (공유객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체의 대기중의 thread를 1개 재개한다. 재개하는 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 쓰레드를 깨워서 실행할 수 있도록 한다. notify()는 랜덤이라 내가 원하는 애 말고 다른 애들을 깨울 수도 있다. final void notifyAll() 이 객체의 대기중의 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 전부를 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다 package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 쓰레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그후에 notify()메소드를 호출하여 wiat하고 있는 쓰레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 쓰레드 A를 생성후에 start한다. // 해당 쓰레드가 실행되면, 해당 쓰레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // b에 대하여 동기화 블럭을 설정 // 만약 main 쓰레드가 아래의 블록을 위의 Thread보다 먼저 실행되었다면 wait를 하게 되면서 모니터링 락을 놓고 대기 synchronized (a) { try { // b.wait()메소드를 호출. // 메인쓰레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
+<meta name="description" content="Object 클래스의 동기 제어 final void wait() notify() 또는 notifyAll()이 호출될 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set 영역(공유 객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체에서 대기 중인 thread를 1개 재개한다. 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 스레드를 깨워서 실행할 수 있도록 한다. notify()는 임의의 스레드를 깨우므로 원하는 스레드가 아닌 다른 스레드를 깨울 수도 있다. final void notifyAll() 이 객체에서 대기 중인 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 스레드를 모두 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다. package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 스레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그 후에 notify() 메소드를 호출하여 wait하고 있는 스레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 스레드 A를 생성한 후 start한다. // 해당 스레드가 실행되면, 해당 스레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // a에 대하여 동기화 블록을 설정 // 만약 main 스레드가 아래의 블록을 위의 Thread보다 먼저 실행했다면 wait를 하면서 모니터링 락을 놓고 대기 synchronized (a) { try { // a.wait() 메소드를 호출. // 메인 스레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
 <meta property="og:url" content="https://www.devkuma.com/docs/java/thread/wait-notify/">
   <meta property="og:site_name" content="devkuma">
   <meta property="og:title" content="Java Thread wait notify">
-  <meta property="og:description" content="Object 클래스의 동기 제어 final void wait() 다른 스레드는 notify() 또는 notifyAll()가 호출 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set영역 (공유객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체의 대기중의 thread를 1개 재개한다. 재개하는 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 쓰레드를 깨워서 실행할 수 있도록 한다. notify()는 랜덤이라 내가 원하는 애 말고 다른 애들을 깨울 수도 있다. final void notifyAll() 이 객체의 대기중의 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 전부를 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다 package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 쓰레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그후에 notify()메소드를 호출하여 wiat하고 있는 쓰레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 쓰레드 A를 생성후에 start한다. // 해당 쓰레드가 실행되면, 해당 쓰레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // b에 대하여 동기화 블럭을 설정 // 만약 main 쓰레드가 아래의 블록을 위의 Thread보다 먼저 실행되었다면 wait를 하게 되면서 모니터링 락을 놓고 대기 synchronized (a) { try { // b.wait()메소드를 호출. // 메인쓰레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
+  <meta property="og:description" content="Object 클래스의 동기 제어 final void wait() notify() 또는 notifyAll()이 호출될 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set 영역(공유 객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체에서 대기 중인 thread를 1개 재개한다. 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 스레드를 깨워서 실행할 수 있도록 한다. notify()는 임의의 스레드를 깨우므로 원하는 스레드가 아닌 다른 스레드를 깨울 수도 있다. final void notifyAll() 이 객체에서 대기 중인 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 스레드를 모두 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다. package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 스레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그 후에 notify() 메소드를 호출하여 wait하고 있는 스레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 스레드 A를 생성한 후 start한다. // 해당 스레드가 실행되면, 해당 스레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // a에 대하여 동기화 블록을 설정 // 만약 main 스레드가 아래의 블록을 위의 Thread보다 먼저 실행했다면 wait를 하면서 모니터링 락을 놓고 대기 synchronized (a) { try { // a.wait() 메소드를 호출. // 메인 스레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
   <meta property="og:locale" content="ko_kr">
   <meta property="og:type" content="article">
     <meta property="article:section" content="330_programming_jvm">
@@ -57,14 +57,14 @@
     <meta property="article:tag" content="Java">
 
   <meta itemprop="name" content="Java Thread wait notify">
-  <meta itemprop="description" content="Object 클래스의 동기 제어 final void wait() 다른 스레드는 notify() 또는 notifyAll()가 호출 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set영역 (공유객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체의 대기중의 thread를 1개 재개한다. 재개하는 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 쓰레드를 깨워서 실행할 수 있도록 한다. notify()는 랜덤이라 내가 원하는 애 말고 다른 애들을 깨울 수도 있다. final void notifyAll() 이 객체의 대기중의 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 전부를 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다 package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 쓰레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그후에 notify()메소드를 호출하여 wiat하고 있는 쓰레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 쓰레드 A를 생성후에 start한다. // 해당 쓰레드가 실행되면, 해당 쓰레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // b에 대하여 동기화 블럭을 설정 // 만약 main 쓰레드가 아래의 블록을 위의 Thread보다 먼저 실행되었다면 wait를 하게 되면서 모니터링 락을 놓고 대기 synchronized (a) { try { // b.wait()메소드를 호출. // 메인쓰레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
+  <meta itemprop="description" content="Object 클래스의 동기 제어 final void wait() notify() 또는 notifyAll()이 호출될 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set 영역(공유 객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체에서 대기 중인 thread를 1개 재개한다. 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 스레드를 깨워서 실행할 수 있도록 한다. notify()는 임의의 스레드를 깨우므로 원하는 스레드가 아닌 다른 스레드를 깨울 수도 있다. final void notifyAll() 이 객체에서 대기 중인 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 스레드를 모두 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다. package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 스레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그 후에 notify() 메소드를 호출하여 wait하고 있는 스레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 스레드 A를 생성한 후 start한다. // 해당 스레드가 실행되면, 해당 스레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // a에 대하여 동기화 블록을 설정 // 만약 main 스레드가 아래의 블록을 위의 Thread보다 먼저 실행했다면 wait를 하면서 모니터링 락을 놓고 대기 synchronized (a) { try { // a.wait() 메소드를 호출. // 메인 스레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
   <meta itemprop="datePublished" content="2021-08-27T08:25:49+09:00">
   <meta itemprop="dateModified" content="2021-08-27T08:25:49+09:00">
-  <meta itemprop="wordCount" content="265">
+  <meta itemprop="wordCount" content="271">
   <meta itemprop="keywords" content="Java">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Java Thread wait notify">
-  <meta name="twitter:description" content="Object 클래스의 동기 제어 final void wait() 다른 스레드는 notify() 또는 notifyAll()가 호출 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set영역 (공유객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체의 대기중의 thread를 1개 재개한다. 재개하는 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 쓰레드를 깨워서 실행할 수 있도록 한다. notify()는 랜덤이라 내가 원하는 애 말고 다른 애들을 깨울 수도 있다. final void notifyAll() 이 객체의 대기중의 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 전부를 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다 package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 쓰레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그후에 notify()메소드를 호출하여 wiat하고 있는 쓰레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 쓰레드 A를 생성후에 start한다. // 해당 쓰레드가 실행되면, 해당 쓰레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // b에 대하여 동기화 블럭을 설정 // 만약 main 쓰레드가 아래의 블록을 위의 Thread보다 먼저 실행되었다면 wait를 하게 되면서 모니터링 락을 놓고 대기 synchronized (a) { try { // b.wait()메소드를 호출. // 메인쓰레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
+  <meta name="twitter:description" content="Object 클래스의 동기 제어 final void wait() notify() 또는 notifyAll()이 호출될 때까지 스레드를 대기시킨다. 동기화 영역에서 락을 풀고 Wait-Set 영역(공유 객체별 존재)으로 이동시킨다. final void wait(long timeout) wait()의 타임아웃 버전이다. final void notify() 이 객체에서 대기 중인 thread를 1개 재개한다. 재개 대상은 선택할 수 없다. Wait-Set 영역에 있는 스레드를 깨워서 실행할 수 있도록 한다. notify()는 임의의 스레드를 깨우므로 원하는 스레드가 아닌 다른 스레드를 깨울 수도 있다. final void notifyAll() 이 객체에서 대기 중인 모든 thread를 재개한다. notifyAll()은 Wait-Set에 있는 스레드를 모두 깨운다. wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다. Object 클래스에서 제공하는 메서드이다. package com.devkuma.basic.thread.wait; public class ThreadA extends Thread { // 해당 스레드가 실행되면 자기 자신의 모니터링 락을 획득 // 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적 // 그 후에 notify() 메소드를 호출하여 wait하고 있는 스레드를 깨운다. int total; @Override public void run() { synchronized (this) { for (int i = 0; i &lt; 5; i&#43;&#43;) { System.out.println(i &#43; &#34;를 더합니다.&#34;); total &#43;= i; try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); } } notify(); } } public static void main(String[] args) { // 스레드 A를 생성한 후 start한다. // 해당 스레드가 실행되면, 해당 스레드는 run 메소드 안에서 자신의 모니터링 락을 획득 ThreadA a = new ThreadA(); a.start(); // a에 대하여 동기화 블록을 설정 // 만약 main 스레드가 아래의 블록을 위의 Thread보다 먼저 실행했다면 wait를 하면서 모니터링 락을 놓고 대기 synchronized (a) { try { // a.wait() 메소드를 호출. // 메인 스레드는 정지 // ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남 System.out.println(&#34;b가 완료될때까지 기다립니다.&#34;); a.wait(); } catch (InterruptedException e) { e.printStackTrace(); } // 깨어난 후 결과를 출력 System.out.println(&#34;Total is: &#34; &#43; a.total); } } }">
 <link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
 <link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
 <script
@@ -211,8 +211,8 @@
   </a>
   <ul class="dropdown-menu">
     <li><span class="dropdown-item active">한국어</span></li>
-      <li><span class="dropdown-item disabled">English</span></li>
-      <li><span class="dropdown-item disabled">日本語</span></li>
+      <li><a class="dropdown-item" href="/en/docs/java/thread/wait-notify/">English</a></li>
+      <li><a class="dropdown-item" href="/jp/docs/java/thread/wait-notify/">日本語</a></li>
       </ul>
 </div></li>
       <li class="nav-item td-navbar__light-dark-menu">
@@ -731,7 +731,7 @@
     </ul>
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavalamda-li">
     <input type="checkbox" id="m-docsjavalamda-check"/>
-    <label for="m-docsjavalamda-check"><a href="/docs/java/lamda/" title="Java Lamda 함수 Function, Consumer, Supplier, Predicate" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsjavalamda"><span class="">Lamda 함수</span></a></label>
+    <label for="m-docsjavalamda-check"><a href="/docs/java/lamda/" title="Java Lambda 함수 Function, Consumer, Supplier, Predicate" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-docsjavalamda"><span class="">Lambda 함수</span></a></label>
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-docsjavahttp-li">
     <input type="checkbox" id="m-docsjavahttp-check"/>
@@ -790,7 +790,7 @@
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavaconvert-between-date-to-localdatetime-li">
     <input type="checkbox" id="m-docsjavaconvert-between-date-to-localdatetime-check"/>
-    <label for="m-docsjavaconvert-between-date-to-localdatetime-check"><a href="/docs/java/convert-between-date-to-localdatetime/" title="Java - Date를 LocalDateTime으로 변환, LocalDateTime를 Date로 변환" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavaconvert-between-date-to-localdatetime"><span class="">Date, LocalDateTime 변환</span></a></label>
+    <label for="m-docsjavaconvert-between-date-to-localdatetime-check"><a href="/docs/java/convert-between-date-to-localdatetime/" title="Java - Date를 LocalDateTime으로 변환, LocalDateTime을 Date로 변환" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavaconvert-between-date-to-localdatetime"><span class="">Date, LocalDateTime 변환</span></a></label>
     
   </li>
     </ul>
@@ -805,11 +805,11 @@
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavathreadrunable-li">
     <input type="checkbox" id="m-docsjavathreadrunable-check"/>
-    <label for="m-docsjavathreadrunable-check"><a href="/docs/java/thread/runable/" title="Java 스레드(Thread) Runable 인터페이스" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavathreadrunable"><span class="">Runable 인터페이스</span></a></label>
+    <label for="m-docsjavathreadrunable-check"><a href="/docs/java/thread/runable/" title="Java 스레드(Thread) Runnable 인터페이스" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavathreadrunable"><span class="">Runnable 인터페이스</span></a></label>
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavathreadpriority-li">
     <input type="checkbox" id="m-docsjavathreadpriority-check"/>
-    <label for="m-docsjavathreadpriority-check"><a href="/docs/java/thread/priority/" title="Java 스레드(Thread) Thread 우선순의" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavathreadpriority"><span class="">Thread 우선순의</span></a></label>
+    <label for="m-docsjavathreadpriority-check"><a href="/docs/java/thread/priority/" title="Java 스레드(Thread) Thread 우선순위" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavathreadpriority"><span class="">Thread 우선순위</span></a></label>
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavathreadwait-notify-li">
     <input type="checkbox" id="m-docsjavathreadwait-notify-check"/>
@@ -825,7 +825,7 @@
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavaatomic-class-li">
     <input type="checkbox" id="m-docsjavaatomic-class-check"/>
-    <label for="m-docsjavaatomic-class-check"><a href="/docs/java/atomic-class/" title="Java 잠금없는 동기화 처리 구현 Atomic 클래스" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavaatomic-class"><span class="">Atomic 클래스</span></a></label>
+    <label for="m-docsjavaatomic-class-check"><a href="/docs/java/atomic-class/" title="Java 잠금 없는 동기화 처리 구현 Atomic 클래스" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-docsjavaatomic-class"><span class="">Atomic 클래스</span></a></label>
     
   </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-docsjavacompletable-future-li">
     <input type="checkbox" id="m-docsjavacompletable-future-check"/>
@@ -1990,7 +1990,7 @@
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">440</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
-        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">Javascript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
         <li><a class="taxonomy-term" href="https://www.devkuma.com/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">JQuery</span><span class="taxonomy-count">53</span></a></li>
@@ -2146,8 +2146,8 @@
 <ul>
 <li><code>final void wait()</code>
 <ul>
-<li>다른 스레드는 <code>notify()</code> 또는 <code>notifyAll()</code>가 호출 때까지 스레드를 대기시킨다.</li>
-<li>동기화 영역에서 락을 풀고 Wait-Set영역 (공유객체별 존재)으로 이동시킨다.</li>
+<li><code>notify()</code> 또는 <code>notifyAll()</code>이 호출될 때까지 스레드를 대기시킨다.</li>
+<li>동기화 영역에서 락을 풀고 Wait-Set 영역(공유 객체별 존재)으로 이동시킨다.</li>
 </ul>
 </li>
 <li><code>final void wait(long timeout)</code>
@@ -2157,26 +2157,26 @@
 </li>
 <li><code>final void notify()</code>
 <ul>
-<li>이 객체의 대기중의 thread를 1개 재개한다. 재개하는 재개 대상은 선택할 수 없다.</li>
-<li>Wait-Set 영역에 있는 쓰레드를 깨워서 실행할 수 있도록 한다.</li>
-<li><code>notify()</code>는 랜덤이라 내가 원하는 애 말고 다른 애들을 깨울 수도 있다.</li>
+<li>이 객체에서 대기 중인 thread를 1개 재개한다. 재개 대상은 선택할 수 없다.</li>
+<li>Wait-Set 영역에 있는 스레드를 깨워서 실행할 수 있도록 한다.</li>
+<li><code>notify()</code>는 임의의 스레드를 깨우므로 원하는 스레드가 아닌 다른 스레드를 깨울 수도 있다.</li>
 </ul>
 </li>
 <li><code>final void notifyAll()</code>
 <ul>
-<li>이 객체의 대기중의 모든 thread를 재개한다.</li>
-<li>notifyAll()은 Wait-Set에 있는 전부를 깨운다.</li>
+<li>이 객체에서 대기 중인 모든 thread를 재개한다.</li>
+<li>notifyAll()은 Wait-Set에 있는 스레드를 모두 깨운다.</li>
 </ul>
 </li>
 <li>wait, notify, notifyAll 모두 동기화 영역에서만 실행 가능하다.</li>
-<li>Object 클래스에서 제공하는 메서드이다</li>
+<li>Object 클래스에서 제공하는 메서드이다.</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">package</span><span style="color:#f8f8f8"> </span><span style="color:#000">com.devkuma.basic.thread.wait</span><span style="color:#000;font-weight:bold">;</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#204a87;font-weight:bold">public</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">class</span> <span style="color:#000">ThreadA</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">extends</span><span style="color:#f8f8f8"> </span><span style="color:#000">Thread</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#8f5902;font-style:italic">// 해당 쓰레드가 실행되면 자기 자신의 모니터링 락을 획득</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#8f5902;font-style:italic">// 해당 스레드가 실행되면 자기 자신의 모니터링 락을 획득</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#8f5902;font-style:italic">// 5번 반복하면서 0.5초씩 쉬면서 total에 값을 누적</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#8f5902;font-style:italic">// 그후에 notify()메소드를 호출하여 wiat하고 있는 쓰레드를 깨운다.</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#8f5902;font-style:italic">// 그 후에 notify() 메소드를 호출하여 wait하고 있는 스레드를 깨운다.</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#204a87;font-weight:bold">int</span><span style="color:#f8f8f8"> </span><span style="color:#000">total</span><span style="color:#000;font-weight:bold">;</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#5c35cc;font-weight:bold">@Override</span><span style="color:#f8f8f8">
@@ -2196,17 +2196,17 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#000;font-weight:bold">}</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">    </span><span style="color:#204a87;font-weight:bold">public</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">static</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">void</span><span style="color:#f8f8f8"> </span><span style="color:#000">main</span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">String</span><span style="color:#ce5c00;font-weight:bold">[]</span><span style="color:#f8f8f8"> </span><span style="color:#000">args</span><span style="color:#000;font-weight:bold">)</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 쓰레드 A를 생성후에 start한다.</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 해당 쓰레드가 실행되면, 해당 쓰레드는 run 메소드 안에서 자신의 모니터링 락을 획득</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 스레드 A를 생성한 후 start한다.</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 해당 스레드가 실행되면, 해당 스레드는 run 메소드 안에서 자신의 모니터링 락을 획득</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#000">ThreadA</span><span style="color:#f8f8f8"> </span><span style="color:#000">a</span><span style="color:#f8f8f8"> </span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#f8f8f8"> </span><span style="color:#204a87;font-weight:bold">new</span><span style="color:#f8f8f8"> </span><span style="color:#000">ThreadA</span><span style="color:#000;font-weight:bold">();</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">start</span><span style="color:#000;font-weight:bold">();</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// b에 대하여 동기화 블럭을 설정</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 만약 main 쓰레드가 아래의 블록을 위의 Thread보다 먼저 실행되었다면 wait를 하게 되면서 모니터링 락을 놓고 대기</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// a에 대하여 동기화 블록을 설정</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#8f5902;font-style:italic">// 만약 main 스레드가 아래의 블록을 위의 Thread보다 먼저 실행했다면 wait를 하면서 모니터링 락을 놓고 대기</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">        </span><span style="color:#204a87;font-weight:bold">synchronized</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">(</span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">)</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">            </span><span style="color:#204a87;font-weight:bold">try</span><span style="color:#f8f8f8"> </span><span style="color:#000;font-weight:bold">{</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#8f5902;font-style:italic">// b.wait()메소드를 호출.</span><span style="color:#f8f8f8">
-</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#8f5902;font-style:italic">// 메인쓰레드는 정지</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#8f5902;font-style:italic">// a.wait() 메소드를 호출.</span><span style="color:#f8f8f8">
+</span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#8f5902;font-style:italic">// 메인 스레드는 정지</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#8f5902;font-style:italic">// ThreadA가 5번 값을 더한 후 notify를 호출하게 되면 wait에서 깨어남</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#000">System</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">out</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">println</span><span style="color:#000;font-weight:bold">(</span><span style="color:#4e9a06">&#34;b가 완료될때까지 기다립니다.&#34;</span><span style="color:#000;font-weight:bold">);</span><span style="color:#f8f8f8">
 </span></span></span><span style="display:flex;"><span><span style="color:#f8f8f8">                </span><span style="color:#000">a</span><span style="color:#000;font-weight:bold">.</span><span style="color:#c4a000">wait</span><span style="color:#000;font-weight:bold">();</span><span style="color:#f8f8f8">
