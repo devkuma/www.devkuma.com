@@ -1,0 +1,170 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Jenkins</title>
+    <link>https://www.devkuma.com/jp/tags/jenkins/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/jenkins/logo/180x180.jpg</url>
+      <title>Jenkins</title>
+      <link>https://www.devkuma.com/jp/tags/jenkins/</link>
+    </image>
+    <description>Recent content in Jenkins on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/jenkins/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Jenkins</title>
+      <link>https://www.devkuma.com/jp/docs/jenkins/</link>
+      <pubDate>Mon, 24 Oct 2022 18:09:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/jenkins/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
+&lt;p&gt;サーバーアプリケーションに機能を追加するには、開発者がローカルコンピュータで開発を完了し、テストまで行ったうえで、問題がなければユーザーが利用できるよう修正内容をサーバーへ反映する必要がある。ここでサーバーへ反映することをデプロイといい、デプロイのための準備過程をビルドという。&lt;/p&gt;
+&lt;h3 id=&#34;build-とは&#34;&gt;Build とは？&lt;/h3&gt;
+&lt;p&gt;ビルドはサーバーへアップロードできる状態にすることであり、サーバーへアップロードしてユーザーが利用できるようにすることをデプロイという。たとえば Spring Boot アプリケーションを Kubernetes にデプロイする場合、まず Maven や Gradle でビルドして &lt;code&gt;.jar&lt;/code&gt; や &lt;code&gt;.war&lt;/code&gt; を作成し、その後 Docker ビルドで Docker Image を作成する。そして k8s では &lt;code&gt;.yml&lt;/code&gt; ファイルに画像バージョンの変更を反映する。&lt;/p&gt;
+&lt;h3 id=&#34;build-を自動化すべき理由&#34;&gt;Build を自動化すべき理由&lt;/h3&gt;
+&lt;p&gt;ビルドは 1 日に 1 回行うこともあれば行わないこともあるが、1 週間、1 か月単位で見るとかなり多く行う。これが 1 年になるとかなり多くの時間になる。&lt;/p&gt;
+&lt;p&gt;たとえば、昔は Java をビルドするときに &lt;code&gt;javac&lt;/code&gt; コマンドを直接使用していたが、今は IDEA を利用すれば &lt;code&gt;main()&lt;/code&gt; メソッドを実行したときに &lt;code&gt;javac&lt;/code&gt; が実行され、その後 &lt;code&gt;java&lt;/code&gt; が実行される。このような繰り返しの過程は、ボタン 1 つまたはショートカットで自動化する必要がある。&lt;/p&gt;
+&lt;p&gt;なぜなら、この作業にも集中力や緊張感などが消耗されるためである。また、ビルドはかなり時間がかかる作業であり、少なくとも 30 秒以上かかる。ビルドを実行してから完了を待つ時間を積み重ねると非常に長い時間になる。&lt;/p&gt;
+&lt;p&gt;開発者の作業時間を最小化するためには、繰り返し作業をできるだけ自動化する必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;jenkins-概要&#34;&gt;Jenkins 概要&lt;/h2&gt;
+&lt;p&gt;上で説明したように、Jenkins は開発者にとって面倒な開発ソースのビルドを自動化するツールである。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;jenkins-logo.png&#34; alt=&#34;Jenkins&#34;&gt;&lt;br&gt;
+&lt;a href=&#34;https://www.jenkins.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jenkins 公式サイト&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Jenkins は、開発作業の自動化を目的として Java で実装されたオープンソースのサーバーソフトウェア (CI ツール) であり、主に次の 2 つの技術的実現に役立つ。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;継続的インテグレーション (CI)
+&lt;ul&gt;
+&lt;li&gt;ソフトウェア開発プロセス全体の単純作業の自動化。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;継続的デリバリー (CD)
+&lt;ul&gt;
+&lt;li&gt;継続的インテグレーションで完成したソフトウェアをテスト環境および本番環境へ自動的にデプロイ。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Jenkins 自体は WAR ファイルとして提供され、Apache Tomcat のようなサーブレットコンテナにデプロイして起動できる。また、この WAR ファイルはサーブレットコンテナ機能も含む実行可能形式でビルドされているため、&lt;code&gt;java -jar jenkins.war&lt;/code&gt; のように単独で実行することもできる。&lt;/p&gt;
+&lt;p&gt;Jenkins は AccuRev、CVS、Subversion、Git、Mercurial、Perforce、ClearCase、RTC などの SCM ツールをサポートし、Apache Ant および Apache Maven ベースのプロジェクトだけでなく、任意のシェルスクリプトや Windows バッチコマンドも実行できる。&lt;/p&gt;
+&lt;p&gt;ビルドはさまざまなトリガーで実行できる。たとえば、バージョン管理システムへのコミット、cron のような仕組みによるスケジューリング、特定のビルド URL へのリクエスト送信で開始できる。また、キュー内の別のビルドが完了したことをトリガーとして次のビルドを実行することもできる。&lt;/p&gt;
+&lt;p&gt;Jenkins はもともと Sun Microsystems で Hudson という名前で開発された。しかし Oracle が Sun を買収した後、Hudson という名前を商標登録したため Jenkins に改名され、独立したオープンソースプロジェクトとして開発が継続されている。Jenkins の大きな技術的利点の 1 つは拡張可能であることだ。さらにコミュニティは改善要望を非常に歓迎しており、現在 1,200 個以上のプラグインがあり、毎月数百人の開発者が新しいプラグインを作成し公式アップデートセンターで利用できる。&lt;/p&gt;
+&lt;p&gt;2016 年にはバージョン 2 がリリースされ、継続的デリバリーのためのパイプラインが標準で統合された。Jenkins の開発は活発で、リリースはほぼ毎週行われている。&lt;/p&gt;
+&lt;h2 id=&#34;jenkins-の主な特徴&#34;&gt;Jenkins の主な特徴&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;継続的インテグレーション (CI) および継続的デリバリー (CD)
+&lt;ul&gt;
+&lt;li&gt;拡張可能な自動化サーバーであるため、単純な CI サーバーとしても、任意プロジェクトの継続的デリバリーのハブとしても使用できる。&lt;/li&gt;
+&lt;li&gt;Jenkins は Java で開発されたオープンソースの継続的インテグレーションサーバー型ツールである。&lt;/li&gt;
+&lt;li&gt;ソフトウェアのビルド、検証、サーバー設置の一連の流れを自動化できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;簡単なインストール
+&lt;ul&gt;
+&lt;li&gt;Jenkins は自己完結した Java ベースのプログラムであり、Windows、Mac OS X、その他 Unix ベース OS 用のパッケージですぐに実行できる。&lt;/li&gt;
+&lt;li&gt;Docker イメージも配布されているため、Docker でそのまま実行できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;構成しやすい
+&lt;ul&gt;
+&lt;li&gt;即時のエラーチェックと組み込みヘルプを含む Web インターフェースを通じて、簡単に設定・構成できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;多様なプラグイン
+&lt;ul&gt;
+&lt;li&gt;ビルド環境、ビルド時に変更すべきオプション、開発環境、開発言語はそれぞれ異なる。&lt;/li&gt;
+&lt;li&gt;これらをカバーするために Jenkins は多様なプラグインを提供する。&lt;/li&gt;
+&lt;li&gt;アップデートセンターの 1,800 個以上のプラグインにより、継続的インテグレーションと継続的デリバリーへ多様な機能を統合できる。&lt;/li&gt;
+&lt;li&gt;ジョブ単位で管理でき、プラグインで機能拡張が可能である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;拡張可能
+&lt;ul&gt;
+&lt;li&gt;プラグインアーキテクチャによって拡張でき、Jenkins でできることに無限の可能性を提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ダッシュボード提供
+&lt;ul&gt;
+&lt;li&gt;さまざまなデプロイ作業の状況を監視できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;デプロイスクリプト実行機能
+&lt;ul&gt;
+&lt;li&gt;デプロイスクリプトは開発者ローカルでも実行できるが、Jenkins を起動しておけばスケジューリングできる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;分散型
+&lt;ul&gt;
+&lt;li&gt;複数のプラットフォームでビルド、テスト、デプロイを迅速に実行できるよう、複数のコンピュータに作業を分散できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;jenkins-と-hudson&#34;&gt;Jenkins と Hudson&lt;/h2&gt;
+&lt;p&gt;Jenkins プロジェクトはもともと Hudson という名前だったが、Oracle との商標権紛争により Jenkins という名前に変更された。&lt;/p&gt;
+&lt;p&gt;2004 年、川口耕介は Sun Microsystems の Java 開発者だった。川口は開発作業でビルドを壊すことに疲れ、コードをリポジトリへコミットする前にそのコードが動作するかどうかを知る方法を探していた。そこで、これを可能にする自動化サーバーを Java で開発し、Hudson と名付けた。Hudson は Sun で有名になり、オープンソースとして他企業にも広がった。&lt;/p&gt;
+&lt;p&gt;2011 年に入ると、Sun を買収した Oracle と独自の Hudson オープンソースコミュニティとの紛争により、Jenkins という新しい名前で分岐することになった。両方の系統は存続したが、Jenkins の方がはるかに活発だった。2014 年に川口は Jenkins ベースの継続的デリバリー製品を提供する CloudBees の CTO になった。&lt;/p&gt;
+&lt;h2 id=&#34;jenkins-の動作環境&#34;&gt;Jenkins の動作環境&lt;/h2&gt;
+&lt;p&gt;前提となる動作環境は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;OS
+&lt;ul&gt;
+&lt;li&gt;Docker&lt;/li&gt;
+&lt;li&gt;Ubuntu / Debian&lt;/li&gt;
+&lt;li&gt;CentOS / Fedora / Red Hat&lt;/li&gt;
+&lt;li&gt;Windows&lt;/li&gt;
+&lt;li&gt;openSUSE&lt;/li&gt;
+&lt;li&gt;FreeBSD&lt;/li&gt;
+&lt;li&gt;macOS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ハードウェア最小構成
+&lt;ul&gt;
+&lt;li&gt;256 MB RAM&lt;/li&gt;
+&lt;li&gt;1 GB の空き容量。ただし Jenkins を Docker コンテナで実行する場合は 10 GB 以上を推奨する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ミドルウェア要件
+&lt;ul&gt;
+&lt;li&gt;Java 8 - JRE または JDK。&lt;/li&gt;
+&lt;li&gt;OpenJDK JDK/JRE 8 - 64 ビット&lt;/li&gt;
+&lt;li&gt;OpenJDK JDK/JRE 11 - 64 ビット&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;対象ブラウザ
+&lt;ul&gt;
+&lt;li&gt;Google Chrome&lt;/li&gt;
+&lt;li&gt;Mozilla Firefox&lt;/li&gt;
+&lt;li&gt;Microsoft Edge&lt;/li&gt;
+&lt;li&gt;Apple Safari&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;jenkins-ライセンス&#34;&gt;Jenkins ライセンス&lt;/h2&gt;
+&lt;p&gt;Jenkins は MIT ライセンスのオープンソースソフトウェアである。MIT ライセンスのソフトウェアは無償で再配布や商用利用などが可能で、他のオープンソースライセンスに比べて制限が非常に緩いライセンスである。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.itworld.co.kr/news/107527&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;젠킨스란 무엇인가, CI(Continuous Integration) 서버의 이해&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jenkins.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jenkins 公式サイト&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.jenkins.io/download/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Jenkins ダウンロード&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Jenkins</category>
+      
+    </item>
+    
+  </channel>
+</rss>
