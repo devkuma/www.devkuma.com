@@ -261,6 +261,98 @@
     </item>
     
     <item>
+      <title>JVM メモリ構造</title>
+      <link>https://www.devkuma.com/jp/docs/jvm/memory-structure/</link>
+      <pubDate>Thu, 20 Jan 2022 07:48:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/jvm/memory-structure/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Java で使用されるメモリモデルの構造を理解しておくと、Java プログラムを作成するうえで大いに役立つ。&lt;/p&gt;
+&lt;h2 id=&#34;jvmjava-virtual-machine&#34;&gt;JVM(Java Virtual Machine)&lt;/h2&gt;
+&lt;p&gt;Java プロセスは JVM という仮想システム上で実行される。この構造により、コンパイルされた Java クラスファイル（bytecode）をさまざまな OS 環境で実行できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_compile_jvm.png&#34; alt=&#34;JVM&#34;&gt;&lt;/p&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Java バイトコード(Java bytecode)&lt;/div&gt;
+
+
+Java バイトコード（Java bytecode）とは、Java 仮想マシンが理解できる言語に変換された Java ソースコードを意味する。  
+Java コンパイラによって変換されるコードの命令サイズが 1 byte であるため、Java バイトコードと呼ばれている。  
+この Java バイトコードの拡張子は `.class` である。  
+Java バイトコードは、Java 仮想マシンさえインストールされていれば、どのオペレーティングシステムでも実行できる。
+&lt;/div&gt;
+
+&lt;h2 id=&#34;java-メモリ領域の構造&#34;&gt;Java メモリ領域の構造&lt;/h2&gt;
+&lt;p&gt;すべての Java プログラムは Java 仮想マシン（JVM）を通じて実行される。Java プログラムが実行されると、JVM はそのプログラムを実行するために必要なメモリをオペレーティングシステムから割り当てられる。&lt;/p&gt;
+&lt;p&gt;JVM は割り当てられたメモリを効率よく使うため、用途に応じて次のように複数の領域に分けて管理する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_runtime_data_area.png&#34; alt=&#34;JVM Runtime Data Area&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Runtime Data Area はオペレーティングシステムから割り当てられたメモリ領域であり、Java アプリケーションを実行するときに使用されるデータを格納する領域である。&lt;br&gt;
+大きく Method Area、Heap Area、Stack Area、PC Register、Native Method Stack に分けられる。&lt;/p&gt;
+&lt;h3 id=&#34;メソッドmethod領域--static-領域&#34;&gt;メソッド(method)領域 / Static 領域&lt;/h3&gt;
+&lt;p&gt;メソッド領域は、Java プログラムで使用されるクラスに関する情報と、クラス変数（static variable）が保存される領域である。&lt;br&gt;
+JVM は Java プログラムで特定のクラスが使用されると、そのクラス、つまり Java バイトコードであるクラスファイル（&lt;code&gt;*.class&lt;/code&gt;）を読み込み、ロードされたクラスとインターフェースに対するランタイム定数プール（runtime constant pool）、メンバ変数（フィールド）、クラス変数（static 変数）、コンストラクタ、メソッドを保存する。&lt;/p&gt;
+&lt;p&gt;この領域に保存された内容は、プログラム開始前にロードされ、プログラム終了時に消滅する。&lt;br&gt;
+ランタイム定数プールには、コンパイル時に分かっている数値リテラルから、実行時に解決される必要があるメソッドやフィールドの参照まで、さまざまな定数が含まれる。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;リテラル（literal）は、コンピュータサイエンス分野で固定された値を意味する。定数は変わらない変数を指し、リテラルは変わらない値（データ）を指す。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;ヒープheap領域&#34;&gt;ヒープ(heap)領域&lt;/h3&gt;
+&lt;p&gt;ヒープ領域は、Java プログラムで使用されるすべてのクラスオブジェクト（インスタンス）変数が保存される領域であり、JVM が管理するプログラム上でデータを保存するために実行時に動的に割り当てて使用する領域である。&lt;/p&gt;
+&lt;p&gt;プロセス実行中に動的に変化するデータは、基本的にここに割り当てられる。つまり、Java プログラムで &lt;code&gt;new&lt;/code&gt; 演算子を使ってインスタンスが生成されると、JVM はそのインスタンスの情報をヒープ領域に保存する。&lt;br&gt;
+ヒープ領域は、メモリの低いアドレスから高いアドレス方向へ割り当てられる。&lt;/p&gt;
+&lt;p&gt;そして、スタック領域の変数がヒープ領域のインスタンスを参照していたものの、以後参照しなくなった場合、そのインスタンスは Java 仮想マシンのガベージコレクションによって削除される。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ガベージコレクションは、インスタンスが参照されなくなるたびに実行されるわけではない。
+そうすると、ガベージコレクションの呼び出しだけで多くのリソースを使うことになり、プログラムの性能が低下する。
+そのため、ガベージコレクションアルゴリズムに従って実行される。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;ヒープ領域の使用期間およびスレッド共有範囲は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;オブジェクトがこれ以上使用されない、または明示的に null 宣言された場合&lt;/li&gt;
+&lt;li&gt;GC（Garbage Collection）の対象&lt;/li&gt;
+&lt;li&gt;構成方法や GC 方法は JVM ベンダーごとに異なる場合がある。&lt;/li&gt;
+&lt;li&gt;すべてのスレッドで共有する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;長時間同じプロセスとして実行されるアプリケーションでは、このヒープ領域のメモリ使用を最適化することが重要である。割り当てるサイズを指定するオプションは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-Xms20m -Xmx100m
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上記のように指定すると、次の設定になる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ヒープ領域に割り当てるメモリの初期サイズ: 20MB&lt;/li&gt;
+&lt;li&gt;ヒープ領域に割り当てるメモリの最大サイズ: 100MB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;スタックstack領域&#34;&gt;スタック(stack)領域&lt;/h3&gt;
+&lt;p&gt;スタック領域は、Java プログラムでメソッドが呼び出されるときに、そのメソッドのスタックフレームが保存される領域である。&lt;/p&gt;
+&lt;p&gt;JVM は Java プログラムでメソッドが呼び出されると、メソッド呼び出しに関係するローカル変数とパラメータをスタック領域に保存する。
+このようにスタック領域はメソッド呼び出しとともに割り当てられ、メソッド呼び出しが完了すると消滅する。スタック領域に保存されるメソッド呼び出し情報をスタックフレーム（stack frame）という。&lt;/p&gt;
+&lt;p&gt;スタック領域は Push でデータを入力し、Pop でデータを出力する。このスタックは LIFO（Last-In First-Out）方式で動作するため、最後に保存されたデータが最初に取り出される。&lt;/p&gt;
+&lt;p&gt;スタック領域は、メモリの高いアドレスから低いアドレス方向へ割り当てられる。&lt;/p&gt;
+&lt;h3 id=&#34;pc-register&#34;&gt;PC Register&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;現在実行中の JVM 命令アドレスを持つ。CPU の PC と同じ役割だと言える。&lt;/li&gt;
+&lt;li&gt;プログラムの実行は CPU がインストラクション（Instruction）を実行することで進む。&lt;/li&gt;
+&lt;li&gt;CPU はインストラクションの実行中に必要な情報を、CPU 内部の記憶装置であるレジスタに保存する。&lt;/li&gt;
+&lt;li&gt;演算結果をメモリに渡す前に保存する CPU 内部の記憶装置である。
+（通常、CPU が命令を処理する過程で必要な情報は Register という CPU 内部の記憶装置に保存される。これは CPU に依存せざるを得ない。そのため、Java の思想を実現するには、この CPU 内 Register の役割を JVM 上の論理的なメモリ領域として実装する必要がある。）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;native-method-stack-area&#34;&gt;Native Method Stack Area&lt;/h3&gt;
+&lt;p&gt;Java 以外の言語で書かれたネイティブコードのための Stack である。&lt;br&gt;
+つまり、JNI（Java Native Interface）を通じて呼び出される C、C++ などのコードを実行するためのスタックである。&lt;br&gt;
+ネイティブメソッドのパラメータ、ローカル変数などをバイトコードとして保存する。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://dzone.com/articles/permgen-and-metaspace&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;PermGen and Metaspace&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.baeldung.com/java-stack-heap&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Stack Memory and Heap Space in Java&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Java</category>
+      
+      <category>JVM</category>
+      
+    </item>
+    
+    <item>
       <title>Java Classクラス</title>
       <link>https://www.devkuma.com/jp/docs/java/class-class/</link>
       <pubDate>Wed, 31 May 2017 00:55:48 +0900</pubDate>
@@ -3318,6 +3410,177 @@ static変数のメモリは、他の変数とは異なる領域に保存され�
     </item>
     
     <item>
+      <title>JVM ヒープメモリ</title>
+      <link>https://www.devkuma.com/jp/docs/jvm/heap-memory/</link>
+      <pubDate>Thu, 20 Jan 2022 07:48:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/jvm/heap-memory/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;ヒープメモリとは&#34;&gt;ヒープメモリとは&lt;/h2&gt;
+&lt;p&gt;ヒープ（Heap）メモリは、Java プログラムの実行中に動的に生成されたオブジェクト（&lt;code&gt;new&lt;/code&gt; 演算子で生成されたオブジェクトまたはインスタンス）が保存される空間である。&lt;br&gt;
+ここに生成されたオブジェクトは、他のオブジェクトのフィールド、またはスタック上に存在する他のメソッドから参照されることがある。参照する変数がなくなると、そのオブジェクトは不要なものとみなされ、Garbage Collector によって割り当てが解除される。&lt;/p&gt;
+&lt;h2 id=&#34;ヒープメモリ領域の役割&#34;&gt;ヒープメモリ領域の役割&lt;/h2&gt;
+&lt;p&gt;ヒープ（Heap）メモリは、Java プログラムの実行中に動的に生成されたオブジェクト（&lt;code&gt;new&lt;/code&gt; 演算子で生成されたオブジェクトまたはインスタンス）が保存される空間である。&lt;br&gt;
+ここに生成されたオブジェクトは、他のオブジェクトのフィールド、またはスタック上に存在する他のメソッドから参照されることがある。参照する変数がなくなると、そのオブジェクトは不要なものとみなされ、Garbage Collector によって割り当てが解除される。&lt;/p&gt;
+&lt;p&gt;ヒープ領域は機能が多様であるため、複数の部分に分けられる。オブジェクトが最初に生成されたときに保存される空間と、オブジェクト生成後に一定時間使用されなければ移動され、ガベージコレクションを実行できるよう分類される空間に分けて管理する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Java 7 HotSpot JVM&lt;/strong&gt;&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_memory_jdk7.png&#34; alt=&#34;heap memory&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Java 8 HotSpot JVM&lt;/strong&gt;&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java_jvm_memory_jdk8.png&#34; alt=&#34;heap memory&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;young-generation&#34;&gt;Young Generation&lt;/h3&gt;
+&lt;p&gt;新しいオブジェクトが最初に生成されたとき、heap memory 内で配置される空間である。&lt;/p&gt;
+&lt;p&gt;Young Generation は次のように分けられる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eden
+&lt;ul&gt;
+&lt;li&gt;Java オブジェクトが生成されるとすぐに割り当てられるメモリ領域である。つまり、&lt;code&gt;new&lt;/code&gt; 演算子で新しく生成されたオブジェクトが配置される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Survivor1, Survivor2
+&lt;ul&gt;
+&lt;li&gt;各領域が埋まると、生き残ったオブジェクトは空いている Survivor へ移動する。&lt;/li&gt;
+&lt;li&gt;このとき参照がないオブジェクトは Minor GC によって収集される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;old-generation&#34;&gt;Old Generation&lt;/h3&gt;
+&lt;p&gt;Young Generation でガベージコレクションを最後まで生き残ったオブジェクトが Old Generation へ移動する。つまり、古いデータが保存される領域である。&lt;br&gt;
+Major GC が実行され、Minor GC より回数は少ない。&lt;/p&gt;
+&lt;h3 id=&#34;permanent-generation&#34;&gt;Permanent Generation&lt;/h3&gt;
+&lt;p&gt;Permanent Generation は &lt;strong&gt;Class または Method Code が保存される領域&lt;/strong&gt;である。PermGen は Heap 領域に属する。&lt;br&gt;
+PermGen は Permanent Generation の略で、JVM がロードしたクラスのメタデータを追跡するために使用する、通常の Java ヒープとは別の特殊なヒープ空間である。&lt;br&gt;
+Permanent Generation には、ロードされたクラスの情報など、ある程度変化しないことが保証されるデータが保存される。&lt;/p&gt;
+&lt;p&gt;デフォルトでは制限されたサイズを持つ。（32-bit JVM: 64MB、64-bit JVM: 82MB）&lt;/p&gt;
+&lt;p&gt;JVM Argument&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-XX:PermSize=N      --&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; PermGen Default Size を設定。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-XX:MaxPermSize=N   --&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; PermGen Max Size を設定。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;metaspace-generation&#34;&gt;Metaspace Generation&lt;/h3&gt;
+&lt;p&gt;Java 8 が登場して JVM 領域に変化があった。JVM の複数のメモリ領域のうち Permanent Generation メモリ領域がなくなり、Metaspace 領域が作られた。
+Metaspace は Java 8 以前の Perm 領域を置き換えるもので、&lt;strong&gt;クラスとメソッドのメタデータが保存される領域&lt;/strong&gt;である。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Metaspace は、Java の Classloader がこれまでロードした Class の Metadata が保存される空間である。&lt;/li&gt;
+&lt;li&gt;重要なのは、Heap 領域ではなく Native メモリ領域に位置する点である。&lt;/li&gt;
+&lt;li&gt;デフォルトでは制限されたサイズを持たない。そのため、必要なだけ増え続ける。&lt;/li&gt;
+&lt;li&gt;Java 8 以降は PermGen 関連の JVM オプションは無視される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;JVM Argument&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-XX:MetaspaceSize=N
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-XX:MaxMetaspaceSize=N
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;MetaspaceSize: Metaspace Default Size を設定。
+&lt;ul&gt;
+&lt;li&gt;この設定は JVM が使用するネイティブメモリ量を変更するために使われる。&lt;/li&gt;
+&lt;li&gt;システムが基本で提供するものより多くのメモリを使用すると確信できる場合に、このオプションを使うとよい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;MaxMetaspaceSize: Metaspace Max Size を設定。
+&lt;ul&gt;
+&lt;li&gt;この設定は metaspace の最大メモリ量を変更するために使われる。&lt;/li&gt;
+&lt;li&gt;アプリケーションをサーバーで動作させるときにメモリ領域を調整したい場合や、メモリリークが発生してシステム全体のネイティブメモリを使い切らないようにしたい場合に使う。&lt;/li&gt;
+&lt;li&gt;もし native メモリがいっぱいになっているにもかかわらず、アプリケーションがさらにメモリを要求すると &lt;code&gt;java.lang.OutOfMemoryError: Metadata space&lt;/code&gt; が発生する。&lt;/li&gt;
+&lt;li&gt;設定を指定しなければ制限は設けられない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;permanent-と-metaspace&#34;&gt;Permanent と Metaspace&lt;/h3&gt;
+&lt;p&gt;Java 8 で PermGen は、いくつかの違いはあるものの Metaspace へ名前が変わった。ここで重要なのは、Metaspace にはデフォルトの最大サイズが無制限である点だ。反対に Java 7 以下の PermGen は、デフォルト最大サイズが 32 ビット JVM で 64MB、64 ビット版で 82MB である。もちろん初期サイズと同じではない。Java 7 およびそれ以前のバージョンは、初期 PermGen 空間の約 12-21MB で開始する。&lt;/p&gt;
+&lt;p&gt;Permanent と Metaspace のデフォルト制限サイズを比較すると次のようになる。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;JVM&lt;/th&gt;
+          &lt;th&gt;Default maximum PermGen size (MB)&lt;/th&gt;
+          &lt;th&gt;Default maximum Metaspace size&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;32-bit client JVM&lt;/td&gt;
+          &lt;td&gt;64&lt;/td&gt;
+          &lt;td&gt;unlimited&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;32-bit server JVM&lt;/td&gt;
+          &lt;td&gt;64&lt;/td&gt;
+          &lt;td&gt;unlimited&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;64-bit JVM&lt;/td&gt;
+          &lt;td&gt;82&lt;/td&gt;
+          &lt;td&gt;unlimited&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Java 7 以前には、インターンされた文字列（Interned Strings）が PermGen に保持されていた。そのため、悪名高い次のような深刻なエラーが発生していた。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;java.lang.OutOfMemoryError: PermGen space
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;PermGen/Metaspace のサイズを調整する必要があるたびに、JVM は標準ヒープと同じようにサイズを調整する。この空間のサイズ調整には Full GC が必要であり、これは常にコストの高い処理である。多くのクラスがロードされる起動中によく観察できる。特にアプリケーションが多くの外部ライブラリに依存している場合はなおさらである。起動中に Full GC が多く発生する場合、通常はこれが原因である。このような場合、初期サイズを増やすと起動性能が向上することがある。&lt;/p&gt;
+&lt;p&gt;PermGen から Metaspace への変更の長所と短所は次のとおりである。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;長所&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PermGen 領域が削除され、heap 領域で使用できるメモリが増えた。&lt;/li&gt;
+&lt;li&gt;PermGen 領域を削除するために存在していた複雑なコードが削除され、PermGen 領域をスキャンするために消費されていた時間が減少し、GC 性能が向上した。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;短所&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;もはや PermGen 空間が不足することはないが（PermGen が存在しないため）、過度なネイティブメモリを消費してプロセス全体のサイズが大きくなる可能性がある。&lt;/li&gt;
+&lt;li&gt;問題は、アプリケーションが多くのクラスや文字列をロードする場合、実際にアプリケーションだけでなくサーバー全体を停止させる可能性があることだ。これはネイティブメモリがオペレーティングシステムによってのみ制限されるためである。つまり、そのままサーバーのすべてのメモリを占有し得る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;java-コードによるメモリ管理&#34;&gt;Java コードによるメモリ管理&lt;/h2&gt;
+&lt;p&gt;Java コードを分析し、ここでメモリをどのように管理するかを見てみよう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Person&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;PersonBuilder&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;buildPerson&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;return&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Person&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;args&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;23&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;John&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;buildPerson&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;main()&lt;/code&gt; メソッドに入ると、スタックメモリにこのメソッドのプリミティブ要素と参照を保存するための空間が作成される。
+&lt;ul&gt;
+&lt;li&gt;スタックメモリは整数 &lt;code&gt;id&lt;/code&gt; のプリミティブ値を直接保存する。&lt;/li&gt;
+&lt;li&gt;Person 型の参照変数 &lt;code&gt;person&lt;/code&gt; もスタックメモリに作成され、ヒープ内の実際のオブジェクトを指す。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;main()&lt;/code&gt; からパラメータ付きコンストラクタ &lt;code&gt;Person(int, String)&lt;/code&gt; を呼び出すと、以前のスタックの上に追加メモリが割り当てられる。これには次のものが保存される。
+&lt;ul&gt;
+&lt;li&gt;スタックメモリにある呼び出しオブジェクトの &lt;code&gt;this&lt;/code&gt; オブジェクト参照&lt;/li&gt;
+&lt;li&gt;スタックメモリのプリミティブ値 &lt;code&gt;id&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;ヒープメモリの文字列プールにある実際の文字列を指す、文字列引数 name の参照変数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;main メソッドはさらに &lt;code&gt;buildPerson()&lt;/code&gt; static メソッドを呼び出しており、このメソッドに対して以前のメソッドの上にスタックメモリで追加割り当てが発生する。これにより、上で説明した方式で変数が再び保存される。&lt;/li&gt;
+&lt;li&gt;ただし、ヒープメモリは &lt;code&gt;Person&lt;/code&gt; 型の新しく生成されたオブジェクト &lt;code&gt;person&lt;/code&gt; に対するすべてのインスタンス変数を保存する。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;この割り当てについては、次の図で確認する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/java/jvm/java-heap-stack-diagram.png&#34; alt=&#34;Java heap stack diagram&#34;&gt;
+出典: &lt;a href=&#34;https://www.baeldung.com/java-stack-heap&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.baeldung.com/java-stack-heap&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+
+      </description>
+      
+      <category>Java</category>
+      
+      <category>JVM</category>
+      
+    </item>
+    
+    <item>
       <title>Java java.mathパッケージのBigDecimalクラス</title>
       <link>https://www.devkuma.com/jp/docs/java/bigdecimal-class/</link>
       <pubDate>Wed, 31 May 2017 00:55:48 +0900</pubDate>
@@ -5919,132 +6182,6 @@ key=3, value=three
 &lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.3.1.3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;8.3.1.3. transient Fields | 公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-      </description>
-      
-      <category>Java</category>
-      
-    </item>
-    
-    <item>
-      <title>Java synchronized修飾子/ブロック - マルチスレッド環境での排他制御</title>
-      <link>https://www.devkuma.com/jp/docs/java/synchronized/</link>
-      <pubDate>Sat, 24 Sep 2022 12:00:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/jp/docs/java/synchronized/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;synchronized&#34;&gt;synchronized&lt;/h2&gt;
-&lt;p&gt;マルチスレッド環境で共有データを操作する場合、処理の衝突に注意する必要があります。synchronized修飾子は、マルチスレッド環境で排他制御を行うときに利用されます。&lt;/p&gt;
-&lt;h2 id=&#34;synchronizedを使用しない場合&#34;&gt;synchronizedを使用しない場合&lt;/h2&gt;
-&lt;p&gt;次は、インスタンス変数&lt;code&gt;count&lt;/code&gt;を複数のスレッドで同時に増加させる処理です。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;package&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;com.devkuma.basic.thread&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;SynchronizedSample&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;THREAD_MAX&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;300000&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;MyThread&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;implements&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Runnable&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;SynchronizedSample&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;_count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;MyThread&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;SynchronizedSample&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;_count&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Override&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;_count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;increment&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;args&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;throws&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;InterruptedException&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;SynchronizedSample&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ss&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;SynchronizedSample&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Thread&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ts&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Thread&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;THREAD_MAX&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;THREAD_MAX&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Thread&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;new&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;MyThread&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ss&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;));&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;start&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;THREAD_MAX&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ts&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;i&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;join&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ss&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;   &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 結果: 299944（毎回結果が異なります）&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;increment&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上のコードは正しく動作しません。上記の&lt;code&gt;this.count++&lt;/code&gt;演算では、&lt;code&gt;count&lt;/code&gt;の値を読み取った後、増加して再代入される前に別のスレッドが割り込む可能性があるためです。&lt;br&gt;
-そのため、本来の最終結果は300,000になるべきですが、299999のような値が返される場合があります。&lt;/p&gt;
-&lt;h2 id=&#34;synchronizedメソッド&#34;&gt;synchronizedメソッド&lt;/h2&gt;
-&lt;p&gt;これを防ぐには、incrementメソッドに&lt;code&gt;synchronized&lt;/code&gt;修飾子を付けます。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;synchronized&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;increment&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;こうすることで、&lt;code&gt;increment&lt;/code&gt;メソッドが複数の&lt;code&gt;thread&lt;/code&gt;から同時に呼び出されることはなくなります。後から呼び出された側は、先に入った処理が終わるまで待機します。そのため、結果は毎回300,000になります。&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
-
-
-ただし、`synchronized`修飾子が正しく動作するのは、メソッドが属するインスタンスが同一の場合です。別のインスタンスがある場合、インスタンスの数だけ同時実行される可能性があるため注意が必要です。
-&lt;/div&gt;
-
-&lt;h2 id=&#34;synchronizedブロック&#34;&gt;synchronizedブロック&lt;/h2&gt;
-&lt;p&gt;上のコードは、&lt;code&gt;synchronized&lt;/code&gt;ブロックを使用して次のように書き直すこともできます。&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;increment&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;synchronized&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;count&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;++&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-      </description>
-      
-      <category>Java</category>
-      
-    </item>
-    
-    <item>
-      <title>初めて作る Java アプリケーション Hello World! Java</title>
-      <link>https://www.devkuma.com/jp/docs/java/hello-world/</link>
-      <pubDate>Wed, 31 May 2017 00:55:48 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/jp/docs/java/hello-world/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;最初のアプリケーションプログラムを作成&#34;&gt;最初のアプリケーションプログラムを作成&lt;/h2&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;HelloWorld&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// クラス開始&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;args&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// メソッド開始&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Hello World! Java.&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;ソースコード作成時の注意事項&#34;&gt;ソースコード作成時の注意事項&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;英字の大文字と小文字を区別する。&lt;/li&gt;
-&lt;li&gt;保存時のファイル名はクラス名と同じにする必要があり、拡張子は &lt;code&gt;.java&lt;/code&gt; である。&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;HelloWorld.java&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;コンパイル
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;javac HelloWorld.java
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;実行
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;java HelloWorld
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;クラス定義&#34;&gt;クラス定義&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;Java はクラス単位でプログラムを作成するため、ソースファイル内に必ずクラスを定義する必要がある。&lt;/li&gt;
-&lt;li&gt;クラス名は先頭文字を大文字で始めるのが慣例である。&lt;/li&gt;
-&lt;li&gt;クラスの構成要素(属性、メソッドなど)は &lt;code&gt;{ }&lt;/code&gt; の中に配置される。&lt;/li&gt;
-&lt;li&gt;ソースファイルを保存するとき、ファイル名は必ずクラス名と一致しなければならない。ただし、1 つのファイルに複数のクラスがある場合は除く。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;mainstring-args-メソッド定義&#34;&gt;&lt;code&gt;main(String[] args)&lt;/code&gt; メソッド定義&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;アプリケーションプログラムを実行するには、少なくとも 1 つ存在しなければならない。&lt;/li&gt;
-&lt;li&gt;プログラムのエントリポイントとして JVM によって最初に呼び出され、メインメソッドブロック内部に記述された命令文を順番に実行する。&lt;/li&gt;
-&lt;li&gt;JVM はセミコロン(&lt;code&gt;;&lt;/code&gt;)で終わる文を 1 つの命令文として認識する。&lt;/li&gt;
-&lt;li&gt;コメントはプログラムのソースコードを理解しやすくするために使用し、コンパイルおよび実行には影響しない。&lt;/li&gt;
 &lt;/ul&gt;
 
       </description>
