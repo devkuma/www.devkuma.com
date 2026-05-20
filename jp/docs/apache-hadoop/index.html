@@ -1,0 +1,1034 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="jp" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Apache Hadoop | devkuma</title>
+<meta name="description" content="Apache Hadoopの概要 Hadoop（ハドゥープ）は、大規模データの蓄積と分析を分散して処理するフレームワークであり、Java言語で実装されている。 Hadoopの元になったのは、Googleの大量データを効率的に処理するための分散処理基盤であるMapReduceとGoogle File Systemである。
+Googleはこのシステムに関する論文を2004年に公開し、それを参考にDoug CuttingとMike Cafarellaによって開発された。Hadoopという名前は、Dougの息子が黄色い象のぬいぐるみに付けた名前に由来し、意味がなく、簡単で、他の場所で使われていないという理由で採用された。黄色い象はHadoopのマスコットキャラクターでもある。
+Hadoopは分散処理基盤であるため、各処理をクラスター内のマシンに分け（Map）、各マシンで処理された結果を集約（Reduce）して最終的な結果を得る。
+近年、大量データ（BigData）の中から目的のデータを抽出したり、保存されたデータから何らかの傾向を読み取ったりするなど、データマイニングへの要求が高まっている。また、BigDataを処理できるだけでなく、より短時間でそのような情報を算出したいという要求も増えている。
+以前はBigDataを処理するためにデータウェアハウスのような専用製品を使用する必要があった。Hadoopは、このようなデータ処理を一般的なサーバーマシンを複数台接続（スケールアウト）することで可能にする。
+複数のサーバーで構成されるHadoopシステムは、複数台に分散されることでシステムの柔軟性を高める。処理性能を向上させるには、Hadoopクラスターにシステムを追加するだけでよい。Hadoopクラスターシステムは一般的なサーバーマシンで構成できるため、ハードウェア調達が容易である。またソフトウェア面でも、クラスターに追加するサーバーにHadoopシステムをインストールして設定するだけでHadoopクラスターをスケールアップできる。この特徴から、ハードウェア、ソフトウェアの両面で拡張性が高いと言える。
+近年はクラウドサービスを使用して複数台のサーバーを簡単に起動できるようになったため、Hadoopを使用してデータ処理を行いたい場合にだけクラウド上にHadoopクラスターを構築できる。さらに性能が不足すればサーバーを追加し、リソースが余ればサーバーを減らし、1つの処理が終わった時点でHadoopクラスターのすべてのマシンを解放する、といった使い方も可能であるため、今後ますます利用場面が増えると考えられる。
+Hadoopバージョン1まではMapReduceのみの並列処理フレームワークだったが、Hadoopバージョン2からはStorm、Spark、Tez/Impalaなどの他の並列処理フレームワークを利用できるようになった。また、Hadoop上のデータに対するMapReduce（Java）以外の処理インターフェースも増えた。例えばImpalaやTezで動作するHiveやPigを通じて、ユーザーは使い慣れたSQLとほぼ同等のクエリを使用してデータへアクセスできる。さらにStormやSparkではストリーミングによるリアルタイムデータ処理が可能になり、HDFS上に存在するデータ以外でもHadoopシステムを利用できるようになっている。
+Hadoopの特徴 Hadoopは次の4つのCoreモジュールで構成されている。
+Hadoop Distributed File System (HDFS) Hadoop MapReduce Hadoop Common Hadoop YARN また、次の2つはHadoopプロジェクトとは別のモジュールである。
+Apache Ozone Apache Submarine HDFS（Hadoop Distributed File System） Hadoop固有の分散ファイルシステムである。ユーザーには1つの大きなファイルシステムに見えるが、各ノードにまたがってファイルを保存する。1つのノードで障害が発生してもデータの欠損がないよう、デフォルトで3つのノードに同じデータを保持（三重化）している。
+MapReduce 分散されたデータに対して並列に処理を行うためのフレームワークである。Mapステップでは各スレーブノードのデータに対して処理を行い、ReduceステップでMapステップにより複数ノードに分散・実行された処理結果の集約を行う。
+Hadoop Common Hadoopの機能を支援するユーティリティ集合である。
+YARN（Yet Another Resource Negotiator） Hadoopバージョン1までは独立したコンポーネントではなかったが、Hadoopバージョン2ではリソース管理を専門とするモジュールとして独立した。MapReduceリソース、ジョブスケジューリングだけでなく、Giraph、Storm、Spark、Tez/Impalaなど他の分散処理フレームワークのリソース管理も可能になった。
+Apache Ozone Hadoopで分散オブジェクトストレージを実現するためのプロジェクトである。数千億規模のファイルとブロックへ拡張できるよう設計されており、YARNやKubernetesのようなコンテナ環境での動作もサポートする。S3およびHadoop File System APIなど複数のプロトコルを使用してアクセスできる。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。
+Apache Submarine YARNのようなリソース管理プラットフォーム上でディープラーニングアプリケーション（TensorFlow、PyTorch、MxNetなど）を実行できるようにするプロジェクトである。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。Hadoop 2.7.3以上で使用できる。
+Hadoopの使用例 HadoopはMapReduceの代わりに、より高速に処理できるApache Sparkを使用できる。詳細はhttps://openstandia.jp/solution/hadoop-spark/を参照する。
+Hadoopの動作環境 HadoopはJava言語で作られているため、JVMが必要である。2022年4月時点の安定版であるHadoop 3.3.2ではJava 8およびJava 11をサポートする。JVMが実行される環境であればOSは問わない。
+Hadoopが実行されるOS 主要Linuxディストリビューション Windows MacOSX HadoopはOpenJDKで正常に動作することが確認されている。各JDKの動作検証結果は、以下のHadoop Wikiページで確認できる。
+https://cwiki.apache.org/confluence/display/HADOOP/Hadoop&#43;Java&#43;Versions">
+<meta property="og:url" content="https://www.devkuma.com/jp/docs/apache-hadoop/">
+  <meta property="og:site_name" content="devkuma">
+  <meta property="og:title" content="Apache Hadoop">
+  <meta property="og:description" content="Apache Hadoopの概要 Hadoop（ハドゥープ）は、大規模データの蓄積と分析を分散して処理するフレームワークであり、Java言語で実装されている。 Hadoopの元になったのは、Googleの大量データを効率的に処理するための分散処理基盤であるMapReduceとGoogle File Systemである。
+Googleはこのシステムに関する論文を2004年に公開し、それを参考にDoug CuttingとMike Cafarellaによって開発された。Hadoopという名前は、Dougの息子が黄色い象のぬいぐるみに付けた名前に由来し、意味がなく、簡単で、他の場所で使われていないという理由で採用された。黄色い象はHadoopのマスコットキャラクターでもある。
+Hadoopは分散処理基盤であるため、各処理をクラスター内のマシンに分け（Map）、各マシンで処理された結果を集約（Reduce）して最終的な結果を得る。
+近年、大量データ（BigData）の中から目的のデータを抽出したり、保存されたデータから何らかの傾向を読み取ったりするなど、データマイニングへの要求が高まっている。また、BigDataを処理できるだけでなく、より短時間でそのような情報を算出したいという要求も増えている。
+以前はBigDataを処理するためにデータウェアハウスのような専用製品を使用する必要があった。Hadoopは、このようなデータ処理を一般的なサーバーマシンを複数台接続（スケールアウト）することで可能にする。
+複数のサーバーで構成されるHadoopシステムは、複数台に分散されることでシステムの柔軟性を高める。処理性能を向上させるには、Hadoopクラスターにシステムを追加するだけでよい。Hadoopクラスターシステムは一般的なサーバーマシンで構成できるため、ハードウェア調達が容易である。またソフトウェア面でも、クラスターに追加するサーバーにHadoopシステムをインストールして設定するだけでHadoopクラスターをスケールアップできる。この特徴から、ハードウェア、ソフトウェアの両面で拡張性が高いと言える。
+近年はクラウドサービスを使用して複数台のサーバーを簡単に起動できるようになったため、Hadoopを使用してデータ処理を行いたい場合にだけクラウド上にHadoopクラスターを構築できる。さらに性能が不足すればサーバーを追加し、リソースが余ればサーバーを減らし、1つの処理が終わった時点でHadoopクラスターのすべてのマシンを解放する、といった使い方も可能であるため、今後ますます利用場面が増えると考えられる。
+Hadoopバージョン1まではMapReduceのみの並列処理フレームワークだったが、Hadoopバージョン2からはStorm、Spark、Tez/Impalaなどの他の並列処理フレームワークを利用できるようになった。また、Hadoop上のデータに対するMapReduce（Java）以外の処理インターフェースも増えた。例えばImpalaやTezで動作するHiveやPigを通じて、ユーザーは使い慣れたSQLとほぼ同等のクエリを使用してデータへアクセスできる。さらにStormやSparkではストリーミングによるリアルタイムデータ処理が可能になり、HDFS上に存在するデータ以外でもHadoopシステムを利用できるようになっている。
+Hadoopの特徴 Hadoopは次の4つのCoreモジュールで構成されている。
+Hadoop Distributed File System (HDFS) Hadoop MapReduce Hadoop Common Hadoop YARN また、次の2つはHadoopプロジェクトとは別のモジュールである。
+Apache Ozone Apache Submarine HDFS（Hadoop Distributed File System） Hadoop固有の分散ファイルシステムである。ユーザーには1つの大きなファイルシステムに見えるが、各ノードにまたがってファイルを保存する。1つのノードで障害が発生してもデータの欠損がないよう、デフォルトで3つのノードに同じデータを保持（三重化）している。
+MapReduce 分散されたデータに対して並列に処理を行うためのフレームワークである。Mapステップでは各スレーブノードのデータに対して処理を行い、ReduceステップでMapステップにより複数ノードに分散・実行された処理結果の集約を行う。
+Hadoop Common Hadoopの機能を支援するユーティリティ集合である。
+YARN（Yet Another Resource Negotiator） Hadoopバージョン1までは独立したコンポーネントではなかったが、Hadoopバージョン2ではリソース管理を専門とするモジュールとして独立した。MapReduceリソース、ジョブスケジューリングだけでなく、Giraph、Storm、Spark、Tez/Impalaなど他の分散処理フレームワークのリソース管理も可能になった。
+Apache Ozone Hadoopで分散オブジェクトストレージを実現するためのプロジェクトである。数千億規模のファイルとブロックへ拡張できるよう設計されており、YARNやKubernetesのようなコンテナ環境での動作もサポートする。S3およびHadoop File System APIなど複数のプロトコルを使用してアクセスできる。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。
+Apache Submarine YARNのようなリソース管理プラットフォーム上でディープラーニングアプリケーション（TensorFlow、PyTorch、MxNetなど）を実行できるようにするプロジェクトである。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。Hadoop 2.7.3以上で使用できる。
+Hadoopの使用例 HadoopはMapReduceの代わりに、より高速に処理できるApache Sparkを使用できる。詳細はhttps://openstandia.jp/solution/hadoop-spark/を参照する。
+Hadoopの動作環境 HadoopはJava言語で作られているため、JVMが必要である。2022年4月時点の安定版であるHadoop 3.3.2ではJava 8およびJava 11をサポートする。JVMが実行される環境であればOSは問わない。
+Hadoopが実行されるOS 主要Linuxディストリビューション Windows MacOSX HadoopはOpenJDKで正常に動作することが確認されている。各JDKの動作検証結果は、以下のHadoop Wikiページで確認できる。
+https://cwiki.apache.org/confluence/display/HADOOP/Hadoop&#43;Java&#43;Versions">
+  <meta property="og:locale" content="jp">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="410_data-science_bigdata">
+    <meta property="article:published_time" content="2022-12-24T10:22:54+09:00">
+    <meta property="article:modified_time" content="2022-12-24T10:22:54+09:00">
+    <meta property="article:tag" content="BigData">
+    <meta property="article:tag" content="Apache Hadoop">
+
+  <meta itemprop="name" content="Apache Hadoop">
+  <meta itemprop="description" content="Apache Hadoopの概要 Hadoop（ハドゥープ）は、大規模データの蓄積と分析を分散して処理するフレームワークであり、Java言語で実装されている。 Hadoopの元になったのは、Googleの大量データを効率的に処理するための分散処理基盤であるMapReduceとGoogle File Systemである。
+Googleはこのシステムに関する論文を2004年に公開し、それを参考にDoug CuttingとMike Cafarellaによって開発された。Hadoopという名前は、Dougの息子が黄色い象のぬいぐるみに付けた名前に由来し、意味がなく、簡単で、他の場所で使われていないという理由で採用された。黄色い象はHadoopのマスコットキャラクターでもある。
+Hadoopは分散処理基盤であるため、各処理をクラスター内のマシンに分け（Map）、各マシンで処理された結果を集約（Reduce）して最終的な結果を得る。
+近年、大量データ（BigData）の中から目的のデータを抽出したり、保存されたデータから何らかの傾向を読み取ったりするなど、データマイニングへの要求が高まっている。また、BigDataを処理できるだけでなく、より短時間でそのような情報を算出したいという要求も増えている。
+以前はBigDataを処理するためにデータウェアハウスのような専用製品を使用する必要があった。Hadoopは、このようなデータ処理を一般的なサーバーマシンを複数台接続（スケールアウト）することで可能にする。
+複数のサーバーで構成されるHadoopシステムは、複数台に分散されることでシステムの柔軟性を高める。処理性能を向上させるには、Hadoopクラスターにシステムを追加するだけでよい。Hadoopクラスターシステムは一般的なサーバーマシンで構成できるため、ハードウェア調達が容易である。またソフトウェア面でも、クラスターに追加するサーバーにHadoopシステムをインストールして設定するだけでHadoopクラスターをスケールアップできる。この特徴から、ハードウェア、ソフトウェアの両面で拡張性が高いと言える。
+近年はクラウドサービスを使用して複数台のサーバーを簡単に起動できるようになったため、Hadoopを使用してデータ処理を行いたい場合にだけクラウド上にHadoopクラスターを構築できる。さらに性能が不足すればサーバーを追加し、リソースが余ればサーバーを減らし、1つの処理が終わった時点でHadoopクラスターのすべてのマシンを解放する、といった使い方も可能であるため、今後ますます利用場面が増えると考えられる。
+Hadoopバージョン1まではMapReduceのみの並列処理フレームワークだったが、Hadoopバージョン2からはStorm、Spark、Tez/Impalaなどの他の並列処理フレームワークを利用できるようになった。また、Hadoop上のデータに対するMapReduce（Java）以外の処理インターフェースも増えた。例えばImpalaやTezで動作するHiveやPigを通じて、ユーザーは使い慣れたSQLとほぼ同等のクエリを使用してデータへアクセスできる。さらにStormやSparkではストリーミングによるリアルタイムデータ処理が可能になり、HDFS上に存在するデータ以外でもHadoopシステムを利用できるようになっている。
+Hadoopの特徴 Hadoopは次の4つのCoreモジュールで構成されている。
+Hadoop Distributed File System (HDFS) Hadoop MapReduce Hadoop Common Hadoop YARN また、次の2つはHadoopプロジェクトとは別のモジュールである。
+Apache Ozone Apache Submarine HDFS（Hadoop Distributed File System） Hadoop固有の分散ファイルシステムである。ユーザーには1つの大きなファイルシステムに見えるが、各ノードにまたがってファイルを保存する。1つのノードで障害が発生してもデータの欠損がないよう、デフォルトで3つのノードに同じデータを保持（三重化）している。
+MapReduce 分散されたデータに対して並列に処理を行うためのフレームワークである。Mapステップでは各スレーブノードのデータに対して処理を行い、ReduceステップでMapステップにより複数ノードに分散・実行された処理結果の集約を行う。
+Hadoop Common Hadoopの機能を支援するユーティリティ集合である。
+YARN（Yet Another Resource Negotiator） Hadoopバージョン1までは独立したコンポーネントではなかったが、Hadoopバージョン2ではリソース管理を専門とするモジュールとして独立した。MapReduceリソース、ジョブスケジューリングだけでなく、Giraph、Storm、Spark、Tez/Impalaなど他の分散処理フレームワークのリソース管理も可能になった。
+Apache Ozone Hadoopで分散オブジェクトストレージを実現するためのプロジェクトである。数千億規模のファイルとブロックへ拡張できるよう設計されており、YARNやKubernetesのようなコンテナ環境での動作もサポートする。S3およびHadoop File System APIなど複数のプロトコルを使用してアクセスできる。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。
+Apache Submarine YARNのようなリソース管理プラットフォーム上でディープラーニングアプリケーション（TensorFlow、PyTorch、MxNetなど）を実行できるようにするプロジェクトである。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。Hadoop 2.7.3以上で使用できる。
+Hadoopの使用例 HadoopはMapReduceの代わりに、より高速に処理できるApache Sparkを使用できる。詳細はhttps://openstandia.jp/solution/hadoop-spark/を参照する。
+Hadoopの動作環境 HadoopはJava言語で作られているため、JVMが必要である。2022年4月時点の安定版であるHadoop 3.3.2ではJava 8およびJava 11をサポートする。JVMが実行される環境であればOSは問わない。
+Hadoopが実行されるOS 主要Linuxディストリビューション Windows MacOSX HadoopはOpenJDKで正常に動作することが確認されている。各JDKの動作検証結果は、以下のHadoop Wikiページで確認できる。
+https://cwiki.apache.org/confluence/display/HADOOP/Hadoop&#43;Java&#43;Versions">
+  <meta itemprop="datePublished" content="2022-12-24T10:22:54+09:00">
+  <meta itemprop="dateModified" content="2022-12-24T10:22:54+09:00">
+  <meta itemprop="wordCount" content="244">
+  <meta itemprop="keywords" content="BigData,Apache Hadoop">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Apache Hadoop">
+  <meta name="twitter:description" content="Apache Hadoopの概要 Hadoop（ハドゥープ）は、大規模データの蓄積と分析を分散して処理するフレームワークであり、Java言語で実装されている。 Hadoopの元になったのは、Googleの大量データを効率的に処理するための分散処理基盤であるMapReduceとGoogle File Systemである。
+Googleはこのシステムに関する論文を2004年に公開し、それを参考にDoug CuttingとMike Cafarellaによって開発された。Hadoopという名前は、Dougの息子が黄色い象のぬいぐるみに付けた名前に由来し、意味がなく、簡単で、他の場所で使われていないという理由で採用された。黄色い象はHadoopのマスコットキャラクターでもある。
+Hadoopは分散処理基盤であるため、各処理をクラスター内のマシンに分け（Map）、各マシンで処理された結果を集約（Reduce）して最終的な結果を得る。
+近年、大量データ（BigData）の中から目的のデータを抽出したり、保存されたデータから何らかの傾向を読み取ったりするなど、データマイニングへの要求が高まっている。また、BigDataを処理できるだけでなく、より短時間でそのような情報を算出したいという要求も増えている。
+以前はBigDataを処理するためにデータウェアハウスのような専用製品を使用する必要があった。Hadoopは、このようなデータ処理を一般的なサーバーマシンを複数台接続（スケールアウト）することで可能にする。
+複数のサーバーで構成されるHadoopシステムは、複数台に分散されることでシステムの柔軟性を高める。処理性能を向上させるには、Hadoopクラスターにシステムを追加するだけでよい。Hadoopクラスターシステムは一般的なサーバーマシンで構成できるため、ハードウェア調達が容易である。またソフトウェア面でも、クラスターに追加するサーバーにHadoopシステムをインストールして設定するだけでHadoopクラスターをスケールアップできる。この特徴から、ハードウェア、ソフトウェアの両面で拡張性が高いと言える。
+近年はクラウドサービスを使用して複数台のサーバーを簡単に起動できるようになったため、Hadoopを使用してデータ処理を行いたい場合にだけクラウド上にHadoopクラスターを構築できる。さらに性能が不足すればサーバーを追加し、リソースが余ればサーバーを減らし、1つの処理が終わった時点でHadoopクラスターのすべてのマシンを解放する、といった使い方も可能であるため、今後ますます利用場面が増えると考えられる。
+Hadoopバージョン1まではMapReduceのみの並列処理フレームワークだったが、Hadoopバージョン2からはStorm、Spark、Tez/Impalaなどの他の並列処理フレームワークを利用できるようになった。また、Hadoop上のデータに対するMapReduce（Java）以外の処理インターフェースも増えた。例えばImpalaやTezで動作するHiveやPigを通じて、ユーザーは使い慣れたSQLとほぼ同等のクエリを使用してデータへアクセスできる。さらにStormやSparkではストリーミングによるリアルタイムデータ処理が可能になり、HDFS上に存在するデータ以外でもHadoopシステムを利用できるようになっている。
+Hadoopの特徴 Hadoopは次の4つのCoreモジュールで構成されている。
+Hadoop Distributed File System (HDFS) Hadoop MapReduce Hadoop Common Hadoop YARN また、次の2つはHadoopプロジェクトとは別のモジュールである。
+Apache Ozone Apache Submarine HDFS（Hadoop Distributed File System） Hadoop固有の分散ファイルシステムである。ユーザーには1つの大きなファイルシステムに見えるが、各ノードにまたがってファイルを保存する。1つのノードで障害が発生してもデータの欠損がないよう、デフォルトで3つのノードに同じデータを保持（三重化）している。
+MapReduce 分散されたデータに対して並列に処理を行うためのフレームワークである。Mapステップでは各スレーブノードのデータに対して処理を行い、ReduceステップでMapステップにより複数ノードに分散・実行された処理結果の集約を行う。
+Hadoop Common Hadoopの機能を支援するユーティリティ集合である。
+YARN（Yet Another Resource Negotiator） Hadoopバージョン1までは独立したコンポーネントではなかったが、Hadoopバージョン2ではリソース管理を専門とするモジュールとして独立した。MapReduceリソース、ジョブスケジューリングだけでなく、Giraph、Storm、Spark、Tez/Impalaなど他の分散処理フレームワークのリソース管理も可能になった。
+Apache Ozone Hadoopで分散オブジェクトストレージを実現するためのプロジェクトである。数千億規模のファイルとブロックへ拡張できるよう設計されており、YARNやKubernetesのようなコンテナ環境での動作もサポートする。S3およびHadoop File System APIなど複数のプロトコルを使用してアクセスできる。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。
+Apache Submarine YARNのようなリソース管理プラットフォーム上でディープラーニングアプリケーション（TensorFlow、PyTorch、MxNetなど）を実行できるようにするプロジェクトである。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。Hadoop 2.7.3以上で使用できる。
+Hadoopの使用例 HadoopはMapReduceの代わりに、より高速に処理できるApache Sparkを使用できる。詳細はhttps://openstandia.jp/solution/hadoop-spark/を参照する。
+Hadoopの動作環境 HadoopはJava言語で作られているため、JVMが必要である。2022年4月時点の安定版であるHadoop 3.3.2ではJava 8およびJava 11をサポートする。JVMが実行される環境であればOSは問わない。
+Hadoopが実行されるOS 主要Linuxディストリビューション Windows MacOSX HadoopはOpenJDKで正常に動作することが確認されている。各JDKの動作検証結果は、以下のHadoop Wikiページで確認できる。
+https://cwiki.apache.org/confluence/display/HADOOP/Hadoop&#43;Java&#43;Versions">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/jp/docs/apache-hadoop/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/jp/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/jp/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/computer/basic/">コンピューターの基礎知識</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/spring/">Spring framework</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-database'></i>
+          <span>Data Science</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/big-data/">Big Data</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/rdb/">Relational Database</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/data-science/" role="button">
+          <span>Data Science</span>
+				</a>
+      </li>
+      
+			
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/jp/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+      </li>
+      
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+      </li>
+      
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">日本語</span>
+    <span class="td-lang-menu__title-code">JP</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/apache-hadoop/">한국어</a></li>
+      <li><a class="dropdown-item" href="/en/docs/apache-hadoop/">English</a></li>
+      <li><span class="dropdown-item active">日本語</span></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-jpdocsapache-hadoop").addClass("active");
+    $("#td-section-nav #m-jpdocsapache-hadoop-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-jpdocsapache-hadoop").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-jpdocsapache-hadoop-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-jpdocsapache-hadoop-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocscategorydata-sciencebig-data-li">
+    <a href="/jp/docs/category/data-science/big-data/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-jpdocscategorydata-sciencebig-data"><span class="">ビッグデータ</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsbig-data-li">
+    <input type="checkbox" id="m-jpdocsbig-data-check"/>
+    <label for="m-jpdocsbig-data-check"><a href="/jp/docs/big-data/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsbig-data"><span class="">ビッグデータ</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmqttintro-li">
+    <input type="checkbox" id="m-jpdocsmqttintro-check"/>
+    <label for="m-jpdocsmqttintro-check"><a href="/jp/docs/mqtt/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsmqttintro"><span class="">MQTT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-hadoop-li">
+    <input type="checkbox" id="m-jpdocsapache-hadoop-check"/>
+    <label for="m-jpdocsapache-hadoop-check"><a href="/jp/docs/apache-hadoop/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsapache-hadoop"><span class="">Apache Hadoop</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-spark-li">
+    <input type="checkbox" id="m-jpdocsapache-spark-check"/>
+    <label for="m-jpdocsapache-spark-check"><a href="/jp/docs/apache-spark/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsapache-spark"><span class="">Apache Spark</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocspyspark-li">
+    <input type="checkbox" id="m-jpdocspyspark-check"/>
+    <label for="m-jpdocspyspark-check"><a href="/jp/docs/pyspark/" title="PySparkの概念と主な機能" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocspyspark"><span class="">PySpark</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsdata-intensive-application-li">
+    <input type="checkbox" id="m-jpdocsdata-intensive-application-check"/>
+    <label for="m-jpdocsdata-intensive-application-check"><a href="/jp/docs/data-intensive-application/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsdata-intensive-application"><span class="">データ指向アプリケーションデザイン</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-kafka-li">
+    <input type="checkbox" id="m-jpdocsapache-kafka-check"/>
+    <label for="m-jpdocsapache-kafka-check"><a href="/jp/docs/apache-kafka/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsapache-kafka"><span class="">Apache Kafka</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-phoenix-li">
+    <input type="checkbox" id="m-jpdocsapache-phoenix-check"/>
+    <label for="m-jpdocsapache-phoenix-check"><a href="/jp/docs/apache-phoenix/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsapache-phoenix"><span class="">Apache Phoenix</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-zookeeper-li">
+    <input type="checkbox" id="m-jpdocsapache-zookeeper-check"/>
+    <label for="m-jpdocsapache-zookeeper-check"><a href="/jp/docs/apache-zookeeper/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsapache-zookeeper"><span class="">Apache ZooKeeper</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstidb-li">
+    <input type="checkbox" id="m-jpdocstidb-check"/>
+    <label for="m-jpdocstidb-check"><a href="/jp/docs/tidb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidb"><span class="">TiDB</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstidbabout-li">
+    <input type="checkbox" id="m-jpdocstidbabout-check"/>
+    <label for="m-jpdocstidbabout-check"><a href="/jp/docs/tidb/about/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidbabout"><span class="">TiDBについて</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidboverview-li">
+    <input type="checkbox" id="m-jpdocstidboverview-check"/>
+    <label for="m-jpdocstidboverview-check"><a href="/jp/docs/tidb/overview/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstidboverview"><span class="">TiDBの概要</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidbexperimental-features-li">
+    <input type="checkbox" id="m-jpdocstidbexperimental-features-check"/>
+    <label for="m-jpdocstidbexperimental-features-check"><a href="/jp/docs/tidb/experimental-features/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstidbexperimental-features"><span class="">TiDBの実験的機能</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidbtidb-limitations-li">
+    <input type="checkbox" id="m-jpdocstidbtidb-limitations-check"/>
+    <label for="m-jpdocstidbtidb-limitations-check"><a href="/jp/docs/tidb/tidb-limitations/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstidbtidb-limitations"><span class="">TiDBの制限事項</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstidbtutorial-li">
+    <input type="checkbox" id="m-jpdocstidbtutorial-check"/>
+    <label for="m-jpdocstidbtutorial-check"><a href="/jp/docs/tidb/tutorial/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidbtutorial"><span class="">TiDBのインストール</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidbhardware-and-software-requirements-li">
+    <input type="checkbox" id="m-jpdocstidbhardware-and-software-requirements-check"/>
+    <label for="m-jpdocstidbhardware-and-software-requirements-check"><a href="/jp/docs/tidb/hardware-and-software-requirements/" title="TiDBのソフトウェアおよびハードウェア推奨事項" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstidbhardware-and-software-requirements"><span class="">ソフトウェアおよびハードウェア推奨事項</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidbquick-start-li">
+    <input type="checkbox" id="m-jpdocstidbquick-start-check"/>
+    <label for="m-jpdocstidbquick-start-check"><a href="/jp/docs/tidb/quick-start/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidbquick-start"><span class="">クイックスタート</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidbcluster-architecture-li">
+    <input type="checkbox" id="m-jpdocstidbcluster-architecture-check"/>
+    <label for="m-jpdocstidbcluster-architecture-check"><a href="/jp/docs/tidb/cluster-architecture/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidbcluster-architecture"><span class="">クラスターアーキテクチャ</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocstidbfailover-li">
+    <input type="checkbox" id="m-jpdocstidbfailover-check"/>
+    <label for="m-jpdocstidbfailover-check"><a href="/jp/docs/tidb/failover/" title="TiDBの自動フェイルオーバー" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocstidbfailover"><span class="">自動フェイルオーバー</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocstidboperator-li">
+    <input type="checkbox" id="m-jpdocstidboperator-check"/>
+    <label for="m-jpdocstidboperator-check"><a href="/jp/docs/tidb/operator/" title="TiDB Operator - 自動フェイルオーバー" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocstidboperator"><span class="">TiDB Operator</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsvector-db-li">
+    <input type="checkbox" id="m-jpdocsvector-db-check"/>
+    <label for="m-jpdocsvector-db-check"><a href="/jp/docs/vector-db/" title="VectorDB（ベクトルデータベース）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsvector-db"><span class="">VectorDB</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsinfluxdb-li">
+    <input type="checkbox" id="m-jpdocsinfluxdb-check"/>
+    <label for="m-jpdocsinfluxdb-check"><a href="/jp/docs/influxdb/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsinfluxdb"><span class="">InfluxDB</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#apache-hadoopの概要">Apache Hadoopの概要</a></li>
+    <li><a href="#hadoopの特徴">Hadoopの特徴</a>
+      <ul>
+        <li><a href="#hdfshadoop-distributed-file-system">HDFS（Hadoop Distributed File System）</a></li>
+        <li><a href="#mapreduce">MapReduce</a></li>
+        <li><a href="#hadoop-common">Hadoop Common</a></li>
+        <li><a href="#yarnyet-another-resource-negotiator">YARN（Yet Another Resource Negotiator）</a></li>
+        <li><a href="#apache-ozone">Apache Ozone</a></li>
+        <li><a href="#apache-submarine">Apache Submarine</a></li>
+      </ul>
+    </li>
+    <li><a href="#hadoopの使用例">Hadoopの使用例</a></li>
+    <li><a href="#hadoopの動作環境">Hadoopの動作環境</a>
+      <ul>
+        <li><a href="#hadoopが実行されるos">Hadoopが実行されるOS</a></li>
+      </ul>
+    </li>
+    <li><a href="#hadoopライセンス">Hadoopライセンス</a></li>
+    <li><a href="#hadoop公式サイト">Hadoop公式サイト</a></li>
+    <li><a href="#hadoopダウンロード">Hadoopダウンロード</a></li>
+    <li><a href="#hadoopを構成する3つのレイヤー">Hadoopを構成する3つのレイヤー</a>
+      <ul>
+        <li><a href="#分散処理エンジン">分散処理エンジン</a></li>
+        <li><a href="#リソースマネージャー">リソースマネージャー</a></li>
+        <li><a href="#分散ファイルシステム">分散ファイルシステム</a></li>
+      </ul>
+    </li>
+    <li><a href="#hadoopエコシステム一覧">Hadoopエコシステム一覧</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/calibre/" data-taxonomy-term="calibre"><span class="taxonomy-label">Calibre</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/epub/" data-taxonomy-term="epub"><span class="taxonomy-label">EPub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage Collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/it%E7%94%A8%E8%AA%9E/" data-taxonomy-term="it%E7%94%A8%E8%AA%9E"><span class="taxonomy-label">IT用語</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">155</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">143</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">Mockk</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sigil/" data-taxonomy-term="sigil"><span class="taxonomy-label">Sigil</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sre/" data-taxonomy-term="sre"><span class="taxonomy-label">SRE</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vectordb/" data-taxonomy-term="vectordb"><span class="taxonomy-label">VectorDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">Web</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0/" data-taxonomy-term="%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="taxonomy-label">アルゴリズム</span><span class="taxonomy-count">55</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%82%B2%E3%83%BC%E3%83%A0/" data-taxonomy-term="%E3%82%B2%E3%83%BC%E3%83%A0"><span class="taxonomy-label">ゲーム</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%AD%E3%83%A5%E3%83%BC/" data-taxonomy-term="%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%AD%E3%83%A5%E3%83%BC"><span class="taxonomy-label">メッセージキュー</span><span class="taxonomy-count">1</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/category/data-science/big-data/">ビッグデータ</a></li>
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/big-data/">ビッグデータ</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Apache Hadoop</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>Apache Hadoop</h1>
+	
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<h2 id="apache-hadoopの概要">Apache Hadoopの概要</h2>
+<p>Hadoop（ハドゥープ）は、大規模データの蓄積と分析を分散して処理するフレームワークであり、Java言語で実装されている。
+Hadoopの元になったのは、Googleの大量データを効率的に処理するための分散処理基盤であるMapReduceとGoogle File Systemである。</p>
+<p>Googleはこのシステムに関する論文を2004年に公開し、それを参考にDoug CuttingとMike Cafarellaによって開発された。Hadoopという名前は、Dougの息子が黄色い象のぬいぐるみに付けた名前に由来し、意味がなく、簡単で、他の場所で使われていないという理由で採用された。黄色い象はHadoopのマスコットキャラクターでもある。</p>
+<p><img src="/docs/apache-hadoop/apache-hadoop.png" alt="Hadoopキャラクター"></p>
+<p>Hadoopは分散処理基盤であるため、各処理をクラスター内のマシンに分け（Map）、各マシンで処理された結果を集約（Reduce）して最終的な結果を得る。<br>
+近年、大量データ（BigData）の中から目的のデータを抽出したり、保存されたデータから何らかの傾向を読み取ったりするなど、データマイニングへの要求が高まっている。また、BigDataを処理できるだけでなく、より短時間でそのような情報を算出したいという要求も増えている。<br>
+以前はBigDataを処理するためにデータウェアハウスのような専用製品を使用する必要があった。Hadoopは、このようなデータ処理を一般的なサーバーマシンを複数台接続（スケールアウト）することで可能にする。</p>
+<p>複数のサーバーで構成されるHadoopシステムは、複数台に分散されることでシステムの柔軟性を高める。処理性能を向上させるには、Hadoopクラスターにシステムを追加するだけでよい。Hadoopクラスターシステムは一般的なサーバーマシンで構成できるため、ハードウェア調達が容易である。またソフトウェア面でも、クラスターに追加するサーバーにHadoopシステムをインストールして設定するだけでHadoopクラスターをスケールアップできる。この特徴から、ハードウェア、ソフトウェアの両面で拡張性が高いと言える。</p>
+<p>近年はクラウドサービスを使用して複数台のサーバーを簡単に起動できるようになったため、Hadoopを使用してデータ処理を行いたい場合にだけクラウド上にHadoopクラスターを構築できる。さらに性能が不足すればサーバーを追加し、リソースが余ればサーバーを減らし、1つの処理が終わった時点でHadoopクラスターのすべてのマシンを解放する、といった使い方も可能であるため、今後ますます利用場面が増えると考えられる。</p>
+<p>Hadoopバージョン1まではMapReduceのみの並列処理フレームワークだったが、Hadoopバージョン2からはStorm、Spark、Tez/Impalaなどの他の並列処理フレームワークを利用できるようになった。また、Hadoop上のデータに対するMapReduce（Java）以外の処理インターフェースも増えた。例えばImpalaやTezで動作するHiveやPigを通じて、ユーザーは使い慣れたSQLとほぼ同等のクエリを使用してデータへアクセスできる。さらにStormやSparkではストリーミングによるリアルタイムデータ処理が可能になり、HDFS上に存在するデータ以外でもHadoopシステムを利用できるようになっている。</p>
+<h2 id="hadoopの特徴">Hadoopの特徴</h2>
+<p>Hadoopは次の4つのCoreモジュールで構成されている。</p>
+<ul>
+<li>Hadoop Distributed File System (HDFS)</li>
+<li>Hadoop MapReduce</li>
+<li>Hadoop Common</li>
+<li>Hadoop YARN</li>
+</ul>
+<p>また、次の2つはHadoopプロジェクトとは別のモジュールである。</p>
+<ul>
+<li>Apache Ozone</li>
+<li>Apache Submarine</li>
+</ul>
+<h3 id="hdfshadoop-distributed-file-system">HDFS（Hadoop Distributed File System）</h3>
+<p>Hadoop固有の分散ファイルシステムである。ユーザーには1つの大きなファイルシステムに見えるが、各ノードにまたがってファイルを保存する。1つのノードで障害が発生してもデータの欠損がないよう、デフォルトで3つのノードに同じデータを保持（三重化）している。</p>
+<h3 id="mapreduce">MapReduce</h3>
+<p>分散されたデータに対して並列に処理を行うためのフレームワークである。Mapステップでは各スレーブノードのデータに対して処理を行い、ReduceステップでMapステップにより複数ノードに分散・実行された処理結果の集約を行う。</p>
+<h3 id="hadoop-common">Hadoop Common</h3>
+<p>Hadoopの機能を支援するユーティリティ集合である。</p>
+<h3 id="yarnyet-another-resource-negotiator">YARN（Yet Another Resource Negotiator）</h3>
+<p>Hadoopバージョン1までは独立したコンポーネントではなかったが、Hadoopバージョン2ではリソース管理を専門とするモジュールとして独立した。MapReduceリソース、ジョブスケジューリングだけでなく、Giraph、Storm、Spark、Tez/Impalaなど他の分散処理フレームワークのリソース管理も可能になった。</p>
+<h3 id="apache-ozone">Apache Ozone</h3>
+<p>Hadoopで分散オブジェクトストレージを実現するためのプロジェクトである。数千億規模のファイルとブロックへ拡張できるよう設計されており、YARNやKubernetesのようなコンテナ環境での動作もサポートする。S3およびHadoop File System APIなど複数のプロトコルを使用してアクセスできる。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。</p>
+<h3 id="apache-submarine">Apache Submarine</h3>
+<p>YARNのようなリソース管理プラットフォーム上でディープラーニングアプリケーション（TensorFlow、PyTorch、MxNetなど）を実行できるようにするプロジェクトである。元々はHadoopのサブプロジェクトだったが、Apacheトップレベルプロジェクトの一つとして独立した。Hadoop 2.7.3以上で使用できる。</p>
+<h2 id="hadoopの使用例">Hadoopの使用例</h2>
+<p>HadoopはMapReduceの代わりに、より高速に処理できるApache Sparkを使用できる。詳細はhttps://openstandia.jp/solution/hadoop-spark/を参照する。</p>
+<h2 id="hadoopの動作環境">Hadoopの動作環境</h2>
+<p>HadoopはJava言語で作られているため、JVMが必要である。2022年4月時点の安定版であるHadoop 3.3.2ではJava 8およびJava 11をサポートする。JVMが実行される環境であればOSは問わない。</p>
+<h3 id="hadoopが実行されるos">Hadoopが実行されるOS</h3>
+<ul>
+<li>主要Linuxディストリビューション</li>
+<li>Windows</li>
+<li>MacOSX</li>
+</ul>
+<p>HadoopはOpenJDKで正常に動作することが確認されている。各JDKの動作検証結果は、以下のHadoop Wikiページで確認できる。<br>
+<a href="https://cwiki.apache.org/confluence/display/HADOOP/Hadoop&#43;Java&#43;Versions" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/HADOOP/Hadoop+Java+Versions<i class="fas fa-external-link-alt"></i></a></p>
+<p>Hadoopはコンパイル済みバイナリパッケージと、ユーザーが直接コンパイルするソース版の両方を提供する。<br>
+コンパイル済みバイナリパッケージはすぐに使用できる一方で、拡張できない設定もあるため、ユーザーが必要な機能を有効にするにはソースからビルドする必要がある場合もある。</p>
+<h2 id="hadoopライセンス">Hadoopライセンス</h2>
+<p>HadoopはApacheのトップレベルプロジェクトの一つである。<br>
+ライセンスはApache License 2.0であり、ユーザーはソフトウェアの使用、配布、修正、派生版配布に制限を受けない。</p>
+<h2 id="hadoop公式サイト">Hadoop公式サイト</h2>
+<p>Hadoopの公式サイトは以下のURLである。
+<a href="http://hadoop.apache.org/" target="_blank" rel="noopener">http://hadoop.apache.org/<i class="fas fa-external-link-alt"></i></a></p>
+<p>また、Hadoop公式WikiページにはHadoopに関するさまざまな情報がある。
+<a href="https://cwiki.apache.org/confluence/display/HADOOP/Home" target="_blank" rel="noopener">https://cwiki.apache.org/confluence/display/HADOOP/Home<i class="fas fa-external-link-alt"></i></a></p>
+<h2 id="hadoopダウンロード">Hadoopダウンロード</h2>
+<p><a href="https://hadoop.apache.org/releases.html" target="_blank" rel="noopener">https://hadoop.apache.org/releases.html<i class="fas fa-external-link-alt"></i></a></p>
+<h2 id="hadoopを構成する3つのレイヤー">Hadoopを構成する3つのレイヤー</h2>
+<p>Hadoopアーキテクチャは主に次の3つのレイヤーで構成される。</p>
+<ul>
+<li>分散処理エンジン（HadoopではHadoop MapReduceを使用）</li>
+<li>リソースマネージャー（HadoopではHadoop YARNを使用）</li>
+<li>分散ファイルシステム（HadoopではHDFSを使用）</li>
+</ul>
+<p>そして、Hadoopはデータにアクセスするためにクエリエンジンを使用することが多い。</p>
+<p>Hadoopはすべてのコンピューターに上記の構成をインストールし、データの読み書きと処理を分散する。</p>
+<h3 id="分散処理エンジン">分散処理エンジン</h3>
+<p>分散処理エンジンは、Hadoopで並列分散処理を担当するソフトウェア群である。</p>
+<p>基本的にはMapReduceという分散処理エンジンが実行される。</p>
+<div class="alert alert-primary" role="alert"><div class="h4 alert-heading" role="heading">MapReduce処理概要</div>
+
+
+MapReduceは次のように分散処理を行う。
+
+- Map: 入力をkey-value形式で出力し、各Mapをノード別に分散可能
+- Shuffle: Map出力をソート
+- Reduce: 同じキーを集約
+</div>
+
+<p>代表的な分散処理エンジンの特徴は次のとおりである。下に行くほど速い。</p>
+<ul>
+<li>MapReduce: 中間結果をHDFS（ストレージ）へ出力</li>
+<li>Tez: 中間結果をYARNコンテナ（ストレージ）へ出力</li>
+<li>Spark: 中間結果をメモリへ出力</li>
+</ul>
+<p>なお、MapReduceは終わらないコンテンツのように見えるため、TezやSparkを使用することを推奨する。</p>
+<h3 id="リソースマネージャー">リソースマネージャー</h3>
+<p>リソースマネージャーは、Hadoopでリソース（CPU、メモリ）管理を担当する。</p>
+<p>MapReduceで使用するリソースマネージャーは、アプリケーションレベルコンテナを管理するHadoop YARNである。</p>
+<p>そのほかに、OSレベルコンテナを管理するApache Mesosもある。こちらはDockerのような技術（Linuxコンテナ）を利用する。</p>
+<h3 id="分散ファイルシステム">分散ファイルシステム</h3>
+<p>分散ファイルシステムは、Hadoopでデータの読み書き分散を担当する。Hadoopで使用される分散ファイルシステムには次が含まれる。</p>
+<ul>
+<li>HDFS: Hadoop標準ファイルシステム</li>
+<li>EMRFS: Amazon S3をストレージとして使用するファイルシステム</li>
+<li>MapR-FS: C言語でHDFSを書き直したファイルシステム。高速である。</li>
+</ul>
+<p>そのほかにもCloud StorageまたはBlob Storageをストレージとして使用できるように見えるが、内部的にどの分散ファイルシステムを使用するかは分からない。</p>
+<h2 id="hadoopエコシステム一覧">Hadoopエコシステム一覧</h2>
+<p>デフォルトではないHadoopを構成するソフトウェア、または周辺ソフトウェアをHadoopエコシステムという。</p>
+<p>Hadoopエコシステムは次のように組み合わせて、さまざまな分散処理を実行できる。</p>
+<ul>
+<li>データウェアハウス構成例: Hadoop + Tez + Hive
+<ul>
+<li>Hiveを使用してHadoopをSQLで操作できる。</li>
+</ul>
+</li>
+<li>機械学習構成例: Hadoop + Spark
+<ul>
+<li>機械学習でよく発生する反復処理をSparkのインメモリ処理で効率化できる。</li>
+</ul>
+</li>
+<li>全文検索構成例: Hadoop + Elasticsearch
+<ul>
+<li>Elasticsearch for Apache Hadoopを使用して全文検索サービスを実装できる。</li>
+<li>Hadoopの分散ファイルシステムとしてElasticsearchクラスターを活用する。</li>
+</ul>
+</li>
+<li>ストリーム処理構成例: 各サーバーおよびIoTデバイス &ndash;&gt; Kafka &ndash;&gt; Hadoop
+<ul>
+<li>複数サーバーおよびIoTデバイスからストリーム処理を行い、Hadoopにデータを集約するにはKafkaを使用する。</li>
+</ul>
+</li>
+</ul>
+<p>以下に代表的なHadoopエコシステムと関連システム、およびその機能を紹介する。</p>
+<table>
+  <thead>
+      <tr>
+          <th>Hadoopエコシステム</th>
+          <th>実現する機能</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Apache Accumulo</td>
+          <td>KVS型のNoSQL。セキュリティ重視</td>
+      </tr>
+      <tr>
+          <td>Apache Atlas</td>
+          <td>ガバナンス制御、コンプライアンス対応</td>
+      </tr>
+      <tr>
+          <td>Cascading</td>
+          <td>MapReduceを簡単に扱うAPI</td>
+      </tr>
+      <tr>
+          <td>Apache Drill</td>
+          <td>エッジ機器データを操作する分散SQLエンジン</td>
+      </tr>
+      <tr>
+          <td>Apache Falcon</td>
+          <td>データライフサイクル管理</td>
+      </tr>
+      <tr>
+          <td>Apache Flume</td>
+          <td>複数データソースからHadoopへ非構造化データを集約（ストリームデータ処理）</td>
+      </tr>
+      <tr>
+          <td>Apache HBase</td>
+          <td>KVS型NoSQL</td>
+      </tr>
+      <tr>
+          <td>Apache Hive</td>
+          <td>SQLライク（HiveQL）なクエリでデータを操作できる。耐障害性重視の場合。DWH実現</td>
+      </tr>
+      <tr>
+          <td>Apache Hue</td>
+          <td>HadoopおよびHadoopエコシステムをGUIで操作</td>
+      </tr>
+      <tr>
+          <td>Apache Impala</td>
+          <td>SQLライク（Impala SQL）なクエリでデータを操作できる。速度重視の場合。リアルタイム処理実現</td>
+      </tr>
+      <tr>
+          <td>Apache Kafka</td>
+          <td>複数データソースからHadoopへ非構造化データを集約（ストリームデータ処理）。Flumeとの差は別途参照</td>
+      </tr>
+      <tr>
+          <td>Apache Knox</td>
+          <td>中央集中型認証およびアクセス管理</td>
+      </tr>
+      <tr>
+          <td>Apache Mahout</td>
+          <td>線形代数、統計分析、機械学習ライブラリ</td>
+      </tr>
+      <tr>
+          <td>Apache Mesos</td>
+          <td>OSレベルコンテナを管理するリソースマネージャー</td>
+      </tr>
+      <tr>
+          <td>Apache Oozie</td>
+          <td>ジョブスケジューラー</td>
+      </tr>
+      <tr>
+          <td>Apache Phoenix</td>
+          <td>HBaseをデータストアとして使用するリアルタイムRDB</td>
+      </tr>
+      <tr>
+          <td>Apache Pig</td>
+          <td>データ処理（ETL）ツール</td>
+      </tr>
+      <tr>
+          <td>Apache Ranger</td>
+          <td>認証済みユーザーへ属性ベースのアクセス権限を付与</td>
+      </tr>
+      <tr>
+          <td>Apache Sentry</td>
+          <td>認証済みユーザーへロールベースのアクセス権限を付与</td>
+      </tr>
+      <tr>
+          <td>Apache Slider</td>
+          <td>YARNアプリケーション制御。長時間起動している場合はKillするなど</td>
+      </tr>
+      <tr>
+          <td>Apache Solr</td>
+          <td>全文検索（Elasticsearchで使用される）</td>
+      </tr>
+      <tr>
+          <td>Apache Spark</td>
+          <td>機械学習、SQL操作、R言語、グラフをメモリ内で処理</td>
+      </tr>
+      <tr>
+          <td>Apache Sqoop</td>
+          <td>RDBMSからHadoopへ構造化データをインポート、エクスポート</td>
+      </tr>
+      <tr>
+          <td>Apache Tez</td>
+          <td>MapReduceより高速な分散処理フレームワーク</td>
+      </tr>
+      <tr>
+          <td>Presto</td>
+          <td>中間結果をメモリへ出力するSQLクエリエンジン</td>
+      </tr>
+  </tbody>
+</table>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
