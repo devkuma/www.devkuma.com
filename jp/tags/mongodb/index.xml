@@ -1,0 +1,595 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – MongoDB</title>
+    <link>https://www.devkuma.com/jp/tags/mongodb/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/mongodb/logo/180x180.jpg</url>
+      <title>MongoDB</title>
+      <link>https://www.devkuma.com/jp/tags/mongodb/</link>
+    </image>
+    <description>Recent content in MongoDB on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/mongodb/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>MongoDB シャーディングの概要</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/sharding/intro/</link>
+      <pubDate>Wed, 19 Jan 2022 09:19:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/sharding/intro/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;スケーリングscaling&#34;&gt;スケーリング(scaling)&lt;/h2&gt;
+&lt;p&gt;シャーディングについて話す前に、まずスケーリングについて見てみよう。&lt;/p&gt;
+&lt;p&gt;一般的なスケーリングで言えば、システム規模が大きくなるとスケーリング、つまり拡張が必要になる。スケーリング方法は大きく「垂直スケーリング」と「水平スケーリング」の2種類に分けられる。&lt;/p&gt;
+&lt;h3 id=&#34;垂直スケーリング&#34;&gt;垂直スケーリング&lt;/h3&gt;
+&lt;p&gt;垂直スケーリングは、CPU、RAM、ストレージをより高性能なものへ交換していく方法である。スケーリングは簡単だが、そもそも CPU やメモリには限界があるため、ある程度の性能限界がある。&lt;/p&gt;
+&lt;h3 id=&#34;水平スケーリング&#34;&gt;水平スケーリング&lt;/h3&gt;
+&lt;p&gt;データセットごとにシステムを分割し、複数のサーバーから並列で処理する方法である。総合的な性能は垂直スケーリングより高くできるが、スケーリングするほど複雑性が増すため管理が難しくなる。&lt;/p&gt;
+&lt;h2 id=&#34;シャーディングshardingとは&#34;&gt;シャーディング(sharding)とは?&lt;/h2&gt;
+&lt;p&gt;シャーディングとは、データを複数サーバーに分散させる「水平スケーリング」の仕組みである。&lt;/p&gt;
+&lt;p&gt;シャーディングには大きく3つの利点がある。「読み書き処理が速くなり、性能を上げやすい」、「ストレージを増設しやすい」、「可用性が高い」である。それぞれの詳細を以下で見ていく。MongoDB は標準機能としてシャーディング、つまり水平スケーリングをサポートする。&lt;/p&gt;
+&lt;h3 id=&#34;読み書き&#34;&gt;読み書き&lt;/h3&gt;
+&lt;p&gt;データをシャードクラスターに分散して保存すると、読み書き処理、つまりファイル I/O を分散処理できる。ファイルの読み書きは遅い処理であるため、これを分散することでより高速な読み書きが可能になる。また、読み書きの負荷が増えても、サーバーを増やすことで水平スケーリングできる。&lt;/p&gt;
+&lt;h3 id=&#34;ストレージ&#34;&gt;ストレージ&lt;/h3&gt;
+&lt;p&gt;シャードクラスターには、分割されたデータが分散して保存される。データ量が増える場合でも、サーバーを増やして水平スケーリングできる。&lt;/p&gt;
+&lt;h3 id=&#34;高可用性&#34;&gt;高可用性&lt;/h3&gt;
+&lt;p&gt;シャードクラスターでは部分的な読み書きが可能である。読み書きできない場合でも、作業を実行できるシャードサーバーから取得できることがある。&lt;/p&gt;
+&lt;h2 id=&#34;シャードクラスター&#34;&gt;シャードクラスター&lt;/h2&gt;
+&lt;p&gt;MongoDB のシャーディングは、シャード、ルーター、構成サーバーという3つの構成要素から成る。それぞれの関係と説明は次のとおりである。&lt;/p&gt;
+&lt;h3 id=&#34;シャード&#34;&gt;シャード&lt;/h3&gt;
+&lt;p&gt;シャードサーバーには、コレクションを分割した断片データ、つまりチャンクを保存する。シャードサーバーはレプリカセットとして構成できる。&lt;/p&gt;
+&lt;h3 id=&#34;ルーター&#34;&gt;ルーター&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;mongos&lt;/code&gt; はクエリルーターであり、アプリケーションからシャードクラスターへのインターフェースを提供する。シャードクラスターにアクセスするときは常に &lt;code&gt;mongos&lt;/code&gt; 経由でアクセスする。シャード化されていないコレクションであっても、必ず &lt;code&gt;mongos&lt;/code&gt; 経由でアクセスする。&lt;/p&gt;
+&lt;h3 id=&#34;構成サーバー&#34;&gt;構成サーバー&lt;/h3&gt;
+&lt;p&gt;シャードクラスター設定に関するメタデータを保存する。どのシャードサーバーにデータがあるかといった情報もこのサーバーに保存される。MongoDB 3.4 以降では、構成サーバーをレプリカセットとして構成する。&lt;/p&gt;
+&lt;h2 id=&#34;シャードキー&#34;&gt;シャードキー&lt;/h2&gt;
+&lt;p&gt;「シャードキー」とは、データを分散してシャードサーバーに保存するときにキーとして利用する情報を指す。MongoDB は「シャードキー」を使って、コレクション内のドキュメント分散を行う。&lt;/p&gt;
+&lt;p&gt;次の図は、x シャードキーで分散された簡単な例である。&lt;/p&gt;
+&lt;p&gt;&amp;hellip; 図 &amp;hellip;&lt;/p&gt;
+&lt;p&gt;「シャードキー」に関するポイントは次の3つである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;すべてのドキュメントに存在する不変のフィールド、またはフィールド群で構成する。&lt;/li&gt;
+&lt;li&gt;一度シャードキーを決定して分散を実行すると、シャードキーを再度変更することはできない。&lt;/li&gt;
+&lt;li&gt;シャーディングするコレクションには、シャードキーを含むインデックスが必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;もちろん、シャードキーの選択が性能、効率、拡張性に大きな影響を与えることは言うまでもない。シャードキーの選択が不適切であれば、上で説明したようにシャードサーバーに偏りが発生し、非効率な動作が発生する可能性がある。&lt;/p&gt;
+&lt;h2 id=&#34;チャンク&#34;&gt;チャンク&lt;/h2&gt;
+&lt;p&gt;前述のように、MongoDB は「シャードキー」の値でデータ保存を分散するが、このとき「チャンク」という塊ごとにグループ化してシャードサーバーへ分散保存する。MongoDB は自動的に「チャンク」がシャードクラスター内で均等に分散されるよう移動する。&lt;/p&gt;
+&lt;p&gt;チャンクに分割し、それを各シャードへ分散保存するイメージは以下のとおりである。&lt;/p&gt;
+&lt;p&gt;&amp;hellip; 図 &amp;hellip;&lt;/p&gt;
+&lt;h2 id=&#34;シャードデータに対する操作制約&#34;&gt;シャードデータに対する操作制約&lt;/h2&gt;
+&lt;p&gt;シャーディングされたデータ、つまりシャードデータに対する操作にはいくつかの制限がある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;group&lt;/code&gt; コマンドは使用できない。&lt;/li&gt;
+&lt;li&gt;代わりに aggregate なしで MapReduce を利用する。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;updateOne&lt;/code&gt; または &lt;code&gt;deleteOne&lt;/code&gt; では &lt;code&gt;_id&lt;/code&gt; を指定する必要がある。&lt;/li&gt;
+&lt;li&gt;シャードキー &lt;code&gt;_id&lt;/code&gt; が含まれていない場合はエラーが発生する。&lt;/li&gt;
+&lt;li&gt;シャーディングしたコレクションにはユニークインデックスが必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;シャードコレクションと非シャードコレクション&#34;&gt;シャードコレクションと非シャードコレクション&lt;/h2&gt;
+&lt;p&gt;MongoDB では、シャード化するコレクションとシャード化しないコレクションを混在させることができる。シャード化するコレクションはシャードクラスターに分散保存されるが、シャード化されていないコレクションはプライマリシャードに保存される。&lt;/p&gt;
+&lt;h2 id=&#34;データ分散方法&#34;&gt;データ分散方法&lt;/h2&gt;
+&lt;p&gt;シャード化するときの分散方法には、「ハッシュシャード」と「レンジシャード」の2つがある。&lt;/p&gt;
+&lt;h3 id=&#34;ハッシュシャード&#34;&gt;ハッシュシャード&lt;/h3&gt;
+&lt;p&gt;シャードキーのハッシュ値を利用してデータ分散を行う。ハッシュを利用したシャードの場合、シャードキーの値が近くてもチャンクが散らばりやすい特徴がある。つまり、シャードキーが単調変化する場合に分散しやすい分散方法である。逆にデータが分散されやすいため、データ構造や取得方法によってはブロードキャスト操作が増える可能性もある。&lt;/p&gt;
+&lt;h3 id=&#34;レンジシャード&#34;&gt;レンジシャード&lt;/h3&gt;
+&lt;p&gt;シャードキーの範囲に従ってデータ分散を行う。ハッシュシャードと異なり、シャードキーの値が近い場合、同じチャンク上に存在する可能性が高くなる分散方法である。シャードキーの選定が不適切であれば、せっかくシャードという分散技術を利用しようとしても、特定サーバーに負荷が偏ってしまう可能性がある。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB mongod コマンドの使い方</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/how-use-mongod/</link>
+      <pubDate>Thu, 13 Jan 2022 07:57:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/how-use-mongod/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;code&gt;mongod&lt;/code&gt; コマンドの基本的な主な使い方、つまりオプションを整理する。&lt;/p&gt;
+&lt;p&gt;ここで扱っているのは重要と思われるオプションだけであるため、その他の多くのオプションについては &lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式マニュアル&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; を参照すること。&lt;/p&gt;
+&lt;h2 id=&#34;基本オプション&#34;&gt;基本オプション&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;オプション&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--config &amp;lt;filename&amp;gt;&lt;/code&gt;, &lt;code&gt;-f &amp;lt;filename&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;起動オプションを含む構成ファイルを指定する。&lt;br&gt;構成ファイルのパスに空白が含まれる場合は、ダブルクォート(&lt;code&gt;&amp;quot;&lt;/code&gt;)で囲む。&lt;br&gt;構成ファイルは ASCII エンコーディングを使用する。UTF-8 など ASCII 以外はサポートしない。構成ファイルと起動オプションを同時に指定した場合は、起動オプションの値が優先される。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--port &amp;lt;port&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: 27017&lt;br&gt;MongoDB が TCP 接続を待ち受けるポート番号を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--maxConns &amp;lt;number&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB が許可する同時接続数を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--logpath &amp;lt;path&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;ログファイルを出力するパスを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--logappend&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB を再起動すると、既存ログファイルの続きとしてロギングされる。&lt;br&gt;MongoDB のデフォルトでは、再起動時に既存ログファイルをバックアップして新しいログファイルを作成する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--slowms &amp;lt;integer&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: 100&lt;br&gt;プロファイリングするしきい値をミリ秒で指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--profile &amp;lt;level&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: 0&lt;br&gt;データベースプロファイリングレベルを変更する。&lt;br&gt;&lt;br&gt;- 0: Off。プロファイリングを行わない。&lt;br&gt;- 1: On。遅い操作のみプロファイリングを行う。&lt;br&gt;- 2: On。すべての操作をプロファイリングする。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--auth&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;データベースアクセス制御を使用する。&lt;br&gt;ユーザーの設定変更は &lt;code&gt;mongo&lt;/code&gt; コマンドで行う。ユーザーが存在しない場合は、&lt;code&gt;localhost&lt;/code&gt; からのアクセスのみ許可される。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--bind_ip &amp;lt;address&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: すべての接続&lt;br&gt;MongoDB が接続を受け付ける IP アドレスを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--dbpath &amp;lt;path&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: &lt;code&gt;C:\data\db&lt;/code&gt;&lt;br&gt;データベースファイルを保存するストレージパスを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;windows-サービスインストールオプション&#34;&gt;Windows サービスインストールオプション&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;オプション&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--install&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB を Windows サービスに追加する。&lt;br&gt;必要に応じて &lt;code&gt;--serviceName&lt;/code&gt;、&lt;code&gt;--serviceDisplayName&lt;/code&gt; を同時に指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--remove&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Windows サービスから MongoDB サービスを削除する。&lt;br&gt;&lt;code&gt;--serviceName&lt;/code&gt; でデフォルト以外の名前をインストールした場合は、&lt;code&gt;--serviceName&lt;/code&gt; を指定する必要がある。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceName &amp;lt;name&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: MongoDB&lt;br&gt;サービス名を指定する。&lt;br&gt;ここで指定した名前は &lt;code&gt;net start &amp;lt;name&amp;gt;&lt;/code&gt;、&lt;code&gt;net stop &amp;lt;name&amp;gt;&lt;/code&gt; の引数として使用される。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceDisplayName &amp;lt;name&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: MongoDB&lt;br&gt;サービス管理ツールに表示される名前を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceDescription &amp;lt;description&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;デフォルト: MongoDB Server&lt;br&gt;サービス管理ツールの説明に表示する文字列を指定する。空白が含まれる場合はダブルクォート(&lt;code&gt;&amp;quot;&lt;/code&gt;)で囲む。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceUser &amp;lt;user&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB を実行するユーザーを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--servicePassword &amp;lt;password&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB を実行するユーザーのパスワードを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;参考文書&#34;&gt;参考文書&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongod&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod.exe/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongod.exe&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB の特徴</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/features/</link>
+      <pubDate>Sun, 09 Jan 2022 18:38:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/features/</guid>
+      <description>
+        
+        
+        &lt;p&gt;今回は MongoDB の特徴について見てみよう。&lt;/p&gt;
+&lt;p&gt;公式サイトにも記載されている内容として、特徴は大きく以下のように整理できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ドキュメントデータベース(NoSQL)&lt;/li&gt;
+&lt;li&gt;特殊クエリ&lt;/li&gt;
+&lt;li&gt;高性能&lt;/li&gt;
+&lt;li&gt;高可用性&lt;/li&gt;
+&lt;li&gt;水平スケーラビリティ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ドキュメントデータベースnosql&#34;&gt;ドキュメントデータベース(NoSQL)&lt;/h2&gt;
+&lt;p&gt;JSON のようにキー・バリュー(Key-Value)の組み合わせをそのまま保存できる、ドキュメント形式のデータベースである。バリューにはさまざまな形式を指定できる。たとえば数値や文字列はもちろん、配列やオブジェクトを保存できることも特徴である。また、このバリューの形式は動的に変更でき、同じフィールド名に複数の形式を入れることもできる。つまり、スキーマレス(schemaless)なドキュメントデータベースである。&lt;/p&gt;
+&lt;h2 id=&#34;性能&#34;&gt;性能&lt;/h2&gt;
+&lt;p&gt;性能を出すために、次のような機能が実装されている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;埋め込みデータモデルによる I/O 処理の削減&lt;/li&gt;
+&lt;li&gt;インデックス(index)のサポート&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;NoSQL でありながら「インデックス」をサポートしていることが MongoDB の特徴である。「インデックス」に関連して「ユニークキー」を指定することもできる。&lt;/p&gt;
+&lt;h2 id=&#34;特殊クエリ&#34;&gt;特殊クエリ&lt;/h2&gt;
+&lt;p&gt;JSON 形式で指定する特殊クエリを活用して DB を検索する。クエリで実行できる操作は基本的な CRUD 操作はもちろん、以下のような特徴的なクエリがある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;集計(Aggregation、Map-Reduce)&lt;/li&gt;
+&lt;li&gt;「テキストインデックス」を使った文字列検索&lt;/li&gt;
+&lt;li&gt;地理空間クエリ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;集計(Aggregation、Map-Reduce)では、保存されたデータに対してさまざまな統計処理を実行できる。クエリ単体の組み立ては独特な実装なので慣れが必要だが、処理順序がパイプライン化されているため、コードの見通しはよい。&lt;/p&gt;
+&lt;p&gt;「地理空間クエリ」は、組み込みの「GeoJSON」形式を利用して「範囲内のポイント検索」を行うことができる。&lt;/p&gt;
+&lt;h2 id=&#34;可用性&#34;&gt;可用性&lt;/h2&gt;
+&lt;p&gt;MongoDB はレプリカセットという機能でレプリケーション機能を提供する。このレプリカセットは自動フェイルオーバーとデータ冗長性を提供する。&lt;/p&gt;
+&lt;h2 id=&#34;水平スケーリング&#34;&gt;水平スケーリング&lt;/h2&gt;
+&lt;p&gt;水平スケーリングという特徴は、「マシンを増やすことで性能を向上できる」ということである。MongoDB では、コア機能であるシャーディングという仕組みによって水平スケーラビリティを実現している。&lt;/p&gt;
+&lt;h2 id=&#34;複数ストレージエンジンのサポート&#34;&gt;複数ストレージエンジンのサポート&lt;/h2&gt;
+&lt;p&gt;MongoDB は複数のストレージエンジンをサポートする。一般的に使用されるファイルシステムのほか、インメモリエンジンを選択できる。また、ストレージエンジン API を公開しているため、サードパーティ製ストレージエンジンを作成することもできる。&lt;/p&gt;
+&lt;h2 id=&#34;参考文書&#34;&gt;参考文書&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/introduction/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Introduction to MongoDB&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.tutorialsjar.com/key-features-of-mongodb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TutorialsJar - What Are The Top 10 Key Features Of MongoDB?&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB Docker インストール</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/installs/</link>
+      <pubDate>Mon, 10 Jan 2022 08:53:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/installs/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;mongodb-docker-インストール&#34;&gt;MongoDB Docker インストール&lt;/h2&gt;
+&lt;h3 id=&#34;mongodb-docker-イメージのダウンロード&#34;&gt;MongoDB Docker イメージのダウンロード&lt;/h3&gt;
+&lt;p&gt;以下のコマンドを実行して MongoDB Docker イメージをダウンロードする。タグにバージョンを指定しない場合は、最新バージョンがダウンロードされる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker pull mongo
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行結果は以下のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker pull mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Using default tag: latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;latest: Pulling from library/mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ea362f368469: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ecab26900ceb: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1847fcb70562: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a7de23811c0d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;29dd51833fb9: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5eccd2be8afb: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd8a8cd6879f: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;e6ca3abc397d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;7481c3682d3c: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;af377cb9eb7d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Digest: sha256:6743836d42756b2ae50549b2eb4585c688fce81a243cedd152b56266c2fb3d17
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Status: Downloaded newer image &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; mongo:latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker.io/library/mongo:latest
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;MongoDB のバージョンを指定するには、タグにバージョンを指定する必要がある。ダウンロード可能な MongoDB バージョンは &lt;a href=&#34;https://hub.docker.com/_/mongo/?tab=tags&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Docker Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; で確認できる。&lt;/p&gt;
+&lt;p&gt;次のコマンドで、ダウンロードした Docker イメージを確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行結果は以下のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker images
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REPOSITORY                                      TAG            IMAGE ID       CREATED         SIZE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mongo                                           latest         ee13a1eacac9   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; days ago      696MB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongodb-docker-コンテナの作成と実行&#34;&gt;MongoDB Docker コンテナの作成と実行&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;-v ~/mongodb/db:/data/db&lt;/code&gt; は、ホスト、つまりコンテナを起動するローカルコンピュータの &lt;code&gt;~/mongodb/db&lt;/code&gt; ディレクトリと、コンテナの &lt;code&gt;/data/db&lt;/code&gt; ディレクトリをマウントする。このようにボリュームを設定しないと、コンテナを削除したときに保存されたデータも削除されるためである。一度削除されたコンテナデータは復元できない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ade97bdb08fde4eaa72ceb0135b0a570d97b21616affb7949a0fc479fec25e0e
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongodb-docker-コンテナの開始停止再起動&#34;&gt;MongoDB Docker コンテナの開始、停止、再起動&lt;/h3&gt;
+&lt;p&gt;MongoDB Docker コンテナを停止する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker stop my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;MongoDB Docker コンテナを開始する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker start my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;MongoDB Docker コンテナを再起動する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker restart my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;mongodb-docker-コンテナの実行確認&#34;&gt;MongoDB Docker コンテナの実行確認&lt;/h4&gt;
+&lt;p&gt;次のコマンドを実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps -a
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                                  COMMAND                  CREATED          STATUS                      PORTS                                       NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ade97bdb08fd   mongo                                                  &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;docker-entrypoint.s...&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;37&lt;/span&gt; seconds ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;36&lt;/span&gt; seconds               0.0.0.0:27017-&amp;gt;27017/tcp                    my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;mongodb-docker-コンテナへの接続&#34;&gt;MongoDB Docker コンテナへの接続&lt;/h4&gt;
+&lt;p&gt;次のコマンドを実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it my-mongodb bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行結果は以下のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it my-mongodb bash
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@ade97bdb08fd:/#
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+      <category>Docker</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB mongo コマンドの使い方</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/how-to-use-mongo/</link>
+      <pubDate>Tue, 11 Jan 2022 18:21:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/how-to-use-mongo/</guid>
+      <description>
+        
+        
+        &lt;p&gt;MongoDB に接続するクライアントモジュールである &lt;code&gt;mongo&lt;/code&gt; を使用して接続する方法について見てみよう。&lt;/p&gt;
+&lt;h2 id=&#34;基本オプション&#34;&gt;基本オプション&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;オプション&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--host &amp;lt;hostname&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;接続する MongoDB サーバーのホスト名を指定する。ホスト名を指定しない場合は localhost に接続する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--port &amp;lt;port&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;MongoDB サーバーに接続するポート番号を指定する。ポート番号を指定しない場合は &lt;code&gt;27017&lt;/code&gt; に接続する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--username &amp;lt;username&amp;gt;, -u &amp;lt;username&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;認証機能が有効な MongoDB にアクセスするときのユーザー名を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--password &amp;lt;password&amp;gt;, -p &amp;lt;password&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;認証機能が有効な MongoDB に接続するときのパスワードを指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--authenticationDatabase &amp;lt;dbname&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;認証するデータベース名を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;ファイル&#34;&gt;ファイル&lt;/h2&gt;
+&lt;h3 id=&#34;dbshell&#34;&gt;.dbshell&lt;/h3&gt;
+&lt;p&gt;mongo シェルで実行されたコマンドの履歴が保存される。ファイルはホームディレクトリ(&lt;code&gt;%UserProfile%&lt;/code&gt;)直下に自動的に作成される。Windows の場合、たとえば次の場所になる。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;%UserProfile%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\Users\&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;ユーザー名&amp;gt;\.dbshell&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongorcjs&#34;&gt;.mongorc.js&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;.mongorc.js&lt;/code&gt; ファイルを決められたディレクトリ(&lt;code&gt;%UserProfile%&lt;/code&gt; または &lt;code&gt;%ProgramData%&lt;/code&gt;)の直下に置くと、&lt;code&gt;mongo&lt;/code&gt; 起動時に自動で &lt;code&gt;.mongorc.js&lt;/code&gt; がロードされて実行される。これを使うと、シェル実行中に共通で使いたい変数や関数をあらかじめ定義しておくことができる。&lt;code&gt;.mongorc.js&lt;/code&gt; はユーザー定義(&lt;code&gt;%UserProfile%&lt;/code&gt;)よりもグローバル定義(&lt;code&gt;%ProgramData%&lt;/code&gt;)を先に読み込む。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.mongorc.js&lt;/code&gt; をロードしたくない場合は、&lt;code&gt;--norc&lt;/code&gt; オプションを付けて &lt;code&gt;mongo&lt;/code&gt; を起動するとロードされない。&lt;/p&gt;
+&lt;p&gt;Windows の場合、たとえば次のようなディレクトリになる。
+&lt;code&gt;%UserProfile%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\Users\&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;ユーザー名&amp;gt;\.mongorc.js&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;%ProgramData%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\ProgramData\MongoDB\.mongorc.js&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考記事&#34;&gt;参考記事&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/reference/program/mongo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongo&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/mongo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongo shell&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB でインデックスを適用する方法</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/create-index/</link>
+      <pubDate>Wed, 12 Jan 2022 08:39:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/create-index/</guid>
+      <description>
+        
+        
+        &lt;p&gt;MongoDB はドキュメント型データベースであるため、少し異なるインデックスが存在する。今回は RDB にはないインデックスの概念について見てみよう。&lt;/p&gt;
+&lt;h2 id=&#34;mongodb-のインデックス&#34;&gt;MongoDB のインデックス&lt;/h2&gt;
+&lt;p&gt;MongoDB では基本的に、ドキュメントを作成するたびに &lt;code&gt;_id&lt;/code&gt; 属性がユニークインデックスとして自動的に生成される。これで不足する場合は、独自に &lt;code&gt;db.collection.createIndex()&lt;/code&gt; を使用してインデックスを作成する。&lt;code&gt;db.collection.createIndex()&lt;/code&gt; によって作成されるインデックスは、B-tree データ構造のインデックスである。&lt;/p&gt;
+&lt;p&gt;MongoDB は単純なキー指定以外にも、いくつかのインデックス型をサポートする。具体的にサポートされるインデックス型は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;単一キー&lt;/li&gt;
+&lt;li&gt;複合キー&lt;/li&gt;
+&lt;li&gt;マルチキー&lt;/li&gt;
+&lt;li&gt;地理空間&lt;/li&gt;
+&lt;li&gt;テキスト&lt;/li&gt;
+&lt;li&gt;ハッシュ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;「複合キー」と「マルチキー」は名称が似ているが内容は異なる。「複合キー」は複数フィールドを組み合わせたキーであり、「マルチキー」は配列を扱う属性について、その配列に含まれるすべての値を対象にするキーである。&lt;/p&gt;
+&lt;p&gt;以下では、基本となる「単一キーインデックス」、「複合キーインデックス」、「マルチキーインデックス」について、具体的な使い方をサンプルコードで見ていく。&lt;/p&gt;
+&lt;h2 id=&#34;インデックスの基本作成&#34;&gt;インデックスの基本作成&lt;/h2&gt;
+&lt;p&gt;mongo シェルで次のコマンドを実行すると、指定したコレクションに対してインデックスを作成できる。&lt;/p&gt;
+&lt;p&gt;JavaScript コードでも関数は同じだが、3番目の引数にコールバックを指定できる点が異なる。&lt;/p&gt;
+&lt;h3 id=&#34;構文&#34;&gt;構文&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;keys, options&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;引数&#34;&gt;引数&lt;/h3&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;引数&lt;/th&gt;
+          &lt;th&gt;Type&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;keys&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;string&lt;/code&gt;/&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;値を持つフィールド名を指定する。昇順キーであれば &lt;code&gt;1&lt;/code&gt;、降順キーであれば &lt;code&gt;-1&lt;/code&gt; を指定する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;options&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;インデックス作成に関するオプションを指定する。オプションとして指定できるものには &lt;code&gt;unique&lt;/code&gt;、&lt;code&gt;collation&lt;/code&gt; がある。他にもあるが、ここではこれだけ覚えておこう。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;使用例&#34;&gt;使用例&lt;/h3&gt;
+&lt;p&gt;以下で「単一キーインデックス(Single field index)」、「複合キーインデックス(Compound index)」、「マルチキーインデックス(Multi-key index)」の使用例を見てみよう。&lt;/p&gt;
+&lt;h2 id=&#34;単一キーインデックスの作成&#34;&gt;単一キーインデックスの作成&lt;/h2&gt;
+&lt;p&gt;以下のようなサンプルドキュメントにインデックスを作成するサンプルコードを3つ扱う。MongoDB はドキュメント型データベースであるため、RDB にはない「埋め込みフィールド」や「埋め込みドキュメント」に対するインデックス作成ができる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;score&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1034&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;city:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;Seoul&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;county:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;Korea Republic of&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;単一フィールド&#34;&gt;単一フィールド&lt;/h3&gt;
+&lt;p&gt;もっとも単純な「単一フィールド」に対するインデックス作成のサンプルコードである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1034&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gt&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;埋め込みフィールド&#34;&gt;埋め込みフィールド&lt;/h3&gt;
+&lt;p&gt;MongoDB は属性値としてドキュメントを指定することもできる。このような場合、ドキュメント内のフィールド、つまりネストされた要素についてもインデックス化できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location.city&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location.city&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kyunggi&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;埋め込みドキュメント&#34;&gt;埋め込みドキュメント&lt;/h3&gt;
+&lt;p&gt;上の「埋め込みフィールド」と似ているが、元のオブジェクトを指定することもできる。ただし、この場合は属性の数と属性の順序を含めて完全一致が求められる点に注意する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; location: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; city: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Seoul&amp;#34;&lt;/span&gt;, county: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Korea Republic of&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;複合キーインデックスの作成&#34;&gt;複合キーインデックスの作成&lt;/h2&gt;
+&lt;p&gt;RDB にも存在する複合キーインデックスである。MongoDB では複数のフィールドをキーとして指定して作成できる。MongoDB の複合キーインデックスでは、「指定された複合キーすべてに一致する」パターンだけでなく、「一部に一致する」パターンでもインデックスが有効である。&lt;/p&gt;
+&lt;p&gt;次のサンプルデータに対して「複合キーインデックス」を作成する例を見てみよう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;stock&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;cases&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: 1, location: 1, stock: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt;, stock: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gt&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上の例ではインデックスの作成が &lt;code&gt;item -&amp;gt; location -&amp;gt; stock&lt;/code&gt; であるため、その先頭部分である &lt;code&gt;item&lt;/code&gt; や &lt;code&gt;item -&amp;gt; location&lt;/code&gt; などでもインデックスが有効になる。&lt;/p&gt;
+&lt;h2 id=&#34;マルチキーインデックスの作成&#34;&gt;マルチキーインデックスの作成&lt;/h2&gt;
+&lt;p&gt;MongoDB には、配列を値として使用するフィールドもある。配列の値は「プリミティブ」でも「オブジェクト」でも、どちらの場合でも「マルチキーインデックス」を作成できる。&lt;/p&gt;
+&lt;p&gt;以下では、配列フィールド &lt;code&gt;ratings&lt;/code&gt; を含むコレクションに対してインデックスを作成し、検索するサンプルを見てみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;  &lt;span style=&#34;color:#a40000&#34;&gt;ratings:&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;2,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;9&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Banana&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;ratings:&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;4,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;インデックス作成は、単純に &lt;code&gt;ratings&lt;/code&gt; に対して &lt;code&gt;createIndex()&lt;/code&gt; を呼び出して作成できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;配列フィールドに対する検索は、通常 &lt;code&gt;$elemMatch&lt;/code&gt; を使用する。以下の例では「3以上6以下の ratings が1レコード以上存在するドキュメント」を抽出している。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$elemMatch&lt;/span&gt;: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gte&lt;/span&gt;: 3, &lt;span style=&#34;color:#000&#34;&gt;$lte&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24459c684f917e3ec0c2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;XYZ&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 4, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;以下のように入力すると、「3以上または6以下を満たすレコードが1件以上存在するドキュメント」を抽出するため、結果的にすべて抽出されてしまう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gte&lt;/span&gt;: 3, &lt;span style=&#34;color:#000&#34;&gt;$lte&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24399c684f917e3ec0c1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ABC&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 2, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;9&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24459c684f917e3ec0c2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;XYZ&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 4, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考文書&#34;&gt;参考文書&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - db.collection.createIndex()&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-single/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Single Field Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-compound/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Compound Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-multikey/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Multikey Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB で unique 制約を適用する方法</title>
+      <link>https://www.devkuma.com/jp/docs/mongodb/unique-constraint/</link>
+      <pubDate>Wed, 12 Jan 2022 08:59:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/mongodb/unique-constraint/</guid>
+      <description>
+        
+        
+        &lt;p&gt;今回は「MongoDB で unique 制約を適用する方法」について見てみよう。&lt;/p&gt;
+&lt;h2 id=&#34;unique-制約の適用&#34;&gt;unique 制約の適用&lt;/h2&gt;
+&lt;p&gt;MongoDB で unique 制約を適用するには、インデックスを作成するときに &lt;code&gt;createIndex()&lt;/code&gt; のオプションとして &lt;code&gt;unique&lt;/code&gt; に &lt;code&gt;true&lt;/code&gt; を指定すればよい。&lt;/p&gt;
+&lt;p&gt;以下では、「単一キーインデックス」の場合と「複合キーインデックス」の場合について、サンプルコードを見ていく。&lt;/p&gt;
+&lt;h3 id=&#34;単一キーインデックス&#34;&gt;単一キーインデックス&lt;/h3&gt;
+&lt;p&gt;単一キーインデックスであれば、単純に次のようなコードを mongo シェルで実行すると作成できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; userId: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;複合キーインデックス&#34;&gt;複合キーインデックス&lt;/h3&gt;
+&lt;p&gt;複合キーインデックスの場合も、単一キーインデックスとコードは変わらない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: 1, lastname: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;複合キーインデックスの場合、複合キーの組み合わせとして一意であればよいため、以下は問題なく設定できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;kc&amp;#34;&lt;/span&gt;, lastname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kim&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;et&amp;#34;&lt;/span&gt;, lastname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kim&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;kc&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;unique-制約の設定制限&#34;&gt;unique 制約の設定制限&lt;/h2&gt;
+&lt;p&gt;RDB の場合と似ているが、すでに重複データが登録されているコレクションに対して unique 制約を設定することはできない。すでに重複している状態では当然と言えば当然である。&lt;/p&gt;
+&lt;p&gt;また、ハッシュインデックスに対して unique 制約を設定することは推奨されない。(&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-hashed/#considerations&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hashed Indexes の Considerations&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;)&lt;/p&gt;
+&lt;h2 id=&#34;unique-制約キーに値が設定されていない場合の動作&#34;&gt;unique 制約キーに値が設定されていない場合の動作&lt;/h2&gt;
+&lt;p&gt;上で「複合キーインデックス」に unique 制約を設定したデータ登録例のように、値がないフィールドが存在する場合、内部的には &lt;code&gt;null&lt;/code&gt; が指定されたものとして処理される。&lt;/p&gt;
+&lt;p&gt;たとえば、次のようにフィールド &lt;code&gt;x&lt;/code&gt; に対する unique 制約があるコレクションがあるとする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; x: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;フィールド &lt;code&gt;x&lt;/code&gt; を指定しないデータが登録されたと仮定する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; y: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WriteResult&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nInserted&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最初は &lt;code&gt;x: null&lt;/code&gt; として指定されるため、正常に登録できる。続けて、フィールド &lt;code&gt;x&lt;/code&gt; が存在しない別のデータを挿入するとどうなるだろうか。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; z: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WriteResult&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nInserted&amp;#34;&lt;/span&gt; : 0,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;writeError&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;code&amp;#34;&lt;/span&gt; : 11000,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;errmsg&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;E11000 duplicate key error collection: test.collection index: x_1 dup key: { : null }&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上記のようにエラーが発生し、挿入できないことがわかる。また、エラーメッセージからも、指定がない場合は &lt;code&gt;null&lt;/code&gt; が指定されることがわかる。&lt;/p&gt;
+&lt;h2 id=&#34;参考文書&#34;&gt;参考文書&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.4/core/index-unique/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Unique Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+  </channel>
+</rss>

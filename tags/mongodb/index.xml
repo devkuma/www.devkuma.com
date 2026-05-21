@@ -40,7 +40,7 @@
 &lt;p&gt;데이터 세트로 시스템 분할을 하여, 여러 개의 서버로부터 병렬로 처리하도록 하는 방법이다. 포괄적으로 성능은 수직 스케일링보다 날 수 있지만 스케일링 할수록 복잡성이 커지므로 관리가 어려워진다.&lt;/p&gt;
 &lt;h2 id=&#34;샤딩sharding이란&#34;&gt;샤딩(sharding)이란?&lt;/h2&gt;
 &lt;p&gt;샤딩이란, 데이터를 복수 서버에 분산시키는 &amp;ldquo;수평 스케일링&amp;rdquo; 구조이다.&lt;/p&gt;
-&lt;p&gt;샤딩을 하는 것으로 크게 3개의 이점(&amp;ldquo;읽고 쓰기 처리가 빠리진다 &amp;amp; 성능을 올리기 쉽다&amp;rdquo;, &amp;ldquo;스토리지가 증설하기 쉽다&amp;rdquo;, &amp;ldquo;가용성이 높다&amp;rdquo;)가 있다. 각각 자세한 내용은 아래에서 살펴 보겠다. MongoDB는 표준 기능으로 샤딩 수평 스케일링)을 지원한다.&lt;/p&gt;
+&lt;p&gt;샤딩을 하는 것으로 크게 3개의 이점(&amp;ldquo;읽고 쓰기 처리가 빨라진다 &amp;amp; 성능을 올리기 쉽다&amp;rdquo;, &amp;ldquo;스토리지가 증설하기 쉽다&amp;rdquo;, &amp;ldquo;가용성이 높다&amp;rdquo;)가 있다. 각각 자세한 내용은 아래에서 살펴 보겠다. MongoDB는 표준 기능으로 샤딩(수평 스케일링)을 지원한다.&lt;/p&gt;
 &lt;h3 id=&#34;읽기쓰기&#34;&gt;읽기/쓰기&lt;/h3&gt;
 &lt;p&gt;데이터를 샤드 클러스터에 분산하고 저장하면 읽기/쓰기 처리(파일 I/O)를 분산 처리할 수 있다. 파일 읽기/쓰기(파일 I/O)는 느린 처리이므로 이를 분산화함으로써 보다 빠른 읽기/쓰기를 할 수 있게 된다. 또, 읽고 쓰기의 부하가 오더라도 서버를 늘려 가는 것으로 수평 스케일링할 수 있다.&lt;/p&gt;
 &lt;h3 id=&#34;스토리지&#34;&gt;스토리지&lt;/h3&gt;
@@ -59,7 +59,7 @@
 &lt;p&gt;&amp;ldquo;샤드 키&amp;quot;란, 데이터를 분산해 샤드 서버에 보존할 때에 키로서 이용하는 정보를 말한다. MongoDB는 &amp;ldquo;샤드 키&amp;quot;를 사용하여 컬렉션 내 문서 분산을 수행한다.&lt;/p&gt;
 &lt;p&gt;다음 그림은 x샤드 키로 분산된 간단한 예이다.&lt;/p&gt;
 &lt;p&gt;&amp;hellip; 그림 &amp;hellip;&lt;/p&gt;
-&lt;p&gt;&amp;ldquo;샤드 키&amp;quot;에 대한 포인트는 아래 3자지디다.&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;샤드 키&amp;quot;에 대한 포인트는 아래 3가지이다.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;모든 문서에 존재하는 불변의 필드 또는 필드군으로 구성한다.&lt;/li&gt;
 &lt;li&gt;일단 샤드 키를 결정하고 분산을 수행되면, 샤드 키를 다시 변경할 수 없다.&lt;/li&gt;
@@ -67,7 +67,7 @@
 &lt;/ul&gt;
 &lt;p&gt;물론 샤드 키의 선택에 의해 성능, 효율, 확장성에 큰 영향을 주는 것은 말할 필요도 없다. 샤드 키 선택이 부적절하다면 위에서 설명한 대로 샤드 서버에 편향이 발생하여 비효율적인 동작이 발생할 수 있다.&lt;/p&gt;
 &lt;h2 id=&#34;청크&#34;&gt;청크&lt;/h2&gt;
-&lt;p&gt;앞서 언급했듯이 MongoDB는 &amp;ldquo;샤드 키&amp;quot;값으로 데이터 저장을 분산하지만,이 때 &amp;ldquo;청크&amp;quot;라는 덩어리마다 그룹화하여 샤드 서버에 분산 저장한다. MongoDB는 자동으로 &amp;ldquo;청크&amp;quot;가 샤드 클러스터 내에서 균형있게 분산되도록 이동한다.&lt;/p&gt;
+&lt;p&gt;앞서 언급했듯이 MongoDB는 &amp;ldquo;샤드 키&amp;quot;값으로 데이터 저장을 분산하지만, 이때 &amp;ldquo;청크&amp;quot;라는 덩어리마다 그룹화하여 샤드 서버에 분산 저장한다. MongoDB는 자동으로 &amp;ldquo;청크&amp;quot;가 샤드 클러스터 내에서 균형 있게 분산되도록 이동한다.&lt;/p&gt;
 &lt;p&gt;청크로 분할 및 그것을 각 샤드에 분산 보존하는 이미지는 아래와 같다.&lt;/p&gt;
 &lt;p&gt;&amp;hellip; 그림 &amp;hellip;&lt;/p&gt;
 &lt;h2 id=&#34;샤드-데이터에-대한-조작-제약&#34;&gt;샤드 데이터에 대한 조작 제약&lt;/h2&gt;
@@ -86,7 +86,7 @@
 &lt;h3 id=&#34;해시-샤드&#34;&gt;해시 샤드&lt;/h3&gt;
 &lt;p&gt;샤드 키의 해시 값을 이용하여 데이터 분산을 수행한다. 해시를 이용한 샤드의 경우, 샤드 키의 값이 가까워져도 청크가 엉망이 되기 쉬운 특징이 있다. 즉, 샤드 키가 단조 변화하는 경우에 분산화하기 쉬운 분산화 방법이다. 반대로 데이터가 분산되기 쉽기 때문에, 데이터 구조나 취득 방법에 따라서는 브로드캐스트 조작이 늘어날 우려도 있다.&lt;/p&gt;
 &lt;h3 id=&#34;레인지-샤드&#34;&gt;레인지 샤드&lt;/h3&gt;
-&lt;p&gt;샤드 키 범위에 따라 데이터 분산을 수행힌다. 해시 샤드와 달리, 샤드 키의 값이 가까우면 같은 청크 상에 존재할 가능성이 높아지는 분산화 방법이다. 샤드키의 선정이 부적절하다면 모처럼 샤드라는 분산화 기술을 이용하려고 하는데도 특정 서버에 부하가 치우쳐 버릴 우려가 있다.&lt;/p&gt;
+&lt;p&gt;샤드 키 범위에 따라 데이터 분산을 수행한다. 해시 샤드와 달리, 샤드 키의 값이 가까우면 같은 청크 상에 존재할 가능성이 높아지는 분산화 방법이다. 샤드 키의 선정이 부적절하다면 모처럼 샤드라는 분산화 기술을 이용하려고 하는데도 특정 서버에 부하가 치우쳐 버릴 우려가 있다.&lt;/p&gt;
 
       </description>
       
@@ -451,7 +451,7 @@
       <description>
         
         
-        &lt;p&gt;이번에는 MontoDB의 특징에 대해 알아보자.&lt;/p&gt;
+        &lt;p&gt;이번에는 MongoDB의 특징에 대해 알아보자.&lt;/p&gt;
 &lt;p&gt;공식 사이트에서도 기재되는 내용으로 특징은 크게 아래와 같이 정리된다.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;도큐먼트 데이터베이스(NoSQL)&lt;/li&gt;
@@ -461,7 +461,7 @@
 &lt;li&gt;수평 확장성&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;도큐먼트-데이터베이스nosql&#34;&gt;도큐먼트 데이터베이스(NoSQL)&lt;/h2&gt;
-&lt;p&gt;JSON처럼 키-밸류(Key-Value) 조합을 그대로 저장할 수 있는 문서 형식의 데이터베이스이다. 밸류에는 다양한 형태를 지정할 수 있다. 예를 들면 수치, 문자열는 물론, 배열이나 오브젝트를 보존할 수 있는 것도 특징이다. 또, 이 밸류의 형태는 동적으로 변경할 수 있고, 같은 필드명에 복수의 형태를 넣을 수도 있다. 즉, 스키마리스(schemaless) 도큐먼트 데이터베이스이다.&lt;/p&gt;
+&lt;p&gt;JSON처럼 키-밸류(Key-Value) 조합을 그대로 저장할 수 있는 문서 형식의 데이터베이스이다. 밸류에는 다양한 형태를 지정할 수 있다. 예를 들면 수치, 문자열은 물론, 배열이나 오브젝트를 보존할 수 있는 것도 특징이다. 또, 이 밸류의 형태는 동적으로 변경할 수 있고, 같은 필드명에 복수의 형태를 넣을 수도 있다. 즉, 스키마리스(schemaless) 도큐먼트 데이터베이스이다.&lt;/p&gt;
 &lt;h2 id=&#34;성능&#34;&gt;성능&lt;/h2&gt;
 &lt;p&gt;성능을 내기 위해 다음과 같은 기능이 구현되어 있다.&lt;/p&gt;
 &lt;ul&gt;
@@ -477,7 +477,7 @@
 &lt;li&gt;지리 공간 쿼리&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;집계(Aggregation, Map-Reduce)에서는 저장된 데이터에 대해 다양한 통계를 수행할 수 있다. 쿼리 단체의 조립은 독특한 구현이므로 익숙해져야 하는데, 처리 순서가 파이프라인화 되어 있어 코드의 전망은 좋다.&lt;/p&gt;
-&lt;p&gt;&amp;ldquo;지리 공간 쿼리&amp;quot;는 내장의 &amp;ldquo;GeoJSON&amp;quot;형식을 이용하여 &amp;ldquo;범위내의 포인트 검색
+&lt;p&gt;&amp;ldquo;지리 공간 쿼리&amp;quot;는 내장의 &amp;ldquo;GeoJSON&amp;quot;형식을 이용하여 &amp;ldquo;범위 내의 포인트 검색
 &amp;ldquo;을 할 수 있다.&lt;/p&gt;
 &lt;h2 id=&#34;가용성&#34;&gt;가용성&lt;/h2&gt;
 &lt;p&gt;MongoDB는 복제 세트라는 기능으로 복제 기능을 제공한다. 이 복제 세트는 자동 장애 조치 및 데이터 중복성을 제공한다.&lt;/p&gt;
@@ -692,7 +692,7 @@
         
         &lt;h2 id=&#34;mongodb-docker-설치&#34;&gt;MongoDB Docker 설치&lt;/h2&gt;
 &lt;h3 id=&#34;mongodb-docker-이미지-다운로드&#34;&gt;MongoDB Docker 이미지 다운로드&lt;/h3&gt;
-&lt;p&gt;아래 명령어를 실행하여 MongoDB Docker 이미지를 다운로드 한다. 태그에 버전을 지정하지 않으면 최신 버전을 다운로드 된다.&lt;/p&gt;
+&lt;p&gt;아래 명령어를 실행하여 MongoDB Docker 이미지를 다운로드한다. 태그에 버전을 지정하지 않으면 최신 버전이 다운로드된다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker pull mongo
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;실행 결과는 아래와 같다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker pull mongo
@@ -720,7 +720,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mongo                                           latest         ee13a1eacac9   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; days ago      696MB
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongodb-docker-컨테이너-생성-및-실행&#34;&gt;MongoDB Docker 컨테이너 생성 및 실행&lt;/h3&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;-v ~/mongodb/db:/data/db&lt;/code&gt;는 호스트(컨테이너를 구동하는 로컬 컴퓨터)의 &lt;code&gt;~/mongodb/db&lt;/code&gt; 디렉터리와 컨테이너의 &lt;code&gt;/data/db&lt;/code&gt; 디렉터리를 마운트시킨다. 이렇게 볼륨을 설정하지 않으면, 컨테이너가 삭제하면서 저장된 데이터도 삭제되기 때문이다. 한번 삭제된 컨테이터 데이터는 복구할 수 없다.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;-v ~/mongodb/db:/data/db&lt;/code&gt;는 호스트(컨테이너를 구동하는 로컬 컴퓨터)의 &lt;code&gt;~/mongodb/db&lt;/code&gt; 디렉터리와 컨테이너의 &lt;code&gt;/data/db&lt;/code&gt; 디렉터리를 마운트시킨다. 이렇게 볼륨을 설정하지 않으면, 컨테이너가 삭제되면서 저장된 데이터도 삭제되기 때문이다. 한번 삭제된 컨테이너 데이터는 복구할 수 없다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ade97bdb08fde4eaa72ceb0135b0a570d97b21616affb7949a0fc479fec25e0e
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongodb-docker-컨테이너-시작중지재시작&#34;&gt;MongoDB Docker 컨테이너 시작/중지/재시작&lt;/h3&gt;
@@ -1014,7 +1014,7 @@ MongoDB 연결을 끊으려면, &lt;code&gt;Ctrl+C&lt;/code&gt;를 누르면 연
       <description>
         
         
-        &lt;p&gt;MongoDB는 도큐먼트형 데이타베이스이기 때문에, 조금 다른 인덱스가 존재이다. 이번에는 RDB에 없는 인덱스의 개념에 대해 알아보겠다.&lt;/p&gt;
+        &lt;p&gt;MongoDB는 도큐먼트형 데이터베이스이기 때문에, 조금 다른 인덱스가 존재한다. 이번에는 RDB에 없는 인덱스의 개념에 대해 알아보겠다.&lt;/p&gt;
 &lt;h2 id=&#34;mongodb의-색인&#34;&gt;MongoDB의 색인&lt;/h2&gt;
 &lt;p&gt;MongoDB에서는 기본적으로 &lt;code&gt;_id&lt;/code&gt; 속성이 고유 인덱스로 문서를 만들 때마다 자동으로 생성된다. 이것으로 부족한 경우는 독자적으로 &lt;code&gt;db.collection.createIndex()&lt;/code&gt;를 사용해 인덱스 작성한다. &lt;code&gt;db.collection.createIndex()&lt;/code&gt;를 이용해 만들어지는 인덱스는 B-tree 데이터 구조의 인덱스이다.&lt;/p&gt;
 &lt;p&gt;MongoDB는 간단한 키 지정 외에도 몇 가지 인덱스 유형을 지원한다. 구체적으로 지원하는 인덱스 유형은 다음과 같다.&lt;/p&gt;
@@ -1089,7 +1089,7 @@ MongoDB 연결을 끊으려면, &lt;code&gt;Ctrl+C&lt;/code&gt;를 누르면 연
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt;, stock: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gt&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에 예에서 인덱스의 작성이 &lt;code&gt;item → loation → stock&lt;/code&gt;이므로, 그 앞에 일부가 되는 &lt;code&gt;item&lt;/code&gt;이나 &lt;code&gt;item → location&lt;/code&gt;등도 인덱스가 유효하다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에 예에서 인덱스의 작성이 &lt;code&gt;item → location → stock&lt;/code&gt;이므로, 그 앞에 일부가 되는 &lt;code&gt;item&lt;/code&gt;이나 &lt;code&gt;item → location&lt;/code&gt;등도 인덱스가 유효하다.&lt;/p&gt;
 &lt;h2 id=&#34;멀티-키-색인-생성&#34;&gt;멀티 키 색인 생성&lt;/h2&gt;
 &lt;p&gt;MongoDB에는 배열을 값으로 사용하는 필드도 있다. 배열의 값은 &amp;ldquo;프리미티브&amp;rdquo; 또는 &amp;ldquo;객체&amp;quot;의 어느쪽이든 &amp;ldquo;멀티키 인덱스&amp;quot;를 작성할 수 있다.&lt;/p&gt;
 &lt;p&gt;이하에서는 배열 필드 ratings를 포함한 콜렉션에 대해서 인덱스를 작성, 검색하는 샘플을 살펴봅니다.&lt;/p&gt;

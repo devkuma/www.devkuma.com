@@ -1,0 +1,595 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – MongoDB</title>
+    <link>https://www.devkuma.com/en/tags/mongodb/</link>
+    <image>
+      <url>https://www.devkuma.com/en/tags/mongodb/logo/180x180.jpg</url>
+      <title>MongoDB</title>
+      <link>https://www.devkuma.com/en/tags/mongodb/</link>
+    </image>
+    <description>Recent content in MongoDB on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/en/tags/mongodb/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>MongoDB Sharding Overview</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/sharding/intro/</link>
+      <pubDate>Wed, 19 Jan 2022 09:19:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/sharding/intro/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;scaling&#34;&gt;Scaling&lt;/h2&gt;
+&lt;p&gt;Before talking about sharding, let&amp;rsquo;s first look at scaling.&lt;/p&gt;
+&lt;p&gt;In general, when a system grows larger, scaling becomes necessary. Scaling methods are broadly divided into two types: vertical scaling and horizontal scaling.&lt;/p&gt;
+&lt;h3 id=&#34;vertical-scaling&#34;&gt;Vertical scaling&lt;/h3&gt;
+&lt;p&gt;Vertical scaling is a method of replacing CPU, RAM, or storage with higher-performance components. Scaling is simple, but there are limits to CPU and memory in the first place, so there is a practical performance limit.&lt;/p&gt;
+&lt;h3 id=&#34;horizontal-scaling&#34;&gt;Horizontal scaling&lt;/h3&gt;
+&lt;p&gt;Horizontal scaling divides a system by data set and processes data in parallel from multiple servers. Overall performance can be better than vertical scaling, but the more it scales, the more complex it becomes, making management difficult.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-sharding&#34;&gt;What is sharding?&lt;/h2&gt;
+&lt;p&gt;Sharding is a horizontal scaling structure that distributes data across multiple servers.&lt;/p&gt;
+&lt;p&gt;Sharding has three major benefits: read/write processing becomes faster and performance is easier to improve, storage is easier to expand, and availability is high. Each is described below. MongoDB supports sharding, or horizontal scaling, as a standard feature.&lt;/p&gt;
+&lt;h3 id=&#34;reads-and-writes&#34;&gt;Reads and writes&lt;/h3&gt;
+&lt;p&gt;When data is distributed and stored in a shard cluster, read/write processing, or file I/O, can be distributed. File read/write operations are slow, so distributing them enables faster reads and writes. In addition, when read/write load increases, the system can horizontally scale by adding servers.&lt;/p&gt;
+&lt;h3 id=&#34;storage&#34;&gt;Storage&lt;/h3&gt;
+&lt;p&gt;Fragmented data is distributed and stored in the shard cluster. Even when the amount of data increases, the system can horizontally scale by adding servers.&lt;/p&gt;
+&lt;h3 id=&#34;high-availability&#34;&gt;High availability&lt;/h3&gt;
+&lt;p&gt;Shard clusters allow partial reads and writes. If a shard cannot be read from or written to, data can also be retrieved from a shard server that can perform the work.&lt;/p&gt;
+&lt;h2 id=&#34;shard-cluster&#34;&gt;Shard cluster&lt;/h2&gt;
+&lt;p&gt;MongoDB sharding consists of three components: shards, routers, and config servers. Their relationships and explanations are as follows.&lt;/p&gt;
+&lt;h3 id=&#34;shard&#34;&gt;Shard&lt;/h3&gt;
+&lt;p&gt;Shard servers store fragmented data, or chunks, from split collections. A shard server can be configured as a replica set.&lt;/p&gt;
+&lt;h3 id=&#34;router&#34;&gt;Router&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;mongos&lt;/code&gt; is a query router that provides an interface from applications to the shard cluster. When accessing a shard cluster, access always goes through &lt;code&gt;mongos&lt;/code&gt;. Even collections that are not sharded must be accessed through &lt;code&gt;mongos&lt;/code&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;config-server&#34;&gt;Config server&lt;/h3&gt;
+&lt;p&gt;Config servers store metadata about shard cluster settings. Information such as which shard server holds the data is also stored on these servers. Since MongoDB 3.4, config servers are configured as replica sets.&lt;/p&gt;
+&lt;h2 id=&#34;shard-key&#34;&gt;Shard key&lt;/h2&gt;
+&lt;p&gt;A shard key is information used as a key when distributing data and storing it on shard servers. MongoDB uses the shard key to distribute documents within a collection.&lt;/p&gt;
+&lt;p&gt;The following figure is a simple example distributed by an x shard key.&lt;/p&gt;
+&lt;p&gt;&amp;hellip; figure &amp;hellip;&lt;/p&gt;
+&lt;p&gt;The important points about shard keys are the following three.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;They consist of immutable fields or groups of fields that exist in every document.&lt;/li&gt;
+&lt;li&gt;Once a shard key is chosen and distribution is performed, the shard key cannot be changed again.&lt;/li&gt;
+&lt;li&gt;A sharded collection requires an index that includes the shard key.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Needless to say, shard key selection greatly affects performance, efficiency, and scalability. If the shard key is chosen poorly, data can become biased toward specific shard servers, as described above, causing inefficient behavior.&lt;/p&gt;
+&lt;h2 id=&#34;chunks&#34;&gt;Chunks&lt;/h2&gt;
+&lt;p&gt;As mentioned above, MongoDB distributes data storage by shard key value, but it groups data into units called chunks and distributes those chunks across shard servers. MongoDB automatically moves chunks so that they are balanced within the shard cluster.&lt;/p&gt;
+&lt;p&gt;The image of splitting data into chunks and distributing them across shards is as follows.&lt;/p&gt;
+&lt;p&gt;&amp;hellip; figure &amp;hellip;&lt;/p&gt;
+&lt;h2 id=&#34;operation-constraints-on-sharded-data&#34;&gt;Operation constraints on sharded data&lt;/h2&gt;
+&lt;p&gt;There are several restrictions on operations for sharded data.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;group&lt;/code&gt; command cannot be used.&lt;/li&gt;
+&lt;li&gt;Use MapReduce instead of aggregate.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;updateOne&lt;/code&gt; or &lt;code&gt;deleteOne&lt;/code&gt; must specify &lt;code&gt;_id&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;An error occurs if the shard key &lt;code&gt;_id&lt;/code&gt; is not included.&lt;/li&gt;
+&lt;li&gt;A sharded collection requires a unique index.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;sharded-and-unsharded-collections&#34;&gt;Sharded and unsharded collections&lt;/h2&gt;
+&lt;p&gt;MongoDB can mix sharded collections and unsharded collections. Sharded collections are distributed and stored in the shard cluster, while unsharded collections are stored on the primary shard.&lt;/p&gt;
+&lt;h2 id=&#34;data-distribution-methods&#34;&gt;Data distribution methods&lt;/h2&gt;
+&lt;p&gt;There are two distribution methods for sharding: hashed sharding and ranged sharding.&lt;/p&gt;
+&lt;h3 id=&#34;hashed-sharding&#34;&gt;Hashed sharding&lt;/h3&gt;
+&lt;p&gt;Hashed sharding distributes data using the hash value of the shard key. With hashed sharding, chunks tend to become scattered even when shard key values are close. In other words, it is a distribution method that makes distribution easier when the shard key changes monotonically. On the other hand, because data is easy to distribute, broadcast operations may increase depending on the data structure and retrieval method.&lt;/p&gt;
+&lt;h3 id=&#34;ranged-sharding&#34;&gt;Ranged sharding&lt;/h3&gt;
+&lt;p&gt;Ranged sharding distributes data according to the shard key range. Unlike hashed sharding, when shard key values are close, they are more likely to exist in the same chunk. If the shard key is chosen poorly, load can become concentrated on specific servers even though sharding is being used as a distribution technique.&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>How to Use the MongoDB mongod Command</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/how-use-mongod/</link>
+      <pubDate>Thu, 13 Jan 2022 07:57:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/how-use-mongod/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This article summarizes the basic main usage and options of the &lt;code&gt;mongod&lt;/code&gt; command.&lt;/p&gt;
+&lt;p&gt;Only the important options are covered here. For many other options, refer to the &lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;official manual&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;basic-options&#34;&gt;Basic options&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Option&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--config &amp;lt;filename&amp;gt;&lt;/code&gt;, &lt;code&gt;-f &amp;lt;filename&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies a configuration file that contains startup options.&lt;br&gt;If the configuration file path contains spaces, enclose it in double quotes (&lt;code&gt;&amp;quot;&lt;/code&gt;).&lt;br&gt;The configuration file uses ASCII encoding. Non-ASCII encodings such as UTF-8 are not supported. If both a configuration file and startup options are specified, the startup option values take precedence.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--port &amp;lt;port&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: 27017&lt;br&gt;Specifies the port number on which MongoDB waits for TCP connections.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--maxConns &amp;lt;number&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the number of concurrent connections MongoDB allows.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--logpath &amp;lt;path&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the path where the log file is output.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--logappend&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;When MongoDB is restarted, logging continues at the end of the existing log file.&lt;br&gt;By default, MongoDB backs up the existing log file and creates a new log file when restarted.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--slowms &amp;lt;integer&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: 100&lt;br&gt;Specifies the profiling threshold in milliseconds.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--profile &amp;lt;level&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: 0&lt;br&gt;Changes the database profiling level.&lt;br&gt;&lt;br&gt;- 0: Off. Does not perform profiling.&lt;br&gt;- 1: On. Profiles only slow operations.&lt;br&gt;- 2: On. Profiles all operations.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--auth&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Uses database access control.&lt;br&gt;User configuration changes are performed with the &lt;code&gt;mongo&lt;/code&gt; command. If no user exists, only access through &lt;code&gt;localhost&lt;/code&gt; is permitted.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--bind_ip &amp;lt;address&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: all connections&lt;br&gt;Specifies the IP address where MongoDB accepts connections.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--dbpath &amp;lt;path&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: &lt;code&gt;C:\data\db&lt;/code&gt;&lt;br&gt;Specifies the storage path where database files are stored.&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;windows-service-installation-options&#34;&gt;Windows service installation options&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Option&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--install&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Adds MongoDB as a Windows service.&lt;br&gt;If needed, specify &lt;code&gt;--serviceName&lt;/code&gt; and &lt;code&gt;--serviceDisplayName&lt;/code&gt; at the same time.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--remove&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Removes the MongoDB service from Windows services.&lt;br&gt;If a non-default name was installed with &lt;code&gt;--serviceName&lt;/code&gt;, specify &lt;code&gt;--serviceName&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceName &amp;lt;name&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: MongoDB&lt;br&gt;Specifies the service name.&lt;br&gt;The name specified here is used as the argument to &lt;code&gt;net start &amp;lt;name&amp;gt;&lt;/code&gt; and &lt;code&gt;net stop &amp;lt;name&amp;gt;&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceDisplayName &amp;lt;name&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: MongoDB&lt;br&gt;Specifies the name displayed in the service management tool.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceDescription &amp;lt;description&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Default: MongoDB Server&lt;br&gt;Specifies the string displayed in the description of the service management tool. If it contains spaces, enclose it in double quotes (&lt;code&gt;&amp;quot;&lt;/code&gt;).&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--serviceUser &amp;lt;user&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the user that runs MongoDB.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--servicePassword &amp;lt;password&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the password for the user that runs MongoDB.&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongod&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/program/mongod.exe/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongod.exe&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>MongoDB Features</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/features/</link>
+      <pubDate>Sun, 09 Jan 2022 18:38:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/features/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This article looks at the features of MongoDB.&lt;/p&gt;
+&lt;p&gt;The main features, also described on the official site, can be summarized as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Document database (NoSQL)&lt;/li&gt;
+&lt;li&gt;Special queries&lt;/li&gt;
+&lt;li&gt;High performance&lt;/li&gt;
+&lt;li&gt;High availability&lt;/li&gt;
+&lt;li&gt;Horizontal scalability&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;document-database-nosql&#34;&gt;Document database (NoSQL)&lt;/h2&gt;
+&lt;p&gt;MongoDB is a document-format database that can store key-value combinations as they are, like JSON. Values can take many forms. For example, it can store numbers and strings, as well as arrays and objects. These value types can also be changed dynamically, and multiple types can be placed under the same field name. In other words, it is a schemaless document database.&lt;/p&gt;
+&lt;h2 id=&#34;performance&#34;&gt;Performance&lt;/h2&gt;
+&lt;p&gt;The following features are implemented to provide performance.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Reduced I/O processing through embedded data models&lt;/li&gt;
+&lt;li&gt;Index support&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One of MongoDB&amp;rsquo;s characteristics is that it supports indexes even though it is NoSQL. You can also specify a unique key in relation to indexes.&lt;/p&gt;
+&lt;h2 id=&#34;special-queries&#34;&gt;Special queries&lt;/h2&gt;
+&lt;p&gt;MongoDB searches the database using special queries specified in JSON format. Queries can perform basic CRUD operations as well as the following distinctive operations.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Aggregation and Map-Reduce&lt;/li&gt;
+&lt;li&gt;String search using text indexes&lt;/li&gt;
+&lt;li&gt;Geospatial queries&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Aggregation and Map-Reduce can perform various statistics on stored data. Query assembly is implemented in a distinctive way, so it takes some getting used to, but the processing order is pipelined, which makes the code easier to follow.&lt;/p&gt;
+&lt;p&gt;Geospatial queries can use the built-in GeoJSON format to search for points within a range.&lt;/p&gt;
+&lt;h2 id=&#34;availability&#34;&gt;Availability&lt;/h2&gt;
+&lt;p&gt;MongoDB provides replication through a feature called replica sets. Replica sets provide automatic failover and data redundancy.&lt;/p&gt;
+&lt;h2 id=&#34;horizontal-scaling&#34;&gt;Horizontal scaling&lt;/h2&gt;
+&lt;p&gt;Horizontal scaling means that performance can be improved by adding machines. MongoDB provides horizontal scalability through a core feature called sharding.&lt;/p&gt;
+&lt;h2 id=&#34;support-for-multiple-storage-engines&#34;&gt;Support for multiple storage engines&lt;/h2&gt;
+&lt;p&gt;MongoDB supports multiple storage engines. In addition to commonly used file systems, you can choose an in-memory engine. It also exposes a storage engine API, so third-party storage engines can be created.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/introduction/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Introduction to MongoDB&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.tutorialsjar.com/key-features-of-mongodb/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TutorialsJar - What Are The Top 10 Key Features Of MongoDB?&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>Installing MongoDB with Docker</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/installs/</link>
+      <pubDate>Mon, 10 Jan 2022 08:53:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/installs/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;installing-mongodb-with-docker&#34;&gt;Installing MongoDB with Docker&lt;/h2&gt;
+&lt;h3 id=&#34;downloading-the-mongodb-docker-image&#34;&gt;Downloading the MongoDB Docker image&lt;/h3&gt;
+&lt;p&gt;Run the following command to download the MongoDB Docker image. If you do not specify a version in the tag, the latest version is downloaded.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker pull mongo
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The result is as follows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker pull mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Using default tag: latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;latest: Pulling from library/mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ea362f368469: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ecab26900ceb: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1847fcb70562: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a7de23811c0d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;29dd51833fb9: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5eccd2be8afb: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;cd8a8cd6879f: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;e6ca3abc397d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;7481c3682d3c: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;af377cb9eb7d: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Digest: sha256:6743836d42756b2ae50549b2eb4585c688fce81a243cedd152b56266c2fb3d17
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Status: Downloaded newer image &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; mongo:latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker.io/library/mongo:latest
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To specify the MongoDB version, specify the version in the tag. You can check available MongoDB versions on &lt;a href=&#34;https://hub.docker.com/_/mongo/?tab=tags&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Docker Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Check the downloaded Docker image with the following command.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The result is as follows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker images
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REPOSITORY                                      TAG            IMAGE ID       CREATED         SIZE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mongo                                           latest         ee13a1eacac9   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; days ago      696MB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;creating-and-running-a-mongodb-docker-container&#34;&gt;Creating and running a MongoDB Docker container&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;-v ~/mongodb/db:/data/db&lt;/code&gt; mounts the &lt;code&gt;~/mongodb/db&lt;/code&gt; directory on the host, meaning the local computer running the container, to the &lt;code&gt;/data/db&lt;/code&gt; directory in the container. If you do not set up a volume this way, the stored data is deleted when the container is deleted. Once deleted, container data cannot be recovered.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run --name my-mongodb -v ~/mongodb/db:/data/db -d -p 27017:27017 mongo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ade97bdb08fde4eaa72ceb0135b0a570d97b21616affb7949a0fc479fec25e0e
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;starting-stopping-and-restarting-a-mongodb-docker-container&#34;&gt;Starting, stopping, and restarting a MongoDB Docker container&lt;/h3&gt;
+&lt;p&gt;Stop the MongoDB Docker container.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker stop my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Start the MongoDB Docker container.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker start my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Restart the MongoDB Docker container.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker restart my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;checking-whether-the-mongodb-docker-container-is-running&#34;&gt;Checking whether the MongoDB Docker container is running&lt;/h4&gt;
+&lt;p&gt;Run the following command.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps -a
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                                  COMMAND                  CREATED          STATUS                      PORTS                                       NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ade97bdb08fd   mongo                                                  &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;docker-entrypoint.s...&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;37&lt;/span&gt; seconds ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;36&lt;/span&gt; seconds               0.0.0.0:27017-&amp;gt;27017/tcp                    my-mongodb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;connecting-to-the-mongodb-docker-container&#34;&gt;Connecting to the MongoDB Docker container&lt;/h4&gt;
+&lt;p&gt;Run the following command.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it my-mongodb bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The result is as follows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it my-mongodb bash
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@ade97bdb08fd:/#
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+      <category>Docker</category>
+      
+    </item>
+    
+    <item>
+      <title>How to Use the MongoDB mongo Command</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/how-to-use-mongo/</link>
+      <pubDate>Tue, 11 Jan 2022 18:21:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/how-to-use-mongo/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This article explains how to connect using &lt;code&gt;mongo&lt;/code&gt;, the client module for connecting to MongoDB.&lt;/p&gt;
+&lt;h2 id=&#34;basic-options&#34;&gt;Basic options&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Option&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--host &amp;lt;hostname&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the host name of the MongoDB server to connect to. If no host name is specified, it connects to localhost.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--port &amp;lt;port&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the port number used to connect to the MongoDB server. If no port number is specified, it connects to &lt;code&gt;27017&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--username &amp;lt;username&amp;gt;, -u &amp;lt;username&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the user name when accessing MongoDB with authentication enabled.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--password &amp;lt;password&amp;gt;, -p &amp;lt;password&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the password when connecting to MongoDB with authentication enabled.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;--authenticationDatabase &amp;lt;dbname&amp;gt;&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the database name used for authentication.&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;files&#34;&gt;Files&lt;/h2&gt;
+&lt;h3 id=&#34;dbshell&#34;&gt;.dbshell&lt;/h3&gt;
+&lt;p&gt;This stores the history of commands executed in the mongo shell. The file is automatically created directly under the home directory (&lt;code&gt;%UserProfile%&lt;/code&gt;). On Windows, for example, it is located in the following place.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;%UserProfile%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\Users\&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;user name&amp;gt;\.dbshell&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;mongorcjs&#34;&gt;.mongorc.js&lt;/h3&gt;
+&lt;p&gt;If you place the &lt;code&gt;.mongorc.js&lt;/code&gt; file directly under a defined directory (&lt;code&gt;%UserProfile%&lt;/code&gt; or &lt;code&gt;%ProgramData%&lt;/code&gt;), &lt;code&gt;.mongorc.js&lt;/code&gt; is automatically loaded and executed when &lt;code&gt;mongo&lt;/code&gt; starts. This lets you predefine variables or functions that you want to use commonly while the shell is running. &lt;code&gt;.mongorc.js&lt;/code&gt; reads global definitions (&lt;code&gt;%ProgramData%&lt;/code&gt;) before user definitions (&lt;code&gt;%UserProfile%&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;If you do not want to load &lt;code&gt;.mongorc.js&lt;/code&gt;, start &lt;code&gt;mongo&lt;/code&gt; with the &lt;code&gt;--norc&lt;/code&gt; option.&lt;/p&gt;
+&lt;p&gt;On Windows, for example, the directories are as follows.
+&lt;code&gt;%UserProfile%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\Users\&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;user name&amp;gt;\.mongorc.js&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;%ProgramData%&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\ProgramData\MongoDB\.mongorc.js&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/reference/program/mongo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongo&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.2/mongo/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB Manual - mongo shell&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>How to Apply Indexes in MongoDB</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/create-index/</link>
+      <pubDate>Wed, 12 Jan 2022 08:39:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/create-index/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Because MongoDB is a document database, it has indexes that work a little differently. This article explains index concepts that do not exist in relational databases.&lt;/p&gt;
+&lt;h2 id=&#34;mongodb-indexes&#34;&gt;MongoDB indexes&lt;/h2&gt;
+&lt;p&gt;In MongoDB, the &lt;code&gt;_id&lt;/code&gt; property is basically created automatically as a unique index whenever a document is created. If this is not enough, you can create your own indexes with &lt;code&gt;db.collection.createIndex()&lt;/code&gt;. Indexes created with &lt;code&gt;db.collection.createIndex()&lt;/code&gt; are B-tree data structure indexes.&lt;/p&gt;
+&lt;p&gt;MongoDB supports several index types in addition to simple key specifications. The supported index types are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Single key&lt;/li&gt;
+&lt;li&gt;Compound key&lt;/li&gt;
+&lt;li&gt;Multikey&lt;/li&gt;
+&lt;li&gt;Geospatial&lt;/li&gt;
+&lt;li&gt;Text&lt;/li&gt;
+&lt;li&gt;Hashed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;ldquo;Compound key&amp;rdquo; and &amp;ldquo;multikey&amp;rdquo; have similar names, but they are different. A compound key is a key made from a combination of multiple fields, while a multikey is a key that targets all values included in an array for a field that handles arrays.&lt;/p&gt;
+&lt;p&gt;Below, we will look at concrete examples of the basic single-field index, compound index, and multikey index.&lt;/p&gt;
+&lt;h2 id=&#34;basic-index-creation&#34;&gt;Basic index creation&lt;/h2&gt;
+&lt;p&gt;You can create an index on a specified collection by running the following command in the mongo shell.&lt;/p&gt;
+&lt;p&gt;The function is the same in JavaScript code, but JavaScript can specify a callback as the third argument.&lt;/p&gt;
+&lt;h3 id=&#34;syntax&#34;&gt;Syntax&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;keys, options&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;arguments&#34;&gt;Arguments&lt;/h3&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Argument&lt;/th&gt;
+          &lt;th&gt;Type&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;keys&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;string&lt;/code&gt;/&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies the field name that has a value. Specify &lt;code&gt;1&lt;/code&gt; for an ascending key and &lt;code&gt;-1&lt;/code&gt; for a descending key.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;options&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Specifies options for index creation. The available options include &lt;code&gt;unique&lt;/code&gt; and &lt;code&gt;collation&lt;/code&gt;. There are more options, but remember these for now.&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;examples&#34;&gt;Examples&lt;/h3&gt;
+&lt;p&gt;Below, we will look at examples of single-field indexes, compound indexes, and multikey indexes.&lt;/p&gt;
+&lt;h2 id=&#34;creating-a-single-field-index&#34;&gt;Creating a single-field index&lt;/h2&gt;
+&lt;p&gt;This section covers three sample codes for creating indexes on a sample document like the following. Because MongoDB is a document database, it can create indexes on embedded fields and embedded documents that do not exist in relational databases.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;score&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1034&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;city:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;Seoul&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;county:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;Korea Republic of&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;single-field&#34;&gt;Single field&lt;/h3&gt;
+&lt;p&gt;This is the simplest sample code for creating an index on a single field.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1034&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; score: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gt&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;embedded-field&#34;&gt;Embedded field&lt;/h3&gt;
+&lt;p&gt;MongoDB can also specify a document as an attribute value. In this case, fields inside the document, or nested elements, can also be indexed.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location.city&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;location.city&amp;#34;&lt;/span&gt;: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kyunggi&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;embedded-document&#34;&gt;Embedded document&lt;/h3&gt;
+&lt;p&gt;This is similar to an embedded field, but you can also specify the original object. However, note that in this case an exact match is required, including the number and order of attributes.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; location: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; city: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Seoul&amp;#34;&lt;/span&gt;, county: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Korea Republic of&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;creating-a-compound-key-index&#34;&gt;Creating a compound-key index&lt;/h2&gt;
+&lt;p&gt;This is a compound-key index, which also exists in relational databases. In MongoDB, it can be created by specifying multiple fields as keys. In a MongoDB compound-key index, the index is effective not only for patterns that match all specified compound keys, but also for patterns that match part of them.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s look at an example of creating a compound-key index for the following sample data.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;location&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;stock&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;type&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;cases&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: 1, location: 1, stock: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; item: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;, location: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;xxx store&amp;#34;&lt;/span&gt;, stock: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gt&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In the example above, the index is created as &lt;code&gt;item -&amp;gt; location -&amp;gt; stock&lt;/code&gt;, so the leading parts such as &lt;code&gt;item&lt;/code&gt; and &lt;code&gt;item -&amp;gt; location&lt;/code&gt; can also use the index.&lt;/p&gt;
+&lt;h2 id=&#34;creating-a-multikey-index&#34;&gt;Creating a multikey index&lt;/h2&gt;
+&lt;p&gt;MongoDB also has fields that use arrays as values. Whether an array contains primitive values or objects, a multikey index can be created.&lt;/p&gt;
+&lt;p&gt;Below, we will look at examples of creating an index on a collection that includes an array field named &lt;code&gt;ratings&lt;/code&gt; and searching it.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Apple&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;  &lt;span style=&#34;color:#a40000&#34;&gt;ratings:&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;2,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;9&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Banana&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;ratings:&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;4,&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#a40000&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;An index can be created simply by calling &lt;code&gt;createIndex()&lt;/code&gt; for &lt;code&gt;ratings&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Searches on array fields usually use &lt;code&gt;$elemMatch&lt;/code&gt;. The following example extracts documents where at least one &lt;code&gt;ratings&lt;/code&gt; record is greater than or equal to 3 and less than or equal to 6.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$elemMatch&lt;/span&gt;: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gte&lt;/span&gt;: 3, &lt;span style=&#34;color:#000&#34;&gt;$lte&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24459c684f917e3ec0c2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;XYZ&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 4, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If you enter the following, it extracts documents where at least one record satisfies greater than or equal to 3 or less than or equal to 6, so all documents are extracted as a result.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.find&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; ratings: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$gte&lt;/span&gt;: 3, &lt;span style=&#34;color:#000&#34;&gt;$lte&lt;/span&gt;: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;6&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24399c684f917e3ec0c1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ABC&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 2, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;9&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;_id&amp;#34;&lt;/span&gt; : ObjectId&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;5a2d24459c684f917e3ec0c2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;item&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;XYZ&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;ratings&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt; 4, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - db.collection.createIndex()&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-single/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Single Field Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-compound/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Compound Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/manual/core/index-multikey/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Multikey Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>How to Apply Unique Constraints in MongoDB</title>
+      <link>https://www.devkuma.com/en/docs/mongodb/unique-constraint/</link>
+      <pubDate>Wed, 12 Jan 2022 08:59:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/mongodb/unique-constraint/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This article explains how to apply unique constraints in MongoDB.&lt;/p&gt;
+&lt;h2 id=&#34;applying-unique-constraints&#34;&gt;Applying unique constraints&lt;/h2&gt;
+&lt;p&gt;To apply a unique constraint in MongoDB, specify &lt;code&gt;true&lt;/code&gt; for the &lt;code&gt;unique&lt;/code&gt; option of &lt;code&gt;createIndex()&lt;/code&gt; when creating an index.&lt;/p&gt;
+&lt;p&gt;The examples below show the cases of a single-key index and a compound-key index.&lt;/p&gt;
+&lt;h3 id=&#34;single-key-index&#34;&gt;Single-key index&lt;/h3&gt;
+&lt;p&gt;For a single-key index, you can create it by simply running the following code in the mongo shell.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; userId: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;compound-key-index&#34;&gt;Compound-key index&lt;/h3&gt;
+&lt;p&gt;For a compound-key index, the code is the same as for a single-key index.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: 1, lastname: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;With a compound-key index, the combination of compound keys only needs to be unique, so the following can be set without issue.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;kc&amp;#34;&lt;/span&gt;, lastname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kim&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;et&amp;#34;&lt;/span&gt;, lastname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Kim&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.members.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; firstname: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;kc&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;limits-on-setting-unique-constraints&#34;&gt;Limits on setting unique constraints&lt;/h2&gt;
+&lt;p&gt;As with relational databases, you cannot apply a unique constraint to a collection that already contains duplicate data. This may be obvious once duplicate data already exists.&lt;/p&gt;
+&lt;p&gt;Also, setting a unique constraint on a hashed index is not recommended. See &lt;a href=&#34;https://docs.mongodb.com/manual/core/index-hashed/#considerations&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Considerations for Hashed Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;behavior-when-no-value-is-set-for-the-unique-constraint-key&#34;&gt;Behavior when no value is set for the unique constraint key&lt;/h2&gt;
+&lt;p&gt;As in the example above where a unique constraint was set with a compound-key index, if there is a field with no value, MongoDB internally treats it as &lt;code&gt;null&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;For example, suppose there is a collection with a unique constraint on field &lt;code&gt;x&lt;/code&gt; as follows.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.createIndex&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; x: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;, &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; unique: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Assume that data is inserted without specifying field &lt;code&gt;x&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; y: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WriteResult&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nInserted&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The first insert succeeds because &lt;code&gt;x: null&lt;/code&gt; is assigned. What happens if another document without field &lt;code&gt;x&lt;/code&gt; is inserted?&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; db.collection.insert&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt; z: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WriteResult&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;({&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nInserted&amp;#34;&lt;/span&gt; : 0,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;writeError&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;code&amp;#34;&lt;/span&gt; : 11000,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;errmsg&amp;#34;&lt;/span&gt; : &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;E11000 duplicate key error collection: test.collection index: x_1 dup key: { : null }&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As shown above, an error occurs and the insert cannot be performed. The error message also shows that &lt;code&gt;null&lt;/code&gt; is assigned when no value is specified.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.mongodb.com/v3.4/core/index-unique/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;MongoDB - Unique Indexes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>MongoDB</category>
+      
+    </item>
+    
+  </channel>
+</rss>
