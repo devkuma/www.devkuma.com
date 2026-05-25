@@ -2674,5 +2674,524 @@ C:\apache\Apache24\logs&amp;gt;
       
     </item>
     
+    <item>
+      <title>Apache | VirtualHost Configuration</title>
+      <link>https://www.devkuma.com/en/docs/apache/virtualhost/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/virtualhost/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This section explains how to use a single server as a web server for multiple domains. There are two main approaches: assigning multiple IP addresses when the server has multiple interfaces, or routing requests by hostname on a single IP address.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | VirtualHost Configuration | IP-based Virtual Hosts</title>
+      <link>https://www.devkuma.com/en/docs/apache/ip-%EA%B8%B0%EB%B0%98-%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/ip-%EA%B8%B0%EB%B0%98-%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;ip-based-virtual-hosts&#34;&gt;IP-based Virtual Hosts&lt;/h3&gt;
+&lt;p&gt;IP-based virtual hosting assigns a virtual host to each IP address when a single server has multiple LAN cards and can use multiple IP addresses.&lt;/p&gt;
+&lt;p&gt;To assign IP-based virtual hosts, use &lt;code&gt;VirtualHost&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost IP address 1:port number&amp;gt;
+  ...
+  ...
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost IP address 2:port number&amp;gt;
+  ...
+  ...
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;For example, if the two IP addresses &lt;code&gt;192.168.1.1&lt;/code&gt; and &lt;code&gt;192.168.1.2&lt;/code&gt; are assigned, register &lt;code&gt;ww1.devkuma.com&lt;/code&gt; as &lt;code&gt;192.168.1.1&lt;/code&gt; in DNS and &lt;code&gt;ww2.devkuma.com&lt;/code&gt; as &lt;code&gt;192.168.1.2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To configure two hosts in one Apache instance, write the following in &lt;code&gt;httpd.conf&lt;/code&gt; or &lt;code&gt;http-vhosts.conf&lt;/code&gt;. From a management perspective, it is better to write this in &lt;code&gt;http-vhosts.conf&lt;/code&gt; rather than &lt;code&gt;httpd.conf&lt;/code&gt;. For details, see &lt;a href=&#34;https://www.devkuma.com/books/pages/1404&#34;&gt;Name-based Virtual Hosts&lt;/a&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost 192.168.1.1:80&amp;gt;
+    ServerName     ww1.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;
+    CustomLog      logs/ww1.access.log common
+    ErrorLog       logs/ww1.error.log
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost 192.168.1.2:80&amp;gt;
+    ServerName     ww2.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;
+    CustomLog      logs/ww2.access.log common
+    ErrorLog       logs/ww2.error.log
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;You need to configure the required settings for each IP address. For example, when &lt;code&gt;ww1.devkuma.com&lt;/code&gt; is accessed, the content under the document root &lt;code&gt;${SRVROOT}/htdocs-ww1&lt;/code&gt;, which is configured for &lt;code&gt;192.168.1.1&lt;/code&gt;, is returned.&lt;/p&gt;
+&lt;p&gt;Because each &lt;code&gt;VirtualHost&lt;/code&gt; can have its own individual settings, configure the settings as needed. As shown above, it is recommended to configure &lt;code&gt;ServerName&lt;/code&gt;, &lt;code&gt;DocumentRoot&lt;/code&gt;, and log-related settings separately. They are not required, however, so common settings may also be used.&lt;/p&gt;
+&lt;p&gt;You also need to configure access permissions for each document root. In the &lt;code&gt;httpd.conf&lt;/code&gt; file, set appropriate permissions for the two document roots as follows.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;Directory &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;&amp;gt;
+    Require all granted
+&amp;lt;/Directory&amp;gt;
+
+&amp;lt;Directory &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;&amp;gt;
+    Require all granted
+&amp;lt;/Directory&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;practice&#34;&gt;Practice&lt;/h2&gt;
+&lt;p&gt;Note: This was written without actually performing or verifying the exercise because there was no environment available for testing IP-based virtual hosts. Please use it as a reference.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | VirtualHost Configuration | Name-based Virtual Hosts</title>
+      <link>https://www.devkuma.com/en/docs/apache/%EC%9D%B4%EB%A6%84-%EA%B8%B0%EB%B0%98-%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/%EC%9D%B4%EB%A6%84-%EA%B8%B0%EB%B0%98-%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;name-based-virtual-hosts&#34;&gt;Name-based Virtual Hosts&lt;/h3&gt;
+&lt;p&gt;With name-based virtual hosting, the IP address does not have to be unique. Apache determines which host is being accessed by checking the &lt;code&gt;Host&lt;/code&gt; header included in the client request.&lt;/p&gt;
+&lt;p&gt;First, use &lt;code&gt;VirtualHost&lt;/code&gt; to configure each &lt;code&gt;ServerName&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost IP address:port-number&amp;gt;
+    ServerName www1.devkuma.com
+    ....
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost  IP address:port-number&amp;gt;
+    ServerName www2.devkuma.com
+    ....
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Apache refers to the &lt;code&gt;Host&lt;/code&gt; header included in the request and finds the block that matches &lt;code&gt;ServerName&lt;/code&gt;. When a matching block is found, that block&amp;rsquo;s settings are applied.&lt;/p&gt;
+&lt;p&gt;More specifically, to assign the two hosts &lt;code&gt;ww1.devkuma.com&lt;/code&gt; and &lt;code&gt;ww2.devkuma.com&lt;/code&gt; to one or more IP addresses and make each access behave differently, configure them as follows.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww1.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;
+    CustomLog      logs/ww1.access.log common
+    ErrorLog       logs/ww1.error.log
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww2.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;
+    CustomLog      logs/ww2.access.log common
+    ErrorLog       logs/ww2.error.log
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note: The &lt;code&gt;*:80&lt;/code&gt; part above may also be specified explicitly with an IP address, such as &lt;code&gt;192.168.1.2:80&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;practice&#34;&gt;Practice&lt;/h2&gt;
+&lt;p&gt;Now let&amp;rsquo;s try the actual exercise. First, register DNS entries for the two hosts. Here, instead of DNS, write the following in the &lt;code&gt;hosts&lt;/code&gt; file. For details about the &lt;code&gt;hosts&lt;/code&gt; file, see &lt;a href=&#34;https://www.devkuma.com/books/pages/1377&#34;&gt;Host Access Settings (hosts file)&lt;/a&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;127.0.0.1 ww1.devkuma.com
+127.0.0.1 ww2.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next is the &lt;code&gt;httpd.conf&lt;/code&gt; configuration. The virtual host settings will be written in the &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;First, enable the &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; file. Search for &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; in the &lt;code&gt;httpd.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Virtual hosts
+#Include conf/extra/httpd-vhosts.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Remove the &lt;code&gt;#&lt;/code&gt; before &lt;code&gt;Include&lt;/code&gt; so that &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; is loaded.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Virtual hosts
+Include conf/extra/httpd-vhosts.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, edit the &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; file. It is located in the &lt;code&gt;(Apache installation directory)Apache24\conf\extra&lt;/code&gt; directory.&lt;/p&gt;
+&lt;p&gt;It should contain sample settings like the following. Comments are omitted here.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerAdmin webmaster@dummy-host.example.com
+    DocumentRoot &amp;#34;${SRVROOT}/docs/dummy-host.example.com&amp;#34;
+    ServerName dummy-host.example.com
+    ServerAlias www.dummy-host.example.com
+    ErrorLog &amp;#34;logs/dummy-host.example.com-error.log&amp;#34;
+    CustomLog &amp;#34;logs/dummy-host.example.com-access.log&amp;#34; common
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost *:80&amp;gt;
+    ServerAdmin webmaster@dummy-host2.example.com
+    DocumentRoot &amp;#34;${SRVROOT}/docs/dummy-host2.example.com&amp;#34;
+    ServerName dummy-host2.example.com
+    ErrorLog &amp;#34;logs/dummy-host2.example.com-error.log&amp;#34;
+    CustomLog &amp;#34;logs/dummy-host2.example.com-access.log&amp;#34; common
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Here, change it as follows.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww1.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;
+    CustomLog      logs/ww1.access.log common
+    ErrorLog       logs/ww1.error.log
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww2.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;
+    CustomLog      logs/ww2.access.log common
+    ErrorLog       logs/ww2.error.log
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note: The &lt;code&gt;httpd-vhosts.conf&lt;/code&gt; file is loaded into &lt;code&gt;httpd.conf&lt;/code&gt; through &lt;code&gt;Include&lt;/code&gt;. Therefore, the log format name &lt;code&gt;common&lt;/code&gt; specified above uses the &lt;code&gt;common&lt;/code&gt; format defined in &lt;code&gt;httpd.conf&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Also create each document root as configured above, then create and place separate HTML files as follows.&lt;/p&gt;
+&lt;p&gt;{Apache installation directory}/htdocs-ww1/index.html&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;html&amp;gt;
+&amp;lt;body&amp;gt;
+&amp;lt;h1&amp;gt;WW1 Page&amp;lt;/h1&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;{Apache installation directory}/htdocs-ww2/index.html&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;html&amp;gt;
+&amp;lt;body&amp;gt;
+&amp;lt;h1&amp;gt;WW2 Page&amp;lt;/h1&amp;gt;
+&amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In the &lt;code&gt;httpd.conf&lt;/code&gt; file, set appropriate permissions for the two document roots as follows.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;Directory &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;&amp;gt;
+    Require all granted
+&amp;lt;/Directory&amp;gt;
+
+&amp;lt;Directory &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;&amp;gt;
+    Require all granted
+&amp;lt;/Directory&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The preparation is now complete. First, access &lt;code&gt;http://ww1.devkuma.com&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_ww1.png&#34; alt=&#34;Name-based virtual host&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The HTML file contained in the document root for &lt;code&gt;ww1.devkuma.com&lt;/code&gt; is displayed.&lt;/p&gt;
+&lt;p&gt;Next, access &lt;code&gt;http://ww2.devkuma.com/&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_ww2.png&#34; alt=&#34;Name-based virtual host&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The HTML file contained in the document root for &lt;code&gt;ww2.devkuma.com&lt;/code&gt; is displayed.&lt;/p&gt;
+&lt;p&gt;This explains how to use one IP address and Apache to return separate pages for hosts using multiple domains.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | VirtualHost Configuration | Virtual Host Alias Settings (ServerAlias)</title>
+      <link>https://www.devkuma.com/en/docs/apache/%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8-%EB%B3%84%EC%B9%AD-%EC%84%A4%EC%A0%95-serveralias/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/%EA%B0%80%EC%83%81-%ED%98%B8%EC%8A%A4%ED%8A%B8-%EB%B3%84%EC%B9%AD-%EC%84%A4%EC%A0%95-serveralias/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;virtual-host-alias-settings-serveralias&#34;&gt;Virtual Host Alias Settings (ServerAlias)&lt;/h2&gt;
+&lt;p&gt;When name-based virtual hosts are configured, let&amp;rsquo;s see what happens when the server is accessed with an unregistered hostname.&lt;/p&gt;
+&lt;p&gt;For example, assume DNS or the &lt;code&gt;hosts&lt;/code&gt; file contains the following entries.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;127.0.0.1 localhost
+127.0.0.1 ww1.devkuma.com
+127.0.0.1 ww2.devkuma.com
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Also assume virtual hosts are configured only for &lt;code&gt;ww1.devkuma.com&lt;/code&gt; and &lt;code&gt;ww2.devkuma.com&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww1.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;
+    CustomLog      logs/ww1.access.log common
+    ErrorLog       logs/ww1.error.log
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww2.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;
+    CustomLog      logs/ww2.access.log common
+    ErrorLog       logs/ww2.error.log
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;In this case, when &lt;code&gt;http://localhost&lt;/code&gt; is accessed, the first registered virtual host configuration is applied as the default.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_localhost_ww1.png&#34; alt=&#34;Virtual host alias settings (ServerAlias)&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Here, the first registered virtual host, &lt;code&gt;ww1.devkuma.com&lt;/code&gt;, was displayed.&lt;/p&gt;
+&lt;p&gt;In this situation, you can apply the settings of a non-default host to a hostname that does not have its own virtual host configuration. Use &lt;code&gt;ServerAlias&lt;/code&gt; to register the hostname as an alias in the virtual host settings.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ServerAlias hostname1 hostname2 ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;When registering multiple hostnames, write them separated by spaces.&lt;/p&gt;
+&lt;h2 id=&#34;practice&#34;&gt;Practice&lt;/h2&gt;
+&lt;p&gt;Now let&amp;rsquo;s try the actual exercise. Register &lt;code&gt;localhost&lt;/code&gt; as a &lt;code&gt;ServerAlias&lt;/code&gt; for &lt;code&gt;ww2.devkuma.com&lt;/code&gt; so that access to &lt;code&gt;http://localhost/&lt;/code&gt; also uses the &lt;code&gt;ww2.devkuma.com&lt;/code&gt; settings.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww1.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww1&amp;#34;
+    CustomLog      logs/ww1.access.log common
+    ErrorLog       logs/ww1.error.log
+&amp;lt;/VirtualHost&amp;gt;
+
+&amp;lt;VirtualHost *:80&amp;gt;
+    ServerName     ww2.devkuma.com
+    ServerAdmin    devkuma@devkuma.com
+    DocumentRoot   &amp;#34;${SRVROOT}/htdocs-ww2&amp;#34;
+    CustomLog      logs/ww2.access.log common
+    ErrorLog       logs/ww2.error.log
+    ServerAlias    localhost
+&amp;lt;/VirtualHost&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The preparation is now complete. Restart Apache, then access &lt;code&gt;http://localhost/&lt;/code&gt; again.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_localhost_ww2.png&#34; alt=&#34;Virtual host alias settings (ServerAlias)&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This time, &lt;code&gt;ww2.devkuma.com&lt;/code&gt;, which was configured as an alias, was displayed instead of the default setting.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Integrating with Tomcat (mod_proxy_ajp)</title>
+      <link>https://www.devkuma.com/en/docs/apache/tomcat%EA%B3%BC-%EC%97%B0%EB%8F%99-modproxyajp/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/tomcat%EA%B3%BC-%EC%97%B0%EB%8F%99-modproxyajp/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This section explains how to integrate Apache with Tomcat. The integration uses &lt;code&gt;mod_proxy_ajp&lt;/code&gt;.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Integrating with Tomcat (mod_proxy_ajp) | Creating a Simple Web App in Tomcat</title>
+      <link>https://www.devkuma.com/en/docs/apache/tomcat%EC%97%90-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%9B%B9%EC%83%9D%EC%84%B1/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/tomcat%EC%97%90-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%9B%B9%EC%83%9D%EC%84%B1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;First, configure Tomcat so it works by itself. The goal is to run a simple JSP through Apache that displays only &lt;code&gt;Tomcat Page&lt;/code&gt; from Tomcat.&lt;/p&gt;
+&lt;p&gt;For the web program created here, create a directory named &lt;code&gt;hello&lt;/code&gt; under &lt;code&gt;{Tomcat installation directory}/webapps&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\apache\apache-tomcat-9.0.29\webapps&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;gt;dir&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; C 드라이브의 볼륨에는 이름이 없습니다.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 볼륨 일련 번호: XXXX-XXXX
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; C:\apache\apache-tomcat-9.0.29\webapps 디렉터리
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-08  오전 02:38    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          .
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-08  오전 02:38    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          ..
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-07  오전 02:19    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          docs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-07  오전 02:19    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          examples
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-08  오전 02:40    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          hello &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;------------------ newly created directory.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-07  오전 02:19    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          host-manager
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-07  오전 02:19    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          manager
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2019-12-07  오전 02:19    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;DIR&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;          ROOT
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;               0개 파일                   0 바이트
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;               8개 디렉터리  450,057,445,376 바이트 남음
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;C&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f57900&#34;&gt;\apache\apache-tomcat-9.0.29\webapps&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;In the created directory, create the configuration file &lt;code&gt;{Tomcat installation directory}/webapps/hello/WEB-INF/web.xml&lt;/code&gt; and write the following.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;web-app&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://java.sun.com/xml/ns/javaee&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;xmlns:xsi=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#c4a000&#34;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#c4a000&#34;&gt;version=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;3.0&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;welcome-file-list&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;welcome-file&amp;gt;&lt;/span&gt;index.jsp&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/welcome-file&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/welcome-file-list&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/web-app&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then create the file &lt;code&gt;{Tomcat installation directory}/webapps/hello/index.jsp&lt;/code&gt;, which will be displayed on the screen, and write the following.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;html&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;body&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;h1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;Tomcat Page&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;h1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;body&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;html&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now run the command file &lt;code&gt;{Tomcat installation directory}/bin/startup.bat&lt;/code&gt; to start Tomcat. A console window like the following should appear.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_tomcat.png&#34; alt=&#34;Creating a simple web app in Tomcat&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Check whether the page is displayed by accessing &lt;code&gt;http://localhost:8080/hello/&lt;/code&gt; in a browser.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_tomcat_page.png&#34; alt=&#34;Creating a simple web app in Tomcat&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If it is displayed as above, the preparation is complete.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Integrating with Tomcat (mod_proxy_ajp) | Stop Port 8080 and Check the AJP/1.3 Protocol</title>
+      <link>https://www.devkuma.com/en/docs/apache/8080-%ED%8F%AC%ED%8A%B8%EB%A5%BC-%EC%A4%91%EC%A7%80%ED%95%98%EA%B3%A0-ajp/1-3-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%ED%99%95%EC%9D%B8/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/8080-%ED%8F%AC%ED%8A%B8%EB%A5%BC-%EC%A4%91%EC%A7%80%ED%95%98%EA%B3%A0-ajp/1-3-%ED%94%84%EB%A1%9C%ED%86%A0%EC%BD%9C-%ED%99%95%EC%9D%B8/</guid>
+      <description>
+        
+        
+        &lt;p&gt;To change access so it goes through Apache, prevent direct connections to Tomcat, which is currently running on port 8080.&lt;/p&gt;
+&lt;p&gt;For the configuration, open &lt;code&gt;server.xml&lt;/code&gt; in &lt;code&gt;{Tomcat installation directory}/conf&lt;/code&gt; with a text editor. Search for &lt;code&gt;8080&lt;/code&gt;, and you should find the following.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;Connector&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;port=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8080&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#c4a000&#34;&gt;protocol=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;HTTP/1.1&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;               &lt;span style=&#34;color:#c4a000&#34;&gt;connectionTimeout=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;20000&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;               &lt;span style=&#34;color:#c4a000&#34;&gt;redirectPort=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;8443&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Comment out this entire section.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;&amp;lt;!--
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;    &amp;lt;Connector port=&amp;#34;8080&amp;#34; protocol=&amp;#34;HTTP/1.1&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;               connectionTimeout=&amp;#34;20000&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;               redirectPort=&amp;#34;8443&amp;#34; /&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;--&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now it is no longer possible to connect to Tomcat on port 8080.&lt;/p&gt;
+&lt;p&gt;After completing the configuration, restart Tomcat and try accessing &lt;code&gt;http://localhost:8080/hello/helloworld&lt;/code&gt; in a browser.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_tomcat_err_connect_.png&#34; alt=&#34;Stop port 8080&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Then search &lt;code&gt;server.xml&lt;/code&gt; for the following content. It should appear when you search for &lt;code&gt;AJP&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;    &amp;lt;!-- Define an AJP 1.3 Connector on port 8009 --&amp;gt;
+    &amp;lt;Connector port=&amp;#34;8009&amp;#34; protocol=&amp;#34;AJP/1.3&amp;#34; redirectPort=&amp;#34;8443&amp;#34; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Apache will connect to Tomcat on port 8009 using the &lt;code&gt;AJP/1.3&lt;/code&gt; protocol.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Integrating with Tomcat (mod_proxy_ajp) | Apache Configuration (Connecting with mod_proxy_ajp)</title>
+      <link>https://www.devkuma.com/en/docs/apache/apache-%EC%84%A4%EC%A0%95-modproxyajp%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EC%97%B0%EA%B2%B0/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/apache-%EC%84%A4%EC%A0%95-modproxyajp%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%EC%97%B0%EA%B2%B0/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Now only the Apache configuration remains. Because the integration uses &lt;code&gt;mod_proxy_ajp&lt;/code&gt;, first change the configuration so the &lt;code&gt;mod_proxy&lt;/code&gt; and &lt;code&gt;mod_proxy_ajp&lt;/code&gt; modules are loaded.&lt;/p&gt;
+&lt;p&gt;Search for &lt;code&gt;mod_proxy_ajp&lt;/code&gt; in the &lt;code&gt;httpd.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#LoadModule proxy_module modules/mod_proxy.so
+#LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If they are commented out, remove the leading &lt;code&gt;#&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This changes the configuration so the &lt;code&gt;mod_proxy&lt;/code&gt; and &lt;code&gt;mod_proxy_ajp&lt;/code&gt; modules are loaded.&lt;/p&gt;
+&lt;p&gt;Next, configure requests for Tomcat. When a URL beginning with &lt;code&gt;http://localhost/hello/&lt;/code&gt; is accessed, Apache will call the Tomcat file. To do that, first use &lt;code&gt;Location&lt;/code&gt; as a section container and write the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;Location /hello/&amp;gt;
+
+&amp;lt;/Location&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;For section containers, see &lt;a href=&#34;https://www.devkuma.com/books/pages/1376&#34;&gt;Access Scope Settings (Section Containers)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Write the settings for accessing Tomcat inside &lt;code&gt;&amp;lt;Location&amp;gt;&lt;/code&gt;. Because Tomcat connects through port 8009 using the AJP/1.3 protocol, write the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;Location /hello/&amp;gt;
+    ProxyPass ajp://localhost:8009/hello/
+&amp;lt;/Location&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Writing this in the &lt;code&gt;httpd.conf&lt;/code&gt; file completes the setup.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_tomcat_ok.png&#34; alt=&#34;Connecting with mod_proxy_ajp&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If it is displayed as above, calling Tomcat through Apache succeeded.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Apache Server Management (mod_status)</title>
+      <link>https://www.devkuma.com/en/docs/apache/apache-%EC%84%9C%EB%B2%84-%EA%B4%80%EB%A6%AC-modstatus/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/apache-%EC%84%9C%EB%B2%84-%EA%B4%80%EB%A6%AC-modstatus/</guid>
+      <description>
+        
+        
+        &lt;p&gt;This section explains Apache server management tasks, such as viewing Apache runtime status and configuration information from the client side.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Apache Server Management (mod_status) | Checking Runtime Status (server-status)</title>
+      <link>https://www.devkuma.com/en/docs/apache/%EC%9E%91%EB%8F%99-%EC%83%81%ED%83%9C-%ED%99%95%EC%9D%B8-server-status/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/%EC%9E%91%EB%8F%99-%EC%83%81%ED%83%9C-%ED%99%95%EC%9D%B8-server-status/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Apache provides a handler called &lt;code&gt;server-status&lt;/code&gt; in the &lt;code&gt;mod_status&lt;/code&gt; module. A handler is like a function that performs a certain action; you can think of it as a group of program logic.&lt;/p&gt;
+&lt;p&gt;By calling the &lt;code&gt;server-status&lt;/code&gt; handler, you can check Apache&amp;rsquo;s runtime status. Let&amp;rsquo;s configure it so the runtime status can be viewed by calling the &lt;code&gt;server-status&lt;/code&gt; handler from a browser.&lt;/p&gt;
+&lt;h2 id=&#34;load-the-mod_status-module&#34;&gt;Load the mod_status Module&lt;/h2&gt;
+&lt;p&gt;First, load the module with &lt;code&gt;LoadModule&lt;/code&gt; so the &lt;code&gt;mod_status&lt;/code&gt; module can be used. Search for &lt;code&gt;mod_status&lt;/code&gt; in the &lt;code&gt;httpd.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#LoadModule status_module modules/mod_status.so
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If there is a &lt;code&gt;#&lt;/code&gt; before &lt;code&gt;LoadModule&lt;/code&gt;, remove it.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;LoadModule status_module modules/mod_status.so
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Next, configure the &lt;code&gt;server-status&lt;/code&gt; handler call. Use &lt;code&gt;Include&lt;/code&gt; to load the &lt;code&gt;httpd-info.conf&lt;/code&gt; file. Search for &lt;code&gt;httpd-info.conf&lt;/code&gt; in the &lt;code&gt;httpd.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Real-time info on requests and configuration
+#Include conf/extra/httpd-info.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If there is a &lt;code&gt;#&lt;/code&gt; before &lt;code&gt;Include&lt;/code&gt;, remove it.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Real-time info on requests and configuration
+Include conf/extra/httpd-info.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;check-the-httpd-infoconf-file&#34;&gt;Check the httpd-info.conf File&lt;/h2&gt;
+&lt;p&gt;Next, search for &lt;code&gt;/server-status&lt;/code&gt; in the &lt;code&gt;httpd-info.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;lt;Location /server-status&amp;gt;
+    SetHandler server-status
+    Require host .example.com
+    Require ip 127
+&amp;lt;/Location&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;Location&lt;/code&gt; sets the URL path to &lt;code&gt;/server-status&lt;/code&gt;, and &lt;code&gt;SetHandler&lt;/code&gt; specifies that the &lt;code&gt;server-status&lt;/code&gt; handler should be called and executed when the URL path &lt;code&gt;/server-status&lt;/code&gt; is requested.&lt;/p&gt;
+&lt;p&gt;With this configuration, when the browser requests &lt;code&gt;http://localhost/server-status&lt;/code&gt;, the &lt;code&gt;server-status&lt;/code&gt; handler runs and returns the result.
+The server runtime status should not be exposed to everyone, so access is allowed only from localhost.&lt;/p&gt;
+&lt;h2 id=&#34;check-execution&#34;&gt;Check Execution&lt;/h2&gt;
+&lt;p&gt;Access &lt;code&gt;http://127.0.0.1/server-status&lt;/code&gt; locally.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_status.png&#34; alt=&#34;server-status&#34;&gt;&lt;/p&gt;
+&lt;p&gt;If you can access the URL like this, you can monitor Apache&amp;rsquo;s runtime status as shown above.&lt;/p&gt;
+&lt;h2 id=&#34;automatic-updates-at-a-specified-interval&#34;&gt;Automatic Updates at a Specified Interval&lt;/h2&gt;
+&lt;p&gt;When connecting from localhost, add &lt;code&gt;?refresh=seconds&lt;/code&gt; as a URL parameter to fetch the latest information again at the specified interval.&lt;/p&gt;
+&lt;p&gt;For example, enter &lt;code&gt;http://127.0.0.1/server-status?refresh=5&lt;/code&gt; to update automatically every 5 seconds.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_status_refresh.png&#34; alt=&#34;server-status&#34;&gt;&lt;/p&gt;
+&lt;p&gt;As shown above, you can confirm that the latest information is fetched again and displayed automatically every 5 seconds.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache | Apache Server Management (mod_status) | Displaying Extended Status (ExtendedStatus)</title>
+      <link>https://www.devkuma.com/en/docs/apache/%ED%99%95%EC%9E%A5-%EC%83%81%ED%83%9C-%ED%91%9C%EC%8B%9C-extendedstatus/</link>
+      <pubDate>Wed, 13 Nov 2019 23:46:40 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/apache/%ED%99%95%EC%9E%A5-%EC%83%81%ED%83%9C-%ED%91%9C%EC%8B%9C-extendedstatus/</guid>
+      <description>
+        
+        
+        &lt;p&gt;When executing the &lt;code&gt;server-status&lt;/code&gt; handler, setting &lt;code&gt;ExtendedStatus&lt;/code&gt; to &lt;code&gt;On&lt;/code&gt; also lets you view information about the URLs and resources currently being processed.&lt;/p&gt;
+&lt;p&gt;Search for &lt;code&gt;ExtendedStatus&lt;/code&gt; in the &lt;code&gt;httpd-info.conf&lt;/code&gt; file, and you should find the following.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#
+# ExtendedStatus controls whether Apache will generate &amp;#34;full&amp;#34; status
+# information (ExtendedStatus On) or just basic information (ExtendedStatus
+# Off) when the &amp;#34;server-status&amp;#34; handler is called. The default is Off.
+#
+#ExtendedStatus On
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The description says the default is &lt;code&gt;Off&lt;/code&gt;. Remove the &lt;code&gt;#&lt;/code&gt; from &lt;code&gt;ExtendedStatus On&lt;/code&gt; and set the extended status to &lt;code&gt;On&lt;/code&gt; to view detailed information.&lt;/p&gt;
+&lt;p&gt;Then set it to &lt;code&gt;On&lt;/code&gt; and access &lt;code&gt;http://localhost/server-status&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/apache/apache_ExtendedStatus.png&#34; alt=&#34;ExtendedStatus&#34;&gt;&lt;/p&gt;
+&lt;p&gt;You can see that more detailed information is displayed at the bottom of the screen.&lt;/p&gt;
+
+      </description>
+      
+      <category>Apache</category>
+      
+      <category>WEB</category>
+      
+    </item>
+    
   </channel>
 </rss>
