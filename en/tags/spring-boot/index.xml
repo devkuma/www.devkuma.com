@@ -308,5 +308,480 @@ Hello Spring MVC
       
     </item>
     
+    <item>
+      <title>Spring Boot default metrics</title>
+      <link>https://www.devkuma.com/en/docs/prometheus/spring-boot/default-metrics/</link>
+      <pubDate>Sat, 10 Dec 2022 04:41:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/prometheus/spring-boot/default-metrics/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;a href=&#34;https://tomgregory.com/spring-boot-default-metrics/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://tomgregory.com/spring-boot-default-metrics/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This page looks at the most important default metrics provided by Spring Boot and how to use them to highlight problems in an application more effectively.&lt;/p&gt;
+&lt;h2 id=&#34;overview-of-spring-boot-actuator-and-micrometer&#34;&gt;Overview of Spring Boot Actuator and Micrometer&lt;/h2&gt;
+&lt;p&gt;Spring Boot Actuator provides various monitoring and management endpoints through HTTP and JMX. By integrating with the Micrometer application monitoring framework, it includes very important metrics features.&lt;/p&gt;
+&lt;p&gt;The first page of the &lt;a href=&#34;https://micrometer.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Micrometer&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; site says:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Micrometer provides a simple facade over the instrumentation clients for the most popular monitoring systems, allowing you to instrument your JVM-based application code without vendor lock-in. Think SLF4J, but for metrics.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Micrometer is a vendor-independent metrics facade. In other words, metrics are collected in one common way and exposed in the format required by various monitoring systems. If SLF4J exists for logging systems, Micrometer exists for monitoring systems.&lt;/p&gt;
+&lt;p&gt;Popular supported monitoring frameworks include Graphite, Prometheus, and StatsD. Here, the focus is Prometheus, a standalone service that periodically fetches metrics from an application.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/prometheus-pull.png&#34; alt=&#34;Prometheus pull&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;add-actuator-metrics-to-a-spring-boot-application&#34;&gt;Add Actuator metrics to a Spring Boot application&lt;/h2&gt;
+&lt;p&gt;To configure a Spring Boot application to publish metrics in Prometheus format, follow these steps.&lt;/p&gt;
+&lt;h3 id=&#34;include-additional-dependencies&#34;&gt;Include additional dependencies&lt;/h3&gt;
+&lt;p&gt;To include the Spring Boot Starter Actuator &lt;a href=&#34;https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;, add the following to the Gradle dependency list.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The Maven equivalent is:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.springframework.boot&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;spring-boot-starter-actuator&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then add the Micrometer Registry Prometheus &lt;a href=&#34;https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;module&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;, so metrics can be scraped from the application in Prometheus format.&lt;/p&gt;
+&lt;p&gt;Gradle:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;io.micrometer:micrometer-registry-prometheus:1.5.1&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Maven:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;io.micrometer&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;micrometer-registry-prometheus&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.5.1&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;enable-metrics-in-configuration&#34;&gt;Enable metrics in configuration&lt;/h3&gt;
+&lt;p&gt;By default, almost all Spring Boot Actuator HTTP endpoints are disabled, but they can be enabled through configuration. Add the following setting to the &lt;code&gt;application.properties&lt;/code&gt; file in the project&amp;rsquo;s &lt;code&gt;src/main/resources&lt;/code&gt; folder.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-properties&#34; data-lang=&#34;properties&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;management.endpoints.web.exposure.include&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;metrics,prometheus&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The Actuator module has many endpoints that can be enabled, but this configuration enables only the following two.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;/actuator/metrics&lt;/code&gt;: an endpoint that provides a JSON API for exploring metrics and viewing their values.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/actuator/prometheus&lt;/code&gt;: an endpoint that returns metrics in a custom format required for collection by Prometheus.
+&lt;ul&gt;
+&lt;li&gt;This is the part that will be explained continuously below.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-spring-mvc-metrics&#34;&gt;1. Spring MVC metrics&lt;/h2&gt;
+&lt;p&gt;For any web application, the default Spring MVC metrics provide an excellent starting point for monitoring inbound HTTP traffic. Whether you need to track errors, traffic volume, or request latency, these metrics help.&lt;/p&gt;
+&lt;h3 id=&#34;inbound-http-request-duration&#34;&gt;Inbound HTTP request duration&lt;/h3&gt;
+&lt;p&gt;For each endpoint exposed by a Spring Boot application, the &lt;code&gt;http_server_requests_seconds&lt;/code&gt; summary metric provides information about request count and request duration. It consists of two metrics exposed by the &lt;code&gt;/actuator/prometheus&lt;/code&gt; endpoint.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP http_server_requests_seconds  &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE http_server_requests_seconds summary&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_server_requests_seconds_count&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;exception&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;None&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 12.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_server_requests_seconds_sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;exception&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;None&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.083579374
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;http_server_requests_seconds_count&lt;/code&gt; is the total number of requests received by the application at that endpoint.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;http_server_requests_seconds_sum&lt;/code&gt; is the sum of the durations of all requests received by the application at that endpoint.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These metrics include the following tags.&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Tag&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+          &lt;th&gt;Example&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;exception&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Class name of the exception that occurred&lt;/td&gt;
+          &lt;td&gt;None, NullPointerException&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;method&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;HTTP request method&lt;/td&gt;
+          &lt;td&gt;GET, POST, PUT, PATCH, etc.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;outcome&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;String description of the HTTP response status&lt;/td&gt;
+          &lt;td&gt;SUCCESS, SERVER_ERROR&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;status&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;HTTP response status code&lt;/td&gt;
+          &lt;td&gt;200, 500, etc.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;uri&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Request URI&lt;/td&gt;
+          &lt;td&gt;&lt;code&gt;/hello&lt;/code&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;What is a tag?&lt;/div&gt;
+
+
+A tag is useful for measuring variations in a metric. For example, with `http_server_requests_seconds_count`, you can measure the number of requests for a specific URI.
+
+If the application starts returning a different error response status, the metric is separated into a metric with a different status tag. Those metrics can be queried together or separately.
+&lt;/div&gt;
+
+&lt;p&gt;In Prometheus, you can create a simple query that provides the average inbound request duration across all tags.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rate&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;http_server_requests_seconds_sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1m&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;])&lt;/span&gt; / rate&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;http_server_requests_seconds_count&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1m&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/prometheus-graph-1.png&#34; alt=&#34;http_server_requests_seconds_count / http_server_requests_seconds_sum graph&#34;&gt;&lt;/p&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Why use the rate function?&lt;/div&gt;
+
+
+You may wonder why the rate function is included in the Prometheus query above. Why not just divide the request count by the total request duration? The [Micrometer website](https://micrometer.io/docs/registry/prometheus#_timers) explains:
+
+&#34;Representing a counter without rate normalization over some time window is rarely useful, as the representation is a function of both the rapidity with which the counter is incremented and the longevity of the service.&#34;
+
+&#34;Since the representation is a function of both the speed at which the counter increases and the lifetime of the service, representing a counter without rate normalization over a period of time is rarely useful.&#34;
+&lt;/div&gt;
+
+&lt;h3 id=&#34;inbound-http-request-quantiles-and-percentiles&#34;&gt;Inbound HTTP request quantiles and percentiles&lt;/h3&gt;
+&lt;p&gt;Spring MVC metrics can also calculate quantiles and percentiles, which can be useful when evaluating how slow API request durations are while ignoring the slowest requests.&lt;/p&gt;
+&lt;p&gt;For example, the 95th percentile is the value below which 95% of observed values fall and above which 5% fall. In other words, it provides the slowest request duration seen by 95% of requests.&lt;/p&gt;
+&lt;p&gt;To enable quantiles, add an additional configuration property to &lt;code&gt;application.properties&lt;/code&gt;, replacing it with the quantiles of interest, which are not percentiles despite the name.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-properties&#34; data-lang=&#34;properties&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;management.metrics.web.server.request.autotime.percentiles&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;lt;comma-separated list of quantiles&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If the property is configured as &lt;code&gt;0.95&lt;/code&gt;, the following metric is generated at &lt;code&gt;/actuator/prometheus&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_server_requests_seconds&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;exception&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;None&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;,quantile&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;0.95&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.023068672
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The tags used with this metric are the same as above, but now there is also a &lt;code&gt;quantile&lt;/code&gt; tag that can be used to query the metric.&lt;/p&gt;
+&lt;p&gt;The query &lt;code&gt;http_server_requests_seconds{quantile=&amp;quot;0.95&amp;quot;}&lt;/code&gt; generates a graph in Prometheus.&lt;/p&gt;
+&lt;h3 id=&#34;maximum-inbound-http-request-duration&#34;&gt;Maximum inbound HTTP request duration&lt;/h3&gt;
+&lt;p&gt;For each endpoint exposed by a Spring Boot application, the &lt;code&gt;http_server_requests_seconds_max&lt;/code&gt; gauge metric provides the maximum duration for each inbound HTTP request type.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP http_server_requests_seconds_max Duration of HTTP server request handling&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE http_server_requests_seconds_max gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_server_requests_seconds_max&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;exception&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;None&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.005831
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;http_server_requests_seconds_max&lt;/code&gt; is the maximum request duration during a period. When a new time window starts, the value is reset to 0. The default time window is two minutes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The tags used with this metric are the same as above.&lt;/p&gt;
+&lt;p&gt;This graph is generated in Prometheus from a regular &lt;code&gt;http_server_requests_seconds_max&lt;/code&gt; query.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/prometheus-graph-3.png&#34; alt=&#34;http_server_requests_seconds_max graph&#34;&gt;&lt;/p&gt;
+&lt;p&gt;All metrics described in this document can be started and run immediately using the accompanying GitHub repository. It includes a Spring Boot application that generates metrics and a Prometheus instance where queries can be executed.&lt;/p&gt;
+&lt;h2 id=&#34;2-http-client-resttemplate-and-webclient-outbound-request-metrics&#34;&gt;2. HTTP client RestTemplate and WebClient outbound request metrics&lt;/h2&gt;
+&lt;p&gt;If you perform outbound HTTP requests using the &lt;code&gt;RestTemplate&lt;/code&gt; or &lt;code&gt;WebClient&lt;/code&gt; classes, request metrics similar to inbound HTTP requests can be used. For these metrics to work, the HTTP client must be created using the injected &lt;code&gt;RestTemplateBuilder&lt;/code&gt; or &lt;code&gt;WebClient.Builder&lt;/code&gt; class.&lt;/p&gt;
+&lt;h3 id=&#34;outbound-http-request-duration&#34;&gt;Outbound HTTP request duration&lt;/h3&gt;
+&lt;p&gt;Each outbound endpoint gets the &lt;code&gt;http_client_requests_seconds&lt;/code&gt; metric. It consists of two metrics exposed by the &lt;code&gt;/actuator/prometheus&lt;/code&gt; endpoint.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP http_client_requests_seconds Timer of RestTemplate operation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE http_client_requests_seconds summary&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_client_requests_seconds_count&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clientName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;google.com&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/https://google.com&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 3.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_client_requests_seconds_sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clientName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;google.com&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/https://google.com&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.465022459
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;http_client_requests_seconds_count&lt;/code&gt; is the total number of requests the application made to this endpoint.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;http_client_requests_seconds_sum&lt;/code&gt; is the sum of the durations of all requests the application made to this endpoint.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These metrics also include the following tags.&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Tag&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;clientName&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Name of the endpoint being called, using the host of the URI&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;exception&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Class name of the exception that occurred&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;method&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;HTTP request method&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;outcome&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;String description of the HTTP response status&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;status&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;HTTP response status code&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;uri&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Request URI&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;In Prometheus, you can create a simple query that provides average outbound request duration over time.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rate&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;http_client_requests_seconds_sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1m&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;])&lt;/span&gt; / rate&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;http_client_requests_seconds_count&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;1m&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;maximum-outbound-http-request-duration&#34;&gt;Maximum outbound HTTP request duration&lt;/h3&gt;
+&lt;p&gt;Each outbound endpoint gets the &lt;code&gt;http_client_requests_seconds_max&lt;/code&gt; gauge metric, which provides the maximum duration of each outbound HTTP request type.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP http_client_requests_seconds_max Timer of RestTemplate operation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE http_client_requests_seconds_max gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http_client_requests_seconds_max&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;clientName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;google.com&amp;#34;&lt;/span&gt;,method&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;,outcome&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;SUCCESS&amp;#34;&lt;/span&gt;,status&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;200&amp;#34;&lt;/span&gt;,uri&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/https://google.com&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.205564498
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;http_client_requests_seconds_max&lt;/code&gt; is the maximum request duration during a period. When a new time window starts, the value is reset to 0. The default time window is two minutes.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The tags used with this metric are the same as in &amp;ldquo;Outbound HTTP request duration&amp;rdquo; above.&lt;/p&gt;
+&lt;h2 id=&#34;3-jvm-metrics&#34;&gt;3. JVM metrics&lt;/h2&gt;
+&lt;p&gt;Micrometer includes three types of metrics that help monitor what is happening in the JVM (Java Virtual Machine).&lt;/p&gt;
+&lt;h3 id=&#34;jvm-memory-metrics&#34;&gt;JVM memory metrics&lt;/h3&gt;
+&lt;p&gt;For each memory area, you can check the amount of memory used with &lt;code&gt;jvm_memory_used_bytes&lt;/code&gt; and the available memory with &lt;code&gt;jvm_memory_max_bytes&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_memory_used_bytes The amount of used memory&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_memory_used_bytes gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_memory_used_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;heap&amp;#34;&lt;/span&gt;,id&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;G1 Survivor Space&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 8388608.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_memory_used_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;heap&amp;#34;&lt;/span&gt;,id&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;G1 Old Gen&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 3938936.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_memory_used_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nonheap&amp;#34;&lt;/span&gt;,id&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Metaspace&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 4.2306152E7
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_memory_max_bytes gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_memory_max_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;heap&amp;#34;&lt;/span&gt;,id&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;G1 Survivor Space&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; -1.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_memory_max_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;heap&amp;#34;&lt;/span&gt;,id&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;G1 Old Gen&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 8.589934592E9
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;There is a lot of data here, but for example, you can display the total amount of used heap memory in Prometheus with the following query.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;jvm_memory_used_bytes&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;heap&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;})&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This uses the Prometheus &lt;code&gt;sum&lt;/code&gt; function to add the memory used in all heap memory areas visible in the &lt;code&gt;id&lt;/code&gt; tag above, such as &lt;em&gt;G1 Survivor Space&lt;/em&gt;, &lt;em&gt;G1 Old Gen&lt;/em&gt;, and &lt;em&gt;G1 Eden Space&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/prometheus-graph-22.png&#34; alt=&#34;Graphing jvm_memory_used_bytes to show used heap memory&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;jvm-garbage-collection-metrics&#34;&gt;JVM garbage collection metrics&lt;/h3&gt;
+&lt;p&gt;There are many garbage collection metrics available to gain deep insight into how the JVM manages memory. They can largely be divided into the following areas.&lt;/p&gt;
+&lt;h2 id=&#34;pause-time&#34;&gt;Pause time&lt;/h2&gt;
+&lt;p&gt;The &lt;code&gt;jvm_gc_pause_seconds&lt;/code&gt; and &lt;code&gt;jvm_gc_pause_seconds_max&lt;/code&gt; metrics provide information about the time spent in garbage collection.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_pause_seconds Time spent in GC pause&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_pause_seconds summary&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_count&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;action&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;end of minor GC&amp;#34;&lt;/span&gt;,cause&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Metadata GC Threshold&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 1.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_sum&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;action&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;end of minor GC&amp;#34;&lt;/span&gt;,cause&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Metadata GC Threshold&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.005
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_pause_seconds_max Time spent in GC pause&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_pause_seconds_max gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_max&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;action&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;end of minor GC&amp;#34;&lt;/span&gt;,cause&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Metadata GC Threshold&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;memory-pool-size-increase&#34;&gt;Memory pool size increase&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;jvm_gc_memory_allocated_bytes_total&lt;/code&gt; metric tells you about increases in the size of the young-generation memory pool, while &lt;code&gt;jvm_gc_memory_promoted_bytes_total&lt;/code&gt; is for the old generation.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the young generation memory pool after one GC to before the next&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_memory_allocated_bytes_total counter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_memory_allocated_bytes_total 2.66338304E8
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_memory_promoted_bytes_total counter&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_memory_promoted_bytes_total 1.4841448E7
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;live-old-generation-pool-size&#34;&gt;Live old-generation pool size&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;jvm_gc_live_data_size_bytes&lt;/code&gt; metric tells you the old-generation pool size. &lt;code&gt;jvm_gc_max_data_size_bytes&lt;/code&gt; tells you the maximum size that can be allocated to the old-generation pool.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_live_data_size_bytes Size of old generation memory pool after a full GC&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_live_data_size_bytes gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_live_data_size_bytes 9039328.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_gc_max_data_size_bytes Max size of old generation memory pool&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_gc_max_data_size_bytes gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_max_data_size_bytes 5.22190848E8
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;jvm-thread-metrics&#34;&gt;JVM thread metrics&lt;/h2&gt;
+&lt;p&gt;These metrics let you check the threads in the JVM.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_threads_states_threads The current number of threads having NEW state&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_threads_states_threads gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;runnable&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 7.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;blocked&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;waiting&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 11.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;timed-waiting&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 3.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;new&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_states_threads&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;state&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;terminated&amp;#34;&lt;/span&gt;,&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; 0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_threads_live_threads gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_live_threads 21.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_threads_daemon_threads The current number of live daemon threads&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_threads_daemon_threads gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_daemon_threads 17.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# TYPE jvm_threads_peak_threads gauge&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_threads_peak_threads 23.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;jvm_threads_states_threads&lt;/code&gt; shows the number of threads in each thread state.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;jvm_threads_live_threads&lt;/code&gt; shows the total number of live threads, including daemon and non-daemon threads.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;jvm_threads_daemon_threads&lt;/code&gt; shows the total number of daemon threads.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;jvm_threads_peak_threads&lt;/code&gt; shows the maximum total number of threads since the JVM started.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Daemon thread&lt;/div&gt;
+
+
+A daemon thread is a low-priority thread that performs background tasks such as garbage collection.
+&lt;/div&gt;
+
+&lt;p&gt;If you run &lt;code&gt;jvm_threads_states_threads&lt;/code&gt; in Prometheus, you can see all thread states in the graph.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/prometheus-graph-23.png&#34; alt=&#34;jvm_threads_states_threads graph&#34;&gt;&lt;/p&gt;
+
+      </description>
+      
+      <category>Prometheus</category>
+      
+      <category>Grafana</category>
+      
+      <category>Spring</category>
+      
+      <category>Spring Boot</category>
+      
+    </item>
+    
+    <item>
+      <title>Quick Guide to Application Monitoring with Spring Boot &#43; Prometheus &#43; Grafana &#43; Docker</title>
+      <link>https://www.devkuma.com/en/docs/prometheus/spring-boot/</link>
+      <pubDate>Sat, 10 Dec 2022 04:41:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/prometheus/spring-boot/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/springboot-docker-prometheus-grafana.png&#34; alt=&#34;Installing Spring Boot, Prometheus, and Grafana with Docker&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;overview&#34;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This guide configures Spring Boot Actuator to expose &lt;a href=&#34;https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.metrics&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Metrics&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;, sends those metrics to Prometheus, and visualizes them in Grafana.&lt;/p&gt;
+&lt;h2 id=&#34;create-a-spring-boot-project&#34;&gt;Create a Spring Boot Project&lt;/h2&gt;
+&lt;p&gt;First, create a Spring Boot project that will expose metrics for Prometheus.&lt;/p&gt;
+&lt;h3 id=&#34;command-to-create-a-new-project&#34;&gt;Command to create a new project&lt;/h3&gt;
+&lt;p&gt;Use the &lt;code&gt;curl&lt;/code&gt; command below to create a new Spring Boot project.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl https://start.spring.io/starter.tgz &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;bootVersion&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;2.7.6 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;web,actuator,prometheus &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;baseDir&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;spring-actuator-prometheus &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;groupId&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;com.devkuma &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;artifactId&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;spring-actuator-prometheus &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;packageName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;com.devkuma.prometheus &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;applicationName&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;ActuatorPrometheusApplication &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;javaVersion&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;11&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;packaging&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;jar &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-d &lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;gradle-project &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; tar -xzvf -
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;This command uses Java 11 and Spring Boot 2.7.6, and adds the &lt;code&gt;web&lt;/code&gt;, &lt;code&gt;actuator&lt;/code&gt;, and &lt;code&gt;prometheus&lt;/code&gt; dependencies.&lt;/p&gt;
+&lt;h3 id=&#34;check-dependencies-in-the-build-file&#34;&gt;Check dependencies in the build file&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;build.gradle&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000&#34;&gt;dependencies&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;org.springframework.boot:spring-boot-starter-actuator&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;implementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;runtimeOnly&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;io.micrometer:micrometer-registry-prometheus&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000&#34;&gt;testImplementation&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;spring-boot-starter-actuator&lt;/code&gt; provides access to Spring Boot application information.
+&lt;ul&gt;
+&lt;li&gt;Since Spring Boot 2.0, Actuator includes Micrometer support for measuring application metrics.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;micrometer-registry-prometheus&lt;/code&gt; provides metrics that Prometheus can read.
+&lt;ul&gt;
+&lt;li&gt;This library converts metrics produced by Micrometer into a metric format that a Prometheus server can use.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;configure-the-actuator-endpoint&#34;&gt;Configure the Actuator endpoint&lt;/h3&gt;
+&lt;p&gt;In Spring Web, Actuator provides an additional endpoint so that a Prometheus server can pull application metric information generated through Micrometer.&lt;/p&gt;
+&lt;p&gt;Actuator can configure the list of endpoints exposed under &lt;code&gt;/actuator&lt;/code&gt; through the &lt;code&gt;management.endpoints.web.exposure.include&lt;/code&gt; option in &lt;code&gt;application.yml&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;/src/main/resources/application.yml&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yml&#34; data-lang=&#34;yml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;management&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;endpoints&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;exposure&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;include&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;health, prometheus&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Here, the default &lt;code&gt;health&lt;/code&gt; endpoint and the Prometheus endpoint are exposed.&lt;/p&gt;
+&lt;h3 id=&#34;check-the-endpoint-list-provided-by-the-application&#34;&gt;Check the endpoint list provided by the application&lt;/h3&gt;
+&lt;p&gt;Run the application and open &lt;code&gt;http://localhost:8080/actuator&lt;/code&gt; to check the list of endpoints provided by Actuator.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;_links&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;self&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;href&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost:8080/actuator&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;templated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;health-path&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;href&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost:8080/actuator/health/{*path}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;templated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;health&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;href&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost:8080/actuator/health&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;templated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;prometheus&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;href&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;http://localhost:8080/actuator/prometheus&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;&amp;#34;templated&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;false&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;At &lt;code&gt;http://localhost:8080/actuator/prometheus&lt;/code&gt;, you can check the metrics collected through Micrometer.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# HELP tomcat_sessions_active_current_sessions  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# TYPE tomcat_sessions_active_current_sessions gauge
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tomcat_sessions_active_current_sessions 0.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# HELP jvm_gc_pause_seconds Time spent in GC pause
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# TYPE jvm_gc_pause_seconds summary
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_count{action=&amp;#34;end of minor GC&amp;#34;,cause=&amp;#34;Metadata GC Threshold&amp;#34;,} 1.0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_sum{action=&amp;#34;end of minor GC&amp;#34;,cause=&amp;#34;Metadata GC Threshold&amp;#34;,} 0.006
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# TYPE jvm_gc_pause_seconds_max gauge
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;jvm_gc_pause_seconds_max{action=&amp;#34;end of minor GC&amp;#34;,cause=&amp;#34;Metadata GC Threshold&amp;#34;,} 0.006
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... omitted ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Each entry is displayed as a metric that Prometheus can recognize, such as &lt;code&gt;tomcat_sessions_active_current_sessions&lt;/code&gt; and &lt;code&gt;jvm_gc_pause_seconds_count&lt;/code&gt;, and you can also check the HELP and TYPE information above each metric.&lt;/p&gt;
+&lt;h2 id=&#34;prometheus-server&#34;&gt;Prometheus Server&lt;/h2&gt;
+&lt;p&gt;Now that the application is ready, prepare a Prometheus server to collect the metrics generated by the application.&lt;/p&gt;
+&lt;p&gt;This guide uses Prometheus installed in Docker. For Prometheus Docker installation, refer to &lt;a href=&#34;https://www.devkuma.com/en/docs/prometheus/docker-install/&#34;&gt;this page&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;configure-the-prometheus-server&#34;&gt;Configure the Prometheus server&lt;/h3&gt;
+&lt;p&gt;When starting the Prometheus server, configure the settings file (&lt;code&gt;prometheus.yml&lt;/code&gt;) as follows.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc/prometheus/prometheus.yml&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yml&#34; data-lang=&#34;yml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;global&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;scrape_interval&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;10s&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Pull metrics every 10 seconds&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;evaluation_interval&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;10s&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Configure how often rules are evaluated&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;scrape_configs&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;job_name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;spring-actuator-prometheus&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metrics_path&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/actuator/prometheus&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Application prometheus endpoint&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;static_configs&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;targets&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;host.docker.internal:8080&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Application host:port&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Warn: Application Host&lt;/div&gt;
+
+
+In this configuration file, the Application Host is set to `host.docker.internal`.
+This host can be used in Docker environments on Mac or Windows. On Linux, enter `localhost` instead.
+
+**Reference**: [Collect Docker metrics with Prometheus](https://docs.docker.com/config/daemon/prometheus/)
+&lt;/div&gt;
+
+&lt;h3 id=&#34;check-the-prometheus-server&#34;&gt;Check the Prometheus server&lt;/h3&gt;
+&lt;p&gt;Now start the Prometheus Docker container and connect to Prometheus.&lt;/p&gt;
+&lt;p&gt;If everything above is correct, open Prometheus (&lt;code&gt;http://localhost:9090&lt;/code&gt;) and you will see the Prometheus main screen as shown below.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-prometheus-1.png&#34; alt=&#34;Prometheus main screen&#34;&gt;&lt;/p&gt;
+&lt;p&gt;In the &lt;strong&gt;Status &amp;gt; Configuration&lt;/strong&gt; menu, you can check whether the file configured for Prometheus has been applied.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-prometheus-2.png&#34; alt=&#34;Prometheus Configuration&#34;&gt;&lt;/p&gt;
+&lt;p&gt;In the &lt;strong&gt;Status &amp;gt; Targets&lt;/strong&gt; menu, you can check the status of the connected application.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-prometheus-3.png&#34; alt=&#34;Prometheus application status&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Finally, return to the main screen, enter &lt;code&gt;jvm_memory_used_bytes&lt;/code&gt; in Expression, execute it, and select Graph to see a chart like the one below.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-prometheus-4.png&#34; alt=&#34;Prometheus graph&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;grafana-server&#34;&gt;Grafana Server&lt;/h2&gt;
+&lt;p&gt;Now let&amp;rsquo;s look at how to visualize the metrics collected by Prometheus in Grafana.&lt;/p&gt;
+&lt;p&gt;You can run queries on the Prometheus web page and visualize the desired metrics as graphs. However, manually running queries every time for monitoring is inefficient, and the built-in dashboard is limited to simple graph viewing.&lt;br&gt;
+Because Prometheus alone has limitations for visualization, metrics are usually monitored with a separate visualization tool.&lt;/p&gt;
+&lt;p&gt;If you followed &lt;a href=&#34;https://www.devkuma.com/en/docs/prometheus/docker-install/&#34;&gt;this page&lt;/a&gt;, Grafana should also already be installed together with Prometheus.&lt;/p&gt;
+&lt;h3 id=&#34;grafana-login&#34;&gt;Grafana login&lt;/h3&gt;
+&lt;p&gt;First, open Grafana (&lt;code&gt;http://localhost:9090&lt;/code&gt;) and you will see the Grafana login screen as shown below.&lt;br&gt;
+You can log in with the default account information (ID/password), &lt;code&gt;admin/admin&lt;/code&gt;.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;add-a-grafana-data-source&#34;&gt;Add a Grafana data source&lt;/h3&gt;
+&lt;p&gt;After logging in, the first screen below appears. Click the icon under DATA SOURCES.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Click Prometheus in the list of data sources to add.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-3.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;When the screen for adding a Prometheus data source appears, enter &lt;code&gt;Name&lt;/code&gt; and &lt;code&gt;URL&lt;/code&gt;.&lt;br&gt;
+For Name, enter any name you want, and for URL, enter &lt;code&gt;http://host.docker.internal:9090&lt;/code&gt;.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-4.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Scroll down and click the &lt;strong&gt;Save &amp;amp; test&lt;/strong&gt; button. A success message, &lt;code&gt;Data source is working&lt;/code&gt;, will be displayed.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-5.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Click the Configuration icon to confirm the data source you just registered.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-6.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;add-a-grafana-metric-graph-chart&#34;&gt;Add a Grafana metric graph chart&lt;/h3&gt;
+&lt;p&gt;Next, click the Explore icon, select &lt;code&gt;jvm_memory_max_bytes&lt;/code&gt; for Metric, and click the &lt;strong&gt;Run query&lt;/strong&gt; button.
+Then you will see a graph chart like the one below.&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-7.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Click the &lt;strong&gt;Add to dashboard&lt;/strong&gt; button, and the &lt;strong&gt;Add panel to dashboard&lt;/strong&gt; screen appears.&lt;br&gt;
+Select &lt;strong&gt;New dashboard&lt;/strong&gt;, then click the &lt;strong&gt;Open dashboard&lt;/strong&gt; button.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-8.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;p&gt;On the &lt;strong&gt;Save dashboard&lt;/strong&gt; screen, enter a &lt;strong&gt;Dashboard name&lt;/strong&gt; and click &lt;strong&gt;Save&lt;/strong&gt; to save it.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-9.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Now click the Dashboard icon on the left and select the &lt;code&gt;JVM Memory used&lt;/code&gt; item with the name you entered earlier.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-10.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Then you can see the chart as shown below.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-11.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;p&gt;You can drag this chart sideways to resize it and save the layout.
+&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-grafana-12.png&#34; alt=&#34;Grafana&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;The complete project code is available &lt;a href=&#34;https://github.com/devkuma/spring-tutorial/tree/main/spring-actuator-prometheus&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://micrometer.io/docs/concepts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Micrometer Application Monitoring | concepts&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://jongmin92.github.io/2019/12/04/Spring/prometheus/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Building a monitoring system for a Spring Boot application&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Prometheus</category>
+      
+      <category>Grafana</category>
+      
+      <category>Spring</category>
+      
+      <category>Spring Boot</category>
+      
+    </item>
+    
   </channel>
 </rss>

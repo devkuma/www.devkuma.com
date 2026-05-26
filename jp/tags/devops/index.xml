@@ -75,5 +75,914 @@ IT領域におけるサイロとは、業務プロセス、業務アプリケー
       
     </item>
     
+    <item>
+      <title>Kubernetes概要</title>
+      <link>https://www.devkuma.com/jp/docs/kubernetes/overview/</link>
+      <pubDate>Sun, 04 Sep 2022 12:54:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/kubernetes/overview/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Kubernetesを学ぶ前に、まずDockerについて知っておく必要がある。Dockerについて知らない場合は、先に&lt;a href=&#34;https://www.devkuma.com/jp/docs/docker/quick-start/&#34;&gt;Docker&lt;/a&gt;について学んでほしい。&lt;/p&gt;
+&lt;h2 id=&#34;kubernetesとは&#34;&gt;Kubernetesとは？&lt;/h2&gt;
+&lt;p&gt;Kubernetes（略称k8s）の&lt;a href=&#34;https://kubernetes.io/ja/docs/home/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;によると、Kubernetesはオープンソースシステムであり、「コンテナを管理するための基盤ツール」である。&lt;br&gt;
+複数のホストでコンテナを扱う場合に便利で、アプリケーションの開発および管理を簡単かつ安全にしてくれる。&lt;/p&gt;
+&lt;p&gt;Googleが2014年6月に開始した、Goで作られたオープンソースソフトウェア（OSS）である。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt;と&lt;code&gt;docker-compose&lt;/code&gt;の違いは、同じホスト上で複数コンテナを管理するか、単一コンテナを管理するかという違いである。この構成では、ホストが停止するとコンテナも一緒に停止してしまう。そのため、ホストを複数作成し、複数のコンテナをそれらのホストグループに割り当てるものが「コンテナオーケストレーション（Container Orchestration）ツール」である。この種のツールとしてKubernetesが最も広く使われている。&lt;/p&gt;
+&lt;h2 id=&#34;kubernetesの特徴&#34;&gt;Kubernetesの特徴&lt;/h2&gt;
+&lt;p&gt;k8sとも呼ばれるKubernetesの基本機能には、コンテナ化されたアプリケーションのデプロイ、拡張、ロードバランシング、ロギング、モニタリングなどがある。&lt;/p&gt;
+&lt;p&gt;また、アプリケーション運用では、高負荷などで異常が発生したときの対応、スケールアウト、自動フェイルオーバーなど、気を配るべき問題が多い。&lt;/p&gt;
+&lt;p&gt;VMを使用する構成では、結局のところ管理はVM単位で行う必要があり、スケールアウトや自動フェイルオーバーの設定もVM単位でしか行えない。&lt;br&gt;
+Kubernetesを使用すると、コンテナ単位またはアプリケーション単位で管理でき、スケールアウトやフェイルオーバーもアプリケーション単位で設定できる。&lt;/p&gt;
+&lt;h2 id=&#34;なぜkubernetesを使うのか&#34;&gt;なぜKubernetesを使うのか？&lt;/h2&gt;
+&lt;p&gt;マイクロサービスアーキテクチャを実現するにはKubernetesが必要である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/microservices.png&#34; alt=&#34;Monoliths and Microservices&#34;&gt;&lt;br&gt;
+&lt;em&gt;Figure 1: Monoliths and Microservices&lt;/em&gt; - &lt;a href=&#34;https://martinfowler.com/articles/microservices.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://martinfowler.com/articles/microservices.html&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;マイクロサービスアーキテクチャとは？&lt;/div&gt;
+
+
+- アプリケーションの機能を細分化し、それぞれを別のプロセスとして動作させる。比較対象はモノリシックアーキテクチャである。
+- 構成可能で、拡張可能で、柔軟かつ弾力的である。
+- 開発体制もスケールして動作する。
+&lt;/div&gt;
+
+&lt;p&gt;もう少し具体的に、システムが変化する構造を見ていこう。&lt;/p&gt;
+&lt;p&gt;以前は、多くのシステムが多機能なプロセスで構成されたモノリシックアーキテクチャで構成されていた。&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-1.png&#34; alt=&#34;Monolithic&#34;&gt;&lt;/p&gt;
+&lt;p&gt;その後、以下のようなマイクロサービスアーキテクチャが導入された。
+&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-2.png&#34; alt=&#34;Microservice&#34;&gt;&lt;/p&gt;
+&lt;p&gt;そして再び、マイクロサービスはコンテナアーキテクチャへと変化した。&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-3.png&#34; alt=&#34;Container&#34;&gt;&lt;/p&gt;
+&lt;p&gt;これにより、デプロイ単位が細分化され、更新や機能追加が容易になった。
+&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/service-architecture-4.png&#34; alt=&#34;Container&#34;&gt;&lt;/p&gt;
+&lt;p&gt;これだけ見ると利点ばかりに見えるが、一方で構造は複雑になり、管理はより難しくなった。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;コンテナの起動が面倒である。&lt;/li&gt;
+&lt;li&gt;コンテナ間通信の制御が複雑である。&lt;/li&gt;
+&lt;li&gt;コンテナのデータ永続性はどのように管理すべきか。&lt;/li&gt;
+&lt;li&gt;コンテナで障害が発生したり停止したりしたとき、どのように復旧すべきか。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;こうした不便な点を解決してくれるのがKubernetesである。このようなマイクロサービスアーキテクチャでKubernetesを使う利点は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;複数ホスト上の複数コンテナにロードバランシングし、ワークロードを分散できる。&lt;/li&gt;
+&lt;li&gt;1つのPod、つまりコンテナが停止した場合でも自動的に回復できる。&lt;/li&gt;
+&lt;li&gt;無停止更新、つまりローリングアップデートができる。&lt;/li&gt;
+&lt;li&gt;アプリケーション稼働中にScale-up、Scale-downができる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;kubernetesの機能&#34;&gt;Kubernetesの機能&lt;/h2&gt;
+&lt;p&gt;Kubernetesの機能は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;クラスタリング（Clustering）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;複数のシステムをクラスタリングし、リソースをプーリングできる。&lt;/li&gt;
+&lt;li&gt;クラスタを構成するマシンをNodeという。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;マニフェスト（manifest）による宣言的リソース管理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;アプリケーションに関連するさまざまな要素をリソースとして管理する。&lt;/li&gt;
+&lt;li&gt;リソースの定義をYAMLで記述する。
+&lt;ul&gt;
+&lt;li&gt;これをマニフェストという。&lt;/li&gt;
+&lt;li&gt;リソースの操作ではなく、定義だけを記述する。そのため宣言的という。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;リソース種類&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;コンテナ: 単一コンテナ。直接定義することはできない。&lt;/li&gt;
+&lt;li&gt;Pod: コンテナを統合管理するもの。VMのような概念。デプロイの最小単位。&lt;/li&gt;
+&lt;li&gt;Deployment: Podのスケーリングを行うもの。&lt;/li&gt;
+&lt;li&gt;Service: 仮想ルーターおよびロードバランサーのようなもの。&lt;/li&gt;
+&lt;li&gt;ConfigMap、Secret: コンテナ内の設定ファイルなどを表すもの。Secretは暗号化される。&lt;/li&gt;
+&lt;li&gt;PersistentVolume: 永続ボリューム。ホストディレクトリやNFS共有など。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;宣言的リソース管理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;リソース定義が登録されると、Kubernetesは実際のリソース状態を定義どおりに動作させる。&lt;/li&gt;
+&lt;li&gt;Podのコンテナイメージを変更したい場合:
+&lt;ul&gt;
+&lt;li&gt;古いコンテナを削除し、新しいコンテナの起動を指示する。&lt;/li&gt;
+&lt;li&gt;それが難しければ、コンテナイメージ名を書き換えたPod定義で上書きする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;仮想フラットネットワーク&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;各Podは複数ノードに分散してデプロイされるが、すべてのPodは仮想ネットワークの同一セグメントにある。&lt;/li&gt;
+&lt;li&gt;Kubernetesの仮想ネットワークでコンテナ間通信を行うインターフェースはCNI（Container Network Interface）として標準化されている。&lt;/li&gt;
+&lt;li&gt;さまざまな種類のプラグインが存在する。
+&lt;ul&gt;
+&lt;li&gt;Weave Net: VXLAN&lt;/li&gt;
+&lt;li&gt;Calico: BGP&lt;/li&gt;
+&lt;li&gt;Flannel&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;仮想ネットワーク内DNS&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ロードバランサーの機能を持つServiceにはDNS名が付く。&lt;/li&gt;
+&lt;li&gt;このDNS名は仮想ネットワーク内のDNSでIPアドレスに解決できる。&lt;/li&gt;
+&lt;li&gt;つまり、PodをServiceの背後に置くことで、PodにDNS名でアクセスできる。
+&lt;ul&gt;
+&lt;li&gt;PodのIPアドレスは動的に変わるため、Service経由のアクセスが基本である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;リソースの論理的分割、つまりグループ化&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Namespaceというリソースで、PodやServiceなどのリソースをグループ化できる。&lt;/li&gt;
+&lt;li&gt;Namespaceごとにアクセスを隔離するものではないため、管理目的で使用する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;コンテナ死活監視およびオートヒーリング&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;コンテナの死活監視を定義できる。&lt;/li&gt;
+&lt;li&gt;次のいずれかを定期的に実行し、その結果で死活を確認する。
+&lt;ul&gt;
+&lt;li&gt;HTTPポーリング&lt;/li&gt;
+&lt;li&gt;TCP ping&lt;/li&gt;
+&lt;li&gt;任意のコマンド&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;コンテナが停止したと判断されると、Kubernetesが再起動してくれる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;その他&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Pod複製&lt;/li&gt;
+&lt;li&gt;Podローリングアップデート&lt;/li&gt;
+&lt;li&gt;ワンショット作業（Job）&lt;/li&gt;
+&lt;li&gt;定期実行タスク（CronJob）&lt;/li&gt;
+&lt;li&gt;Pod単位、Namespace単位のリソース（CPU、メモリ）制限&lt;/li&gt;
+&lt;li&gt;仮想ネットワークアクセスポリシー（NetworkPolicy）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/ja/docs/home/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kubernetes公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/playlist?list=PLApuRlvrZKohaBHvXAOhUD-RxD0uQ3z0c&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;動画講座 | Kubernetesシリーズ&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://bcho.tistory.com/1255?category=731548&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kubernetes #1 - 紹介 | チョ・デヒョプのブログ&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Kubernetes</category>
+      
+      <category>DevOps</category>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetesアーキテクチャ</title>
+      <link>https://www.devkuma.com/jp/docs/kubernetes/architecture/</link>
+      <pubDate>Sun, 04 Sep 2022 12:54:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/kubernetes/architecture/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;アーキテクチャを理解する&#34;&gt;アーキテクチャを理解する&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/kubernetes-architecture-diagram.png&#34; alt=&#34;Kubernetesアーキテクチャ図&#34;&gt;&lt;br&gt;
+&lt;em&gt;Kubernetesアーキテクチャ図 - 出典: Wikipedia&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Kubernetesをデプロイすると、クラスタがデプロイされる。このKubernetesクラスタは、コンテナ化されたアプリケーションを実行するNodeと呼ばれるワーカーマシンの集合である。アプリケーションのコンポーネントはPodと呼ばれ、上の図のように、このPodが1つ以上のNodeに含まれてデプロイされる。Nodeの制御は&lt;code&gt;kubelet&lt;/code&gt;というエージェントで行われ、Nodeへのアクセスは&lt;code&gt;kube-proxy&lt;/code&gt;というプロキシを通じて行われる。&lt;/p&gt;
+&lt;p&gt;Control planeという構成要素は、クラスタを制御する機能を持つ。&lt;/p&gt;
+&lt;h2 id=&#34;kubernetesのnode&#34;&gt;KubernetesのNode&lt;/h2&gt;
+&lt;p&gt;Kubernetesでは、クラスタ全体を管理するコントローラーとして&lt;strong&gt;Master Node&lt;/strong&gt;が存在し、コンテナがデプロイされるマシン、つまり仮想マシンや物理サーバーマシンである&lt;strong&gt;Worker Node&lt;/strong&gt;が存在する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/kubernetes-master-worker.png&#34; alt=&#34;Master NodeとWorker Node&#34;&gt;&lt;/p&gt;
+&lt;p&gt;DockerでいうDaemonのような役割を持つ&lt;strong&gt;Master Node&lt;/strong&gt;にクライアントからコマンドを送り、それを受け取ったMaster Nodeが&lt;strong&gt;Worker Node&lt;/strong&gt;と呼ばれるNodeにコマンドを送る構造になっている。&lt;/p&gt;
+&lt;p&gt;Master Node、つまりControl planeの役割は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;クラスタ制御&lt;/li&gt;
+&lt;li&gt;Worker Nodeの状態を管理および制御&lt;/li&gt;
+&lt;li&gt;スケジューリング、ライフサイクル監視&lt;/li&gt;
+&lt;li&gt;負荷分散、自動復旧&lt;/li&gt;
+&lt;li&gt;single master&lt;/li&gt;
+&lt;li&gt;multi master（3、5個のmaster nodes）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Worker Nodeの役割は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;コンテナが実行されるサーバー&lt;/li&gt;
+&lt;li&gt;Dockerプラットフォームを通じてコンテナを動作させ、実際のサービスを提供&lt;/li&gt;
+&lt;li&gt;複数Nodeでクラスタを形成&lt;/li&gt;
+&lt;li&gt;Master Nodeの命令に従ってPodを作成、削除&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;各構成要素はHTTPSを通じて通信し、クラスタを形成する。&lt;/p&gt;
+&lt;p&gt;クライアントが実行コマンドを入力するのはコンソールだが、Kubernetesの場合は&lt;code&gt;kubectl&lt;/code&gt;コマンドを通じて、manifestと呼ばれる各種設定を書いたファイルを作成したり、manifestファイルに基づいてMaster Nodeにリソース操作を実行するよう命令したりする。&lt;/p&gt;
+&lt;h2 id=&#34;control-plane-componentmaster-component&#34;&gt;Control plane component、Master component&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;kube-apiserver
+&lt;ul&gt;
+&lt;li&gt;Kubernetesリソース定義を操作するためのREST APIを外部に提供する。&lt;/li&gt;
+&lt;li&gt;Kubernetes Control planeのフロントエンド。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;etcd
+&lt;ul&gt;
+&lt;li&gt;kube-apiserverがリソース定義などを保存するDBである。&lt;/li&gt;
+&lt;li&gt;分散DBなので、通常はクラスタとして構成する。&lt;/li&gt;
+&lt;li&gt;一貫性と高可用性を持つKey-valueストア。&lt;/li&gt;
+&lt;li&gt;Kubernetesのすべてのクラスタ情報の保存場所。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;kube-scheduler
+&lt;ul&gt;
+&lt;li&gt;PodにNodeが割り当てられているか確認し、割り当てる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;kube-controller-manager
+&lt;ul&gt;
+&lt;li&gt;kube-apiserverのAPIを使用してPod定義の作成を監視し、Podをどこにデプロイするかを決定する。&lt;/li&gt;
+&lt;li&gt;通知およびPod数を監視する複数のコントローラープロセスを実行する。&lt;/li&gt;
+&lt;li&gt;Podを観察し、数を保証する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;cloud-controller-manager
+&lt;ul&gt;
+&lt;li&gt;kube-apiserverのAPIでさまざまなリソース定義を監視し、実際のリソース状態を定義と同じにする。&lt;/li&gt;
+&lt;li&gt;基盤となるクラウドプロバイダーと相互作用するコントローラーを実行する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;worker-nodeコンポーネント&#34;&gt;Worker Nodeコンポーネント&lt;/h2&gt;
+&lt;p&gt;Worker NodeコンポーネントはPodやコンテナを管理および監視する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kubelet
+&lt;ul&gt;
+&lt;li&gt;クラスタの各Nodeで実行されるエージェント。&lt;/li&gt;
+&lt;li&gt;kube-apiserverのAPIでPod定義を監視し、コンテナの起動および停止のためにDockerと連携する。&lt;/li&gt;
+&lt;li&gt;kube-apiserverからのAPI呼び出しを受けるHTTPSポートを持ち、コンテナのログを返すこともある。&lt;/li&gt;
+&lt;li&gt;各コンテナがPodで実行中であることを保証する。&lt;/li&gt;
+&lt;li&gt;デーモン形式で動作する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;kube-proxy
+&lt;ul&gt;
+&lt;li&gt;クラスタの各Nodeで実行されるネットワークプロキシ。&lt;/li&gt;
+&lt;li&gt;kube-apiserverのAPIでService定義を監視し、ホストOSに対してServiceへ通信を転送する設定を行う。&lt;/li&gt;
+&lt;li&gt;iptables ruleを構成する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;コンテナランタイム
+&lt;ul&gt;
+&lt;li&gt;コンテナを実行するエンジン。&lt;/li&gt;
+&lt;li&gt;docker、containerd、runc。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;kubernetesクラスタを自分で構成するツール&#34;&gt;Kubernetesクラスタを自分で構成するツール&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;kubeadm
+&lt;ul&gt;
+&lt;li&gt;Kubernetesが公式提供するクラスタ作成/管理ツール。&lt;/li&gt;
+&lt;li&gt;Kubernetes公式インストールツール（Kubernetes admin）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;kubespray
+&lt;ul&gt;
+&lt;li&gt;Kubernetesクラスタをデプロイするオープンプロジェクト。&lt;/li&gt;
+&lt;li&gt;さまざまな形式でKubernetesクラスタを構成可能。&lt;/li&gt;
+&lt;li&gt;オンプレミスでサービスクラスタを運用するときに有用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;オブジェクト&#34;&gt;オブジェクト&lt;/h2&gt;
+&lt;p&gt;Kubernetesを理解するうえで最も重要な部分がオブジェクトである。最も基本的な構成単位となるBasic objectと、このBasic objectを作成および管理する追加機能を持つControllerで構成される。また、これらのオブジェクトのspec、つまり設定以外に、追加情報であるメタ情報で構成されると考えればよい。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Running app on Kubernetes&lt;/strong&gt;&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/running-app-on-kubernetes-image-20200923101415547.png&#34; alt=&#34;Running app on Kubernetes&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;object-spec&#34;&gt;Object Spec&lt;/h3&gt;
+&lt;p&gt;オブジェクトはすべて、オブジェクトの特性、つまり設定情報を記述したObject Specで定義される。コマンドラインを通じてオブジェクトを作成するときに引数として渡して定義したり、YAMLやJSONファイルでspecを定義したりできる。&lt;/p&gt;
+&lt;h3 id=&#34;basic-object&#34;&gt;Basic Object&lt;/h3&gt;
+&lt;p&gt;Kubernetesによってデプロイおよび管理される最も基本的なオブジェクトは、コンテナ化されてデプロイされるアプリケーションのワークロードを記述するオブジェクトで、Pod、Service、Volume、Namespaceの4種類がある。簡単に説明すると、Podはコンテナ化されたアプリケーション、Volumeはディスク、Serviceはロードバランサー、Namespaceはパッケージ名のようなものと考えればよい。それぞれを詳しく見ていこう。&lt;/p&gt;
+&lt;h3 id=&#34;ラベル&#34;&gt;ラベル&lt;/h3&gt;
+&lt;p&gt;&amp;hellip; 作成中 &amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;コントローラー&#34;&gt;コントローラー&lt;/h3&gt;
+&lt;p&gt;&amp;hellip; 作成中 &amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;アドオン&#34;&gt;アドオン&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ネットワークアドオン
+&lt;ul&gt;
+&lt;li&gt;CNI - weave、calico、faneld、kube-route &amp;hellip;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;DNSアドオン
+&lt;ul&gt;
+&lt;li&gt;coreDNS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ダッシュボードアドオン&lt;/li&gt;
+&lt;li&gt;コンテナリソース監視
+&lt;ul&gt;
+&lt;li&gt;cAdvisor&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;クラスタロギング
+&lt;ul&gt;
+&lt;li&gt;コンテナログ、k8s運用ログを収集して中央集約する。&lt;/li&gt;
+&lt;li&gt;ELK（ElasticSearch、Logstash、Kibana）、EFK（ElasticSearch、Fluentd、Kibana）、DataDog&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ja.wikipedia.org/wiki/Kubernetes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kubernetes | Wikipedia&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://bcho.tistory.com/1256?category=731548&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Kubernetes #2 概念理解 (1/2) | チョ・デヒョプのブログ&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Kubernetes</category>
+      
+      <category>DevOps</category>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetesローカル開発環境を作る - minikubeのインストールと使用</title>
+      <link>https://www.devkuma.com/jp/docs/kubernetes/minikube/</link>
+      <pubDate>Wed, 07 Sep 2022 14:03:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/kubernetes/minikube/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;ローカル開発環境を作りアプリケーションを動かす&#34;&gt;ローカル開発環境を作り、アプリケーションを動かす&lt;/h2&gt;
+&lt;p&gt;今回はWebアプリケーションのコンテナをローカルKubernetesに立てることを目標にする。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;参考までに、ここではmacOSを中心にインストールを進めた。環境が違えば方法も異なる可能性があるので参考にしてほしい。&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;minikubeのインストールと使用&#34;&gt;Minikubeのインストールと使用&lt;/h2&gt;
+&lt;p&gt;今回はMinikubeという、ローカル環境でKubernetesを簡単に実行できるツールを使用する。このツールを使うと単一ノードのKubernetesクラスタを作成できる。&lt;br&gt;
+Minikubeの使い方は&lt;a href=&#34;https://kubernetes.io/docs/tasks/tools/#specifying-the-vm-driver&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;を参考にするとよい。&lt;/p&gt;
+&lt;h3 id=&#34;インストール前の事前準備&#34;&gt;インストール前の事前準備&lt;/h3&gt;
+&lt;h4 id=&#34;dockerインストール&#34;&gt;Dockerインストール&lt;/h4&gt;
+&lt;p&gt;minikubeのインストール前に、Dockerを必ずインストールして使用することをおすすめする。&lt;/p&gt;
+&lt;h4 id=&#34;kubectlインストール&#34;&gt;kubectlインストール&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;kubectl&lt;/code&gt;はKubernetesのClusterと通信し、さまざまなObjectの状態確認やCRUD操作などに使用されるCLIツールである。&lt;br&gt;
+minikubeをインストールし、Kubernetes Clusterとの作業を行うために必要である。&lt;/p&gt;
+&lt;p&gt;ここではmacOSでHomebrewを使用してインストールする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install kubectl
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;他のシステムでは&lt;a href=&#34;https://kubernetes.io/docs/tasks/tools/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;を参考に進める。&lt;/p&gt;
+&lt;h3 id=&#34;minikubeをmacosにインストール&#34;&gt;MinikubeをmacOSにインストール&lt;/h3&gt;
+&lt;p&gt;ここではHomebrewを使用してインストールを進める。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行するとHomebrewがminikubeと関連ファイルをインストールし、zsh completionsも設定される。&lt;/p&gt;
+&lt;h3 id=&#34;minikubeを使用する&#34;&gt;Minikubeを使用する&lt;/h3&gt;
+&lt;h4 id=&#34;minikube-cluster開始&#34;&gt;Minikube cluster開始&lt;/h4&gt;
+&lt;p&gt;インストールが成功したか、次のKubernetesクラスタを開始するコマンドで確認できる。&lt;/p&gt;
+&lt;p&gt;次のようにKubernetesバージョンを指定して起動する方法がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube start --kubernetes-version &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;起動するバージョン&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次のように指定しなければ、新しいバージョンが起動される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube start
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;起動時にはベースイメージをダウンロードし、Dockerコンテナを作成し、証明書とキーを生成してコントロールプレーンを起動する。環境によってはswap、Dockerバージョン、kubeletサービスなどに関する警告が表示される場合がある。&lt;/p&gt;
+&lt;h4 id=&#34;minikube-cluster開始後の確認&#34;&gt;Minikube cluster開始後の確認&lt;/h4&gt;
+&lt;p&gt;minikubeはDocker imageをダウンロードして実行し、Kubernetes Clusterを作成し、&lt;code&gt;kubectl&lt;/code&gt;との接続のために&lt;code&gt;~/.kube/config&lt;/code&gt;ファイル設定まで完了してくれる。
+1つずつ見てみよう。&lt;/p&gt;
+&lt;p&gt;minikube起動時にdownloadされるDocker imageは次のように確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker images
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REPOSITORY                    TAG       IMAGE ID       CREATED        SIZE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcr.io/k8s-minikube/kicbase   v0.0.33   f7ba2bce4549   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; weeks ago    1.06GB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ダウンロードしたDocker imageでminikube containerを実行し、Kubernetes clusterが作成されたことを確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                 COMMAND                  CREATED             STATUS             PORTS                                                                                                                        NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;d9391f64eba5   gcr.io/k8s-minikube/kicbase:v0.0.33   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/entr...&amp;#34;&lt;/span&gt;   About an hour ago   Up About an hour   0.0.0.0:49463-&amp;gt;22/tcp, 0.0.0.0:49464-&amp;gt;2376/tcp, 0.0.0.0:49466-&amp;gt;5000/tcp, 0.0.0.0:49467-&amp;gt;8443/tcp, 0.0.0.0:49465-&amp;gt;32443/tcp   minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Kubernetes Clusterとkubectlの接続情報を含むconfigファイルが作成されている。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cat ~/.kube/config
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;apiVersion: v1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;clusters:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    certificate-authority: /Users/user/.minikube/ca.crt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    server: https://127.0.0.1:50472
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;contexts:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- context:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    cluster: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    user: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;current-context: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kind: Config
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;preferences: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;users:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  user:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    client-certificate: /Users/user/.minikube/profiles/minikube/client.crt
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    client-key: /Users/user/.minikube/profiles/minikube/client.key
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;minikube-cluster状態確認&#34;&gt;Minikube cluster状態確認&lt;/h4&gt;
+&lt;p&gt;クラスタの状態を確認するコマンドは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;type: Control Plane
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;host: Running
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubelet: Stopped
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;apiserver: Stopped
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubeconfig: Configured
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;minikube-cluster一時停止再稼働&#34;&gt;Minikube cluster一時停止/再稼働&lt;/h4&gt;
+&lt;p&gt;Kubernetes clusterを一時停止するコマンドは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube pause
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;一時停止後は、kubectlを通じたClusterへのアクセスや追加コマンドがtimeoutになり、使用できない。&lt;br&gt;
+ただし、既にデプロイ済みのapplicationには影響しないため、動作し続ける。&lt;/p&gt;
+&lt;p&gt;一時停止状態から再びClusterを再稼働したい場合は、次のコマンドを使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube unpause
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;minikube-cluster終了&#34;&gt;Minikube cluster終了&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube stop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube stop
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;✋  Stopping node &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;minikube&amp;#34;&lt;/span&gt;  ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🛑  Powering off &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;minikube&amp;#34;&lt;/span&gt; via SSH ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🛑  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; node stopped.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;minikube-cluster削除&#34;&gt;Minikube cluster削除&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube delete
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;すべての内容を削除する初期化コマンドは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube delete --all
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🔥  docker 의 &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;minikube&amp;#34;&lt;/span&gt; 를 삭제하는 중 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🔥  /Users/user/.minikube/machines/minikube 제거 중 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;💀  &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;minikube&amp;#34;&lt;/span&gt; 클러스터 관련 정보가 모두 삭제되었습니다
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🔥  모든 프로필이 성공적으로 삭제되었습니다
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;kubernetesでwebサーバーを設定して起動する&#34;&gt;KubernetesでWebサーバーを設定して起動する&lt;/h2&gt;
+&lt;p&gt;minikubeをインストールしたので、Kubernetes環境を作り、コンテナを実行してみよう。&lt;/p&gt;
+&lt;p&gt;Webサーバーには、Minikubeに適した簡単な応答だけを返すecho-serverを使用する。&lt;/p&gt;
+&lt;h3 id=&#34;minikubeクラスタ作成&#34;&gt;minikubeクラスタ作成&lt;/h3&gt;
+&lt;p&gt;minikubeを起動してクラスタを作成する。既に起動している場合は再起動しなくてもよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube start
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;このときDockerコンテナの起動状態を確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                 COMMAND                  CREATED              STATUS              PORTS                                                                                                                        NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;39b6898f6256   gcr.io/k8s-minikube/kicbase:v0.0.33   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/entr...&amp;#34;&lt;/span&gt;   About a minute ago   Up About a minute   0.0.0.0:51435-&amp;gt;22/tcp, 0.0.0.0:51436-&amp;gt;2376/tcp, 0.0.0.0:51438-&amp;gt;5000/tcp, 0.0.0.0:51439-&amp;gt;8443/tcp, 0.0.0.0:51437-&amp;gt;32443/tcp   minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;minikubeのコンテナが動作していることを確認できる。&lt;/p&gt;
+&lt;h3 id=&#34;kubectlを使用してdeploymentを作成&#34;&gt;kubectlを使用してDeploymentを作成&lt;/h3&gt;
+&lt;p&gt;次にkubectlでKubernetes Deploymentを作成する。このKubernetes Deploymentオブジェクトを作成することで、アプリケーションを実行できるようになる。これはYAMLファイルで作成できる。これ自体はサービスというより、Podを作るためのDeploymentアプリである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl create deployment hello-minikube --image&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;k8s.gcr.io/echoserver:1.10
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps/hello-minikube created
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;もしM1 MacBookなら、&lt;code&gt;echoserver:1.10&lt;/code&gt;ではなく&lt;code&gt;echoserver-arm:1.8&lt;/code&gt;を使用する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create deploy hello-minikube --image&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;k8s.gcr.io/echoserver-arm:1.8
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;作成された&lt;code&gt;hello-minikube&lt;/code&gt; Deploymentを使用し、サービスとして公開する。ここが実際のアプリとほぼ同等のものと思われる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl expose deployment hello-minikube --type&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;NodePort --port&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8080&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service/hello-minikube exposed
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;podにデプロイされたコンテナ確認&#34;&gt;Podにデプロイされたコンテナ確認&lt;/h3&gt;
+&lt;p&gt;この時点でDockerコンテナの動作状態を確認してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                                 COMMAND                  CREATED         STATUS         PORTS                                                                                                                        NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;24733d0fd443   gcr.io/k8s-minikube/kicbase:v0.0.33   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/entr...&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; minutes ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;5&lt;/span&gt; minutes   0.0.0.0:54248-&amp;gt;22/tcp, 0.0.0.0:54249-&amp;gt;2376/tcp, 0.0.0.0:54251-&amp;gt;5000/tcp, 0.0.0.0:54247-&amp;gt;8443/tcp, 0.0.0.0:54250-&amp;gt;32443/tcp   minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;明らかに&lt;code&gt;hello-minikube&lt;/code&gt;というコンテナは別に動いておらず、minikubeのコンテナ上で動作しているようである。おそらくこのminikubeコンテナ自体にKubernetesの単一ノードとPod、Deploymentが作られたのだと思われる。&lt;/p&gt;
+&lt;p&gt;ではPodが作成されたか確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                              READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hello-minikube-5d44b6b577-l99jz   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          4m59s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;STATUSがRunningになっており、起動していることを確認できる。また&lt;code&gt;1/1&lt;/code&gt;からPod数は1つであることも分かる。&lt;/p&gt;
+&lt;h3 id=&#34;サービス動作確認&#34;&gt;サービス動作確認&lt;/h3&gt;
+&lt;p&gt;サービスURLは次のコマンドで確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% minikube service hello-minikube --url
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http://127.0.0.1:54612
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ブラウザで確認すると、アプリケーションが実行中であることを確認できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/kubernetes/echoserver.png&#34; alt=&#34;echoserver&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;削除&#34;&gt;削除&lt;/h3&gt;
+&lt;p&gt;次は削除手順である。&lt;/p&gt;
+&lt;p&gt;サービス削除は次のコマンドで行う。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete services hello-minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hello-minikube&amp;#34;&lt;/span&gt; deleted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;hello-minikube&lt;/code&gt; Deployment削除は次のコマンドで行う。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete deployment hello-minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deployment.apps &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hello-minikube&amp;#34;&lt;/span&gt; deleted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;付録-コンテナの中を覗いてみる&#34;&gt;付録: コンテナの中を覗いてみる&lt;/h2&gt;
+&lt;p&gt;公式ドキュメントにあったローカル開発環境を作るチュートリアルはこの程度で終わりだが、コンテナの中を覗いてみる。&lt;/p&gt;
+&lt;p&gt;次のコマンドでminikubeに入る。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -itu &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; minikube /bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/#
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コンテナに入ったらルートディレクトリに移動し、何があるか&lt;code&gt;ll&lt;/code&gt;コマンドで確認してみよう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/# ll
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;total &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;drwxr-xr-x   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; root root &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4096&lt;/span&gt; Sep  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt; 06:33 ./
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;drwxr-xr-x   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; root root &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4096&lt;/span&gt; Sep  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt; 06:33 ../
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;-rwxr-xr-x   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; root root    &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; Sep  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7&lt;/span&gt; 06:33 .dockerenv*
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/#
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;top&lt;/code&gt;コマンドでプロセスも確認してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/# top
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;top - 07:23:51 up 18:40,  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; users,  load average: 0.69, 0.44, 0.37
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Tasks:  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;38&lt;/span&gt; total,   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; running,  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;37&lt;/span&gt; sleeping,   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; stopped,   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; zombie
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1855&lt;/span&gt; root      &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1998680&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;100428&lt;/span&gt;  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;64300&lt;/span&gt; S   7.6   1.2   3:17.60 kubelet
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1675&lt;/span&gt; root      &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1171496&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;360280&lt;/span&gt;  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;72324&lt;/span&gt; S   7.3   4.5   5:20.97 kube-apiserver
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;588&lt;/span&gt; root      &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2028192&lt;/span&gt;  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;91008&lt;/span&gt;  &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;44340&lt;/span&gt; S   5.3   1.1   1:24.24 dockerd
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   ... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コンソール内容を見ると、上位に&lt;code&gt;kubelet&lt;/code&gt;と&lt;code&gt;kube-apiserver&lt;/code&gt;のプロセスが実行されている。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;kube-apiserver&lt;/code&gt;は開発者からの操作を受け付けるAPIを提供し、&lt;code&gt;kubelet&lt;/code&gt;はエージェントとして各ノード、今回は単一ノードに存在し、Pod実行を保証する。&lt;br&gt;
+&lt;code&gt;containerd*&lt;/code&gt;として作成された多数のプロセスがあり、複数のコンテナが上がっていることが分かる。&lt;/p&gt;
+&lt;p&gt;さらに&lt;code&gt;docker ps&lt;/code&gt;コマンドで実行中のDockerコンテナ一覧を取得してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/# docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS     NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;20094df9033f   ba04bb24b957           &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/storage-provisioner&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes             k8s_storage-provisioner_storage-provisioner_kube-system_514497a4-deaf-4755-a600-73f796f6be9e_1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a9368295b1f7   7a75aeb869dc           &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/usr/local/bin/kube...&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes             k8s_kube-proxy_kube-proxy-52hmm_kube-system_d0ed4ddc-0ccc-4f06-aeb9-cc18d5184e77_0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;9b1f9ed7a6c1   k8s.gcr.io/pause:3.6   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/pause&amp;#34;&lt;/span&gt;                 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;59&lt;/span&gt; minutes             k8s_POD_kube-proxy-52hmm_kube-system_d0ed4ddc-0ccc-4f06-aeb9-cc18d5184e77_0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root@minikube:/#
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コンテナ内でコンテナの稼働を初めて確認したが、これによりechoserverのイメージを使ったコンテナが動いていることが分かった。&lt;/p&gt;
+&lt;p&gt;仮説だが、&lt;code&gt;NAMES&lt;/code&gt;を見ると&lt;code&gt;POD&lt;/code&gt;という文字が書かれているコンテナがあり、Podをコンテナで表現しているように思える。&lt;br&gt;
+&lt;code&gt;kube-proxy&lt;/code&gt;のコンテナもあるようで、これがServiceのプロキシとして動いているようだ。&lt;/p&gt;
+&lt;p&gt;今回はここまでだが、次回はもう少しKubernetesのアーキテクチャと設定を変えながら、どのように動作するか見ていく。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kubernetes.io/ko/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://minikube.sigs.k8s.io/docs/start/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;minikube&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.inflearn.com/chats/624565&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;M1 MacBookでminikubeにechoserver実行失敗時にechoserver-armを使用 - Inflearn&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Kubernetes</category>
+      
+      <category>DevOps</category>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes namespace</title>
+      <link>https://www.devkuma.com/jp/docs/kubernetes/namespace/</link>
+      <pubDate>Sat, 10 Sep 2022 09:16:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/kubernetes/namespace/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;namespace&#34;&gt;Namespace&lt;/h2&gt;
+&lt;p&gt;namespaceはKubernetesリソースの領域であり、1つのクラスタを複数の論理単位に分けて使用し、権限とポリシーをclusterの下位sectionに適用するメカニズムを提供する。
+つまり、リソースをグループ化して管理できる機会を提供する。&lt;/p&gt;
+&lt;h2 id=&#34;namespaceの使用&#34;&gt;namespaceの使用&lt;/h2&gt;
+&lt;p&gt;namespaceは用途に応じて実行するアプリを区分するときに使用する。&lt;/p&gt;
+&lt;p&gt;整理すると次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1つのクラスタを複数チームやユーザーが共有するときの領域区分&lt;/li&gt;
+&lt;li&gt;開発環境、テスト環境、本番環境のようなソフトウェア環境の区分&lt;/li&gt;
+&lt;li&gt;インフラチームが見られる区域と開発チームが見られる区域の区分
+&lt;ul&gt;
+&lt;li&gt;権限のboundary&lt;/li&gt;
+&lt;li&gt;リソースのboundary&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;namespaceを使用する&#34;&gt;namespaceを使用する&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;namespace作成&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CLI
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create namespace blue
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;YAML
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create namespace green --dry-run&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;client -o yaml &amp;gt; green-ns.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create -f green-ns.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;namespace管理&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl delete namespace
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;namespaces取得&#34;&gt;namespaces取得&lt;/h3&gt;
+&lt;p&gt;登録されたnamespacesの取得は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get namespace
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;初回インストール直後にnamespaces一覧を取得すると次のようになる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME              STATUS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;default           Active   5m30s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-node-lease   Active   5m31s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-public       Active   5m31s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system       Active   5m31s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;デフォルトでnamespaceは4つ存在する。&lt;/p&gt;
+&lt;h4 id=&#34;cluster作成時に使われる基本namespace&#34;&gt;Cluster作成時に使われる基本namespace&lt;/h4&gt;
+&lt;p&gt;default&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;他のnamespaceがないobjectのための基本namespace&lt;/li&gt;
+&lt;li&gt;container、pod、service、replicasetなどのリソースに対する領域を提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;kube-system&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kubernetes systemが作成したobjectのためのnamespace&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;kube-public&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自動で作成され、すべてのユーザー（認証されていないユーザーを含む）が読み取り権限でアクセスできる。&lt;/li&gt;
+&lt;li&gt;主にcluster全体の中で公開的に見えて読み取れるresourceのために予約されている。&lt;/li&gt;
+&lt;li&gt;公開的な性格は単なる慣例であり、必須要件ではない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;default-namespace&#34;&gt;default namespace&lt;/h3&gt;
+&lt;p&gt;何もない状態でPodを取得してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;No resources found in default namespace.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この内容から、namespaceを指定しない場合は&lt;code&gt;default&lt;/code&gt;が基本で使用されていることが分かる。&lt;/p&gt;
+&lt;p&gt;次のコマンドはすべて同じ動作をする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;kubectl get pod
+kubectl get pod --namespace default
+kubectl get pod -n default
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;特定namespaceでpodを取得する&#34;&gt;特定namespaceでPodを取得する&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get pods -n &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;取得するnamespace名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次のコマンドは&lt;code&gt;kube-system&lt;/code&gt; namespaceにあるPodを取得したものである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pods -n kube-system
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                               READY   STATUS    RESTARTS        AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;coredns-6d4b75cb6d-7shzf           1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m13s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;etcd-minikube                      1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m28s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-apiserver-minikube            1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m26s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-controller-manager-minikube   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m26s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-proxy-dbd6p                   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m13s
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-scheduler-minikube            1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;               6m26s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;すべてのnamespaceでpodを取得する&#34;&gt;すべてのnamespaceでPodを取得する&lt;/h3&gt;
+&lt;p&gt;すべてのnamespaceでPodを取得するコマンドは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl get pods --all-namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実際に実行してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pods --all-namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   coredns-6d4b75cb6d-7shzf           1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             10m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   etcd-minikube                      1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             11m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   kube-apiserver-minikube            1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             11m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   kube-controller-manager-minikube   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             11m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   kube-proxy-dbd6p                   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             10m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   kube-scheduler-minikube            1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;             11m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system   storage-provisioner                1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;10m ago&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;   11m
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;ここでは&lt;code&gt;kube-system&lt;/code&gt;しかないが、これは別途Podを作成していないためである。&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;namespaceを作成する&#34;&gt;namespaceを作成する&lt;/h3&gt;
+&lt;h4 id=&#34;cliでnamespaceを作成する&#34;&gt;CLIでnamespaceを作成する&lt;/h4&gt;
+&lt;p&gt;CLIでnamespaceを作成するコマンドは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create namespace &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;作成するnamespace名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実際に&lt;code&gt;blue&lt;/code&gt;というnamespaceを作成してみる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl create namespace blue
+namespace/blue created
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;作成されたか確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME              STATUS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;blue              Active   10s &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt;&amp;lt;&amp;lt; 作成されたblue namespace
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;default           Active   27m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-node-lease   Active   27m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-public       Active   27m
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kube-system       Active   27m
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;yamlでnamespaceを作成する&#34;&gt;YAMLでnamespaceを作成する&lt;/h4&gt;
+&lt;p&gt;YAMLでnamespaceを作成してみる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;kubectl create namespace [作成するnamespace名] --dry-run=client -o yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl create namespace green --dry-run=client -o yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: green
+spec: {}
+status: {}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;green-ns.yaml&lt;/code&gt;ファイルとして作成する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;$ kubectl create namespace green --dry-run -o yaml &amp;gt; green-ns.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;green-ns.yaml&lt;/code&gt;を必要なものだけ残すため、次のように修正する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;apiVersion: v1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kind: Namespace
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;metadata:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: green
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;作成した&lt;code&gt;green-ns.yaml&lt;/code&gt;でnamespaceを作成する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl create -f green-ns.yaml
+namespace/green created
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;作成されたか確認する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get namespaces
+NAME              STATUS   AGE
+blue              Active   11m
+default           Active   27m
+green             Active   43s &amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt;&amp;lt; 作成されたgreen namespace
+kube-node-lease   Active   27m
+kube-public       Active   27m
+kube-system       Active   27m
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;特定namespaceにpodを作成する&#34;&gt;特定namespaceにPodを作成する&lt;/h3&gt;
+&lt;h4 id=&#34;特定namespaceにcliからpodを作成する&#34;&gt;特定namespaceにCLIからPodを作成する&lt;/h4&gt;
+&lt;p&gt;次のコマンドでnamespaceフラグ（&lt;code&gt;--namespace&lt;/code&gt;）を&lt;code&gt;green&lt;/code&gt;に指定してPodを作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl run nginx --image&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;nginx:1.14 --port &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt; --namespace green
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pod/nginx created
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;green namespaceにあるPodを取得すると、正常に作成されたことが分かる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pods -n green
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME        READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;webserver   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          48s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;特定namespaceを削除&#34;&gt;特定namespaceを削除&lt;/h4&gt;
+&lt;p&gt;green namespaceに作成したPodを削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete pod nginx -n green
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pod &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;nginx&amp;#34;&lt;/span&gt; deleted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;注意点: namespaceを削除すると、その中に入っていたPodもすべて削除される。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;特定namespaceにyamlからpodを作成する&#34;&gt;特定namespaceにYAMLからPodを作成する&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;nginx.yaml&lt;/code&gt;ファイルを作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl run nginx --image&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;nginx:1.14 --port &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt; --dry-run&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;client -o yaml &amp;gt; nginx.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;生成された&lt;code&gt;nginx.yaml&lt;/code&gt;ファイルを次のように修正する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kind&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Pod&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx:1.14&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;今回はnamespaceフラグを指定して作成してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create -f nginx.yaml -n green
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;yamlにnamespaceを指定して特定namespaceにpodを作成する&#34;&gt;YAMLにnamespaceを指定して特定namespaceにPodを作成する&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;nginx.yaml&lt;/code&gt;ファイルで&lt;code&gt;metadata &amp;gt; namespace&lt;/code&gt;に次のように&lt;code&gt;green&lt;/code&gt;を指定する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kind&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Pod&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;namespace&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;green&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# namespace指定&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx:1.14&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;今回はnamespaceフラグ（&lt;code&gt;-n green&lt;/code&gt;）を指定せずに作成してみる。既に同じPod名がある場合は、先に削除する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl create -f nginx.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pod/nginx created
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;green namespaceにあるPodを取得すると、正常に作成されたことが分かる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pods -n green
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME    READY   STATUS    RESTARTS   AGE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;nginx   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;使用するnamespaceを切り替える---kubectl-config&#34;&gt;使用するnamespaceを切り替える - kubectl config&lt;/h3&gt;
+&lt;p&gt;基本で使用するnamespaceを&lt;code&gt;default&lt;/code&gt;ではない名前のnamespaceへ切り替える。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;使用方法:&lt;/strong&gt;
+namespaceを含むcontextを登録する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl config --help
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl config set-context NAME --cluster&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;kubernetes ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl config view
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;登録されたnamespaceへcontextを変更する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ kubectl config use-context NAME
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;configヘルプを見る&#34;&gt;configヘルプを見る&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl config --help
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行すると、kubeconfigファイルを修正するためのsubcommandと使用方法が表示される。&lt;/p&gt;
+&lt;h4 id=&#34;config設定内容を見る&#34;&gt;config設定内容を見る&lt;/h4&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;kubectl config view
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;実行結果:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl config view
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;apiVersion: v1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;clusters:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 中間省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;contexts:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- context:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    cluster: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    extensions:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    - extension:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        last-update: Sat, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; Sep &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2022&lt;/span&gt; 09:22:47 KST
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        provider: minikube.sigs.k8s.io
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        version: v1.26.1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;      name: context_info
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    namespace: default
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    user: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  name: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;current-context: minikube
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 最後省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;新規context追加&#34;&gt;新規context追加&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl config use-context green@kubenetes --cluster&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;minikube --user&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;kubernates-admin --namespace&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;green
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;現在のcontext確認&#34;&gt;現在のcontext確認&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl config current-context
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;minikube
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;現在のcontext変更&#34;&gt;現在のcontext変更&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl config use-context &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;context名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Kubernetes</category>
+      
+      <category>DevOps</category>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes YAMLテンプレートとAPI</title>
+      <link>https://www.devkuma.com/jp/docs/kubernetes/yaml-template-api/</link>
+      <pubDate>Sat, 10 Sep 2022 09:16:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/kubernetes/yaml-template-api/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;api-version&#34;&gt;API version&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;alpha -&amp;gt; beta -&amp;gt; stable&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Kubernetes Objectを定義するときはapiVersionが必要である。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;KubernetesがAPIをupdateすると、新しいAPIが作成される。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;API Objectの種類およびバージョン&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;種類&lt;/th&gt;
+          &lt;th&gt;バージョン&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Deployment&lt;/td&gt;
+          &lt;td&gt;apps/v1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Pod&lt;/td&gt;
+          &lt;td&gt;v1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;ReplicaSet&lt;/td&gt;
+          &lt;td&gt;v1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;ReplicationController&lt;/td&gt;
+          &lt;td&gt;apps/v1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Service&lt;/td&gt;
+          &lt;td&gt;v1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;PersistentVolume&lt;/td&gt;
+          &lt;td&gt;v1&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kind&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Pod&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;namespace&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;green&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx:1.14&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;nginx&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl explain &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Object&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl explain pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;KIND:     Pod
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;VERSION:  v1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DESCRIPTION:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Pod is a collection of containers that can run on a host. This resource is
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     created by clients and scheduled onto hosts.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;FIELDS:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   apiVersion	&amp;lt;string&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     APIVersion defines the versioned schema of this representation of an
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     object. Servers should convert recognized schemas to the latest internal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     value, and may reject unrecognized values. More info:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   kind	&amp;lt;string&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Kind is a string value representing the REST resource this object
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     represents. Servers may infer this from the endpoint the client submits
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     requests to. Cannot be updated. In CamelCase. More info:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   metadata	&amp;lt;Object&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Standard object&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;s metadata. More info:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   spec	&amp;lt;Object&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Specification of the desired behavior of the pod. More info:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   status	&amp;lt;Object&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Most recently observed status of the pod. This data may not be up to date.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     Populated by the system. Read-only. More info:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Kubernetes</category>
+      
+      <category>DevOps</category>
+      
+    </item>
+    
   </channel>
 </rss>

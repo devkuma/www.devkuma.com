@@ -1605,7 +1605,7 @@ OCI runtime exec failed: exec failed: unable to start container process: exec: &
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Version: 1.0.0
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hostname: helloworld
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/ $
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 결과를 보면, &lt;code&gt;curl&lt;/code&gt;에서 helloworld의 IP인 &lt;code&gt;172.17.0.3&lt;/code&gt;을 지정하고, 포트를 &lt;code&gt;8080&lt;/code&gt;으로 열렸기 때문에, &lt;code&gt;curl&lt;/code&gt; 컨테이너로부터 hellorowld 컨테이너에 접속을 할 수 있게 된 것이다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 결과를 보면, &lt;code&gt;curl&lt;/code&gt;에서 helloworld의 IP인 &lt;code&gt;172.17.0.3&lt;/code&gt;을 지정하고, 포트를 &lt;code&gt;8080&lt;/code&gt;으로 열렸기 때문에, &lt;code&gt;curl&lt;/code&gt; 컨테이너로부터 helloworld 컨테이너에 접속을 할 수 있게 된 것이다.&lt;/p&gt;
 &lt;p&gt;이는 내부에 있는지 확인하기 위해 curl 컨테이너가 동작한 상태로, 또 하나의 터미널을 열어서 Pod 목록을 IP를 포함해 표시해 보도록 하자.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl get pod -o wide
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME         READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
@@ -1670,9 +1670,9 @@ ClusterIP에서는 불가능했던 클러스터 외부에의 Pod의 공개를 No
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;접속한 결과 &lt;code&gt;helloworld&lt;/code&gt;에 접근이 가능한 것을 확인할 수 있다. 이 결과는 위에서 설명한 &amp;ldquo;클러스터 내부에서 연결&amp;quot;에서의 결과와 동일하다.&lt;/p&gt;
 &lt;p&gt;그러나, 위에서 한 것은 curl 컨테이너에서 직접 &lt;code&gt;helloworld&lt;/code&gt; 컨테이너에 연결을 한 것이고, 이번의 실행한 결과는 curl 컨테이너에서 Service인 &lt;code&gt;helloworld-clusterip&lt;/code&gt;에 접근해서, 로드 밸런스(1개의 Pod만 생성했기 있기 때문에 특정의 Pod가 되긴 하지만) 기능에 의해 Service가 &lt;code&gt;helloworld&lt;/code&gt;에 접속한다는 흐름이 다르다. 따라서, 서로 의미가 다르므로 주의가 필요하다.&lt;/p&gt;
 &lt;h3 id=&#34;nodeport-service&#34;&gt;NodePort Service&lt;/h3&gt;
-&lt;p&gt;HelloWorld Pod를 NodeIP Service로 클러스터 내부와 외부에 게시하고 동일한 클러스터의 다른 Pod에서 액세스할 수 있음을 살펴보겠다.&lt;/p&gt;
+&lt;p&gt;HelloWorld Pod를 NodePort Service로 클러스터 내부와 외부에 게시하고 동일한 클러스터의 다른 Pod에서 액세스할 수 있음을 살펴보겠다.&lt;/p&gt;
 &lt;p&gt;아래와 같이 기동하고 있는 Pod에 대해 &lt;code&gt;--type NodePort&lt;/code&gt;의 옵션을 지정하는 것만으로 ClusterIP의 Service로서 공개할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl expose pod &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Pod명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; --type NodePortIP &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Service명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl expose pod &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Pod명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; --type NodePort &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Service명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;helloworld Pod을 &lt;code&gt;helloworld-nodeport&lt;/code&gt;라는 Service명으로 공개한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl expose pod helloworld --type NodePort --port &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8080&lt;/span&gt; --name helloworld-nodeport
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service/helloworld-nodeport exposed
@@ -1681,7 +1681,7 @@ ClusterIP에서는 불가능했던 클러스터 외부에의 Pod의 공개를 No
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;S&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;          AGE
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-nodeport    NodePort    10.110.238.186   &amp;lt;none&amp;gt;        8080:31942/TCP   38s
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubernetes             ClusterIP   10.96.0.1        &amp;lt;none&amp;gt;        443/TCP          16h
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그 결과 첫번째 행에 &lt;code&gt;Type&lt;/code&gt;이 &lt;code&gt;Nodeport&lt;/code&gt;인 서비스가 생성된 것을 확인할 수 있다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그 결과 첫번째 행에 &lt;code&gt;Type&lt;/code&gt;이 &lt;code&gt;NodePort&lt;/code&gt;인 서비스가 생성된 것을 확인할 수 있다.&lt;/p&gt;
 &lt;p&gt;다음은 동일한 클러스터 내에서 접속할 수 있는지 확인한다. 절차는 ClusterIP의 경우와 동일하다.
 먼저 기존에 &lt;code&gt;curl&lt;/code&gt; 컨테이너를 삭제하고 다시 생성한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl delete pod curl
@@ -1706,9 +1706,9 @@ ClusterIP에서는 불가능했던 클러스터 외부에의 Pod의 공개를 No
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;접속 결과 &lt;code&gt;helloworld&lt;/code&gt;에 접속을 할 수 있다는 것을 확인할 수 있다.&lt;br&gt;
 (minikube 기동시 설정에 따라 액세스 할 수 없는 경우가 있다. 이 경우 &lt;code&gt;minikube service --url helloworld-nodeport&lt;/code&gt; 명령을 실행하고 출력된 url에 대해 curl 명령을 실행한다.)&lt;/p&gt;
 &lt;h3 id=&#34;로드밸런서-서비스&#34;&gt;로드밸런서 서비스&lt;/h3&gt;
-&lt;p&gt;HelloWorld Pod를 NodeIP Service로 클러스터 내부와 외부에 게시하고 동일한 클러스터의 다른 Pod에서 액세스할 수 있음을 살펴 보겠다.&lt;/p&gt;
+&lt;p&gt;HelloWorld Pod를 LoadBalancer Service로 클러스터 내부와 외부에 게시하고 동일한 클러스터의 다른 Pod에서 액세스할 수 있음을 살펴 보겠다.&lt;/p&gt;
 &lt;p&gt;아래와 같이 기동하고 있는 Pod에 &amp;ndash;type LoadBalancer 옵션을 지정하는 것으로 ClusterIP의 Service로서 공개를 실시할 수 있다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl expose pod &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Pod명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; --type NodePortIP &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Service명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl expose pod &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Pod명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; --type LoadBalancer &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Service명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;helloworld&lt;/code&gt; Pod을 &lt;code&gt;helloworld-loadbalancer&lt;/code&gt;이라는 Service명으로 공개한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl expose pod helloworld --type LoadBalancer --port &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8080&lt;/span&gt; --name helloworld-loadbalancer
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service/helloworld-loadbalancer exposed
@@ -1833,7 +1833,7 @@ http://127.0.0.1:53240
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld   nginx   *       192.168.49.2   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;80&lt;/span&gt;      69s
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;또한 ingress resource에 대한 자세한 내용을 보려면 다음 명령을 실행한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl describe ingress &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;Ingress명&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;helloworld인 경우은 앨와 같이 실행한다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;helloworld인 경우는 아래와 같이 실행한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% kubectl describe ingress helloworld
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Name:             helloworld
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Labels:           &amp;lt;none&amp;gt;
@@ -1883,8 +1883,8 @@ http://127.0.0.1:53240
         
         &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-grafana-docker.png&#34; alt=&#34;Spring Batch &amp;#43; Prometheus &amp;#43; Pushgateway &amp;#43; Grafana &amp;#43; Docker&#34;&gt;&lt;/p&gt;
 &lt;h2 id=&#34;개요&#34;&gt;개요&lt;/h2&gt;
-&lt;p&gt;프로메테우스(Promethues)는 기본적으로 매트릭 지표를 제공하는 서버에게 주기적으로 요청(pull)하여 매트릭을 수집하도록 되어 있다.&lt;/p&gt;
-&lt;p&gt;그런데, Spring Batch 같이 CLI 형태로 주기적으로 실행만 되게 해놓은 경우가 있다. 이런 경우에는 IP가 따로 없어서 기적으로 Polling 방식이 아닌 프로메테우스에 매트릭을 역으로 Push 할 수 있도록 해야 한다. 매트릭을 푸시할 수 있도록 지원하는게 바로 Pushgateway이다.&lt;/p&gt;
+&lt;p&gt;프로메테우스(Prometheus)는 기본적으로 매트릭 지표를 제공하는 서버에게 주기적으로 요청(pull)하여 매트릭을 수집하도록 되어 있다.&lt;/p&gt;
+&lt;p&gt;그런데, Spring Batch 같이 CLI 형태로 주기적으로 실행만 되게 해놓은 경우가 있다. 이런 경우에는 IP가 따로 없어서 주기적인 Polling 방식이 아닌 프로메테우스에 매트릭을 역으로 Push 할 수 있도록 해야 한다. 매트릭을 푸시할 수 있도록 지원하는게 바로 Pushgateway이다.&lt;/p&gt;
 &lt;h3 id=&#34;pushgateway&#34;&gt;Pushgateway&lt;/h3&gt;
 &lt;p&gt;프로메테우스에서 제공하는 &lt;a href=&#34;https://github.com/prometheus/pushgateway&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pushgateway&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;는 매트릭을 Push 할 수 있도록 지원하며 Push 된 매트릭을 프로메테우스에서 Pulling 하여 가져갈 수 있도록 중개자 역할을 한다. 이런 구조로 Pushgateway에 Push된 매트릭을 프로메테우스에서 가져갈 수 있다.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-pushgateway-prometheus.png&#34; alt=&#34;Pushgateway&#34;&gt;&lt;/p&gt;
@@ -2292,9 +2292,9 @@ http://127.0.0.1:53240
 &lt;h4 id=&#34;grafana-데이터-소스-설정&#34;&gt;Grafana 데이터 소스 설정&lt;/h4&gt;
 &lt;p&gt;먼저 데이터 소스를 추가한다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-3-1.png&#34; alt=&#34;Grafana 설정&#34;&gt;&lt;/p&gt;
-&lt;p&gt;데이터 소스로 &amp;ldquo;Promethues&amp;quot;을 선택한다.&lt;br&gt;
+&lt;p&gt;데이터 소스로 &amp;ldquo;Prometheus&amp;quot;을 선택한다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-3-2.png&#34; alt=&#34;Grafana 설정&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Promethues의 Data Source 소스를 추가 화면이 나오면, &amp;ldquo;Name&amp;rdquo;, &amp;ldquo;URL&amp;quot;를 입력한다.&lt;br&gt;
+&lt;p&gt;Prometheus의 Data Source 소스를 추가 화면이 나오면, &amp;ldquo;Name&amp;rdquo;, &amp;ldquo;URL&amp;quot;를 입력한다.&lt;br&gt;
 (여기서는 구현 환경이 macOS이어서 URL에는 &amp;ldquo;&lt;a href=&#34;http://host.docker.internal:9090&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://host.docker.internal:9090&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&amp;quot;을 입력하였으나, Linux 환경 등에서는 다를 수  있으니 주의바란다.)&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-3-3.png&#34; alt=&#34;Grafana 설정&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-3-4.png&#34; alt=&#34;Grafana 설정&#34;&gt;&lt;/p&gt;
@@ -2305,7 +2305,7 @@ http://127.0.0.1:53240
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-4-2.png&#34; alt=&#34;Grafana 대시보드 설정&#34;&gt;&lt;/p&gt;
 &lt;p&gt;내용을 확인하고, &amp;ldquo;Import&amp;quot;을 클릭한다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-4-3.png&#34; alt=&#34;Grafana 대시보드 설정&#34;&gt;&lt;/p&gt;
-&lt;p&gt;이제 대시 보드 화면으로 이동하면 sprinb-batch 메트릭 정보가 그래프로 보이는 것을 확인할 수 있다.&lt;br&gt;
+&lt;p&gt;이제 대시 보드 화면으로 이동하면 spring-batch 메트릭 정보가 그래프로 보이는 것을 확인할 수 있다.&lt;br&gt;
 &lt;img src=&#34;https://www.devkuma.com/docs/prometheus/spring-batch-prometheus-4-4.png&#34; alt=&#34;Grafana 대시보드 확인&#34;&gt;&lt;/p&gt;
 &lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
 &lt;ul&gt;
@@ -2592,7 +2592,7 @@ deployment.apps/helloworld created
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-xnhnt   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zbfc7   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helloworld-7b8f9795b8-zn6vn   1/1     Running   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;          17s
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;동작은 Rolling Update와 비슷하게 서서시 교체되는 식이다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;동작은 Rolling Update와 비슷하게 서서히 교체되는 식이다.&lt;/p&gt;
 
       </description>
       
@@ -3015,7 +3015,7 @@ deployment.apps/helloworld created
         
         &lt;p&gt;앞에서 Dockerfile에서 이미지를 빌드하는 방법을 소개하였다. 로컬에서 빌드한 이미지는 Docker Engine에 캐시되어 있을 뿐이고 다른 사람은 사용할 수 없다. 이미지를 다른 사람이 사용할 수 있게 하려면, 이용자가 접근 할 수 있는 위치에 이미지를 공개해야 한다. Docker 회사나 AWS를 비롯한 각종 클라우드 벤더는 Docker 이미지를 관리하고 공유하는 구조로, &amp;ldquo;레지스트리&amp;quot;라는 서비스를 제공하고 있다. 이번에는 Docker 이미지의 레지스트리로 Docker Hub 및 AWS ECR (EC2 Container Registry)의 개요, 간단한 이미지 등록 · 취득 방법 및 팀 내에서 이미지를 관리 할 때 고려해야 할 사항에 대해 소개한다.&lt;/p&gt;
 &lt;h2 id=&#34;레지스트리에-이미지를-공유&#34;&gt;레지스트리에 이미지를 공유&lt;/h2&gt;
-&lt;p&gt;첫째, 팀의 이미지 관리 방식에 대한 개요를 이해하기 위해, 벤더 중립적인 수준에서의 리지스토리의 개요를 소개한다. 개별 서비스에 의존하는 부분에 대해서는 서비스 별 섹션에서 설명한다.&lt;/p&gt;
+&lt;p&gt;첫째, 팀의 이미지 관리 방식에 대한 개요를 이해하기 위해, 벤더 중립적인 수준에서의 레지스트리의 개요를 소개한다. 개별 서비스에 의존하는 부분에 대해서는 서비스 별 섹션에서 설명한다.&lt;/p&gt;
 &lt;p&gt;레지스트리는 팀에서 이미지를 관리 · 공유하기 위해 주로 두 가지 역할을 제공한다.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;이미지 등록 및 공유
@@ -3037,7 +3037,7 @@ deployment.apps/helloworld created
 &lt;li&gt;레지스트리에 게시할 이미지(Nginx와 Node.js 등)의 범주에 대해 &amp;ldquo;저장소&amp;quot;가 실제 이미지 저장소에 등록된다.&lt;/li&gt;
 &lt;li&gt;저장소에 이미지를 복수 등록할 수 있고, 각 이미지는 태그로 구분된다. 버전 번호별로 이미지를 구별하고 싶은 경우 등에는 태그에 버전 번호를 지정한다. 예를 들어, Docker 공식 Node.js 이미지의 경우, 14.17.1 및 14.17.1-alpine 등으로 Node.js의 버전 번호와 Linux 배포판 등 이미지의 내용을 태그로 표현하고 있다.
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;주의&lt;/strong&gt;: 태그가 동일한 이미지는 덮어 쓰기버리기 때문에 저장소에 이미지를 push 할 때는 주의가 필요한다.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;주의&lt;/strong&gt;: 태그가 동일한 이미지는 덮어 쓰기 때문에 저장소에 이미지를 push 할 때는 주의가 필요한다.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;먼저 레지스트리에 액세스 할 때 인증이 필요하다. 또한 push 및 pull 등 저장소에 대한 작업에 대한 사용자별로 접근 권한을 설정할 수 있다. 따라서 이미지를 관리하는 사람에게는 저장소에 push 권한을 부여하여 이미지를 이용하는 사람은 pull 권한을 부여하는 것이 가능하다.&lt;/li&gt;
@@ -3133,7 +3133,7 @@ Login Succeeded
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다시  Docker Hub 대시 보드를 확인해 보면 TAG가 &amp;ldquo;0.0.1&amp;quot;인 이미지가 추가된 것을 확인 할 수 있을 것이다.&lt;/p&gt;
 &lt;h3 id=&#34;개인-저장소를-팀과-공유하려면&#34;&gt;개인 저장소를 팀과 공유하려면?&lt;/h3&gt;
 &lt;p&gt;지금까지는 개인의 공개 저장소에 이미지를 push하는 방법을 소개하였다. 공개 저장소이므로 다음 명령을 입력하면 누구나 이미지를 pull 받을 수 있게 된다.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% dokcer pull devkuma/myfirstapp
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker pull devkuma/myfirstapp
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;그다지 중요하지 않는 개인 프로젝트라면 개인 계정에 공개 저장소로 하여도 상관 없겠지만, 실제 개발은 팀의 개인 저장소를 제공하여 팀 구성원만 액세스 할 수 있게 해야 할 것이다.&lt;/p&gt;
 &lt;p&gt;Docker Hub는 비공개 저장소를 만들 수 있는데, 1개까지 무료고 그 이상은 유료이다. 요금은 Docker Hub 대시 보드에서 &lt;a href=&#34;https://www.docker.com/pricing&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pricing&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 페이지를 참조하도록 하자.&lt;/p&gt;
 &lt;p&gt;Docker Hub에는 다음 팀의 저장소를 만들기 위해 &lt;a href=&#34;https://docs.docker.com/docker-hub/orgs/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Organization와 Team&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 이라는 기능이 있다. Organization은 팀 멤버가 속한 조직을 의미하고, Team은 그 조직의 특정 역할을 가진 팀을 의미한다.&lt;/p&gt;
@@ -3318,7 +3318,7 @@ Login Succeeded
         
         &lt;h2 id=&#34;config-map&#34;&gt;Config Map&lt;/h2&gt;
 &lt;p&gt;Config Map이라는 리소스를 사용하여 환경 변수 등을 Key Value 쌍으로 저장할 수 있다. Config Map은 설정된 환경 변수를 볼륨으로 포드에 마운트한다.
-환경 변수의 설정은 매니페스트내의 spec안에 env라고 하는 항목을 마련해, 설정할 수도 있다. 그러나 이 경우 변수를 재사용할 수 없게 됩니다. 이 문제를 Config Map을 사용하여 해결할 수 있다.&lt;/p&gt;
+환경 변수의 설정은 매니페스트내의 spec안에 env라고 하는 항목을 마련해, 설정할 수도 있다. 그러나 이 경우 변수를 재사용할 수 없게 된다. 이 문제를 Config Map을 사용하여 해결할 수 있다.&lt;/p&gt;
 &lt;p&gt;구체적으로 어떻게 작성하는지에 대해 살펴 보겠다. 먼저 Config Map 매니페스트를 작성한다. 이것은 kubectl create 명령에서 configmap을 지정하여 가능하다. 아래의 예에서는 yaml 파일을 작성하고 있다. 이 경우 TEST_ENV라는 환경 변수에 Hello_world라는 문자열을 저장한다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl create configmap my-config --from-literal &lt;span style=&#34;color:#000&#34;&gt;TEST_ENV&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;Hello_World -o yaml &amp;gt; configmap.yaml 
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위의 명령을 실행하여 만든 yaml 파일은 다음과 같다.&lt;br&gt;
@@ -3333,7 +3333,7 @@ Login Succeeded
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;namespace&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;default&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;resourceVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;10632&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;uid&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;2371e43c-c361-40be-8ab9-5269edfb41c3&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 경우에는 yaml 파일의 1단에 data가 작성되고 있있는데, 이건 작성하는 노드가 가지는 데이터를 지정하는 항목이다. 이 경우는 단순히 &lt;code&gt;key:TEST_ENV&lt;/code&gt;에 &lt;code&gt;value:Hello_world&lt;/code&gt;를 나타내고 있다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 경우에는 yaml 파일의 1단에 data가 작성되고 있는데, 이건 작성하는 노드가 가지는 데이터를 지정하는 항목이다. 이 경우는 단순히 &lt;code&gt;key:TEST_ENV&lt;/code&gt;에 &lt;code&gt;value:Hello_world&lt;/code&gt;를 나타내고 있다.&lt;/p&gt;
 &lt;p&gt;이와 같이 작성한 yaml 파일을 이용해 노드를 생성(&lt;code&gt;kubectl apply&lt;/code&gt;)하고, 환경 변수를 이용하는 경우에는 Pod 생성시에 이 Config Map를 인용하여 사용할 수 있다.&lt;/p&gt;
 &lt;p&gt;아래와 같이 Pod 생성용의 yaml 파일에 작성한 것으로 Config Map의 정보의 반영을 실행한다.&lt;/p&gt;
 &lt;p&gt;pod.yaml&lt;/p&gt;
@@ -3360,7 +3360,7 @@ Login Succeeded
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;gcr.io/google-samples/hello-app:1.0&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;8080&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에 &lt;code&gt;pod.yaml&lt;/code&gt;의 경우, &lt;code&gt;helloworld&lt;/code&gt;라는 Pod를 생성하는 yaml 파일이지만, &lt;code&gt;helloworld&lt;/code&gt; 내의 환경 변수로 &lt;code&gt;TEST_ENV_POD&lt;/code&gt;를 만들고, 그 내용은 &lt;code&gt;my-config&lt;/code&gt;라는 Condig Map의 &lt;code&gt;TEST_ENV&lt;/code&gt;에 저장된 값을 사용한다는 것으로 지정되어 있다. 이러한 지정 방법으로 하는 것은 다른 Pod에서도 동일하게 이용할 수 있어 재사용성이 높일 수 있게 된다.&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;위에 &lt;code&gt;pod.yaml&lt;/code&gt;의 경우, &lt;code&gt;helloworld&lt;/code&gt;라는 Pod를 생성하는 yaml 파일이지만, &lt;code&gt;helloworld&lt;/code&gt; 내의 환경 변수로 &lt;code&gt;TEST_ENV_POD&lt;/code&gt;를 만들고, 그 내용은 &lt;code&gt;my-config&lt;/code&gt;라는 Config Map의 &lt;code&gt;TEST_ENV&lt;/code&gt;에 저장된 값을 사용한다는 것으로 지정되어 있다. 이러한 지정 방법으로 하는 것은 다른 Pod에서도 동일하게 이용할 수 있어 재사용성이 높일 수 있게 된다.&lt;/p&gt;
 &lt;p&gt;계속 해서 Pod에 Volume을 마운트하는 방법을 살펴 보겠다. Pod는 관리상의 기본 단위로 되어 있고, &lt;a href=&#34;http://localhost:1313/docs/kubernetes/pod-kubectl/#kubernetes-pod-%EA%B4%80%EB%A6%AC&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;가상 Network Interface(IP, 파일 시스템)를 공유한다&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;고 하는 것을 앞에서 그랬는데, 이는 즉, Pod 자체가 Kubernetes상에서는 가상 호스트와 같이 생각될 수 있는 것을 의미한다. 이러한 Pod에 볼륨으로 Config Map을 마운트한다. Config Map은 환경 변수뿐만 아니라 Key-Value 쌍을 저장하고 해당 데이터를 파일로 볼륨에 마운트 할 수 있다. 위에서 본 것은 Config Map에 저장된 데이터를 환경 변수로 호출하였다.&lt;/p&gt;
 &lt;p&gt;이를 실현하기 위해 다음과 같이 pod.yaml 파일을 수정한다.&lt;br&gt;
 &lt;em&gt;pod.yaml&lt;/em&gt;&lt;/p&gt;
@@ -3395,8 +3395,8 @@ Login Succeeded
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;path&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;keys&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이 yaml 파일에서는 볼륨에 관해서, &lt;code&gt;my-config&lt;/code&gt;라는 이름의 Config Map을 &lt;code&gt;my-config-volume&lt;/code&gt;라는 이름의 볼륨으로 지정하고, 이 이름을 지정해 마운트를 실행하여, 그 때에 대응하는 컨테이너내의 패스명을 &lt;code&gt;/my-config/TEST_ENV&lt;/code&gt;로 하는 것을 하고 있다. 이렇게 하면 파일화되어 변경할 수 있다는 장점이 있다.&lt;/p&gt;
 &lt;h2 id=&#34;영속-volume&#34;&gt;영속 Volume&lt;/h2&gt;
-&lt;p&gt;이어서 영속 Volumme(Persistest Volume)에 대해 살펴보겠다.&lt;/p&gt;
-&lt;p&gt;컨테이너에서는 데이터는 Pod내에 있는 Volume에 변경을 실시하는 것으로 데이터의 작성을 하고 있다. 따라서 Pod가 사라지면 데이터도 사라진다. 이를 방지하려면 클러스터 와이드의 Node에 있는 Persistest Volume에 데이터를 저장한다. 실제 동작으로는 여러 Node가 있는 클러스터내에 각 Node가 공유할 수 있는 volume(Persistest Volume)를 생성하여, 각 Node가 필요한 만큼만 이 공통 volume에 요구를 하여, 받아온 volume를 요구처의 Node 로 마운트한다는 것이다.&lt;/p&gt;
+&lt;p&gt;이어서 영속 Volume(Persistent Volume)에 대해 살펴보겠다.&lt;/p&gt;
+&lt;p&gt;컨테이너에서는 데이터는 Pod내에 있는 Volume에 변경을 실시하는 것으로 데이터의 작성을 하고 있다. 따라서 Pod가 사라지면 데이터도 사라진다. 이를 방지하려면 클러스터 와이드의 Node에 있는 Persistent Volume에 데이터를 저장한다. 실제 동작으로는 여러 Node가 있는 클러스터내에 각 Node가 공유할 수 있는 volume(Persistent Volume)를 생성하여, 각 Node가 필요한 만큼만 이 공통 volume에 요구를 하여, 받아온 volume를 요구처의 Node 로 마운트한다는 것이다.&lt;/p&gt;
 &lt;p&gt;그 때문에, 공통적인 volume를 정의하는 yaml 파일(&lt;code&gt;pv.yaml&lt;/code&gt;)과 요구 사항을 넣은 yaml 파일(&lt;code&gt;pvc.yaml&lt;/code&gt;)을 준비하고, Pod(Node) 작성시에 사용하는 yaml 파일(&lt;code&gt;pod.yaml&lt;/code&gt;)에는, 이 요구 사항을 참조하도록 작성한다. 각 파일의 샘플은 아래와 같다.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;pv.yaml&lt;/em&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
@@ -3482,7 +3482,7 @@ $ sudo mkdir mnt/pvc
 &lt;h3 id=&#34;개발-환경의-표준화&#34;&gt;개발 환경의 표준화&lt;/h3&gt;
 &lt;p&gt;팀 구성원이 규칙대로 개발 환경을 수동으로 정비하면 시간이 걸릴뿐만 아니라 수작업 실수를 유발할 가능성이 있다. Docker Compose를 사용하여 설정 파일을 전달하면, 개발 환경의 세부 사항을 걱정하지 않고 하나의 명령으로 환경을 정비 할 수 있다. 이로 개발 환경 정비 작업을 간소화 할 수 있다.&lt;/p&gt;
 &lt;h3 id=&#34;테스트-환경의-자동화&#34;&gt;테스트 환경의 자동화&lt;/h3&gt;
-&lt;p&gt;CI(Continuous intergration)와 CD(Continuous Deployment)를 할 경우, end to end 테스트(모든 구성 요소를 결합하여 테스트)를 자동화하려면 이상적으로는 테스트마다 독립적인 테스트 환경을 제공 해야 한다. Docker Compose를 사용하면 필요한 테스트 환경을 명령어 1개로 시작할 수 있으며, 검사가 완료되면 쉽게 파기할 수도 있다.&lt;/p&gt;
+&lt;p&gt;CI(Continuous Integration)와 CD(Continuous Deployment)를 할 경우, end to end 테스트(모든 구성 요소를 결합하여 테스트)를 자동화하려면 이상적으로는 테스트마다 독립적인 테스트 환경을 제공 해야 한다. Docker Compose를 사용하면 필요한 테스트 환경을 명령어 1개로 시작할 수 있으며, 검사가 완료되면 쉽게 파기할 수도 있다.&lt;/p&gt;
 &lt;h3 id=&#34;단일-호스트-배포&#34;&gt;단일 호스트 배포&lt;/h3&gt;
 &lt;p&gt;운영 환경이 단일 서버의 경우 Docker Compose를 사용하여 배포 할 수 있다. 자세한 내용은 &lt;a href=&#34;https://docs.docker.com/compose/production/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;문서&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;를 참조해라.&lt;/p&gt;
 &lt;p&gt;그러나 응용 프로그램을 확장하기 위해 다중 노드에 배포하려면 일반적으로 Docker Engine의 &lt;a href=&#34;https://docs.docker.com/engine/swarm/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Swarm mode&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 라는 기능 또는 &lt;a href=&#34;https://aws.amazon.com/ko/ecs/features&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;AWS ECS&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; 와 &lt;a href=&#34;https://cloud.google.com/kubernetes-engine&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Google Container Engine&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;과 같은 클라우드 클러스터 매니저가 더 적합하다.&lt;/p&gt;
@@ -4120,7 +4120,7 @@ Options:
         
         
         &lt;p&gt;지금까지는 기본적으로 대부분이 커멘드 내에 Pod 등의 정보를 넣어 커멘드를 실행하였지만, 매번 원하는 것이 익숙해 지도록 커멘드의 예제를 들어 갔다. 예를 들어, 이전 섹션의 Deployment를 시작한 다음 Pod 수를 늘리는 등의 작성 방법이 전형적인 예이다. 이렇게 매번 하고 싶은 것을 명령하는 것을 &lt;strong&gt;명령적&lt;/strong&gt;이라고 한다. 이 방법은 어떻게(how)에 주목하고 있다.&lt;/p&gt;
-&lt;p&gt;이에 대해서 최종적으로 얻고 싶은 상태를 입력하여 지정ㅎ새서 작성을 실행하는 것을 &lt;strong&gt;선언적&lt;/strong&gt;이라고 한다. 선언적인 경우에는 정보(what)에 주목해 작성을 실행한다.&lt;/p&gt;
+&lt;p&gt;이에 대해서 최종적으로 얻고 싶은 상태를 입력하여 지정해서 작성을 실행하는 것을 &lt;strong&gt;선언적&lt;/strong&gt;이라고 한다. 선언적인 경우에는 정보(what)에 주목해 작성을 실행한다.&lt;/p&gt;
 &lt;p&gt;Kubernetes에서는 선언적인 기술 방법으로서, yaml 파일(매니페스트)에 정보를 기재하는 방법을 이용한다. 이 yaml 파일안에 최종적으로 얻고 싶은 Pod 등의 정보(what)를 기입하는 것으로 목적의 것을 Kubernetes에 자동으로 작성한다. 이 때 Kubernetes에서는 어떻게(how) 만드는 방법은 생각할 필요가 없기 때문에, 이 how를 추상화할 수 있다는 점이 선언적인 방법의 장점이라고 할 수 있다.&lt;/p&gt;
 &lt;p&gt;예를 들면, 다음의 2개는 같은 것을 명령적(&lt;code&gt;kubectl run&lt;/code&gt;)에 기재한 것과 선언적(&lt;code&gt;pod.yaml&lt;/code&gt;)으로 작성된 예제이다.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;명령적&lt;/strong&gt; : &lt;code&gt;kubectl run&lt;/code&gt;&lt;/p&gt;
@@ -4145,7 +4145,7 @@ Options:
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl run --image gcr.io/google-samples/hello-app:1.0 --restart Never helloworld -o yaml helloworld &amp;gt; pod.yaml
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;이렇게 yaml을 지정하여 &lt;code&gt;kubectl run&lt;/code&gt;과 동일한 Pod를 생성하려면 &lt;code&gt;kubectl apply&lt;/code&gt; 명령으로 작성한 yaml 파일을 지정하여 가능하다.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;kubectl apply -f pod.yaml
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다음에 yaml 파일의 작성한 내용에 대해서 알아 보겠다. 다만, 모든 내용을 여기에 다 언급하면, 양이 방대해지므로 일부만 언급을 하돌고 하겠다. 다른 항목에 대해서는 공식 문서를 참고 주길 바란다.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다음에 yaml 파일의 작성한 내용에 대해서 알아 보겠다. 다만, 모든 내용을 여기에 다 언급하면, 양이 방대해지므로 일부만 언급하도록 하겠다. 다른 항목에 대해서는 공식 문서를 참고 주길 바란다.
 위에서 설명한 &lt;code&gt;pod.yaml&lt;/code&gt; 파일이 아마도 가장 간단한 형태일 것이다. 그러나 대규모 구성도 동일하다.&lt;/p&gt;
 &lt;p&gt;이 yaml 파일의 1단에 기재되어 있는 것으로 부터 보도록 하자. 크게 네 가지 항목이 있다는 걸 알 수 있다. 그 항목은 각각 다음과 같은 의미를 갖는다.&lt;/p&gt;
 &lt;table&gt;
@@ -4497,7 +4497,7 @@ Setting Docker configuration on the remote daemon...
         &lt;p&gt;이번에는 Docker 바인딩 마운트 기능에 대해 설명한다. 또한 바인딩 마운트의 구체적인 예로서 Java Hello World 프로그램을 컴파일하고 실행하는 방법을 소개한다.&lt;/p&gt;
 &lt;h2 id=&#34;docker-마운트-기능&#34;&gt;Docker 마운트 기능&lt;/h2&gt;
 &lt;p&gt;&amp;lsquo;마운트&amp;rsquo;라는 용어는 Linux 나 Windows 등 OS의 용어로 아시는 사람이 많을 것이다. 예를 들어 &amp;ldquo;하드 디스크를 탑재하는 것&amp;quot;이라고 말했다면 OS가 하드 디스크를 인식하고 사용할 수 있는 상태로 만드는 것을 의미한다.&lt;/p&gt;
-&lt;p&gt;Docker에서 &amp;ldquo;마운트&amp;quot;는 컨테이너 외부에있는 데이터를 컨테이너에서 사용할 수 있는 상태가 될 것을 의미한다. 207년 말에 공개된 &amp;ldquo;Docker v17.12.0-ce&amp;quot;는 다음의 세 가지 마운트 기능이 제공되고 있다.&lt;/p&gt;
+&lt;p&gt;Docker에서 &amp;ldquo;마운트&amp;quot;는 컨테이너 외부에있는 데이터를 컨테이너에서 사용할 수 있는 상태가 될 것을 의미한다. 2017년 말에 공개된 &amp;ldquo;Docker v17.12.0-ce&amp;quot;는 다음의 세 가지 마운트 기능이 제공되고 있다.&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;바인드 마운트 (bind)&lt;/li&gt;
 &lt;li&gt;볼륨 마운트 (volume)&lt;/li&gt;

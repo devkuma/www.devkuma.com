@@ -23,6 +23,537 @@
     
     
     <item>
+      <title>Helm概要</title>
+      <link>https://www.devkuma.com/jp/docs/helm/overview/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/helm/overview/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Helmを学ぶ前に、まずKubernetesについて知っておく必要がある。Kubernetesについて知らない場合は、先に&lt;a href=&#34;https://www.devkuma.com/jp/docs/kubernetes/&#34;&gt;Kubernetes&lt;/a&gt;について学んでほしい。&lt;/p&gt;
+&lt;h2 id=&#34;helm概要&#34;&gt;Helm概要&lt;/h2&gt;
+&lt;p&gt;HelmはKubernetesクラスタ用のパッケージマネージャーであり、Kubernetesクラスタで実行されるアプリケーションのデプロイに、この「Helm」というツールが活用される。&lt;br&gt;
+Helmは設定ファイルに基づいてアプリケーションのデプロイを自動実行するツールで、Kubernetesアプリケーションのパッケージマネージャーとして現在最も人気のある製品の一つである。&lt;/p&gt;
+&lt;p&gt;HelmはDeis（2017年にMicrosoftが買収）のプロジェクトの一つで、2015年に開催された最初のKubeCon（The Kubernetes Community Conference）でHelm Classicとして発表された。Helmプロジェクトは2016年1月にKubernetesプロジェクトと統合され、Kubernetesのサブプロジェクトになった。そして2016年後半にHelm 2.0、2018年6月にHelm 3.0がリリースされ、本格的なCNCF（Cloud Native Computing Foundation）プロジェクトへ昇格した。&lt;/p&gt;
+&lt;h2 id=&#34;kubernetesにアプリケーションをデプロイするための事実上の標準ツールhelm&#34;&gt;Kubernetesにアプリケーションをデプロイするための事実上の標準ツール「Helm」&lt;/h2&gt;
+&lt;p&gt;最近では、コンテナクラスタ技術であるKubernetesを活用したサービス運用が増えており、Kubernetes上で動作することを前提としたソフトウェアも登場している。一方で、Kubernetesでのアプリケーション配置には課題も多い。&lt;/p&gt;
+&lt;p&gt;Kubernetesは、サービスを複数の小さなコンポーネントに分割して実装するマイクロサービスアーキテクチャと相性がよい。このような構成のサービスでは、各コンポーネントを個別にクラスタへデプロイする必要がある。また、サービスを外部に公開したり各種設定を行ったりするために、Kubernetesクラスタに「リソース」を作成して設定を実行する必要がある。これらの作業は複雑になることがあるため、Kubernetesクラスタへのデプロイを支援したり、デプロイ済みコンテナを管理したりするためのさまざまなツールが登場している。&lt;/p&gt;
+&lt;p&gt;ここで紹介するHelmは、そのようなKubernetesクラスタへのアプリケーションデプロイを支援するツールの一つである（図1）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-site.png&#34; alt=&#34;Helm公式Webサイト&#34;&gt;
+&lt;strong&gt;図1.&lt;/strong&gt; &lt;em&gt;Helm公式Webサイト&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;最近のOSやプログラミング言語の多くでは、第三者が作成したソフトウェア（パッケージ）を集めて公開するサービス（リポジトリ）が提供されており、そこに公開されているソフトウェアの検索、ダウンロード、インストールなどを簡単な操作で行える「パッケージマネージャー」というソフトウェアが提供されている。HelmはKubernetes用パッケージマネージャーとも呼ばれ、OSやプログラミング言語のパッケージマネージャーと似た機能を備えている。Helmが提供する具体的な機能を簡単にまとめると次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Chartという設定ファイルを基にした各種リソースの自動生成&lt;/li&gt;
+&lt;li&gt;デプロイ済みアプリケーションの削除や更新などの管理&lt;/li&gt;
+&lt;li&gt;リポジトリに公開されたChartの検索、ダウンロード、インストール&lt;/li&gt;
+&lt;li&gt;Chartのパッケージングおよびリポジトリへのアップロード&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Kubernetesの基盤となっているコンテナ技術Dockerでは、すでにコンテナイメージを提供するリポジトリ機構が用意されている。そのためHelmでは、イメージ自体は直接扱わず、「Chart」という設定ファイルだけをリポジトリで管理する構造になっている。その点を除けば、Helmが提供する機能は一般的なパッケージマネージャーが提供する機能とほぼ同じであり、&lt;code&gt;helm&lt;/code&gt;というCLIツールを使ってChartをダウンロードしたり、それを基にクラスタへ自動でアプリケーションをデプロイしたりできる。&lt;/p&gt;
+&lt;p&gt;また、Helmでは「stable」や「incubator」という名称の公式リポジトリが提供されているほか、サードパーティによるリポジトリも多く提供されている。これらのリポジトリに公開されたChartは、&lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;というサイトを通じて検索できるようになっている（図2）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/artifact-hub-site.png&#34; alt=&#34;Helmの公式リポジトリ「Artifact Hub」&#34;&gt;
+&lt;strong&gt;図2.&lt;/strong&gt; &lt;em&gt;Helmの公式リポジトリ「Artifact Hub」&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;helmの歴史とコミュニティ&#34;&gt;Helmの歴史とコミュニティ&lt;/h2&gt;
+&lt;p&gt;Helmは2016年2月にv1.0がリリースされ、現在までに2回のメジャーアップデートが行われている。この記事時点の最新版は、2022年8月にリリースされたv3.9.4である。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Helm v1
+&lt;ul&gt;
+&lt;li&gt;2015年にDEISの内部プロジェクトとして開始
+&lt;ul&gt;
+&lt;li&gt;2017年にDEISはMicrosoftに買収&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Helm v2
+&lt;ul&gt;
+&lt;li&gt;2016年1月: Googleプロジェクトに参加&lt;/li&gt;
+&lt;li&gt;2016年から2018年: Helm 2の高度化（2.0.0から2.12.2）&lt;/li&gt;
+&lt;li&gt;2018年6月: CNCFプロジェクトに参加&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Helm v3
+&lt;ul&gt;
+&lt;li&gt;2019年11月: リリース発表&lt;/li&gt;
+&lt;li&gt;2019年から2021年: Helm 3の高度化（3.0.0から3.5.2）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;当初はKubernetesのサブプロジェクトとして開発が進められていたが、その後Linux Foundation傘下の非営利団体Cloud Native Computing Foundation（CNCF）配下となり、現在もその体制で開発が進められている。CNCFはクラウド関連技術の開発を推進する団体であり、Kubernetes自体もCNCF配下で開発されている。このような歴史的背景から、HelmはKubernetesの事実上の公式パッケージマネージャーとしても知られている。&lt;/p&gt;
+&lt;p&gt;Helmプロジェクト自身が提供する「stable」や「incubator」などの公式リポジトリでは、すでにさまざまなアプリケーションのChartが公開されており、メンテナーによって作成されたChartも多く公開されている。また、以前紹介したKubernetes関連ツールであるIstioやJenkins Xといったソフトウェアでも、Helmが公式のインストールツールとして採用され、使用されている。&lt;/p&gt;
+&lt;p&gt;なお、helmは船などで使われる舵を意味する単語である。また、chartは航海用地図に由来している。&lt;/p&gt;
+&lt;h2 id=&#34;helmの主な特徴&#34;&gt;Helmの主な特徴&lt;/h2&gt;
+&lt;p&gt;HelmはGo言語で書かれており、HelmクライアントとHelmライブラリの2つの構成要素で構成される。&lt;br&gt;
+HelmはHelmクライアントを通じて、Kubernetesで実行されるアプリケーションをLinuxの&lt;code&gt;yum&lt;/code&gt;コマンドのようにインストール、つまりデプロイし、削除できる。アプリケーション管理はChartというパッケージ化された構成ファイルを使用して行われる。Chartにはアプリケーション自体は含まれておらず、アプリケーションを構築するために必要な情報が含まれている。また、Artifact HubというサイトにはさまざまなChartが公開されており、利用できる。&lt;/p&gt;
+&lt;p&gt;HelmライブラリはKubernetesクライアントライブラリを使用してKubernetesと通信する。通信にはREST+JSONが使用される。独自のデータベースは不要で、Kubernetes Secretにデータを保持する。&lt;/p&gt;
+&lt;p&gt;Helmの基本概念は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Chart: アプリケーションインスタンスを作るために必要な構成ファイルの集合。&lt;/li&gt;
+&lt;li&gt;Configuration: Chartインストール時にアプリケーションに対するさまざまなパラメータを設定するためのもの。&lt;/li&gt;
+&lt;li&gt;Release: Chartがインストールされ、アプリケーション、つまりReleaseオブジェクトが実行可能な状態になったインスタンス。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helmでは次のことができる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Chartの新規作成&lt;/li&gt;
+&lt;li&gt;ChartをChartアーカイブ（tgz）としてパッケージング&lt;/li&gt;
+&lt;li&gt;Chartが保存されたChartリポジトリの操作&lt;/li&gt;
+&lt;li&gt;KubernetesクラスタへのChartのインストールおよび削除&lt;/li&gt;
+&lt;li&gt;HelmでインストールしたChartのリリースライフサイクル管理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helmクライアントとライブラリの役割はそれぞれ次のとおりである。&lt;/p&gt;
+&lt;h3 id=&#34;helmクライアント&#34;&gt;Helmクライアント&lt;/h3&gt;
+&lt;p&gt;エンドユーザー向けのコマンドラインプログラムで、次を担当する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ローカルChart開発&lt;/li&gt;
+&lt;li&gt;リポジトリ管理&lt;/li&gt;
+&lt;li&gt;Release管理&lt;/li&gt;
+&lt;li&gt;Helmライブラリと連携してChartを送信したり、Releaseのアップグレードや削除を要求したりできる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;helmライブラリ&#34;&gt;Helmライブラリ&lt;/h3&gt;
+&lt;p&gt;すべてのHelm操作をKubernetes APIとともに実行する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ChartからReleaseオブジェクトを作成&lt;/li&gt;
+&lt;li&gt;Releaseオブジェクトを構築し、Kubernetesにインストール&lt;/li&gt;
+&lt;li&gt;Releaseオブジェクトをアップグレードまたは削除&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;helmと類似したツール&#34;&gt;Helmと類似したツール&lt;/h2&gt;
+&lt;p&gt;Helmと類似したツールには、Ksonnet、Kapitan、Kustomize、kompose、Ansibleがある。&lt;/p&gt;
+&lt;h2 id=&#34;helmコマンドの例&#34;&gt;Helmコマンドの例&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;コマンド&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm install&lt;/td&gt;
+          &lt;td&gt;Chartをインストールする。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm list&lt;/td&gt;
+          &lt;td&gt;Release一覧を表示する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm pull&lt;/td&gt;
+          &lt;td&gt;Chartをダウンロードしてローカルに展開する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm repo add&lt;/td&gt;
+          &lt;td&gt;Chartリポジトリを追加する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm repo list&lt;/td&gt;
+          &lt;td&gt;Chartリポジトリ一覧を表示する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm search&lt;/td&gt;
+          &lt;td&gt;Chartを検索する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm show&lt;/td&gt;
+          &lt;td&gt;Chartの詳細情報を表示する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm uninstall&lt;/td&gt;
+          &lt;td&gt;Releaseを削除する。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;helm upgrade&lt;/td&gt;
+          &lt;td&gt;新しいChartへアップグレードする。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Helm公式サイト&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/helm/helm&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHubリポジトリ&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helmとは？ Kubernetesプロジェクト管理、ユースケース</title>
+      <link>https://www.devkuma.com/jp/docs/helm/what-is-helm/</link>
+      <pubDate>Thu, 18 Jan 2024 12:30:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/helm/what-is-helm/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helmとは&#34;&gt;Helmとは？&lt;/h2&gt;
+&lt;p&gt;Helmは、Kubernetes構成ファイルを1つの再利用可能なパッケージに統合し、Kubernetesアプリケーションの作成、パッケージング、構成、デプロイを自動化するツールである。&lt;/p&gt;
+&lt;p&gt;マイクロサービスアーキテクチャでは、アプリケーションが大きくなるほどマイクロサービスの数が増え、管理が難しくなる。オープンソースのコンテナオーケストレーション技術であるKubernetesを使うと、複数のマイクロサービスを1つのデプロイにまとめてプロセスを簡素化できる。しかし、Kubernetesアプリケーションの開発ライフサイクルを管理するときにも、バージョン管理、リソース割り当て、更新、ロールバックなど、固有の問題がいくつも発生する。&lt;/p&gt;
+&lt;p&gt;これらの問題に対する最も簡単な解決策の一つがHelmであり、Helmを使うとデプロイの一貫性、反復性、安定性を高められる。&lt;/p&gt;
+&lt;h2 id=&#34;helmを使ってkubernetes管理を簡素化する&#34;&gt;Helmを使ってKubernetes管理を簡素化する&lt;/h2&gt;
+&lt;p&gt;コンテナは、アプリケーションとその依存関係を1つのイメージファイルにまとめた軽量なソフトウェアコンポーネントである。コンテナは異なる環境間での移植性が高く、アプリケーションの起動時間を短縮し、すばやく拡張できる。&lt;/p&gt;
+&lt;p&gt;KubernetesデプロイはYAML設定ファイルを使用する。デプロイが複雑で頻繁に更新される場合、これらのファイルのすべてのバージョンを追跡するのは難しい。Helmは、1つのデプロイ用YAMLファイルとバージョン情報を管理できる便利なツールである。このファイルを使用すると、簡単なコマンドで複雑なKubernetesクラスタを設定、管理できる。ここではHelmのさまざまな構成要素を見て、それを活用してKubernetes管理を簡素化する方法を確認する。&lt;/p&gt;
+&lt;h3 id=&#34;helm-chartとは&#34;&gt;Helm chartとは？&lt;/h3&gt;
+&lt;p&gt;Helm chartは、アプリケーションをKubernetesクラスタにデプロイするために必要なすべてのリソースを含むパッケージである。パッケージには、Deployment、Service、Secret、特定アプリケーションの状態を定義するConfig Mapなど、さまざまなYAML設定ファイルが含まれる。&lt;/p&gt;
+&lt;p&gt;Helm chartはこれらのYAMLファイルとテンプレートをパッケージ化したものであり、パラメータ化された値に応じて追加の設定ファイルを生成できる。この方式により、さまざまな環境に合わせて設定ファイルをカスタマイズしたり、複数のデプロイで再利用できる設定ファイルを生成したりできる。また、各Helm chartを個別にバージョン管理できるため、異なる設定を持つ複数バージョンのアプリケーションを簡単に管理できる。&lt;/p&gt;
+&lt;h3 id=&#34;configファイル&#34;&gt;configファイル&lt;/h3&gt;
+&lt;p&gt;configファイルにはアプリケーションの設定が含まれており、通常はYAMLファイルに保存される。Kubernetesクラスタのリソースはこの値に従ってデプロイされる。&lt;/p&gt;
+&lt;h3 id=&#34;release&#34;&gt;release&lt;/h3&gt;
+&lt;p&gt;Chartを実行するインスタンスをReleaseと呼び、&lt;code&gt;helm install&lt;/code&gt;コマンドを実行すると、configファイルとChartファイルを取得してすべてのKubernetesリソースをデプロイする。&lt;/p&gt;
+&lt;h2 id=&#34;アーキテクチャ&#34;&gt;アーキテクチャ&lt;/h2&gt;
+&lt;p&gt;Helmの概念を理解したら、次はHelmのアーキテクチャを見ていく。Helmのアーキテクチャには、クライアントとライブラリという2つの主要構成要素がある。&lt;/p&gt;
+&lt;p&gt;Helmクライアントは、ローカルChart開発、リポジトリ、Release管理のためのエンドユーザー向けコマンドラインユーティリティであり、MySQLコマンドを実行するためにMySQLデータベースクライアントを使うのと同じように、Helmコマンドを実行するためにHelmクライアントを使用する。&lt;/p&gt;
+&lt;p&gt;Helmライブラリはすべての主要処理を担当する。このライブラリには、Helmコマンドで指定された処理を実行するための実際のコードが含まれており、HelmライブラリはconfigとChartファイルの組み合わせを処理してReleaseを作成する。&lt;/p&gt;
+&lt;p&gt;Helmアーキテクチャはバージョン2から3へ移行する中で大きく改善された。バージョン2では、TillerサーバーがHelmクライアントとKubernetes APIサーバーを仲介する役割を果たした。また、Helmが作成したすべてのリソースを追跡した。バージョン3ではクライアント専用アーキテクチャを志向し、Tillerサーバーをなくし、API直接接続を通じてKubernetes APIサーバーと相互作用するようになった。&lt;/p&gt;
+&lt;h2 id=&#34;helmの動作原理&#34;&gt;Helmの動作原理&lt;/h2&gt;
+&lt;p&gt;Helmアプリケーションライブラリは、Chartを使ってKubernetesアプリケーションを定義、作成、インストール、アップグレードできる。Helm Chartを使用すると、Kubernetesコマンドラインインターフェースを使わなくてもクラスタを制御でき、複雑なKubernetesコマンドを覚えなくてもKubernetesマニフェストを管理できる。&lt;/p&gt;
+&lt;p&gt;Helmが有用な現実的なシナリオを考えてみよう。プロダクション環境に10個のレプリカを持つアプリケーションをデプロイすると仮定する。アプリケーションのYAMLファイルにこの仕様を指定し、&lt;code&gt;kubectl&lt;/code&gt;コマンドを使ってデプロイを実行する。&lt;/p&gt;
+&lt;p&gt;次に、ステージング環境で同じアプリケーションを実行する。しかし、ステージング環境には3個のレプリカが必要であり、ステージング環境では内部アプリケーションビルドを実行する必要がある。この場合、デプロイ用YAMLファイルのレプリカ数とDocker imageタグを更新し、ステージングKubernetesクラスタで更新済みファイルを使用する。&lt;/p&gt;
+&lt;p&gt;アプリケーションが複雑になるほどYAMLファイルの数は増える。1つのアプリをさまざまな環境にデプロイするために多数のYAMLファイルを更新するのは非常に面倒であり、結果としてYAMLファイルの設定フィールドも増える。Helmを使うと、環境に応じてフィールドをパラメータ化できる。前の例では、レプリカ数とDockerイメージに静的値を指定せず、別のファイルでその値を指定する。その別のファイルが&lt;code&gt;values.yaml&lt;/code&gt;である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-values-yaml-file-1.png&#34; alt=&#34;Values.yamlファイル&#34;&gt;&lt;/p&gt;
+&lt;p&gt;この方式を使うと、環境ごとにvaluesファイルを用意し、各ファイルに適切な値を設定すればよい。Helmでは、実際のYAML設定と設定フィールド値の管理を分離できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/helm/helm-values-yaml-file-2.png&#34; alt=&#34;構成可能なフィールド値&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;helmリポジトリ&#34;&gt;Helmリポジトリ&lt;/h2&gt;
+&lt;p&gt;HelmリポジトリはHelm Chartをアップロードできる場所である。個人リポジトリを作成して組織内でChartを共有することもでき、&lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;というグローバルHelmリポジトリを通じて、さまざまな用途のChartを検索してインストールする機能もある。簡単に言えば、DockerイメージにおけるDocker Hubが、Helm ChartにおけるArtifact Hubである。&lt;/p&gt;
+&lt;h2 id=&#34;helmでデプロイおよびロールバックする&#34;&gt;Helmでデプロイおよびロールバックする&lt;/h2&gt;
+&lt;p&gt;Helm Chartを作成した後、アプリをデプロイするのは非常に簡単であり、すべてのKubernetesリソースをデプロイするために2から3個のHelmコマンドを実行するだけでよい。&lt;/p&gt;
+&lt;p&gt;実際の例として、Helm Chartを使ってデプロイしたKubernetesクラスタでアプリケーションを実行していると仮定する。このアプリケーションに&lt;a href=&#34;https://prometheus.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Prometheus&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;のような監視ソリューションを構成してみよう。選択肢は2つある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Prometheusアプリケーション用のすべてのDeploymentとServiceを最初から作成する場合、時間がかかる。&lt;/li&gt;
+&lt;li&gt;Artifact HubでPrometheus Chartを探し、自分の要件に合わせて設定を更新してインストールする。Docker Hubで既存のDockerイメージを探し、DockerfileのFROM文に指定するのと似ている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;次の手順で目的のHelm Chartをインストールできる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HelmライブラリがHelm Chartを取得する場所を把握できるように、Helmリポジトリをローカルに登録する。&lt;/li&gt;
+&lt;li&gt;設定したリポジトリから利用可能なすべてのHelm Chartを取得する。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;values.yaml&lt;/code&gt;ファイルを必要に応じて更新し、&lt;code&gt;helm install&lt;/code&gt;コマンドを使って特定のHelm Chartをインストールする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Helmを使うもう一つの利点は、ロールバックプロセスが簡単なことである。&lt;/p&gt;
+&lt;p&gt;Helmはアプリケーションレベルで動作する。つまり、実行中アプリケーションの状態、すなわちReleaseが維持される。アプリケーションの新バージョンをデプロイしたが期待どおりに動作しない場合、&lt;code&gt;helm rollback&lt;/code&gt;コマンドを使って以前の安定したReleaseに戻せる。このコマンドはすべてのDeployment、Service、Kubernetesリソースをロールバックする。&lt;/p&gt;
+&lt;p&gt;Helmがなければ、このように簡単にはロールバックできず、各Kubernetesリソースごとにロールバックを実行する必要があるため、複雑なアプリケーションの管理がより難しくなる。&lt;/p&gt;
+&lt;h2 id=&#34;helmとcicd&#34;&gt;HelmとCI/CD&lt;/h2&gt;
+&lt;p&gt;Helmを活用すると、CI/CD（Continuous Integration &amp;amp; Continuous Delivery）パイプラインでKubernetesアプリケーションのビルドおよびテストがはるかに簡単になる。アプリケーションを任意の環境へ自動的にデプロイしてビルド時間を短縮できる。パイプラインでセルフホストランナーを使用すると、ビルドおよびテスト環境の柔軟性を高められる。&lt;/p&gt;
+&lt;p&gt;CircleCIのセルフホストランナーを使うと、ユーザーが管理する環境でCI/CDジョブを実行できる。つまり、独立した仮想マシンやKubernetesのようなクラスタ全体を実行環境として使える。コンテナランナーを使うと、Helm Chartを使用してコンテナ化されたワークロードをプライベートKubernetesクラスタへデプロイし、必要に応じて環境を拡張できる。&lt;/p&gt;
+&lt;h2 id=&#34;helm使用の長所と短所&#34;&gt;Helm使用の長所と短所&lt;/h2&gt;
+&lt;p&gt;Helmには役立つユースケースと、そうでないユースケースがある。このセクションでは、Helmが役立つユースケースと役立たないユースケースを確認し、Helmが役立つかどうかを区別するいくつかのポイントを示す。&lt;/p&gt;
+&lt;h3 id=&#34;helmが適している場合&#34;&gt;Helmが適している場合&lt;/h3&gt;
+&lt;p&gt;Helmは、多数のマイクロサービスを含む複雑なアプリケーションをKubernetesで実行するプロジェクトに有用である。Helmを使うと、アプリケーションのデプロイと管理を簡単に自動化でき、手作業を減らしてシステムの信頼性と安定性を向上できる。また、事前構成されたさまざまなパッケージで構成されたリポジトリにより、アプリケーションへ新しい機能を簡単に追加できる。&lt;/p&gt;
+&lt;p&gt;Helmを使ってアプリケーションコンポーネントを、インストールとアップグレードが容易なモジュール型Chartとして構成すると、アプリケーションコンポーネント管理プロセスを簡素化できる。また、アプリケーション保守に必要な手作業が減り、複雑なシステムを手動管理するときに発生するエラーや不整合を防止できる。&lt;/p&gt;
+&lt;p&gt;Helmは複数環境、たとえば開発、ステージング、プロダクションなどへコンテナをデプロイできるよう支援するため、開発プロセス全体でコンテナのライフサイクルを簡単に管理できる。&lt;/p&gt;
+&lt;h3 id=&#34;helmが適していない場合&#34;&gt;Helmが適していない場合&lt;/h3&gt;
+&lt;p&gt;Helmは、サーバーにデプロイするコンテナが1つだけのプロジェクトには適していない。この場合、Helmでコンテナデプロイを管理する必要はなく、むしろHelmを使うとプロセスが複雑になる可能性がある。Helmは複数コンテナのデプロイを1つの単位として管理するために作られているため、このシナリオには適していない。&lt;/p&gt;
+&lt;p&gt;パッケージマネージャーを使わずに少数のKubernetesアプリケーションを手動で管理できる場合にも、Helmは大きな助けにはならない。&lt;/p&gt;
+&lt;p&gt;また、Helmのようなサードパーティツールの使用を禁止する厳格なセキュリティポリシーがある環境では、Helmを使用できないだろう。&lt;/p&gt;
+&lt;h2 id=&#34;helmを導入すべき理由&#34;&gt;Helmを導入すべき理由&lt;/h2&gt;
+&lt;p&gt;プロジェクトにHelmを使うことが役立つかどうかを判断できるポイントがいくつかある。たとえば、プロジェクトに複数のKubernetesアプリケーションが含まれており、それらを統合的に管理してデプロイする必要がある場合である。この場合、Helmを使ってこれらのアプリケーションを1つのChartとしてパッケージングすると、管理とデプロイが容易になる。&lt;/p&gt;
+&lt;p&gt;プロジェクトでKubernetesアプリケーションを頻繁に更新し、デプロイする場合にも、Helmはアプリケーションのライフサイクル、つまりデプロイ、更新、ロールバックなどを管理できるツールを備えているため役立つ。そのため、アプリケーション更新管理とデプロイがはるかに簡単になる。&lt;/p&gt;
+&lt;p&gt;最後は、プロジェクトに複数のチームとメンバーが参加し、共同でKubernetesアプリケーションを開発してデプロイする必要がある場合である。この場合、Helmのバージョン管理とChart共有機能が役立ち、チーム間の協業とデプロイ間の一貫性維持が容易になる。&lt;/p&gt;
+&lt;h2 id=&#34;helmの参考情報&#34;&gt;Helmの参考情報&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://circleci.com/blog/what-is-helm/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;What is Helm? A complete guide | CircleCI&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helm Chart</title>
+      <link>https://www.devkuma.com/jp/docs/helm/chart/</link>
+      <pubDate>Thu, 18 Jan 2024 12:30:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/helm/chart/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helm-chartとは&#34;&gt;Helm chartとは&lt;/h2&gt;
+&lt;p&gt;Helm chartは、アプリケーションをKubernetesクラスタへデプロイするために必要なすべてのリソースを含むパッケージである。パッケージには、Deployment、Service、Secret、そして特定アプリケーションの状態を定義するConfigMapなど、さまざまなYAML設定ファイルが含まれる。&lt;/p&gt;
+&lt;p&gt;Helm chartはこれらのYAMLファイルとテンプレートをパッケージ化したものであり、パラメータ化された値に応じて追加の設定ファイルを生成できる。この方式により、さまざまな環境に合わせて設定ファイルをカスタマイズしたり、複数のデプロイで再利用できる設定ファイルを作成したりできる。また、各Helm chartを個別にバージョン管理できるため、異なる設定を持つ複数バージョンのアプリケーションを簡単に管理できる。&lt;/p&gt;
+&lt;h3 id=&#34;helm-packageとchart&#34;&gt;Helm packageとchart&lt;/h3&gt;
+&lt;p&gt;Helmはchartsというpackaging formatを使用する。パッケージはHelm chartをパッケージ化したものであり、チャートはKubernetesのresource YAMLファイルを&lt;strong&gt;テンプレート&lt;/strong&gt;として作成し、&lt;strong&gt;メタ情報ファイル&lt;/strong&gt;などを圧縮したファイルを指す。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ここでのchartは、Kubernetes resourcesをdescribeするfileの集合である。&lt;/li&gt;
+&lt;li&gt;chartは何かをデプロイするために使用される。
+&lt;ul&gt;
+&lt;li&gt;例: memcached Pod、HTTP serversを持つWeb app、databasesなど。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;chartは特定のdirectory treeで構成されたfileから作成される。
+&lt;ul&gt;
+&lt;li&gt;これらのfileは、デプロイされるversionのarchiveとしてpackagingできる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;chartファイルの作成と構造&#34;&gt;chartファイルの作成と構造&lt;/h2&gt;
+&lt;h3 id=&#34;chartディレクトリの作成&#34;&gt;chartディレクトリの作成&lt;/h3&gt;
+&lt;p&gt;Helmチャートを作成するディレクトリを作り、&lt;code&gt;helm create {directory}&lt;/code&gt;コマンドで基本ディレクトリを生成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% mkdir charts
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; charts
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm create app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Creating app
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;chartファイル構造&#34;&gt;chartファイル構造&lt;/h3&gt;
+&lt;p&gt;生成された基本ファイル構造は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% tree app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── Chart.yaml                    &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chartの名前、バージョン、説明などの情報を書いたYAMLファイル。 (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── charts                        &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# このChartが依存するチャートを含むディレクトリ。 (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;├── templates                     &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# valuesと結合されたとき、有効なKubernetes manifestファイルを生成するテンプレートファイルのディレクトリ。 (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── NOTES.txt                 &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 簡単な使い方を含むテキストファイル。 (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── _helpers.tpl              &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# template manifestファイルで共有する変数定義。 (required)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── deployment.yaml           &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# クラスタに起動するリソーステンプレートファイル&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── hpa.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── ingress.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── service.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   ├── serviceaccount.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│   └── tests
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;│       └── test-connection.yaml
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;└── values.yaml                   &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chartのテンプレートで使用するデフォルト環境設定変数を定義したファイル。 (optional)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; directories, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; files
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;マニフェストファイル（manifest file）とは、コンピューティングにおいて、集合の一部または論理的な単位であるファイル群のためのメタデータを含むファイルである。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;yamlファイル&#34;&gt;YAMLファイル&lt;/h2&gt;
+&lt;h3 id=&#34;chartyaml&#34;&gt;chart.yaml&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Helm Chart自体のAPIバージョン (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chart名 (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chartバージョン。SemVer（Semantic Versioning）規則に従う必要がある。 (required)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;         &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 例: X.X.X形式。SemVer規則参照: https://semver.org/lang/ko/&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kubeVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chartのインストールと実行を保証する、互換性のある最小KubernetesバージョンのSemVer範囲 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;             &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 例: &amp;#34;&amp;gt;=1.15.3&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;description&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chartプロジェクトの簡単な説明 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chartタイプ (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;keywords&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;Chartプロジェクトに関するキーワードリスト (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Helm search時にkeywordも一緒に検索される。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;home&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ChartプロジェクトホームページのURL (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;sources&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;ChartプロジェクトのソースコードURLリスト (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chart repositoryアドレスではない。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;dependencies&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# チャート要件のリスト (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;チャート名 (nginx)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;チャートのバージョン (&amp;#34;1.2.3&amp;#34;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;repository&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;リポジトリURL (&amp;#34;https://example.com/charts&amp;#34;) または (&amp;#34;@repo-name&amp;#34;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;condition: (optional) チャートの有効/無効を決定するboolean値を作るYAMLパス。例&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;subchart1.enabled&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;tags&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;有効化/無効化をまとめるためにチャートをグループ化できるタグ&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;enabled&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;(optional) チャートをロードできるかを決定するboolean&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;import-values&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;ImportValuesは、取り込む親キーに対するソース値のマッピングを保持する。各項目は文字列、または子/親子リスト項目ペアにできる。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;alias&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;(optional) チャートの別名として使用される。同じチャートを複数回追加する必要があるときに便利である。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;maintainers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;maintainerの名前（各maintainerごとにrequired）&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;email&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;maintainerのemail（各maintainerごとにoptional）&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;url&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;maintainerに関するURL（各maintainerごとにoptional）&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;icon&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;アイコンとして使用されるSVGまたはPNG画像URL。カタログでチャートを表示するときに使用される。 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;appVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Chartを利用して提供されるアプリのバージョン (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Chartを利用して提供されるアプリのバージョンであり、SemVer形式に従わなくてもよい。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;deprecated&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;チャートがdeprecatedされたチャートかどうかをboolean(true/false)で明示 (optional)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;annotations&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;example&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;キーでマッピングされた注釈のリスト (optional).&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;valuesyaml&#34;&gt;values.yaml&lt;/h3&gt;
+&lt;p&gt;templateでは&lt;code&gt;{{ .Values.image.tag }}&lt;/code&gt;のような形で使用する。これはインデントに注意して作成する必要がある。&lt;/p&gt;
+&lt;h3 id=&#34;templatesフォルダにデプロイするresourceを定義&#34;&gt;templatesフォルダにデプロイするresourceを定義&lt;/h3&gt;
+&lt;p&gt;基本的にdeployment、service、serviceaccount、ingressが存在する。&lt;/p&gt;
+&lt;p&gt;必要に応じてpersistentvolume、configmapなどを定義する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;apiVersion&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;apps/v1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;kind&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Deployment&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;app&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;if not .Values.autoscaling.enabled }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;replicas&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.replicaCount }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;end }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;selector&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;matchLabels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;template&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;metadata&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;with .Values.podAnnotations }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;annotations&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;toYaml . | nindent 8 }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;{{- &lt;span style=&#34;color:#000&#34;&gt;end }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;labels&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;spec&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containers&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Chart.Name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;imagePullPolicy&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.image.pullPolicy }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;http&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;containerPort&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.port  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;protocol&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;TCP&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;envFrom&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;configMapRef&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;            &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.config.name  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumeMounts&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;mountPath&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.mountpath  }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;          &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.volumename }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.container.volumename }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;claimName&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;{{&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;.Values.PVC.name }}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;helmのtemplate構文&#34;&gt;Helmのtemplate構文&lt;/h3&gt;
+&lt;p&gt;テンプレートファイルはGoテンプレート作成の標準規約に従う。&lt;a href=&#34;https://pkg.go.dev/text/template&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;(text/template Go package documentation)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;{{ }}&lt;/code&gt;で変数を使用する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.Values&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;values.yaml&lt;/code&gt;ファイルで定義された変数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.Charts&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Charts.yaml&lt;/code&gt;ファイルで定義された変数。&lt;/li&gt;
+&lt;li&gt;Chartのバージョンは&lt;code&gt;Chart.Version&lt;/code&gt;で、メンテナは&lt;code&gt;Chart.Maintainers&lt;/code&gt;で取得できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.Release&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;デプロイ時に割り当てた情報を使用する。
+&lt;ul&gt;
+&lt;li&gt;たとえば、&lt;code&gt;--namespace test&lt;/code&gt;でinstallした場合、&lt;code&gt;.Release.Namespace&lt;/code&gt;にtestが割り当てられる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Name&lt;/code&gt;: リリース名（Chart名ではない）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Namespace&lt;/code&gt;: Chartがリリースされたネームスペース&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.Service&lt;/code&gt;: リリースを実行するサービス&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.IsUpgrade&lt;/code&gt;: 現在アップグレードまたはロールバック中ならtrueに設定される。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Release.IsInstall&lt;/code&gt;: 現在インストール中ならtrueに設定される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;include...&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;_helpers.tplファイルで定義された変数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;with ~ end&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;変数に対するscopeを定める構文であり、その区間の&lt;code&gt;.&lt;/code&gt;が設定した変数に属することを定義する。&lt;/li&gt;
+&lt;li&gt;例: 次のコードでは&lt;code&gt;.drink&lt;/code&gt;は&lt;code&gt;.Values.favorite.drink&lt;/code&gt;を意味する。
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;{{- with .Values.favorite }}
+  drink: {{ .drink | default &amp;#34;tea&amp;#34; | quote }}
+  food: {{ .food | upper | quote }}
+{{- end }}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;toYaml&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;該当変数をYAML形式に変更する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;quote&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;string型に変更する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;chartを検査する&#34;&gt;Chartを検査する&lt;/h3&gt;
+&lt;p&gt;定義したchartに構文上の問題がないか確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm lint &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yamlの場所&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;これは構文エラーだけを点検するものであり、問題なくインストールされることを意味しない。&lt;/p&gt;
+&lt;p&gt;templatesを基に変数を参照し、リソースデプロイ時の結果をプレビューできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm template &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yamlの場所&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この過程により、デプロイしたい形になっているか確認できる。&lt;/p&gt;
+&lt;p&gt;chartを試験インストールしてエラーを確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm install &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;release name&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yamlの場所&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;  --debug --dry-run
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--dry-run&lt;/code&gt;: 実際のクラスタにはインストールせず、chartを試験インストールするオプション。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--debug&lt;/code&gt;: デプロイ用manifestファイルの内容を表示する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;chartを作成してrepoに登録する&#34;&gt;chartを作成してrepoに登録する&lt;/h3&gt;
+&lt;p&gt;helm repositoryには、チャート保存所の各チャート情報を含む&lt;code&gt;index.yaml&lt;/code&gt;ファイルが必要である。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;index.yaml&lt;/code&gt;が存在するフォルダで次のコマンドを実行し、パッケージングしてchartを作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm package &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Chart.yamlの場所&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;Chart.yaml&lt;/code&gt;に定義した&lt;code&gt;{name}-{version}.tgz&lt;/code&gt;として圧縮ファイルが作成される。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;リポジトリに登録せず、生成した圧縮ファイルをローカルで使うだけなら&lt;code&gt;helm install {name}&lt;/code&gt;で可能である。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;chartを作成したので、チャート情報を含むindexファイルを更新する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm repo index &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;index.yamlパス&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;GitHub repositoryの場合は&lt;code&gt;git push&lt;/code&gt;を行ったあと、&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;chart一覧をrepositoryから再取得して更新する。&lt;/p&gt;
+&lt;p&gt;更新されたか検索して確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm search repo &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;チャート名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;検索語はキーワードとして扱われ、その語を含むチャートとチャートのrepository一覧が出力される。&lt;/p&gt;
+&lt;h3 id=&#34;作成したchartを利用してインストールする&#34;&gt;作成したChartを利用してインストールする&lt;/h3&gt;
+&lt;p&gt;作成したチャートを次のコマンドでインストールする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm install &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;デプロイ名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;リポジトリ名/chart名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; -n &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;ネームスペース&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://helm.sh/ko/docs/topics/charts/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Helm | Charts&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
+      <title>Helmのインストール</title>
+      <link>https://www.devkuma.com/jp/docs/helm/install/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/helm/install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;helmのインストール&#34;&gt;Helmのインストール&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;helm&lt;/code&gt;コマンドは&lt;a href=&#34;https://github.com/helm/helm/releases&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHubのリリースページ&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;から取得でき、ここではソースコードのほか、Windows、Linux、macOS用のバイナリも提供されている。配布アーカイブの中にはバイナリファイル（&lt;code&gt;helm&lt;/code&gt;）がそのまま格納されているため、Helmを利用したいマシンでダウンロードして展開し、適切なディレクトリへコピーすればインストールは完了である。&lt;/p&gt;
+&lt;p&gt;また、macOSのHomebrewやWindowsのChocolateyといったパッケージマネージャーからもインストールできる。詳しい説明は&lt;a href=&#34;https://helm.sh/ja/docs/intro/install/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;公式ドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;を参照してほしい。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;helm&lt;/code&gt;コマンドはKubernetesクラスタへアクセスするために&lt;code&gt;kubectl&lt;/code&gt;コマンドを使用する。そのため、&lt;code&gt;helm&lt;/code&gt;コマンドを実行するシステムには&lt;code&gt;kubectl&lt;/code&gt;コマンドがインストールされており、&lt;code&gt;kubectl&lt;/code&gt;コマンドでKubernetesクラスタへアクセスできるように設定されている必要がある。&lt;/p&gt;
+&lt;p&gt;対応するKubernetesクラスタのバージョンは明示されていないが、「Kubernetesの最新安定版」との組み合わせが推奨されている。とはいえ、古いバージョンのKubernetesがすぐに利用できなくなるわけではない。ただし、Kubernetes 1.6以前ではロール（Role）ベースのアクセス制御（RBAC）関連の設定に制限があるとされている。&lt;/p&gt;
+&lt;p&gt;なお、Helm v2では&lt;code&gt;helm&lt;/code&gt;コマンドに加えて、Kubernetes上で動作する&lt;code&gt;tiller&lt;/code&gt;というアプリケーションが必要だったが、v3ではTillerが廃止され、&lt;code&gt;helm&lt;/code&gt;コマンドだけが必要な構成に変更された。&lt;/p&gt;
+&lt;h3 id=&#34;macosでインストールhomebrew&#34;&gt;macOSでインストール（Homebrew）&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% brew install helm
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Running &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;brew update --auto-update&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Auto-updated Homebrew!
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Updated &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; taps &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;homebrew/core and homebrew/services&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;You have &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt; outdated formulae installed.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;You can upgrade them with brew upgrade
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;or list them with brew outdated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading https://ghcr.io/v2/homebrew/core/helm/manifests/3.9.4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;######################################################################## 100.0%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading https://ghcr.io/v2/homebrew/core/helm/blobs/sha256:01a042f197753
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Downloading from https://pkg-containers.githubusercontent.com/ghcr1/blobs/sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;######################################################################## 100.0%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Pouring helm--3.9.4.arm64_monterey.bottle.tar.gz
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Caveats
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;zsh completions have been installed to:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  /opt/homebrew/share/zsh/site-functions
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Summary
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;🍺  /opt/homebrew/Cellar/helm/3.9.4: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;64&lt;/span&gt; files, 47.6MB
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&amp;gt; Running &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;brew cleanup helm&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hide these hints with HOMEBREW_NO_ENV_HINTS &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;see &lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;man brew&lt;span style=&#34;color:#4e9a06&#34;&gt;`&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
+      
+    </item>
+    
+    <item>
       <title>Helm</title>
       <link>https://www.devkuma.com/jp/docs/helm/</link>
       <pubDate>Mon, 05 Sep 2022 18:17:00 +0900</pubDate>
@@ -47,6 +578,109 @@ Linuxのyumやapt、Node.jsのnpm、Pythonのpipなど、パッケージ管理�
       </description>
       
       <category>Helm</category>
+      
+    </item>
+    
+    <item>
+      <title>Helmを使う</title>
+      <link>https://www.devkuma.com/jp/docs/helm/uses/</link>
+      <pubDate>Wed, 14 Sep 2022 09:24:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/helm/uses/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;公開されたchartを使用してアプリケーションをデプロイする&#34;&gt;公開されたChartを使用してアプリケーションをデプロイする&lt;/h3&gt;
+&lt;p&gt;前述したように、HelmではChartという設定ファイルに基づいてアプリケーションをデプロイする。Chartは&lt;code&gt;helm&lt;/code&gt;コマンドを実行するローカルマシン上に用意したものだけでなく、リポジトリで公開されているChartを直接ダウンロードして利用することもできる。まずはHelmによるアプリケーションデプロイの例として、リポジトリで公開されているChartを利用する方法を見ていく。&lt;/p&gt;
+&lt;p&gt;すでに述べたように、公開されたChartは&lt;a href=&#34;https://artifacthub.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Artifact Hub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;というサイトで検索できる。Artifact Hubでは&lt;code&gt;&amp;lt;リポジトリ名&amp;gt;/&amp;lt;Chart名&amp;gt;/&lt;/code&gt;という形式でChartが表示されており、その中でリポジトリ名が「&lt;a href=&#34;https://charts.helm.sh/stable/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;stable&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;」や「&lt;a href=&#34;https://charts.helm.sh/incubator/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;incubator&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;」になっているものはHelmの公式リポジトリで提供されているChartで、リポジトリ名がそれ以外のものはサードパーティが提供しているChartである。同じ名前のChartが別のリポジトリで公開されている場合もあるが、それらはソースが異なる点に注意する必要がある。&lt;/p&gt;
+&lt;p&gt;リポジトリ経由でChartをインストールするには、まずChartを提供するリポジトリをローカルコンピュータに登録する必要がある。Helmをインストールした直後はどのリポジトリも登録されていない状態なので、公式リポジトリで提供されているChartを利用する場合でもリポジトリの追加作業が必要になる。&lt;/p&gt;
+&lt;p&gt;リポジトリの追加は&lt;code&gt;helm repo add &amp;lt;リポジトリ名&amp;gt; &amp;lt;URL&amp;gt;&lt;/code&gt;コマンドで実行できる。たとえば公式の&lt;code&gt;bitnami&lt;/code&gt;リポジトリを追加する場合は、次のように実行する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% helm repo add bitnami https://charts.bitnami.com/bitnami
+&amp;#34;bitnami&amp;#34; has been added to your repositories
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;なお、Linux環境では使用するリポジトリの設定はホームディレクトリ配下の&lt;code&gt;.config/helm&lt;/code&gt;というディレクトリにあり、リポジトリで公開されているChart一覧のキャッシュはホームディレクトリ配下の&lt;code&gt;.cache/helm/repository&lt;/code&gt;ディレクトリに保存される。これらの情報は&lt;code&gt;helm -h&lt;/code&gt;コマンドで表示できる&lt;code&gt;helm&lt;/code&gt;コマンドのヘルプにも記載されているので、必要に応じて確認しておく。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm -h
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;The Kubernetes package manager
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 中略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Operating System &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Cache Path                &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Configuration Path             &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Data Path               &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;---------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;--------------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;-------------------------&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Linux            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.cache/helm         &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.config/helm             &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/.local/share/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; macOS            &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/Caches/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/Preferences/helm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/Library/helm      &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; Windows          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %TEMP%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm               &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %APPDATA%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm                 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; %APPDATA%&lt;span style=&#34;color:#4e9a06&#34;&gt;\h&lt;/span&gt;elm          &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リポジトリの登録後は、&lt;code&gt;helm search&lt;/code&gt;コマンドでリポジトリに登録されているChartを検索できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;helm search repo &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&amp;lt;検索キーワード&amp;gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;キーワードを省略すると、登録されているリポジトリで提供されているすべてのChartが出力される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm search repo
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME                                        	CHART VERSION	APP VERSION  	DESCRIPTION
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/airflow                             	13.1.5       	2.3.4        	Apache Airflow is a tool to express and execute...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/apache                              	9.2.3        	2.4.54       	Apache HTTP Server is an open-source HTTP serve...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bitnami/argo-cd                             	4.1.3        	2.4.11       	Argo CD is a continuous delivery tool &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; Kuber...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;登録済みリポジトリの情報はローカルにキャッシュされるため、時間が経つと古くなることがある。&lt;code&gt;helm repo update&lt;/code&gt;コマンドを実行すると、リポジトリキャッシュを最新の状態に更新できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm repo update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Hang tight &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;while&lt;/span&gt; we grab the latest from your chart repositories...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...Successfully got an update from the &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;bitnami&amp;#34;&lt;/span&gt; chart repository
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Update Complete. ⎈Happy Helming!⎈
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Helmでは、Chartを使用してアプリケーションをデプロイすることを「install（インストール）」と呼び、インストールされたアプリケーションのインスタンスを「Release（リリース）」と呼ぶ。また、各インスタンスには固有の名前（Release名）がある。Release名が重複しなければ、同じChartから複数のReleaseを作成することもできる。&lt;/p&gt;
+&lt;p&gt;リポジトリで公開されたChartを使用してアプリケーションをインストール（デプロイ）するには、&lt;code&gt;helm install &amp;lt;Release名&amp;gt; &amp;lt;Chart名&amp;gt;&lt;/code&gt;コマンドを実行する。&lt;/p&gt;
+&lt;p&gt;次の例は、&lt;code&gt;bitnami/wordpress&lt;/code&gt;というChartを&lt;code&gt;wordpress&lt;/code&gt;というRelease名でデプロイしたものである。デプロイに成功すると、そのアプリケーションに関するメモなどを含む&lt;code&gt;NOTES&lt;/code&gt;が表示される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% helm install wordpress bitnami/wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAME: wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;LAST DEPLOYED: Thu Sep &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;15&lt;/span&gt; 00:33:19 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2022&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NAMESPACE: default
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;STATUS: deployed
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REVISION: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;TEST SUITE: None
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NOTES:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CHART NAME: wordpress
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CHART VERSION: 15.2.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;APP VERSION: 6.0.2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;** Please be patient &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;while&lt;/span&gt; the chart is being deployed **
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Your WordPress site can be accessed through the following DNS name from within your cluster:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    wordpress.default.svc.cluster.local &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;port 80&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;To access your WordPress site from outside the cluster follow the steps below:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1. Get the WordPress URL by running these commands:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  NOTE: It may take a few minutes &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; the LoadBalancer IP to be available.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        Watch the status with: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;kubectl get svc --namespace default -w wordpress&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;kubectl get svc --namespace default wordpress --include &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;WordPress URL: http://&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;WordPress Admin URL: http://&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$SERVICE_IP&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;/admin&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2. Open a browser and access WordPress using the obtained URL.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;3. Login with the following credentials below to see your blog:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; Username: user
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; Password: &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;$(&lt;/span&gt;kubectl get secret --namespace default wordpress -o &lt;span style=&#34;color:#000&#34;&gt;jsonpath&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{.data.wordpress-password}&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; base64 -d&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;デプロイは現在のKubernetesコンテキストに対して実行されるため、特定のnamespaceを使用したい場合は、事前に&lt;code&gt;kubectl config&lt;/code&gt;コマンドなどでコンテキストを設定しておく。&lt;/p&gt;
+&lt;p&gt;また、この&lt;code&gt;bitnami/wordpress&lt;/code&gt; Chartでは永続化ストレージを利用するため、クラスタ内でデフォルトのStorage Classが設定されている必要がある。Storage Classの設定方法は使用しているKubernetesクラスタによって異なるため、Kubernetes用Storage Classの作成については別途確認してほしい。&lt;/p&gt;
+&lt;p&gt;デプロイされたRelease一覧は&lt;code&gt;helm list&lt;/code&gt;コマンドで確認できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% helm list
+NAME     	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+wordpress	default  	1       	2022-09-15 00:33:19.166716 +0900 KST	deployed	wordpress-15.2.2	6.0.2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここで作成されたPodを&lt;code&gt;kubectl get pods&lt;/code&gt;コマンドで確認すると、次のように&lt;code&gt;wordpress-d5c8dffb7-bws4d&lt;/code&gt;と&lt;code&gt;wordpress-mariadb-0&lt;/code&gt;の2つのPodが作成されていることがわかる。環境によって&lt;code&gt;d5c8dffb7-bws4d&lt;/code&gt;の部分は変わる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;% kubectl get pods
+NAME                        READY   STATUS             RESTARTS        AGE
+wordpress-d5c8dffb7-bws4d   0/1     CrashLoopBackOff   5 (2m21s ago)   7m33s
+wordpress-mariadb-0         1/1     Running            0               7m33s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&amp;hellip; 作成中（Podにエラーが発生して作成中止） &amp;hellip;&lt;/p&gt;
+
+      </description>
+      
+      <category>Helm</category>
+      
+      <category>Kubernetes</category>
       
     </item>
     
