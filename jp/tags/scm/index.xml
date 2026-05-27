@@ -23,6 +23,263 @@
     
     
     <item>
+      <title>git-flow (Git ブランチモデル)</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-flow/</link>
+      <pubDate>Thu, 25 Aug 2022 10:42:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-flow/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;git-flow&#34;&gt;git flow&lt;/h2&gt;
+&lt;p&gt;git-flow は、2010 年に Vincent Driessen が書いた「A Successful Git Branching Model」というブログ記事で提案されたブランチ戦略である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/git-model-2x.png&#34; alt=&#34;git flow&#34;&gt;&lt;/p&gt;
+&lt;p&gt;各ブランチの使い方は次のとおりである。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;メインブランチ: 中央リポジトリと、それを clone した各開発者のリポジトリが依存する中心的なブランチ。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;master&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;リリース用ブランチ。リリースするたびにタグを付与する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;develop&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;開発用ブランチ。リリース前の最新バージョン。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;サポートブランチ: 原則として各開発メンバーのリポジトリだけに存在し、役割が終わると削除される短命なブランチ。
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;feature&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;develop&lt;/code&gt; から派生し、特定機能の開発のために作成されるブランチ。機能開発が終わると &lt;code&gt;develop&lt;/code&gt; にマージされ、削除される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;release&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;develop&lt;/code&gt; から派生し、リリース準備のために使うブランチ。リリース準備中に不要な feature が入り込まないようにするために作られる。&lt;/li&gt;
+&lt;li&gt;リリースが終わると &lt;code&gt;master&lt;/code&gt; と &lt;code&gt;develop&lt;/code&gt; にマージされ、その後削除される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;hotfix&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;主にリリース済み製品で障害が発生した場合に緊急で作成されるブランチ。&lt;code&gt;master&lt;/code&gt; から直接派生し、バグを修正した後 &lt;code&gt;master&lt;/code&gt; にマージされてタグが付与される。&lt;/li&gt;
+&lt;li&gt;また、バグ修正が後から漏れないように &lt;code&gt;develop&lt;/code&gt; にもマージする。リリース作業中で &lt;code&gt;release&lt;/code&gt; ブランチが存在する場合は、そこにもマージする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;よりシンプルに 1 ブランチで運用する場合:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;master&lt;/code&gt; は常にデプロイ可能である。&lt;/li&gt;
+&lt;li&gt;新しく何かを進めるときは、&lt;code&gt;master&lt;/code&gt; から直接ブランチを作成する。&lt;/li&gt;
+&lt;li&gt;作成したブランチはローカル環境にコミットし、リモートリポジトリにも同じ名前のブランチとして定期的に push する。&lt;/li&gt;
+&lt;li&gt;開発が完了したら &lt;code&gt;master&lt;/code&gt; に Pull Request を送る。&lt;/li&gt;
+&lt;li&gt;Pull Request が検証されたら &lt;code&gt;master&lt;/code&gt; にマージし、すぐに環境へデプロイする。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Pull Request が検証された後すぐにマージしてデプロイするため、Pull Request を送る前にテストが完了している必要がある。手動テストでも自動テストでもよい。
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;master&lt;/code&gt; は常にデプロイ可能でなければならない。マージされるということは、すぐにデプロイ可能であることを意味する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;git-branch-network&#34;&gt;Git branch network&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/git-branch-network-1.png&#34; alt=&#34;branch&#34;&gt; &lt;img src=&#34;https://www.devkuma.com/docs/git/git-branch-network-2.png&#34; alt=&#34;branch&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;主要-branch&#34;&gt;主要 Branch&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;ブランチ名&lt;/th&gt;
+          &lt;th&gt;分類&lt;/th&gt;
+          &lt;th&gt;説明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;work&lt;/td&gt;
+          &lt;td&gt;メインブランチ&lt;/td&gt;
+          &lt;td&gt;すべての作業ブランチは &lt;code&gt;work&lt;/code&gt; ブランチへ統合され、そこから分岐する。&lt;br&gt;このブランチは削除できない、プロジェクトのすべての作業ソースを含むメインブランチである。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;develop&lt;/td&gt;
+          &lt;td&gt;デプロイブランチ&lt;/td&gt;
+          &lt;td&gt;dev 環境へのデプロイ用 branch。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;test&lt;/td&gt;
+          &lt;td&gt;デプロイブランチ&lt;/td&gt;
+          &lt;td&gt;test 環境へのデプロイ用 branch。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;master&lt;/td&gt;
+          &lt;td&gt;デプロイブランチ&lt;/td&gt;
+          &lt;td&gt;pre、live 環境へのデプロイ用 branch。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;feature/&lt;/td&gt;
+          &lt;td&gt;作業ブランチ&lt;/td&gt;
+          &lt;td&gt;新規開発用ブランチ。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;bugfix/&lt;/td&gt;
+          &lt;td&gt;作業ブランチ&lt;/td&gt;
+          &lt;td&gt;不具合修正用ブランチ。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;hotfix/&lt;/td&gt;
+          &lt;td&gt;作業ブランチ&lt;/td&gt;
+          &lt;td&gt;緊急修正用ブランチ。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;release/&lt;/td&gt;
+          &lt;td&gt;デプロイブランチ&lt;/td&gt;
+          &lt;td&gt;Custom デプロイ用ブランチであり、&lt;code&gt;work&lt;/code&gt; ブランチ上ではデプロイできない状況、たとえば cherry-pick による選択的デプロイ時に使う。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;メインブランチ (&lt;code&gt;work&lt;/code&gt;) は PR merge だけを許可するポリシーであり、作業ブランチで作業した内容は必ず Pull Request を通じてメインブランチへ統合する。&lt;/li&gt;
+&lt;li&gt;デプロイブランチ (&lt;code&gt;develop&lt;/code&gt;, &lt;code&gt;test&lt;/code&gt;, &lt;code&gt;master&lt;/code&gt;) はいつでも削除でき、目的のデプロイコミット時点から新しく作成できる。&lt;/li&gt;
+&lt;li&gt;作業ブランチ (&lt;code&gt;feature/&lt;/code&gt;, &lt;code&gt;bugfix/&lt;/code&gt;, &lt;code&gt;hotfix/&lt;/code&gt;) は、メインブランチへ PR された後は削除対象ブランチになる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;branch-ポリシー&#34;&gt;Branch ポリシー&lt;/h2&gt;
+&lt;p&gt;すべての作業ブランチは Jira issue と連携していなければならない。&lt;/p&gt;
+&lt;h3 id=&#34;jira-issue-管理連携プロセス&#34;&gt;Jira issue 管理連携プロセス&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Jira issue を作成する。&lt;/li&gt;
+&lt;li&gt;分岐点を作る。Jira issue タグを自動生成する。
+&lt;ul&gt;
+&lt;li&gt;例: &lt;code&gt;feature/PROJ-1&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;コミットメッセージに Jira issue 番号を付けて自動連携する。
+&lt;ul&gt;
+&lt;li&gt;例: &lt;code&gt;feat(PROJ-1): project init&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;作業完了後、&lt;code&gt;work&lt;/code&gt; ブランチへ pull request を送る。&lt;/li&gt;
+&lt;li&gt;作業ブランチを削除する。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;rebase-ポリシー&#34;&gt;Rebase ポリシー&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/git-rebase-policy-1.png&#34; alt=&#34;Rebase ポリシー&#34;&gt; &lt;img src=&#34;https://www.devkuma.com/docs/git/git-rebase-policy-2.png&#34; alt=&#34;Rebase ポリシー&#34;&gt;&lt;/p&gt;
+&lt;p&gt;作業ブランチからメインブランチへ PR する際は、必ず &lt;code&gt;rebase work&lt;/code&gt; によって base を &lt;code&gt;work&lt;/code&gt; の最新位置へ変更し、1 つのコミットに統合して PR を進める。&lt;/p&gt;
+&lt;p&gt;(&lt;code&gt;git rebase -i&lt;/code&gt;: コミット統合機能)&lt;/p&gt;
+&lt;h3 id=&#34;rebase-を必須にする理由&#34;&gt;Rebase を必須にする理由&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ブランチネットワークをきれいに保つ。&lt;/li&gt;
+&lt;li&gt;メインブランチへ merge する前に、作業者が自分で conflict を解決して PR を進められる。&lt;/li&gt;
+&lt;li&gt;機能ごとに 1 commit とすることで、1 cherry-pick が 1 機能であることを保証できる。&lt;/li&gt;
+&lt;li&gt;多くの作業者が同時に作業しても、ブランチモデルをシンプルに保て、新しい作業者にとっても学習コストが高くならない。&lt;/li&gt;
+&lt;li&gt;グラフがきれいで単純になり、コードの流れの把握や明確なデプロイ時点の決定が容易になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;pull-request-ポリシー&#34;&gt;Pull Request ポリシー&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;作業ブランチを作成する。&lt;/li&gt;
+&lt;li&gt;作業ブランチで開発する。&lt;/li&gt;
+&lt;li&gt;開発完了後に rebase (&lt;code&gt;git rebase -i&lt;/code&gt;) し、その過程で conflict を解決し、1 つのコミットに統合する。&lt;/li&gt;
+&lt;li&gt;メインブランチへ PR する。&lt;/li&gt;
+&lt;li&gt;コードレビューを行う。Default reviewer は 1 名。&lt;/li&gt;
+&lt;li&gt;作業者が直接 PR を承認する。&lt;/li&gt;
+&lt;li&gt;メインブランチへマージ済みの作業ブランチは削除する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;コミットメッセージ規則&#34;&gt;コミットメッセージ規則&lt;/h2&gt;
+&lt;p&gt;Git commit message convention。&lt;/p&gt;
+&lt;h3 id=&#34;共通事項&#34;&gt;共通事項&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;subject
+&lt;ul&gt;
+&lt;li&gt;必須事項であり、コミット内容を簡潔に整理して書く。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;body
+&lt;ul&gt;
+&lt;li&gt;任意事項であり、追加情報が必要な場合に書く。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;footer
+&lt;ul&gt;
+&lt;li&gt;任意事項であり、影響範囲、たとえば PC/MW/APP を書く。&lt;/li&gt;
+&lt;li&gt;または、追加で tracking が必要な情報や関連 issue key を書く。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;ブランチ分類別&#34;&gt;ブランチ分類別&lt;/h3&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;type&lt;/th&gt;
+          &lt;th&gt;branch name&lt;/th&gt;
+          &lt;th&gt;msg convention&lt;/th&gt;
+          &lt;th&gt;remarks&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;feature&lt;/td&gt;
+          &lt;td&gt;feature/{ISSUE-KEY}*&lt;/td&gt;
+          &lt;td&gt;feature(ISSUE-KEY): subject&lt;br&gt;body&lt;br&gt;footer&lt;/td&gt;
+          &lt;td&gt;新機能追加。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;bugfix&lt;/td&gt;
+          &lt;td&gt;bugfix/{ISSUE-KEY}*&lt;/td&gt;
+          &lt;td&gt;bugfix(ISSUE-KEY): subject&lt;br&gt;body&lt;br&gt;footer&lt;/td&gt;
+          &lt;td&gt;QA 中に修正が発生した場合。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;hotfix&lt;/td&gt;
+          &lt;td&gt;hotfix/{ISSUE-KEY}*&lt;/td&gt;
+          &lt;td&gt;hotfix(ISSUE-KEY): subject&lt;br&gt;body&lt;br&gt;footer&lt;/td&gt;
+          &lt;td&gt;運用中に障害による修正が発生した場合。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;release&lt;/td&gt;
+          &lt;td&gt;release/{ISSUE-KEY}&lt;em&gt;&lt;br&gt;または&lt;br&gt;release/yyyymmdd/{ISSUE-KEY}&lt;/em&gt;&lt;/td&gt;
+          &lt;td&gt;release: subject&lt;br&gt;issue-key-list&lt;br&gt;body&lt;br&gt;footer&lt;/td&gt;
+          &lt;td&gt;デプロイ時点を表記する場合。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;docs&lt;/td&gt;
+          &lt;td&gt;docs/*&lt;/td&gt;
+          &lt;td&gt;docs: subject&lt;br&gt;body&lt;/td&gt;
+          &lt;td&gt;文書類を修正する場合。例: Javadoc, README.md。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;refactor&lt;/td&gt;
+          &lt;td&gt;refactor/*&lt;/td&gt;
+          &lt;td&gt;refactor: subject&lt;br&gt;body&lt;/td&gt;
+          &lt;td&gt;コードリファクタリングを行う場合。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;test&lt;/td&gt;
+          &lt;td&gt;test/*&lt;/td&gt;
+          &lt;td&gt;test: subject&lt;br&gt;body&lt;/td&gt;
+          &lt;td&gt;テストコード、リファクタリングテストコードを追加する場合。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;config&lt;/td&gt;
+          &lt;td&gt;config/*&lt;/td&gt;
+          &lt;td&gt;config: subject&lt;br&gt;body&lt;/td&gt;
+          &lt;td&gt;設定ファイルを修正する場合。例: &lt;code&gt;*.config&lt;/code&gt;, &lt;code&gt;*.properties&lt;/code&gt;, &lt;code&gt;*.yml&lt;/code&gt;。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
       <title>Git</title>
       <link>https://www.devkuma.com/jp/docs/git/</link>
       <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
@@ -99,6 +356,73 @@
     </item>
     
     <item>
+      <title>Git で作業中の内容をすべて削除したい場合</title>
+      <link>https://www.devkuma.com/jp/docs/git/reset-clean/</link>
+      <pubDate>Sun, 26 Nov 2023 11:32:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/reset-clean/</guid>
+      <description>
+        
+        
+        &lt;p&gt;作業中の内容をすべて削除したい場合がある。&lt;/p&gt;
+&lt;p&gt;その場合は、次のコマンドで削除できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset --hard HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clean -f -d -x
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git リモートリポジトリ URL の変更</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-remote-set-url/</link>
+      <pubDate>Thu, 25 Aug 2022 10:42:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-remote-set-url/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;リモートリポジトリ-url-を変更する&#34;&gt;リモートリポジトリ URL を変更する&lt;/h2&gt;
+&lt;p&gt;既存のリモートリポジトリ URL を変更するには、&lt;code&gt;git remote set-url&lt;/code&gt; コマンドを使う。&lt;/p&gt;
+&lt;h3 id=&#34;接続されている-git-リポジトリを確認する&#34;&gt;接続されている Git リポジトリを確認する&lt;/h3&gt;
+&lt;p&gt;変更する前に、現在のローカル Git リポジトリがどのリモートリポジトリと接続されているかを、次のように &lt;code&gt;git remote -v&lt;/code&gt; で確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;origin  https://github.com/user/repo.git &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;fetch&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;origin  https://github.com/user/repo.git &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;push&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;接続されている-git-リポジトリを変更する&#34;&gt;接続されている Git リポジトリを変更する&lt;/h3&gt;
+&lt;p&gt;確認後、次の形式でコマンドを入力するとリモートリポジトリ URL が変更される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote set-url origin &amp;lt;変更するリモートリポジトリ URL&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行例は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git remote set-url origin https://github.com/user/repo2.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2 つの引数を持つ。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;origin&lt;/code&gt;: 既存のリモートリポジトリ名。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;https://github.com/user/repo2.git&lt;/code&gt;: 新しく変更するリモートリポジトリ URL。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;関連文書&#34;&gt;関連文書&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://minsone.github.io/git/github-managing-remotes-changing-a-remotes-url&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub / Managing Remotes / リモートリポジトリ URL の変更&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/docs/git-remote&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git remote man page&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/book/ko/v2/Git%EC%9D%98-%EA%B8%B0%EC%B4%88-%EB%A6%AC%EB%AA%A8%ED%8A%B8-%EC%A0%80%EC%9E%A5%EC%86%8C&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Pro Git - Working with Remotes&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
       <title>Git の基本</title>
       <link>https://www.devkuma.com/jp/docs/git/git-%EA%B8%B0%EB%B3%B8/</link>
       <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
@@ -147,6 +471,267 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;index に登録されていない変更内容もすべて commit 領域へ登録する。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -a -m &amp;#34;コメント&amp;#34;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>リモート Git リポジトリ | git remote</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-remote/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-remote/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-remote-コマンド&#34;&gt;git remote コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git remote&lt;/code&gt; は、他のリポジトリとの接続を作成、確認、名前変更、削除するコマンドである。リモート接続は、他のリポジトリへの直接リンクというよりブックマークに近い。他のリポジトリへリアルタイムにアクセスするものではなく、長い URL の代わりに使える短い名前として機能する。&lt;/p&gt;
+&lt;p&gt;たとえば、ローカルリポジトリと中央リポジトリの間、さらにローカルリポジトリと別の開発者のリポジトリの間に、2 つのリモート接続を持たせることができる。それらを完全な URL で参照する代わりに、&lt;code&gt;origin&lt;/code&gt; や &lt;code&gt;john&lt;/code&gt; といった名前のショートカットを他の Git コマンドへ渡せる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git remote&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;他のリポジトリへのリモート接続を一覧表示する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote -v
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上のコマンドと似ているが、各接続の URL も表示する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote add &amp;lt;name&amp;gt; &amp;lt;url&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リモートリポジトリへの新しい接続を作成する。作成後は、他の Git コマンドで &lt;code&gt;&amp;lt;url&amp;gt;&lt;/code&gt; の代わりに &lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; をショートカットとして使用できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote rm &amp;lt;name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;&amp;lt;name&amp;gt;&lt;/code&gt; という名前のリモートリポジトリ接続を削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote rename &amp;lt;old-name&amp;gt; &amp;lt;new-name&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リモート接続の名前を &lt;code&gt;&amp;lt;old-name&amp;gt;&lt;/code&gt; から &lt;code&gt;&amp;lt;new-name&amp;gt;&lt;/code&gt; へ変更する。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;Git は、各開発者に独立した開発環境を提供するよう設計されている。そのため、リポジトリ間で情報が自動的に移動することはない。開発者は中央リポジトリのコミットを手動でローカルリポジトリへ取得したり、ローカルコミットを手動で中央リポジトリへ push したりする必要がある。&lt;code&gt;git remote&lt;/code&gt; は、そのような共有作業のコマンドへ URL を渡すための便利な方法を提供する。&lt;/p&gt;
+&lt;h3 id=&#34;origin-リモートリポジトリ&#34;&gt;origin リモートリポジトリ&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git clone&lt;/code&gt; でリポジトリを clone すると、clone 元のリポジトリを指す &lt;code&gt;origin&lt;/code&gt; という名前のリモート接続が自動的に作成される。これは上流から変更を pull したり、ローカルコミットを公開したりする簡単な方法を提供する。Git ベースの多くのプロジェクトでは、中央リポジトリの名前は &lt;code&gt;origin&lt;/code&gt; になっている。&lt;/p&gt;
+&lt;h3 id=&#34;リポジトリ-url&#34;&gt;リポジトリ URL&lt;/h3&gt;
+&lt;p&gt;Git はリモートリポジトリを参照する多くの方法をサポートしている。リモートリポジトリへアクセスする一般的な方法として、HTTP プロトコルと SSH プロトコルがある。HTTP は、リポジトリへ匿名の読み取り専用アクセスを提供する簡単な方法である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://host/path/to/repo.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ただし、通常は HTTP アドレスへ匿名で push することはできない。読み書きアクセスには SSH を使う。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ssh://user@host/path/to/repo.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;この場合、ホストマシン上に有効な SSH アカウントが必要である。それ以外については、Git は基本的に認証が必要なアクセスをサポートしている。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;origin&lt;/code&gt; 以外に、他の開発者のリポジトリへの接続を作っておくと便利な場合が多い。たとえば、同僚の John が &lt;code&gt;dev.example.com/john.git&lt;/code&gt; に公開リポジトリを持っている場合、次のように新しい接続を作成する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git remote add john http://dev.example.com/john.git
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;個別開発者のリポジトリへこのようにアクセスすることで、中央リポジトリを通さずに共同作業できる。この機能は、大規模プロジェクトで作業する小規模チームに特に便利である。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>リモート Git リポジトリ | git fetch</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-fetch/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-fetch/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-fetch-コマンド&#34;&gt;git fetch コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git fetch&lt;/code&gt; は、リモートリポジトリからローカルリポジトリへブランチを取得するコマンドである。取得したブランチは、これまで学んできた通常のローカルブランチではなく、リモート追跡ブランチとして保存される。この機能により、ローカルリポジトリへ統合する前に変更内容を確認できる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch &amp;lt;remote&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;指定したリポジトリからすべてのブランチを取得するコマンドである。関連するすべてのコミットとファイルもそのリポジトリからダウンロードされる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git fetch &amp;lt;remote&amp;gt; &amp;lt;branch&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上のコマンドと同じ機能を持つが、取得対象は指定したブランチだけである。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;fetch は、他の開発者の作業内容を確認したい場合に行う操作である。取得したブランチはリモート追跡ブランチとして表現されるため、ローカルの開発作業にはまったく影響しない。取得したブランチをローカルリポジトリへ統合する前に内容を確認できるため、fetch は安全な操作である。このコマンドは、中央リポジトリの進行状況を確認できるという意味では SVN の &lt;code&gt;svn update&lt;/code&gt; に似ているが、実際にはブランチをローカルブランチへ統合しない。&lt;/p&gt;
+&lt;h3 id=&#34;リモート追跡ブランチ&#34;&gt;リモート追跡ブランチ&lt;/h3&gt;
+&lt;p&gt;リモート追跡ブランチはローカルブランチに似ているが、他の開発者のリポジトリにあるブランチを指している。ローカルブランチと同じようにリモート追跡ブランチをチェックアウトできるが、その場合は過去のコミットをチェックアウトした場合と同様に detached &lt;code&gt;HEAD&lt;/code&gt; 状態になる。つまり、リモート追跡ブランチは読み取り専用ブランチだと考えられる。&lt;/p&gt;
+&lt;p&gt;リモート追跡ブランチの一覧を表示するには、&lt;code&gt;-r&lt;/code&gt; フラグを指定して &lt;code&gt;git branch&lt;/code&gt; を実行する。リモート追跡ブランチ名の先頭には、そのブランチがあるリモート接続の名前が付くため、ローカルブランチと混同しない。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -r
+# origin/master
+# origin/develop
+# origin/some-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここでも通常の &lt;code&gt;git checkout&lt;/code&gt; や &lt;code&gt;git log&lt;/code&gt; を使ってブランチを確認できる。リモート追跡ブランチに含まれる変更が受け入れ可能であれば、通常の &lt;code&gt;git merge&lt;/code&gt; でローカルリポジトリへマージできる。したがって SVN とは異なり、ローカルリポジトリをリモートリポジトリと同期する作業は、実際には fetch と merge の 2 段階である。&lt;code&gt;git pull&lt;/code&gt; はこの 2 段階の作業を簡単にするショートカットである。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;この例では、ローカルリポジトリを中央リポジトリの &lt;code&gt;master&lt;/code&gt; ブランチと同期するときの一般的なワークフローを示す。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git fetch origin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、ダウンロードされたブランチが表示される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;a1e8fb5..45e66a4 master -&amp;gt; origin/master
+a1e8fb5..9e8ab1c develop -&amp;gt; origin/develop
+* [new branch] some-feature -&amp;gt; origin/some-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;チュートリアル図のように、これらのリモート追跡ブランチにあるコミットはローカルブランチのコミットとは異なる形で表示される。&lt;code&gt;git fetch&lt;/code&gt; を実行すると、リモートリポジトリのすべてのブランチにアクセスできる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git fetch&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;中央リポジトリの &lt;code&gt;master&lt;/code&gt; に追加されたコミットを確認するには、次のように &lt;code&gt;master&lt;/code&gt; ブランチの範囲を対象に &lt;code&gt;git log&lt;/code&gt; を実行する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline master..origin/master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;次のコマンドは変更を受け入れ、それらをローカルの &lt;code&gt;master&lt;/code&gt; ブランチへマージする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+git log origin/master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;そして &lt;code&gt;origin/master&lt;/code&gt; をマージする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git merge origin/master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;これで &lt;code&gt;origin/master&lt;/code&gt; と &lt;code&gt;master&lt;/code&gt; の両ブランチが同じコミットを指すようになり、中央リポジトリとの同期が完了する。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>リモート Git リポジトリ | git pull</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-pull/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-pull/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-pull-コマンド&#34;&gt;git pull コマンド&lt;/h3&gt;
+&lt;p&gt;中央リポジトリからの変更をローカルリポジトリへマージする作業は、Git ベースの共同作業ワークフローでよく行われる。&lt;code&gt;git fetch&lt;/code&gt; に続けて &lt;code&gt;git merge&lt;/code&gt; を実行する方法はすでに説明したが、&lt;code&gt;git pull&lt;/code&gt; はこの 2 つのコマンドをまとめて実行するショートカットである。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git pull &amp;lt;remote&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;現在のブランチについて、指定したリモートからコピーを fetch し、それを現在のブランチへすぐにマージする。これは &lt;code&gt;git fetch &amp;lt;remote&amp;gt;&lt;/code&gt; を実行した後、&lt;code&gt;git merge origin/&amp;lt;current-branch&amp;gt;&lt;/code&gt; を実行するのと同じである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git pull --rebase &amp;lt;remote&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上のコマンドと似ているが、リモートブランチを現在のブランチへ統合するときに &lt;code&gt;git rebase&lt;/code&gt; を使う。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git pull&lt;/code&gt; は SVN の &lt;code&gt;svn update&lt;/code&gt; に相当すると考えられる。このコマンドは、ローカルリポジトリを中央リポジトリと同期するための便利な方法である。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git pull&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;最初はローカルリポジトリが &lt;code&gt;origin&lt;/code&gt; と同期していたとする。&lt;code&gt;git fetch&lt;/code&gt; を実行した結果、&lt;code&gt;origin/master&lt;/code&gt; が最後に確認した時点から進んでいることがわかる。ここで &lt;code&gt;git merge&lt;/code&gt; を実行すると、リモートの &lt;code&gt;master&lt;/code&gt; がローカルの &lt;code&gt;master&lt;/code&gt; へマージされる。&lt;/p&gt;
+&lt;h2 id=&#34;rebase-を使った-pull&#34;&gt;rebase を使った pull&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;--rebase&lt;/code&gt; フラグは、履歴の線形性を保ち、マージコミットを減らしたい場合に使う。rebase は「自分の変更作業はすべて、完了済みの最新変更を基準にしたい」という操作に相当し、多くの開発者は merge より rebase を選ぶ傾向がある。この意味で、単純な &lt;code&gt;git pull&lt;/code&gt; よりも &lt;code&gt;--rebase&lt;/code&gt; フラグを付けた &lt;code&gt;git pull&lt;/code&gt; の方が、SVN の &lt;code&gt;svn update&lt;/code&gt; に近いといえる。&lt;/p&gt;
+&lt;p&gt;実際に &lt;code&gt;--rebase&lt;/code&gt; フラグを指定した pull は非常に一般的なワークフローであるため、そのための設定コマンドが用意されている。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git config --global branch.autosetuprebase always
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、以後のすべての &lt;code&gt;git pull&lt;/code&gt; は統合時に &lt;code&gt;git merge&lt;/code&gt; ではなく &lt;code&gt;git rebase&lt;/code&gt; を使う。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次は、中央リポジトリの &lt;code&gt;master&lt;/code&gt; ブランチと同期する方法を示している。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+git pull --rebase origin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、他の開発者の作業成果がすべて反映された上に、ローカル変更が配置される。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>リモート Git リポジトリ | git push</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-push/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-push/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-push-コマンド&#34;&gt;git push コマンド&lt;/h3&gt;
+&lt;p&gt;push とは、ブランチをローカルリポジトリからリモートリポジトリへ書き込む操作を意味する。このコマンドは &lt;code&gt;git fetch&lt;/code&gt; の反対であり、fetch がブランチをローカルリポジトリへ取り込む操作であるのに対し、push はブランチをリモートリポジトリへ送り出す操作である。このコマンドは変更の誤った上書きを引き起こす可能性があるため、使用時には注意が必要である。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git push &amp;lt;remote&amp;gt; &amp;lt;branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;指定したブランチを、関連するすべてのコミットおよび内部オブジェクトとともに &lt;code&gt;&amp;lt;remote&amp;gt;&lt;/code&gt; へ push するコマンドである。このコマンドを実行すると、push 先リポジトリにローカルブランチが作成される。変更の誤った上書きを防ぐため、Git は push 先リポジトリで fast-forward 以外の統合処理が必要な場合、push を拒否する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git push &amp;lt;remote&amp;gt; --force
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上のコマンドと似ているが、fast-forward でない場合でも強制的に push を実行する。push 操作によって何が起こるかを完全に理解している場合を除き、&lt;code&gt;--force&lt;/code&gt; フラグを使ってはならない。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git push &amp;lt;remote&amp;gt; --all
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;すべてのローカルブランチを指定したリモートリポジトリへ push するコマンドである。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git push &amp;lt;remote&amp;gt; --tags
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ブランチを push するだけでは、&lt;code&gt;--all&lt;/code&gt; フラグを指定した場合でもタグは自動的には push されない。&lt;code&gt;--tags&lt;/code&gt; フラグを指定すると、すべてのローカルタグをリモートリポジトリへ送信できる。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git push&lt;/code&gt; の最も一般的な用途は、ローカル変更を中央リポジトリへ公開することである。ローカルで何度かコミットし、それを他の開発者と共有する段階になったら、必要に応じてインタラクティブ rebase で履歴を整理し、中央リポジトリへ push する。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git push&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;チュートリアル図は、ローカルの &lt;code&gt;master&lt;/code&gt; が中央リポジトリの &lt;code&gt;master&lt;/code&gt; より進んでいる状態で、&lt;code&gt;git push origin master&lt;/code&gt; を実行して変更を公開すると何が起こるかを示している。&lt;code&gt;git push&lt;/code&gt; は本質的にはリモートリポジトリで &lt;code&gt;git merge master&lt;/code&gt; を実行することと同等である点を覚えておこう。&lt;/p&gt;
+&lt;h3 id=&#34;強制-push&#34;&gt;強制 push&lt;/h3&gt;
+&lt;p&gt;Git は、push の結果として fast-forward 以外の処理が必要になる場合、push 要求を拒否する。したがって、リモートリポジトリとローカルリポジトリが分岐している場合は、まずリモートブランチを取得してローカルブランチへマージし、その後もう一度 push を試す必要がある。これは SVN で変更をコミットする前に &lt;code&gt;svn update&lt;/code&gt; でローカルリポジトリをリモートリポジトリと同期することに似ている。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;--force&lt;/code&gt; フラグを指定するとこの制限が解除され、リモートリポジトリをローカルリポジトリに一致させる。最後に pull した時点以降にリモートリポジトリで変更が発生していた場合、それらはすべて削除される。強制 push が必要になる代表的なケースは、公開したばかりのコミットに欠陥が見つかり、&lt;code&gt;git commit --amend&lt;/code&gt; やインタラクティブ rebase で修正した場合である。ただし、この場合でも &lt;code&gt;--force&lt;/code&gt; を使う前に、欠陥のあるブランチを pull した開発者が誰もいないことを確認する必要がある。&lt;/p&gt;
+&lt;h3 id=&#34;push-先は-bare-リポジトリに限定する&#34;&gt;push 先は bare リポジトリに限定する&lt;/h3&gt;
+&lt;p&gt;push 先は、&lt;code&gt;--bare&lt;/code&gt; フラグを指定して作成したリポジトリに限定すべきである。push はリモートリポジトリの構造を変更する操作なので、他の開発者の作業リポジトリへ push してはならない。bare リポジトリは作業ディレクトリを持たないため、他の開発者の作業を妨げることがない。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次の例は、ローカル作業の成果を中央リポジトリへ公開する一般的な方法を示している。まずローカルの &lt;code&gt;master&lt;/code&gt; を確実に最新にするため、中央リポジトリの &lt;code&gt;master&lt;/code&gt; を取得し、ローカル変更をその上へ rebase する。コミットを共有する前に、インタラクティブ rebase でコミットを整理するとよい。その後、&lt;code&gt;git push&lt;/code&gt; でローカル &lt;code&gt;master&lt;/code&gt; のすべてのコミットを中央リポジトリへ送る。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+git fetch origin master
+git rebase -i origin/master
+# Squash commits, fix up commit messages etc.
+git push origin master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;すでにローカル &lt;code&gt;master&lt;/code&gt; が最新であることを確認しているため、統合は fast-forward になり、&lt;code&gt;git push&lt;/code&gt; を実行しても前述の fast-forward 以外の統合処理による問題は発生しない。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git サーバー - SSH 公開鍵の作成と登録</title>
+      <link>https://www.devkuma.com/jp/docs/git/ssh-keygen/</link>
+      <pubDate>Sun, 28 Aug 2022 12:06:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/ssh-keygen/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;git-サーバー接続時に-ssh-プロトコルを使う&#34;&gt;Git サーバー接続時に SSH プロトコルを使う&lt;/h2&gt;
+&lt;p&gt;ローカル開発環境だけで Git を使うなら問題ないが、外部 Git サーバー、たとえば GitHub、GitLab、Bitbucket などからコードを clone したり push したりする場合は、SSH プロトコルを使う方が安全である。GitHub のようにインターネット経由で利用する多くの Git サーバーは、SSH プロトコルの公開鍵認証方式をサポートしている。&lt;/p&gt;
+&lt;h2 id=&#34;ssh-公開鍵と秘密鍵を作る&#34;&gt;SSH 公開鍵と秘密鍵を作る&lt;/h2&gt;
+&lt;p&gt;公開鍵を使うには、まず公開鍵を作成する必要がある。ほとんどの OS で手順は似ている。&lt;/p&gt;
+&lt;h3 id=&#34;既存の鍵があるか確認する&#34;&gt;既存の鍵があるか確認する&lt;/h3&gt;
+&lt;p&gt;まず、すでに作成済みの鍵があるか確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ cd ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;id_rsa          id_rsa.pub      known_hosts     known_hosts.old
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;id_rsa&lt;/code&gt; などが表示され、同じ名前に &lt;code&gt;.pub&lt;/code&gt; 拡張子が付いたファイルもあれば、すでに公開鍵が作成されている。このファイルがある場合は、その鍵を使える。&lt;/p&gt;
+&lt;h3 id=&#34;ssh-keygen-で作成する&#34;&gt;ssh-keygen で作成する&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;ssh-keygen&lt;/code&gt; というプログラムで鍵を作成する。&lt;code&gt;ssh-keygen&lt;/code&gt; は Linux や macOS の SSH パッケージに含まれており、Windows では Git for Windows に含まれている。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ssh-keygen
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;次のようにコマンドを実行すると、保存したいディレクトリとパスワードを 2 回入力する。パスフレーズを設定しない場合は、そのまま Enter を押す。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% ssh-keygen
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Generating public/private rsa key pair.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enter file in which to save the key (/Users/user/.ssh/id_rsa):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enter passphrase (empty for no passphrase):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Enter same passphrase again:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Your identification has been saved in /Users/user/.ssh/id_rsa
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Your public key has been saved in /Users/user/.ssh/id_rsa.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;The key fingerprint is:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;SHA256:QKYpyuK6Un3qb0ARjL7lw5ER1mZAMl5nYGMQARD3X0Y user@AL02263852.local
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;The key&amp;#39;s randomart image is:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+---[RSA 3072]----+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|=oBB%*= E        |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| o.O+O+.         |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| .o +*. o        |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|....=. +         |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|o. B .. S        |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|o o * .          |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;| o   =           |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|o   . .          |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|+. ..o.          |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+----[SHA256]-----+
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;正しく作成されていれば、次のように公開鍵を確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cat ~/.ssh/id_rsa.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh-rsa AAAAB3NzaC1yc2EAAAAD2xwcZj/fJnLZbfw ... 中略 ... d+iauipAZDRLz0cgJcoTr0XuZ9DU= user@AL01234567.local
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;公開鍵を-github-アカウントへ登録する&#34;&gt;公開鍵を GitHub アカウントへ登録する&lt;/h2&gt;
+&lt;p&gt;作成した公開鍵は、次のリンクから GitHub アカウントへ登録できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/settings/ssh/new&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Add new SSH keys&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-add-new-ssh-keys.png&#34; alt=&#34;GitHub - Add new SSH keys&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;参照&#34;&gt;参照&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/book/ko/v2/Git-%EC%84%9C%EB%B2%84-SSH-%EA%B3%B5%EA%B0%9C%ED%82%A4-%EB%A7%8C%EB%93%A4%EA%B8%B0&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git サーバー - SSH 公開鍵を作る&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.github.com/en/authentication/connecting-to-github-with-ssh&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Connecting to GitHub with SSH - GitHub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
       </description>
       
       <category>Git</category>
@@ -292,6 +877,36 @@ git init --bare my-project.git
     </item>
     
     <item>
+      <title>Git のリモートブランチとローカルブランチの同期</title>
+      <link>https://www.devkuma.com/jp/docs/git/sync-brach/</link>
+      <pubDate>Fri, 10 Mar 2023 11:40:33 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/sync-brach/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;sync-branch&#34;&gt;Sync branch&lt;/h2&gt;
+&lt;p&gt;Git のソースを取得してローカルで作業していると、リモートにあるブランチとローカルのリモート追跡ブランチが同期しなくなる場合がある。代表的な例は、リモートでは削除されたブランチがローカルにだけ残っている場合である。&lt;/p&gt;
+&lt;p&gt;そのような場合は、次のコマンドで同期できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git remote prune origin
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git remote prune origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Pruning origin
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;URL: https://git.devkuma.com/devkuma/devkuma-hugo-blog.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; * &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;pruned&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; origin/feature/ISSUE-10-fix-code
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; * &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;pruned&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; origin/feature/ISSUE-13-refactoring
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; * &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;pruned&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; origin/feature/ISSUE-26-add-page
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
       <title>Git の基本 | git config</title>
       <link>https://www.devkuma.com/jp/docs/git/git-config/</link>
       <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
@@ -390,6 +1005,43 @@ git config --global alias.ci commit
     </item>
     
     <item>
+      <title>Git 履歴を削除して初期化する</title>
+      <link>https://www.devkuma.com/jp/docs/git/remove-history-init/</link>
+      <pubDate>Tue, 28 Mar 2023 00:06:33 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/remove-history-init/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;git-の初期化&#34;&gt;Git の初期化&lt;/h2&gt;
+&lt;p&gt;Git を使い続けていると、履歴が増え続けて容量が大きくなる。
+不要な履歴であれば、定期的に削除して容量を減らす方法を確認する。&lt;/p&gt;
+&lt;p&gt;まず対象リポジトリへ移動し、既存の履歴を削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ rm -rf .git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Git を初期化する。初期化されると、新しい &lt;code&gt;.git&lt;/code&gt; ディレクトリが作成される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git init
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;すべてのファイルを追加する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git add .
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;or
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git add -A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;そしてコミットする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Initial commit&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リポジトリを接続する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git remote add origin &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;repository address&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;git push&lt;/code&gt; コマンドに &lt;code&gt;--force&lt;/code&gt; オプションを付けて強制 push する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ git push -u --force origin master
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
       <title>Git の基本 | git add</title>
       <link>https://www.devkuma.com/jp/docs/git/git-add/</link>
       <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
@@ -449,6 +1101,80 @@ git commit
         
         &lt;p&gt;SVN では、1 つの中央リポジトリを開発者間のコミュニケーションハブとして使用し、共同作業とは開発者の作業コピーと中央リポジトリの間で変更をやり取りする過程を意味する。Git の協力モデルはこれとは異なり、各開発者がリポジトリのコピーを持ち、その中にローカル履歴とブランチ構造を完全な形で保持している。開発者は他の開発者と個別の変更を共有する必要はなく、通常は一連の作業をまとめて共有する。中央リポジトリを変更する場合、Git は作業コピーの個別変更を中央リポジトリにコミットするのではなく、リポジトリ間でブランチ全体を共有する。&lt;/p&gt;
 &lt;p&gt;以下に示すコマンドを使うと、他のリポジトリとの接続を管理し、ブランチを他のリポジトリへプッシュして公開し、ブランチをローカルリポジトリへ取り込むことで他の開発者の進捗を確認できる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git サブモジュールの追加と削除方法</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-submodule/</link>
+      <pubDate>Sun, 09 Apr 2023 12:27:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-submodule/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
+&lt;p&gt;外部モジュールを参照したい場合は、&lt;code&gt;git submodule&lt;/code&gt; コマンドを使って外部モジュールを追加、つまり clone できる。&lt;code&gt;git submodule&lt;/code&gt; は &lt;code&gt;git clone&lt;/code&gt; と異なり、同じ作業ディレクトリ内に複数のモジュールを追加できるという利点がある。&lt;/p&gt;
+&lt;p&gt;ここではコマンド例として、Hugo のテーマである &lt;code&gt;book&lt;/code&gt; をサブモジュールとして追加し、その後削除してみる。&lt;/p&gt;
+&lt;h2 id=&#34;git-submodule-の追加方法&#34;&gt;Git Submodule の追加方法&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git submodule add&lt;/code&gt; コマンドで、外部モジュールを現在の作業ディレクトリへ追加、つまり clone できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git submodule add &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Git Repository URL&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Submodule Project directory&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git submodule add https://github.com/alex-shpak/hugo-book.git themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cloning into &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;/Users/user/develop/devkuma-hugo-blog/themes/book&amp;#39;&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;remote: Enumerating objects: 4124, &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;remote: Counting objects: 100% &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;6/6&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;remote: Compressing objects: 100% &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;5/5&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;remote: Total &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4124&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;delta 2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, reused &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;delta 1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, pack-reused &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4118&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Receiving objects: 100% &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;4124/4124&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, 6.63 MiB &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; 5.50 MiB/s, &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Resolving deltas: 100% &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;2122/2122&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;done&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;追加された内容は &lt;code&gt;git status&lt;/code&gt; で確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;On branch main
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Your branch is up to date with &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;origin/main&amp;#39;&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Changes to be committed:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;git restore --staged &amp;lt;file&amp;gt;...&amp;#34;&lt;/span&gt; to unstage&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	modified:   .gitmodules
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	new file:   themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この変更内容を &lt;code&gt;git commit&lt;/code&gt; でコミットすればよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{commit message}
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;追加された-git-submodule-の確認&#34;&gt;追加された git submodule の確認&lt;/h2&gt;
+&lt;p&gt;submodule が追加されていれば、&lt;code&gt;git submodule status&lt;/code&gt; コマンドで追加されたモジュール一覧を確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git submodule status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 036e037a63ba06ca366adb1a0c3a005d1a0b15b8 themes/book &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;v9-54-g036e037&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;git-submodule-の削除方法&#34;&gt;Git Submodule の削除方法&lt;/h2&gt;
+&lt;p&gt;まず &lt;code&gt;git submodule deinit&lt;/code&gt; コマンドで対象の submodule を解除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git submodule deinit -f &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Submodule Project directory&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git submodule deinit -f themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cleared directory &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;themes/book&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Submodule &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;themes/book&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;https://github.com/alex-shpak/hugo-book&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; unregistered &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; path &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;themes/book&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次に &lt;code&gt;rm&lt;/code&gt; コマンドで &lt;code&gt;.git/modules&lt;/code&gt; 配下の該当ディレクトリを削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm -rf .git/modules/&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Submodule Project directory&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% rm -rf .git/modules/themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;そして Git から対象ディレクトリを削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git rm -f &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;Submodule Project directory&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; % git rm -f themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rm &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;themes/book&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最後に &lt;code&gt;git commit&lt;/code&gt; を実行し、外部モジュールを削除した内容をコミットする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;{commit message}
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;rm themes/book&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;main f9aaff69&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; rm themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; files changed, &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; deletions&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;-&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; delete mode &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;160000&lt;/span&gt; themes/book
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-%EC%84%9C%EB%B8%8C%EB%AA%A8%EB%93%88&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Git 도구 - 서브모듈&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
       </description>
       
@@ -655,6 +1381,749 @@ git status
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後の &lt;code&gt;git commit&lt;/code&gt; と、現在の作業ツリーにある &lt;code&gt;git add&lt;/code&gt; 済みファイルおよび &lt;code&gt;git add&lt;/code&gt; していないファイルの両方の差分を同時に表示する。&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git diff HEAD
 &lt;/code&gt;&lt;/pre&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の基本 | git log</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-log/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-log/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-log-コマンド&#34;&gt;git log コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git log&lt;/code&gt; はコミット済みのスナップショットを表示するコマンドである。このコマンドを使うと、コミット履歴を絞り込んだり、特定の変更を検索したりできる。&lt;code&gt;git status&lt;/code&gt; が作業ディレクトリとステージング領域の状態を確認するためのコマンドであるのに対し、&lt;code&gt;git log&lt;/code&gt; はコミット済みの履歴だけを対象にする。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git status&lt;/code&gt; と &lt;code&gt;git log&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;ログ出力は、単純なコミット履歴の絞り込み表示から、完全にカスタマイズした形式まで幅広く指定できる。以下では、&lt;code&gt;git log&lt;/code&gt; でよく使われる設定例を紹介する。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;コミット履歴全体をデフォルト形式で表示する。出力が 2 ページ以上にわたる場合は Space キーでスクロールできる。終了するには &lt;code&gt;q&lt;/code&gt; を入力する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log -n &amp;lt;limit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;表示するコミット数を &lt;code&gt;&amp;lt;limit&amp;gt;&lt;/code&gt; に制限する。たとえば &lt;code&gt;git log -n 3&lt;/code&gt; を実行すると、表示されるコミット数は 3 件になる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;各コミットの内容を 1 行に圧縮して表示する。コミット履歴を手早く確認したい場合に適している。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --stat
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;通常の &lt;code&gt;git log&lt;/code&gt; 情報に加えて、変更されたファイルと、その中で追加・削除された行数を表示する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log -p
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;各コミットのパッチを表示する。コミット履歴から得られる最も詳細な情報である、各コミットの完全な差分を確認できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --author=&amp;#34;&amp;lt;pattern&amp;gt;&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;特定の作者が作成したコミットを検索する。&lt;code&gt;&amp;lt;pattern&amp;gt;&lt;/code&gt; には通常のテキストまたは正規表現を指定できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --grep=&amp;#34;&amp;lt;pattern&amp;gt;&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;コミットメッセージが &lt;code&gt;&amp;lt;pattern&amp;gt;&lt;/code&gt; に一致するコミットを検索する。&lt;code&gt;&amp;lt;pattern&amp;gt;&lt;/code&gt; には通常のテキストまたは正規表現を指定できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log &amp;lt;since&amp;gt;..&amp;lt;until&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;&amp;lt;since&amp;gt;&lt;/code&gt; と &lt;code&gt;&amp;lt;until&amp;gt;&lt;/code&gt; の間にあるコミットだけを表示する。2 つの引数には、コミット ID、ブランチ名、&lt;code&gt;HEAD&lt;/code&gt;、その他のバージョン参照を指定できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log &amp;lt;file&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;指定したファイルを含むコミットだけを表示する。特定ファイルの履歴を調べるときに便利である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --graph --decorate --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;いくつかの便利なオプションを組み合わせた例である。&lt;code&gt;--graph&lt;/code&gt; はコミットメッセージの左側にテキストベースのコミット履歴グラフを描画する。&lt;code&gt;--decorate&lt;/code&gt; は表示されるコミットにブランチ名やタグ名を追加する。&lt;code&gt;--oneline&lt;/code&gt; はコミット情報を 1 行に圧縮するため、履歴の概要を把握しやすい。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git log&lt;/code&gt; は Git でコミット履歴を調べるための基本的なツールである。このコマンドを使うと、プロジェクトの特定バージョンを探したり、機能ブランチをマージしたときに何が変わるかを理解したり、問題のある変更がどこで入ったかを調べたりできる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;commit 3157ee3718e180a9476bf2e5cab8e3f1e78a73b7
+Author: John Smith
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ほとんどの情報は直感的に理解できるが、最初の行には説明が必要である。&lt;code&gt;commit&lt;/code&gt; に続く 40 文字の文字列は、コミット内容の SHA-1 チェックサムである。これには 2 つの目的がある。第一に、コミットの完全性を保証する。コミットが破損していれば、別のチェックサムが生成される。第二に、コミットの一意な ID として機能する。&lt;/p&gt;
+&lt;p&gt;この ID は &lt;code&gt;git log &amp;lt;since&amp;gt;..&amp;lt;until&amp;gt;&lt;/code&gt; のようなコマンドで使用でき、特定のコミットを指定できる。たとえば &lt;code&gt;git log 3157e..5ab91&lt;/code&gt; を実行すると、&lt;code&gt;3157e&lt;/code&gt; と &lt;code&gt;5ab91&lt;/code&gt; の間にあるすべてのコミットを表示する。チェックサム以外に個別のコミットを指定する一般的な方法として、ブランチ名や &lt;code&gt;HEAD&lt;/code&gt; キーワードも使える。&lt;code&gt;HEAD&lt;/code&gt; は、ブランチ上であっても特定のコミット上であっても、常に現在のコミットを指す。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;~&lt;/code&gt; 文字は親コミットを相対的に参照するときに使う。たとえば &lt;code&gt;3157e~1&lt;/code&gt; は &lt;code&gt;3157e&lt;/code&gt; の 1 つ前の親コミットを指し、&lt;code&gt;HEAD~3&lt;/code&gt; は現在のコミットから 3 つ前のコミットを意味する。&lt;/p&gt;
+&lt;p&gt;このような指定方法が用意されているのは、多くの Git 操作が特定のコミットを対象に実行されるためである。&lt;code&gt;git log&lt;/code&gt; は操作対象となるコミットを見つける手段を提供するため、そのような作業の出発点になることが多い。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;使い方の節では &lt;code&gt;git log&lt;/code&gt; の例をいくつも紹介したが、1 つのコマンドに複数のオプションを組み合わせて指定できる点に注意しよう。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --author=&amp;#34;John Smith&amp;#34; -p hello.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、John Smith が &lt;code&gt;hello.py&lt;/code&gt; に加えたすべての変更の差分を表示する。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;..&lt;/code&gt; 構文はブランチを比較する場合によく使われる。次の例は、&lt;code&gt;some-feature&lt;/code&gt; ブランチにあり、&lt;code&gt;master&lt;/code&gt; ブランチにはないすべてのコミットを表示する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline master..some-feature
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の変更を取り消す | git checkout</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-checkout/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-checkout/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-checkout-コマンド&#34;&gt;git checkout コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; は、ファイルのチェックアウト、コミットのチェックアウト、ブランチのチェックアウトという 3 つの機能を持つコマンドである。この章では、最初の 2 つについて説明する。&lt;/p&gt;
+&lt;p&gt;コミットをチェックアウトすると、作業ディレクトリはそのコミットと完全に一致した状態になる。このコマンドは、プロジェクトの現在の状態を変更せずに過去の状態を確認したい場合に使う。ファイルをチェックアウトすると、作業ディレクトリの他の部分に影響を与えずに、ファイルの以前のバージョンを確認できる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;master&lt;/code&gt; ブランチに戻るコマンドである。ブランチについては次の章で詳しく説明する。ここではまず、&lt;code&gt;master&lt;/code&gt; ブランチはプロジェクトの「現在」の状態に戻るための手段だと考えればよい。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout &amp;lt;commit&amp;gt; &amp;lt;file&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ファイルの以前のバージョンをチェックアウトするコマンドである。このコマンドは、入力した &lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; にある &lt;code&gt;&amp;lt;file&amp;gt;&lt;/code&gt; のコピーをステージング領域と作業ディレクトリに追加する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout &amp;lt;commit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;作業ディレクトリ内のすべてのファイルを、指定したコミットと同じ状態に更新するコマンドである。&lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; にはコミットハッシュまたはタグを指定できる。このコマンドを実行すると、 detached &lt;code&gt;HEAD&lt;/code&gt; 状態になる。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;すべてのバージョン管理システムの背景にある考え方は、プロジェクトの状態を安全に保存し、コードベースに回復不能な損傷を与える可能性をなくすことである。リポジトリを作成した後、&lt;code&gt;git checkout&lt;/code&gt; は保存済みのスナップショットをローカルマシンに読み込むための手軽な方法になる。&lt;/p&gt;
+&lt;p&gt;過去のコミットをチェックアウトする操作は読み取り専用である。過去バージョンを確認しても、リポジトリには影響しない。プロジェクトの「現在」の状態は変更されず、&lt;code&gt;master&lt;/code&gt; ブランチに残る。通常の開発では &lt;code&gt;HEAD&lt;/code&gt; は &lt;code&gt;master&lt;/code&gt; ブランチまたは他のローカルブランチを指すことが多いが、過去のコミットをチェックアウトすると、&lt;code&gt;HEAD&lt;/code&gt; はブランチではなくコミットを直接指す。この状態を detached &lt;code&gt;HEAD&lt;/code&gt; 状態という。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: 過去のコミットのチェックアウト&lt;/p&gt;
+&lt;p&gt;一方、過去のファイルをチェックアウトすると、リポジトリの現在の状態に影響する。過去バージョンのファイルは、他のファイルと一緒に新しいスナップショットとして再コミットできる。そのため &lt;code&gt;git checkout&lt;/code&gt; は、実質的に個別ファイルの変更を取り消して元に戻す機能として使える。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: ファイルの以前のバージョンのチェックアウト&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;h3 id=&#34;以前のバージョンを確認する&#34;&gt;以前のバージョンを確認する&lt;/h3&gt;
+&lt;p&gt;この例では、常識外れの実験的な開発を始めたものの、それを保存するかどうか判断できないと仮定する。判断の参考にするため、実験を始める前のプロジェクトの状態を確認する。まず、確認したいバージョンの ID を調べる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git log --oneline
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;次のようなプロジェクト履歴が表示される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;b7119f2 Continue doing crazy things
+872fa7e Try something crazy
+a1e8fb5 Make some important changes to hello.py
+435b61d Create hello.py
+9773e52 Initial import
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここで &lt;code&gt;git checkout&lt;/code&gt; を使い、コミットメッセージが &lt;code&gt;Make some important changes to hello.py&lt;/code&gt; であるコミットの内容を確認する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout a1e8fb5
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、作業ディレクトリはコミット &lt;code&gt;a1e8fb5&lt;/code&gt; とまったく同じ状態になる。この状態では、プロジェクトの現在の状態に影響を与えずに、ファイルの閲覧、プロジェクトのコンパイル、テストの実行、さらにはファイルの編集もできる。ただし、この状態で行った作業はリポジトリには保存されない。開発を続けるには、プロジェクトの「現在」の状態に戻る必要がある。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここでは、デフォルトの &lt;code&gt;master&lt;/code&gt; ブランチで開発作業をしていると想定している。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;master&lt;/code&gt; ブランチに戻った後、必要だと判断した変更は &lt;code&gt;git revert&lt;/code&gt; または &lt;code&gt;git reset&lt;/code&gt; を使って取り消せる。&lt;/p&gt;
+&lt;h3 id=&#34;ファイルをチェックアウトする&#34;&gt;ファイルをチェックアウトする&lt;/h3&gt;
+&lt;p&gt;確認対象が特定のファイルだけの場合でも、&lt;code&gt;git checkout&lt;/code&gt; を使ってファイルの以前のバージョンを取得できる。たとえば、過去のコミットに含まれる &lt;code&gt;hello.py&lt;/code&gt; の内容を確認するには、次のコマンドを使う。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout a1e8fb5 hello.py
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;前述のとおり、コミットのチェックアウトとは異なり、このコマンドはプロジェクトの現在の状態に影響する。過去バージョンのファイルは &amp;ldquo;change to be committed&amp;rdquo; として表示され、その変更をコミットすればファイルを以前のバージョンへ戻せる。過去バージョンを保存する必要がない場合は、次のコマンドで最新バージョンをチェックアウトする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout HEAD hello.py
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の変更を取り消す | git revert</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-revert/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-revert/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-revert-コマンド&#34;&gt;git revert コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git revert&lt;/code&gt; は、コミット済みのスナップショットを取り消すためのコマンドである。ただし、プロジェクト履歴からそのコミットをなかったことにするのではない。そのコミットによって加えられた変更を打ち消す方法を見つけ、その結果を新しいコミットとして追加する。これは Git の履歴を保全し、履歴の完全性と共同作業の安全性を保つための方法である。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git revert&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git revert &amp;lt;commit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; で加えられたすべての変更を打ち消し、新しいコミットとして作成して、現在のブランチに適用するコマンドである。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;「revert」は、そのコミットをプロジェクト履歴から削除せずに変更を取り消したい場合に使う。これは、バグを追跡した結果、特定のコミットが原因だと判明した場合などに便利である。&lt;code&gt;git revert&lt;/code&gt; を使えば、手作業で分析して修正し、その結果を新しいスナップショットとしてコミットする代わりに、その一連の作業を自動化できる。&lt;/p&gt;
+&lt;h3 id=&#34;打ち消しとリセット&#34;&gt;打ち消しとリセット&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git revert&lt;/code&gt; は 1 つのコミットだけを打ち消すコマンドであり、そのコミット以降に作成されたすべてのコミットを取り消して以前の状態に戻すコマンドではないことを理解しておこう。Git で後者を行うのは &lt;code&gt;reset&lt;/code&gt; コマンドであり、&lt;code&gt;revert&lt;/code&gt; ではない。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: 打ち消しとリセット&lt;/p&gt;
+&lt;p&gt;打ち消しには、リセットと比べて 2 つの重要な利点がある。第一に、プロジェクト履歴を書き換えないため、すでに公開リポジトリへ公開されたコミットに対しても安全に使える。公開済み履歴を変更する危険性については、&lt;code&gt;git reset&lt;/code&gt; のページを参照してほしい。&lt;/p&gt;
+&lt;p&gt;第二に、&lt;code&gt;git reset&lt;/code&gt; は現在のコミットを後ろへ戻す機能しか持たない。一方、&lt;code&gt;git revert&lt;/code&gt; は履歴上の任意のコミットを個別に対象にできる。たとえば &lt;code&gt;git reset&lt;/code&gt; で過去の 1 コミットだけを元に戻そうとすると、そのコミットと、それ以降に作られたすべてのコミットを削除し、後続のコミットを作り直す必要がある。明らかに、これは 1 つの変更を取り消す効率的な方法ではない。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git revert&lt;/code&gt; コマンドの簡単な使用例を示す。ここではスナップショットをコミットした直後に取り消している。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Edit some tracked files
+
+# Commit a snapshot
+git commit -m &amp;#34;Make some changes that will be undone&amp;#34;
+
+# Revert the commit we just created
+git revert HEAD
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;これを図で表すと次のようになる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/git-tutorial_revert-example.jpg&#34; alt=&#34;Git チュートリアル: git revert の使用例&#34;&gt;&lt;/p&gt;
+&lt;p&gt;ここで、4 番目のコミットは取り消し操作の後もプロジェクト履歴に残っている点に注意してほしい。&lt;code&gt;git revert&lt;/code&gt; は変更を取り消すためにそのコミットを削除するのではなく、新しいコミットを追加する。その結果、3 番目と 5 番目のコミット後のリポジトリは完全に同じ状態になり、さらに 4 番目のコミットも履歴に残るため、後から確認できる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の変更を取り消す | git reset</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-reset/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-reset/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-reset-コマンド&#34;&gt;git reset コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git revert&lt;/code&gt; が変更を取り消す「安全な」方法だとすれば、&lt;code&gt;git reset&lt;/code&gt; は「危険な」方法だといえる。&lt;code&gt;git reset&lt;/code&gt; で変更を取り消し、さらに ref や reflog から元のコミットを参照できなくなると、元の状態へ復元する方法がなくなる場合がある。つまり、この「取り消し」操作自体を取り消せないことがある。&lt;code&gt;git reset&lt;/code&gt; は Git で作業結果を失う可能性がある数少ないコマンドの 1 つなので、使うときは注意が必要である。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; と同じく、&lt;code&gt;git reset&lt;/code&gt; も複数のモードを持つ応用範囲の広いコマンドである。コミット済みのスナップショットを削除する目的にも使えるが、ステージング領域や作業ディレクトリの変更を取り消す目的で使われることの方が多い。いずれにしても、このコマンドはローカル変更の取り消しに限定して使うべきであり、他の開発者に公開済みのコミットを取り消すために使ってはならない。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;作業ディレクトリには何も変更を加えず、指定したファイルをステージング領域から取り除くコマンドである。変更内容を破棄せずに、そのファイルのステージングだけを解除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;作業ディレクトリには何も変更を加えず、ステージング領域を直前のコミット時点の状態に戻すコマンドである。すべてのファイルのステージングを解除し、ステージ済みスナップショットを最初から組み直せる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset --hard
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ステージング領域と作業ディレクトリを、直前のコミット時点の状態に戻すコマンドである。&lt;code&gt;--hard&lt;/code&gt; フラグは、変更のステージング解除に加えて、作業ディレクトリ内のすべての変更を破棄するよう Git に指示する。つまり、コミット前のすべての変更をなかったことにするコマンドなので、ローカルマシンで行った作業を本当に削除してよいか確認する必要がある。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset &amp;lt;commit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のブランチの先端を &lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; の位置へ移動し、ステージング領域をその状態に合わせて戻す。ただし、作業ディレクトリはそのまま残す。このコマンドを実行すると、&lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; 以降の変更は作業ディレクトリに残るため、より小さく整理されたスナップショットを作り直して再コミットできる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset --hard &amp;lt;commit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のブランチの先端を &lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; の位置へ移動し、ステージング領域と作業ディレクトリをその状態に合わせて戻す。このコマンドを実行すると、コミット前の変更だけでなく、&lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; 以降に作られたすべてのコミットもなかったことになる。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;オプション&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--soft&lt;/code&gt;: index と作業ツリーを保持する。つまり両方とも保持する。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--mixed&lt;/code&gt;: index を取り消し、作業ツリーだけを保持する。デフォルトのオプションである。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--hard&lt;/code&gt;: index と作業ツリーの両方を取り消す。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;上で説明したコマンドは、いずれも何らかの形でリポジトリの状態から変更を取り除く。&lt;code&gt;--hard&lt;/code&gt; フラグがない場合、&lt;code&gt;git reset&lt;/code&gt; は変更のステージングを解除したり、一連のスナップショットコミットを取り消してリポジトリを整理したりした後、再構築するための手段である。&lt;code&gt;--hard&lt;/code&gt; は、開発中の実験的な作業結果が望ましくなく、それを完全になかったことにしたい場合に便利である。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;revert&lt;/code&gt; が公開済みコミットを履歴を保ったまま安全に取り消す機能を持つのに対し、&lt;code&gt;git reset&lt;/code&gt; はローカル変更を取り消すための機能である。この 2 つのコマンドは目的が異なるため、動作も異なる。&lt;code&gt;reset&lt;/code&gt; は変更履歴を削除する一方、&lt;code&gt;revert&lt;/code&gt; は変更履歴を保持したうえで、内容を元に戻す新しいコミットを作成する。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: revert と reset&lt;/p&gt;
+&lt;h2 id=&#34;公開済みコミットの取り消しは厳禁&#34;&gt;公開済みコミットの取り消しは厳禁&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;commit&amp;gt;&lt;/code&gt; 以降のスナップショットを一度でも公開リポジトリへ push した場合は、&lt;code&gt;git reset &amp;lt;commit&amp;gt;&lt;/code&gt; を使ってはならない。コミットを公開したら、他の開発者がそれを前提に作業していると考えるべきである。&lt;/p&gt;
+&lt;p&gt;他の開発者が作業中に使っているコミットを取り消すと、共同作業に深刻な問題が発生する可能性がある。彼らがあなたのリポジトリと同期しようとすると、プロジェクト履歴の一部が欠落したように見える。典型的な例では、&lt;code&gt;origin/master&lt;/code&gt; ブランチをローカル &lt;code&gt;master&lt;/code&gt; ブランチに対応する中央リポジトリのブランチとして扱う。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: 公開済みコミットの取り消し&lt;/p&gt;
+&lt;p&gt;reset 後に新しいコミットを作成すると、Git はローカル履歴が &lt;code&gt;origin/master&lt;/code&gt; から分岐したものとして扱う。ローカルリポジトリを同期するために作られるマージコミットは、他の開発者を混乱させ、作業を妨げる可能性がある。&lt;/p&gt;
+&lt;p&gt;重要なのは、&lt;code&gt;git reset &amp;lt;commit&amp;gt;&lt;/code&gt; はうまくいかなかったローカルの実験的な開発作業を破棄するためのものであり、公開済みの変更を取り消すためのものではないと認識することである。公開済みコミットを修正する必要がある場合は、その目的のために用意された &lt;code&gt;git revert&lt;/code&gt; を使う。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;h3 id=&#34;ファイルのステージングを解除する&#34;&gt;ファイルのステージングを解除する&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt; は、ステージ済みスナップショットを作成するときによく使われる。次の例では、&lt;code&gt;hello.py&lt;/code&gt; と &lt;code&gt;main.py&lt;/code&gt; の 2 つのファイルがすでにリポジトリに追加されていると仮定する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Edit both hello.py and main.py
+
+# Stage everything in the current directory
+git add .
+
+# Realize that the changes in hello.py and main.py
+# should be committed in different snapshots
+
+# Unstage main.py
+git reset main.py
+
+# Commit only hello.py
+git commit -m &amp;#34;Make some changes to hello.py&amp;#34;
+
+# Commit main.py in a separate snapshot
+git add main.py
+git commit -m &amp;#34;Edit main.py&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このように、&lt;code&gt;git reset&lt;/code&gt; を使うと次のコミットに含めるべきでない変更のステージングを解除し、各コミットの目的を明確にできる。&lt;/p&gt;
+&lt;h3 id=&#34;ローカルコミットを削除する&#34;&gt;ローカルコミットを削除する&lt;/h3&gt;
+&lt;p&gt;次の例は、より高度なユースケースである。ここでは、しばらく実験的な開発を行い、いくつかのスナップショットをコミットした後、それらをすべて削除したい場合を想定する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Create a new file called `foo.py` and add some code to it
+
+# Commit it to the project history
+git add foo.py
+git commit -m &amp;#34;Start developing a crazy feature&amp;#34;
+
+# Edit `foo.py` again and change some other tracked files, too
+
+# Commit another snapshot
+git commit -a -m &amp;#34;Continue my crazy feature&amp;#34;
+
+# Decide to scrap the feature and remove the associated commits
+git reset --hard HEAD~2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;git reset HEAD~2&lt;/code&gt; は現在のブランチを 2 コミット分だけ前へ戻すコマンドであり、実質的には最近作成した 2 つのスナップショットをプロジェクト履歴から削除する。前述のとおり、このような reset は未公開コミットに限定して使うべきである。コミットを公開リポジトリへ push した場合は、決して上記の操作を行ってはならない。&lt;/p&gt;
+&lt;h2 id=&#34;さまざまな使用例&#34;&gt;さまざまな使用例&lt;/h2&gt;
+&lt;h3 id=&#34;index-への追加を取り消す&#34;&gt;index への追加を取り消す&lt;/h3&gt;
+&lt;p&gt;対象ファイルを index に追加したことを取り消す。作業ツリーの変更内容は保持される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset [file]
+git reset HEAD [file]
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;commit-を取り消す&#34;&gt;commit を取り消す&lt;/h3&gt;
+&lt;p&gt;最後のコミットを取り消し、作業ツリーは保持する。コミットはしたが push していない場合に便利である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset HEAD^
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後の 2 つのコミットを取り消し、作業ツリーは保持する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset HEAD~2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後の 2 つのコミットを取り消し、index と作業ツリーの両方を元に戻す。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset --hard HEAD~2
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;マージしたものをすでにコミットしている場合、そのコミットを取り消す。誤った merge をすでにコミットしてしまった場合に便利である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset --hard ORIG_HEAD
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;HEAD&lt;/code&gt; で変更した内容を取り消す新しい commit を発行する。commit をすでに push してしまった場合に便利である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git revert HEAD
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;作業ツリー全体を元に戻す&#34;&gt;作業ツリー全体を元に戻す&lt;/h3&gt;
+&lt;p&gt;作業ツリー全体を最後のコミット状態に戻す。最後の commit 以降の作業ツリーと index の変更はすべて消える。変更をコミットしていない場合に便利である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git reset --hard HEAD
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の変更を取り消す | git clean</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-clean/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-clean/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-clean-コマンド&#34;&gt;git clean コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git clean&lt;/code&gt; は、作業ディレクトリから追跡されていないファイルを削除するコマンドである。&lt;code&gt;git status&lt;/code&gt; を使えば追跡対象ではないファイルを確認し、手動で削除することも簡単なので、このコマンドは主に利便性を高めるために用意されている。通常の &lt;code&gt;rm&lt;/code&gt; コマンドと同じく、&lt;code&gt;git clean&lt;/code&gt; は取り消せないため、実行する前に追跡されていないファイルを本当に削除してよいか確認してほしい。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git clean&lt;/code&gt; は &lt;code&gt;git reset --hard&lt;/code&gt; とよく組み合わせて使われる。すでに説明したように、&lt;code&gt;reset&lt;/code&gt; が作用するのは追跡対象のファイルだけなので、追跡されていないファイルを整理するには別のコマンドが必要になる。この 2 つのコマンドを一緒に使うと、作業ディレクトリを特定のコミット時点と完全に同じ状態に戻せる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clean -n
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;git clean&lt;/code&gt; のドライランを行うコマンドである。削除される予定のファイルを表示するが、実際には削除しない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clean -f
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;追跡されていないファイルを現在のディレクトリから削除するコマンドである。設定オプション &lt;code&gt;clean.requireForce&lt;/code&gt; が &lt;code&gt;false&lt;/code&gt; に設定されていない限り、このオプションはデフォルトで &lt;code&gt;true&lt;/code&gt; なので、&lt;code&gt;-f&lt;/code&gt; force フラグが必須である。このコマンドは、追跡されていないディレクトリや &lt;code&gt;.gitignore&lt;/code&gt; で指定されたファイルは削除しない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clean -f &amp;lt;path&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;追跡されていないファイルを削除するが、その範囲を指定したパスに限定するコマンドである。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git clean -df
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のディレクトリから、追跡されていないファイルと追跡対象外のディレクトリを削除する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git clean -xf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のディレクトリから、追跡されていないファイルと、Git が通常は無視するファイルを削除する。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git reset --hard&lt;/code&gt; と &lt;code&gt;git clean -f&lt;/code&gt; は、ローカル作業の結果を破棄して最初からやり直したい場合によく一緒に使われる。この 2 つのコマンドを実行すると、作業ディレクトリの状態は直前のコミット時点に戻り、その状態から作業を再開できる。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git clean&lt;/code&gt; は、ビルド後に作業ディレクトリを整理する場合にも便利である。たとえば、C コンパイラが生成した &lt;code&gt;.o&lt;/code&gt; や &lt;code&gt;.exe&lt;/code&gt; バイナリファイルを簡単に削除できる。この作業は、リリース用にプロジェクトをパッケージングするときに必要になる場合がある。この目的には &lt;code&gt;-x&lt;/code&gt; オプションが便利である。&lt;/p&gt;
+&lt;p&gt;また、&lt;code&gt;git clean&lt;/code&gt; は &lt;code&gt;git reset&lt;/code&gt; と並んで、コミット内容を完全に削除してしまう可能性がある数少ない Git コマンドの 1 つであり、使用には注意が必要である。実際に重要な作業内容を失うことが多いため、Git は通常 &lt;code&gt;-f&lt;/code&gt; フラグの指定を必須にしている。これにより、単純な &lt;code&gt;git clean&lt;/code&gt; の実行で誤ってすべてを失うことを防げる。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次の例は、新しく作成されたファイルを含め、作業ディレクトリ内のすべての変更を取り消す。ここでは、すでにいくつかのスナップショットをコミット済みで、さらに新しい実験的な開発の途中にあると仮定する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some existing files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Add some new files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Realize you have no idea what you&amp;#39;re doing&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Undo changes in tracked files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset --hard
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Remove untracked files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clean -df
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この一連の &lt;code&gt;reset&lt;/code&gt; と &lt;code&gt;clean&lt;/code&gt; コマンドを実行すると、作業ディレクトリとステージング領域は直前のコミット時点と完全に同じ状態になる。&lt;code&gt;git status&lt;/code&gt; を実行すると作業ディレクトリがクリーンであることが表示されるため、その状態から再開できる。&lt;/p&gt;
+&lt;p&gt;また、&lt;code&gt;git reset&lt;/code&gt; セクションの 2 番目の例とは異なり、新しく作られたファイルはリポジトリに一度もステージされていない点に注意してほしい。その結果、これらの新しいファイルは追跡対象ではないため、&lt;code&gt;git reset --hard&lt;/code&gt; の影響を受けず、削除するには &lt;code&gt;git clean&lt;/code&gt; が必要になる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git ブランチ | git branch</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-branch/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-branch/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-branch-コマンド&#34;&gt;git branch コマンド&lt;/h3&gt;
+&lt;p&gt;ブランチとは、独立した開発ラインを意味する。ブランチは、Git の基本で説明した編集、ステージ、コミットのプロセスに対する抽象概念である。作業ディレクトリとステージング領域から、独立したプロジェクト履歴を作る手段だと考えることもできる。新しいコミットは現在のブランチの履歴に記録され、プロジェクト履歴の分岐を形成する。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git branch&lt;/code&gt; は、ブランチの作成、一覧表示、名前変更、削除を行うコマンドである。このコマンドには、ブランチを切り替える機能も、分岐した履歴を統合する機能も、変更を取り消す機能もない。そのため &lt;code&gt;git branch&lt;/code&gt; は、多くの場合 &lt;code&gt;git checkout&lt;/code&gt; や &lt;code&gt;git merge&lt;/code&gt; と一緒に使われる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;リポジトリ内のすべてのブランチを一覧表示する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch &amp;lt;branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;&amp;lt;branch&amp;gt;&lt;/code&gt; という名前の新しいブランチを作成する。新しく作成されたブランチは自動的にはチェックアウトされない。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -d &amp;lt;branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;指定したブランチを削除する。ブランチに未マージの変更が残っている場合、Git は削除を拒否するため、このコマンドは安全な操作である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -D &amp;lt;branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;指定したブランチに未マージの変更が残っていても、強制的に削除するコマンドである。特定の開発ラインで作成されたすべてのコミットを完全に削除したい場合に使う。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -m &amp;lt;branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のブランチ名を &lt;code&gt;&amp;lt;branch&amp;gt;&lt;/code&gt; に変更する。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;Git では、ブランチは日常的な開発プロセスの要素である。新機能の開発やバグ修正を行う場合、その規模にかかわらず変更をカプセル化するブランチを作成する。これにより、不安定なコードがメインコードベースへ直接コミットされることを防ぎ、&lt;code&gt;master&lt;/code&gt; ブランチへマージする前に機能の履歴を整理できる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git branch&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;たとえば、リポジトリには小さな機能開発と長期的な機能開発を支える 2 つの独立した開発ラインを持たせることができる。このように開発作業を分岐させることで、両方を同時に進められるだけでなく、基本となる &lt;code&gt;master&lt;/code&gt; ブランチを未完成のコードから守ることができる。&lt;/p&gt;
+&lt;h3 id=&#34;ブランチの先端&#34;&gt;ブランチの先端&lt;/h3&gt;
+&lt;p&gt;Git ブランチの背景にある設計思想は、SVN のブランチよりもはるかに軽量である。SVN ではディレクトリ間でファイルを直接コピーするのに対し、Git のブランチはコミットへの参照として保存される。この意味で、ブランチはコミットのコンテナではなく、一連の作業の先端を示すものだといえる。1 つのブランチの履歴は、コミット同士の関係からたどられる。&lt;/p&gt;
+&lt;p&gt;これは Git のマージモデルに大きな影響を与える。SVN のマージがファイルベースで行われるのに対し、Git はコミットという抽象レベルで作業を行う。実際、プロジェクト履歴のマージは、独立したコミット履歴の結合だと考えられる。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;h3 id=&#34;ブランチを作成する&#34;&gt;ブランチを作成する&lt;/h3&gt;
+&lt;p&gt;ブランチは単なるコミットへのポインタであることを理解しておく必要がある。ブランチを作成しても、Git が行うのはポインタの作成だけであり、リポジトリ自体は変更されない。まず、チュートリアル図のような履歴を持つリポジトリがあるとする。&lt;/p&gt;
+&lt;p&gt;次のコマンドでブランチを作成する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch crazy-experiment
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここではリポジトリの履歴には何の変更も行われない。新しく作られるのは、現在のコミットへのポインタだけである。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: 新しいブランチの作成&lt;/p&gt;
+&lt;p&gt;この操作は単に新しいブランチを作成しただけであることを覚えておこう。このブランチにコミットを追加し始めるには、&lt;code&gt;git checkout&lt;/code&gt; でそれを選択し、その後通常どおり &lt;code&gt;git add&lt;/code&gt; と &lt;code&gt;git commit&lt;/code&gt; を使う。詳しくはこの章の &lt;code&gt;git checkout&lt;/code&gt; を参照する。&lt;/p&gt;
+&lt;h3 id=&#34;ブランチを削除する&#34;&gt;ブランチを削除する&lt;/h3&gt;
+&lt;p&gt;ブランチでの作業が完了し、&lt;code&gt;master&lt;/code&gt; ブランチへのマージも終わっていれば、履歴を失うことなくブランチを削除できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -d crazy-experiment
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ただし、指定したブランチが完全にマージされていない場合、このコマンドを実行するとエラーが表示される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;error: The branch &amp;#39;crazy-experiment&amp;#39; is not fully merged.
+If you are sure you want to delete it, run &amp;#39;git branch -D crazy-experiment&amp;#39;.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;これにより、コミットへの参照を失うこと、つまり小さなミスによって開発ライン全体へのアクセス手段を失うことを防げる。ブランチを削除してよいと確信している場合、たとえばそのブランチで行った実験的な開発が失敗した場合は、大文字の &lt;code&gt;-D&lt;/code&gt; フラグを使う。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch -D crazy-experiment
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、ブランチの状態に関係なく警告なしで削除されるため、慎重に使う必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;git-ブランチの種類&#34;&gt;Git ブランチの種類&lt;/h2&gt;
+&lt;h3 id=&#34;master-branch&#34;&gt;Master branch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;製品としてリリースできるブランチ。&lt;/li&gt;
+&lt;li&gt;リリース履歴を管理するために使う。つまり、リリース可能な状態だけを管理する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;develop-branch&#34;&gt;Develop branch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;次のリリースバージョンを開発するブランチ。&lt;/li&gt;
+&lt;li&gt;機能開発用ブランチをマージするために使う。すべての機能が追加され、バグが修正され、リリース可能な安定状態になったら、&lt;code&gt;develop&lt;/code&gt; ブランチを &lt;code&gt;master&lt;/code&gt; ブランチへマージする。&lt;/li&gt;
+&lt;li&gt;通常はこのブランチを基準に開発を進める。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;feature-branch&#34;&gt;Feature branch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;機能を開発するブランチ。&lt;/li&gt;
+&lt;li&gt;新機能の開発やバグ修正が必要になるたびに、&lt;code&gt;develop&lt;/code&gt; ブランチから分岐する。feature ブランチでの作業は基本的に共有する必要がないため、自分のローカルリポジトリで管理する。&lt;/li&gt;
+&lt;li&gt;開発が完了したら &lt;code&gt;develop&lt;/code&gt; ブランチへマージし、他の人と共有する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;release-branch&#34;&gt;Release branch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;今回のリリースバージョンを準備するブランチ。&lt;/li&gt;
+&lt;li&gt;リリース専用ブランチを使うことで、あるチームがそのリリースを準備している間、別のチームは次のリリースに向けた機能開発を続けられる。つまり、区切られた開発段階を定義するのに適している。&lt;/li&gt;
+&lt;li&gt;たとえば「今週はバージョン 1.3 のリリースを目標にする」といったことを、チームメンバーと簡単に共有して合意できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;hotfix-branch&#34;&gt;Hotfix branch&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;リリース済みバージョンで発生したバグを修正するブランチ。&lt;/li&gt;
+&lt;li&gt;リリース済みバージョンに緊急修正が必要な場合、&lt;code&gt;master&lt;/code&gt; ブランチから分岐する。&lt;code&gt;develop&lt;/code&gt; ブランチで問題箇所を修正してリリース可能なバージョンを作るには時間がかかり、安定性の保証も難しいため、すぐにリリース可能な &lt;code&gt;master&lt;/code&gt; ブランチから直接ブランチを作り、必要な部分だけを修正して再び &lt;code&gt;master&lt;/code&gt; にマージし、リリースする。&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git ブランチ | git checkout</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-checkout/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-checkout/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-checkout-コマンド&#34;&gt;git checkout コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; は、&lt;code&gt;git branch&lt;/code&gt; コマンドで作成されたブランチ間を移動するコマンドである。ブランチをチェックアウトすると、作業ディレクトリ内のファイルはそのブランチに保存されているバージョンへ更新され、その後の新しいコミットはすべてそのブランチに記録される。このコマンドは、作業する開発ラインを選択する手段だと考えられる。&lt;/p&gt;
+&lt;p&gt;前の章では、過去のコミットを見る場合の &lt;code&gt;git checkout&lt;/code&gt; の使い方を説明した。ブランチのチェックアウトも、指定したブランチまたはバージョンに一致するよう作業ディレクトリが更新される点では似ている。ただし、作業ディレクトリに残っている変更がプロジェクト履歴に保存される可能性がある点が異なる。つまり、このコマンドは読み取り専用操作ではない。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout &amp;lt;existing-branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;git branch&lt;/code&gt; コマンドで作成したブランチをチェックアウトするコマンドである。このコマンドを実行すると、&lt;code&gt;&amp;lt;existing-branch&amp;gt;&lt;/code&gt; が現在のブランチになり、それに一致するよう作業ディレクトリが更新される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout -b &amp;lt;new-branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;新しいブランチ &lt;code&gt;&amp;lt;new-branch&amp;gt;&lt;/code&gt; を作成し、すぐにチェックアウトするコマンドである。&lt;code&gt;-b&lt;/code&gt; フラグは、&lt;code&gt;git branch &amp;lt;new-branch&amp;gt;&lt;/code&gt; を実行してから &lt;code&gt;git checkout &amp;lt;new-branch&amp;gt;&lt;/code&gt; を実行するための便利なショートカットである。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout -b &amp;lt;new-branch&amp;gt; &amp;lt;existing-branch&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;上記のコマンドと同じ機能だが、現在のブランチではなく &lt;code&gt;&amp;lt;existing-branch&amp;gt;&lt;/code&gt; を新しいブランチの起点にする。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; は &lt;code&gt;git branch&lt;/code&gt; と一緒によく使われるコマンドである。新機能の開発を始める場合は、&lt;code&gt;git branch&lt;/code&gt; でブランチを作成し、&lt;code&gt;git checkout&lt;/code&gt; でそれをチェックアウトする。1 つのリポジトリ内で &lt;code&gt;git checkout&lt;/code&gt; を使って機能を切り替えることで、複数の機能開発を並行して進められる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git checkout&lt;/code&gt; を使って 1 つのリポジトリ内で複数の機能を切り替える&lt;/p&gt;
+&lt;p&gt;個別の機能ごとに専用ブランチを用意することで、SVN を基盤とした従来のワークフローとは大きく異なる開発手法を使える。既存機能を壊す心配を抑えながら実験的な開発をしやすくなり、関係のない複数の機能開発を同時に進めることもできる。さらに、ブランチの導入によってさまざまな共同作業ワークフローを採用しやすくなる。&lt;/p&gt;
+&lt;h3 id=&#34;detached-head&#34;&gt;Detached HEAD&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git checkout&lt;/code&gt; の 3 つの使い方を学んだので、ここで前の章でも触れた detached &lt;code&gt;HEAD&lt;/code&gt; について説明しておく。&lt;/p&gt;
+&lt;p&gt;前述のとおり、&lt;code&gt;HEAD&lt;/code&gt; は Git では現在のスナップショットへの参照を意味する。&lt;code&gt;git checkout&lt;/code&gt; を実行すると、&lt;code&gt;HEAD&lt;/code&gt; は指定したブランチまたはコミットへ移動する。移動先がブランチであれば問題ないが、コミットを直接チェックアウトした場合は detached &lt;code&gt;HEAD&lt;/code&gt; 状態になる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: Detached HEAD&lt;/p&gt;
+&lt;p&gt;これは、この状態で行われた作業がプロジェクト内の他の開発作業から分離されていることを警告している。detached &lt;code&gt;HEAD&lt;/code&gt; 状態で機能開発を始め、その作業を指すブランチを作成しないまま別のブランチをチェックアウトすると、その機能を参照できなくなる可能性がある。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: Detached HEAD 状態&lt;/p&gt;
+&lt;p&gt;重要なのは、開発作業は常にブランチ上で行うべきであり、detached &lt;code&gt;HEAD&lt;/code&gt; 上で行うべきではないという点である。これにより、コミットへの参照方法を常に確保できる。ただし、過去のコミットを確認するだけであれば、detached &lt;code&gt;HEAD&lt;/code&gt; 状態かどうかを気にする必要はない。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次の例は、Git ブランチの基本的な使い方を示している。新機能の開発作業を始める場合は、専用ブランチを作成してそれに切り替える。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git branch new-feature
+git checkout new-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;こうすることで、前の章で説明したように新しいスナップショットをコミットできる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Edit some files
+git add &amp;lt;file&amp;gt;
+git commit -m &amp;#34;Started work on a new feature&amp;#34;
+# Repeat
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;コミットはすべて &lt;code&gt;master&lt;/code&gt; ブランチとは独立した &lt;code&gt;new-feature&lt;/code&gt; ブランチに記録される。この状態では何度でもコミットでき、その間は他のブランチを気にする必要がない。「公式」コードベースでの作業に戻るには、単に &lt;code&gt;master&lt;/code&gt; ブランチをチェックアウトすればよい。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;このコマンドを実行すると、機能開発を始める前のリポジトリの状態が表示される。ここから、完成した機能をマージしたり、新しいブランチを作成したり、別の機能を始めたり、公式コードベースでの作業を続けたりできる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git ブランチ | git merge</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-merge/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-merge/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;git-merge-コマンド&#34;&gt;git merge コマンド&lt;/h2&gt;
+&lt;p&gt;マージは、Git で分岐した内容を再び統合する方法である。&lt;code&gt;git merge&lt;/code&gt; は、&lt;code&gt;git branch&lt;/code&gt; コマンドで作成された独立した複数の開発ラインを、1 つのブランチへ統合するコマンドである。&lt;/p&gt;
+&lt;p&gt;ここで説明するすべてのコマンドは、現在のブランチにマージする点に注意してほしい。現在のブランチはマージ結果で更新されるが、対象ブランチ、つまり引数で指定したブランチはそのまま残る。そのため &lt;code&gt;git merge&lt;/code&gt; は通常、マージ先のブランチを選択する &lt;code&gt;git checkout&lt;/code&gt; と、不要になった対象ブランチを削除する &lt;code&gt;git branch -d&lt;/code&gt; と一緒に使われる。&lt;/p&gt;
+&lt;h3 id=&#34;使い方&#34;&gt;使い方&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge &amp;lt;branch&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;指定したブランチを現在のブランチへマージするコマンドである。Git はマージアルゴリズムを自動的に選択する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge --no-ff &amp;lt;branch&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;指定したブランチを現在のブランチへマージするが、そのとき常に、たとえ fast-forward が可能であっても、マージコミットを作成してマージする。このコマンドは、リポジトリで発生したすべてのマージを記録したい場合に便利である。&lt;/p&gt;
+&lt;h3 id=&#34;補足説明&#34;&gt;補足説明&lt;/h3&gt;
+&lt;p&gt;独立したブランチで機能開発が完了したら、それをメインコードベースへ反映する必要がある。Git には、リポジトリ履歴の形に応じて複数のアルゴリズム、つまり fast-forward マージと three-way マージが用意されている。&lt;/p&gt;
+&lt;p&gt;fast-forward マージは、現在のブランチの先端から対象ブランチへ向かって 1 本の直線的な経路だけがある場合に適用される。この場合、実際の意味でのマージは行われず、現在のブランチの先端を対象ブランチの先端へ移動するだけで統合される。これにより、対象ブランチから到達できたコミットが、両方のブランチから到達できるようになる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: fast-forward マージ&lt;/p&gt;
+&lt;p&gt;しかし、ブランチが分岐している場合は fast-forward マージを適用できない。対象ブランチへ向かう経路が 1 本だけではないため、履歴を結合するには three-way マージを使う必要がある。three-way マージでは、2 つの履歴を結合するための専用コミットが作成される。この名前は、2 つのブランチの先端コミットと共通祖先コミットという 3 つのコミットを使ってマージコミットを作成することに由来する。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: three-way マージ&lt;/p&gt;
+&lt;p&gt;どちらのマージアルゴリズムも利用できるが、多くの開発者は小さな機能やバグ修正には、しばしば rebase 後の fast-forward マージを使い、長期にわたる機能には three-way マージを使う傾向がある。後者の場合、生成されたマージコミットは 2 つのブランチの象徴的な結合として機能する。&lt;/p&gt;
+&lt;h3 id=&#34;コンフリクトの解決&#34;&gt;コンフリクトの解決&lt;/h3&gt;
+&lt;p&gt;マージしようとしている 2 つのブランチで、同じファイルの同じ部分に変更がある場合、Git はどちらのバージョンを使うべきか判断できない。そのような状況になると、マージコミットを作成する前に停止し、手動でコンフリクトを解決するよう求める。&lt;/p&gt;
+&lt;p&gt;Git のマージプロセスが優れている点は、マージ時のコンフリクト解決にも通常の編集、ステージ、コミットのワークフローを使えることである。マージ時にコンフリクトが発生した場合、&lt;code&gt;git status&lt;/code&gt; を実行すると解決が必要なファイルが表示される。たとえば 2 つのブランチで &lt;code&gt;hello.py&lt;/code&gt; の同じ部分が変更されていると、次のような情報が表示される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# On branch master
+# Unmerged paths:
+# (use &amp;#34;git add/rm ...&amp;#34; as appropriate to mark resolution)
+#
+# both modified: hello.py
+#
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;ここでマージする内容を確認し、必要な修正を行う。修正が終わってマージを続ける準備ができたら、&lt;code&gt;git add&lt;/code&gt; でコンフリクトが発生したファイルをステージング領域に追加する。続いて通常の &lt;code&gt;git commit&lt;/code&gt; でマージコミットを作成する。この過程は通常のスナップショットコミットと完全に同じであるため、一般的な開発者にとってもマージ作業は理解しやすい。&lt;/p&gt;
+&lt;p&gt;また、マージ時のコンフリクトは three-way マージの場合にだけ起こることを覚えておこう。fast-forward マージで変更がコンフリクトを起こすことはない。&lt;/p&gt;
+&lt;h2 id=&#34;git-merge-の使用例&#34;&gt;git merge の使用例&lt;/h2&gt;
+&lt;h3 id=&#34;fast-forward-マージ&#34;&gt;fast-forward マージ&lt;/h3&gt;
+&lt;p&gt;まず fast-forward マージの例を示す。次のコードでは、新しいブランチを作成して 2 つのコミットを追加し、最後に fast-forward マージでそれを &lt;code&gt;master&lt;/code&gt; ブランチへ統合している。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Start a new feature&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b new-feature master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Start a feature&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Finish a feature&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Merge in the new-feature branch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git branch -d new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;これは、長期的な機能開発を行う大規模組織向けのブランチではなく、独立した小規模開発のために短期間の機能ブランチを使う場合の一般的な流れである。&lt;/p&gt;
+&lt;p&gt;また、&lt;code&gt;new-feature&lt;/code&gt; ブランチは &lt;code&gt;master&lt;/code&gt; ブランチから到達可能であるため、&lt;code&gt;git branch -d&lt;/code&gt; を使っても警告は表示されない。&lt;/p&gt;
+&lt;h3 id=&#34;three-way-マージ&#34;&gt;three-way マージ&lt;/h3&gt;
+&lt;p&gt;次の例は前の例と似ているが、機能開発が進んでいる間に &lt;code&gt;master&lt;/code&gt; も進んでいるため、three-way マージが必要になる。このシナリオは、大規模な機能の場合や、プロジェクトで複数の開発者が同時に作業している場合によく発生する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Start a new feature&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout -b new-feature master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Start a feature&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Finish a feature&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Develop the master branch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git checkout master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Edit some files&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add &amp;lt;file&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Make some super-stable changes to master&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Merge in the new-feature branch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git merge new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git branch -d new-feature
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この場合、履歴の形を崩さずに &lt;code&gt;master&lt;/code&gt; を &lt;code&gt;new-feature&lt;/code&gt; へ移動できないため、fast-forward マージは実行できない。&lt;/p&gt;
+&lt;p&gt;一般的なワークフローでは、&lt;code&gt;new-feature&lt;/code&gt; が実際には長期間の開発を必要とする大規模機能であり、その間に &lt;code&gt;master&lt;/code&gt; へ新しいコミットが追加されることが多い。機能ブランチが上の例のように小規模である場合は、それを &lt;code&gt;master&lt;/code&gt; に rebase してから fast-forward マージする方がよいこともある。この方法は不要なマージコミットを減らし、プロジェクト履歴の複雑化を防ぐ。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の履歴を書き換える | git commit --amend</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-commit--amend/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-commit--amend/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-commit-amend-コマンド&#34;&gt;git commit &amp;ndash;amend コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git commit --amend&lt;/code&gt; は、直前のコミットを修正したい場合に便利なコマンドである。このコマンドを実行すると、まったく新しいスナップショットをコミットするのではなく、ステージ済みの変更内容と直前のコミットを結合する。また、スナップショットに変更を加えず、単に前回のコミットメッセージを編集したい場合にも便利である。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git commit --amend&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;ただし、直前のコミットを修正することは、そのコミットをその場で上書きすることではなく、まったく別のコミットに置き換えることを意味する。Git では、チュートリアル図のアスタリスクのように新しいコミットとして見える。公開リポジトリで作業する場合は、この点を覚えておく必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit --amend
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ステージ済みの内容を直前のコミットと結合し、その結果生成されたスナップショットで直前のコミットを置き換えるコマンドである。ステージング領域に何もない状態でこのコマンドを実行すると、スナップショットを変更せずに前回のコミットメッセージだけを編集できる。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;開発現場では、不完全なコミットが行われることは日常的にある。ファイルのステージングを忘れたり、コミットメッセージの形式を間違えたりする場合がある。&lt;code&gt;--amend&lt;/code&gt; フラグは、このような軽いミスを修正する場合に便利である。&lt;/p&gt;
+&lt;h3 id=&#34;公開済みコミットの修正は禁止&#34;&gt;公開済みコミットの修正は禁止&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git reset&lt;/code&gt; のページでは、他の開発者と共有中のコミットを取り消してはいけない理由を説明した。修正についても同じことが成り立つ。公開リポジトリに push されたコミットを修正してはならない。&lt;/p&gt;
+&lt;p&gt;修正されたコミットは実際には完全に新しいコミットであり、以前のコミットはプロジェクト履歴から見えなくなる。これは公開済みコミットを reset した場合と似た問題を引き起こす。他の開発者がすでに作業の基盤として使っているコミットを修正すると、彼らの作業の基盤が失われたように見える。これは開発者を混乱させ、その後の復旧も面倒になる。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次の例では、Git ベースの開発でよくあるシナリオを示す。2 つのファイルを編集して 1 つのスナップショットとしてコミットする予定だったが、最初のコミット時に片方のファイルを追加し忘れたとする。この修正には、単にそのファイルをステージし、&lt;code&gt;--amend&lt;/code&gt; フラグを指定してコミットすればよい。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Edit hello.py and main.py
+git add hello.py
+git commit
+
+# Realize you forgot to add the changes from main.py
+git add main.py
+git commit --amend --no-edit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;通常は、前回のコミットメッセージを表示するためにエディタが開かれる。&lt;code&gt;--no-edit&lt;/code&gt; フラグを指定すると、コミットメッセージを変更せずにコミットを修正できる。必要であればメッセージを修正し、通常どおりファイルを保存して閉じる。結果として生成されるコミットは不完全なコミットを置き換え、&lt;code&gt;hello.py&lt;/code&gt; と &lt;code&gt;main.py&lt;/code&gt; の変更内容が 1 つのスナップショットとしてコミットされたように見える。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の履歴を書き換える | git rebase</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-rebase/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-rebase/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-rebase-コマンド&#34;&gt;git rebase コマンド&lt;/h3&gt;
+&lt;p&gt;rebase は、ブランチの起点となるコミットを別のコミットへ移動する操作である。一般的な動作はチュートリアル図のようになる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: rebase でプロジェクト履歴の線形性を保つ&lt;/p&gt;
+&lt;p&gt;見た目には、rebase はブランチをあるコミットから別のコミットへ移動する手段にすぎないように見える。しかし Git の内部では、新しいコミットを作成し、それを対象のベースコミットへ適用することで実現している。つまり、これはそのままプロジェクト履歴を書き換える操作である。ここでは、ブランチ自体は同じように見えても、それを構成するコミットはまったく別物であることを理解しておく必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git rebase &amp;lt;base&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;現在のブランチを &lt;code&gt;&amp;lt;base&amp;gt;&lt;/code&gt; の上へ rebase するコマンドである。rebase 対象には、コミット ID、ブランチ、タグ、&lt;code&gt;HEAD&lt;/code&gt; からの相対参照など、あらゆる種類のコミット参照を使用できる。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;rebase の主な目的は、プロジェクト履歴の線形性を保つことである。たとえば、機能の作業を開始した後に &lt;code&gt;master&lt;/code&gt; ブランチが進んだシナリオを考える。&lt;/p&gt;
+&lt;p&gt;機能を &lt;code&gt;master&lt;/code&gt; ブランチへ統合するには、直接マージする方法と、rebase してからマージする方法の 2 つがある。最初の選択肢では three-way マージとマージコミットが必要になる。一方、後者では fast-forward マージが可能になり、履歴の線形性を完全に保てる。チュートリアル図は、rebase 後のバージョンが fast-forward マージ可能になる理由を説明している。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: fast-forward マージ&lt;/p&gt;
+&lt;p&gt;rebase は、上流側の変更をローカルリポジトリへ統合する一般的な方法である。&lt;code&gt;git merge&lt;/code&gt; を使って上流側の変更を取り込むと、プロジェクトの進行状況を確認するたびに不要なマージコミットが作成されることがある。これに対して rebase は、「自分の変更作業はすべて、完了済みの最新変更を基準にしたい」という操作に相当する。&lt;/p&gt;
+&lt;h3 id=&#34;公開済みコミットの-rebase-は厳禁&#34;&gt;公開済みコミットの rebase は厳禁&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git commit --amend&lt;/code&gt; や &lt;code&gt;git reset&lt;/code&gt; の説明と同じく、公開リポジトリに push されたコミットを rebase してはならない。rebase は過去のコミットを新しいコミットに置き換えるため、プロジェクト履歴の一部が欠落したように見える。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;次の例は、プロジェクト履歴の線形性を保つために &lt;code&gt;git rebase&lt;/code&gt; と &lt;code&gt;git merge&lt;/code&gt; を併用するものである。これは fast-forward マージを手早く確実に行うための簡単な方法である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Start a new feature
+git checkout -b new-feature master
+# Edit files
+git commit -a -m &amp;#34;Start developing a feature&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;機能開発中にコードベースのセキュリティ脆弱性が見つかったとする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Create a hotfix branch based off of master
+git checkout -b hotfix master
+# Edit files
+git commit -a -m &amp;#34;Fix security hole&amp;#34;
+# Merge back into master
+git checkout master
+git merge hotfix
+git branch -d hotfix
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;hotfix を &lt;code&gt;master&lt;/code&gt; にマージすると、プロジェクト履歴には分岐が発生する。そこで単に &lt;code&gt;git merge&lt;/code&gt; を使うのではなく、この機能ブランチを rebase して、履歴の線形性を保ちながら統合できるようにする。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout new-feature
+git rebase master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;これにより &lt;code&gt;new-feature&lt;/code&gt; は &lt;code&gt;master&lt;/code&gt; の先端へ移動するため、&lt;code&gt;master&lt;/code&gt; と通常の fast-forward マージが可能になる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+git merge new-feature
+&lt;/code&gt;&lt;/pre&gt;
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の履歴を書き換える | git rebase -i</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-rebase-i/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-rebase-i/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-rebase--i-コマンド&#34;&gt;git rebase -i コマンド&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;git rebase&lt;/code&gt; を &lt;code&gt;-i&lt;/code&gt; フラグ付きで実行すると、インタラクティブ rebase セッションが開始される。インタラクティブ rebase は、すべてのコミットをそのまま新しいベースへ移動するのではなく、対象となる個々のコミットを変更できる。これを使うと、既存の一連のコミットを削除、分割、修正、整理して履歴を整えられる。これは &lt;code&gt;git commit --amend&lt;/code&gt; コマンドの拡張版だといえる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git rebase -i &amp;lt;base&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;インタラクティブ rebase セッションを使って、現在のブランチを &lt;code&gt;&amp;lt;base&amp;gt;&lt;/code&gt; の上へ rebase するコマンドである。このコマンドを実行するとエディタが開き、rebase 対象の各コミットに対するコマンドを入力できる。ここでのコマンドは、各コミットを新しい起点へどのように移動するかを指定する。また、エディタ上でコミットの順序を直接編集して並べ替えることもできる。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;インタラクティブ rebase を使うと、見た目上の履歴を自由に作り直して整えられる。この機能により、開発中に雑多なコミットが繰り返された履歴が残っていても、後から見直して構成できるため、開発者はかなりの自由度を得られる。&lt;/p&gt;
+&lt;p&gt;多くの開発者は、&lt;code&gt;master&lt;/code&gt; ブランチへマージする前に機能ブランチをきれいに見せるためにインタラクティブ rebase を使う。インタラクティブ rebase を使うと、重要でないコミットを 1 つにまとめ、不要なコミットを削除し、その他を整理してから「公式」リポジトリへコミットできる。事情を知らない人には、この機能開発が全体としてよく計画されたコミット列として順調に進んだように見える。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;以下の例は、非インタラクティブな &lt;code&gt;git rebase&lt;/code&gt; の説明ページにあった例を、インタラクティブコマンドの場合に書き換えたものである。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;# Start a new feature
+git checkout -b new-feature master
+# Edit files
+git commit -a -m &amp;#34;Start developing a feature&amp;#34;
+# Edit more files
+git commit -a -m &amp;#34;Fix something from the previous commit&amp;#34;
+
+# Add a commit directly to master
+git checkout master
+# Edit files
+git commit -a -m &amp;#34;Fix security hole&amp;#34;
+
+# Begin an interactive rebasing session
+git checkout new-feature
+git rebase -i master
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;最後のコマンドでエディタが開き、&lt;code&gt;new-feature&lt;/code&gt; ブランチ上の 2 つのコミットが関連情報とともに表示される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;pick 32618c4 Start developing a feature
+pick 62eed47 Fix something from the previous commit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;各コミットの前にある &lt;code&gt;pick&lt;/code&gt; コマンドは、rebase の動作を指定する任意のコマンドに変更できる。ここでは &lt;code&gt;squash&lt;/code&gt; コマンドを使って 2 つのコミットを結合できる。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;pick 32618c4 Start developing a feature
+squash 62eed47 Fix something from the previous commit
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;保存してエディタを閉じると rebase が開始される。このとき、結合されたスナップショットに対するコミットメッセージを入力するため、別のエディタウィンドウが開く。コミットメッセージを入力すると rebase が完了し、&lt;code&gt;git log&lt;/code&gt; でコミットが結合されたことを確認できる。&lt;/p&gt;
+&lt;p&gt;Git チュートリアル: &lt;code&gt;git rebase -i&lt;/code&gt; の使用例&lt;/p&gt;
+&lt;p&gt;ここで、結合されたコミットは元のどちらのコミットとも異なる ID を使うこと、つまりこのコミットは実際には新しいコミットであることを覚えておこう。&lt;/p&gt;
+&lt;p&gt;最後に、fast-forward マージを実行して、整理した機能ブランチを &lt;code&gt;master&lt;/code&gt; ブランチへ統合する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;git checkout master
+git merge new-feature
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;インタラクティブ rebase の威力は、書き換えられた &lt;code&gt;master&lt;/code&gt; ブランチの履歴に現れる。ID が &lt;code&gt;62eed47&lt;/code&gt; のコミットは、不要なものとして履歴から完全に姿を消している。事情を知らない人には、&lt;code&gt;new-feature&lt;/code&gt; の開発者が有能で、必要最小限の整ったコミットだけで開発を完了したように見える。このように rebase は、プロジェクト履歴を整理し、わかりやすくする機能である。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+    <item>
+      <title>Git の履歴を書き換える | git reflog</title>
+      <link>https://www.devkuma.com/jp/docs/git/git-reflog/</link>
+      <pubDate>Sun, 13 Aug 2017 19:04:43 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/git-reflog/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;git-reflog-コマンド&#34;&gt;git reflog コマンド&lt;/h3&gt;
+&lt;p&gt;Git には reflog という機能があり、ブランチの先端や &lt;code&gt;HEAD&lt;/code&gt; の更新を追跡できる。これにより、どのブランチやタグからも参照されなくなった状態にも戻れる。履歴を書き換えた後でも、reflog にはブランチの過去の状態が記録されているため、必要に応じてそこへ戻れる。&lt;/p&gt;
+&lt;h2 id=&#34;使い方&#34;&gt;使い方&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reflog
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ローカルリポジトリの reflog を表示するコマンドである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reflog --relative-date
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;「2 週間前」のような相対日付形式で reflog を表示するコマンドである。&lt;/p&gt;
+&lt;h2 id=&#34;補足説明&#34;&gt;補足説明&lt;/h2&gt;
+&lt;p&gt;現在の &lt;code&gt;HEAD&lt;/code&gt; が更新されるたび、たとえばブランチの切り替え、履歴の書き換え、または単に新しいコミットを作成した場合などに、reflog へ新しい項目が追加される。&lt;/p&gt;
+&lt;h2 id=&#34;使用例&#34;&gt;使用例&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;git reflog&lt;/code&gt; を理解するために、1 つの例を見てみよう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0a2e358 HEAD@&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;0&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;: reset: moving to HEAD~2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0254ea7 HEAD@&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;: checkout: moving from 2.2 to master
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;c10f740 HEAD@&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;: checkout: moving from master to 2.2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上の reflog では、まず &lt;code&gt;master&lt;/code&gt; から &lt;code&gt;2.2&lt;/code&gt; という名前のブランチへチェックアウトし、その後 &lt;code&gt;master&lt;/code&gt; へ戻っている。続いて reset により古いコミットへ移動している。reflog は最も新しいログを上に表示し、&lt;code&gt;HEAD@{0}&lt;/code&gt; というラベルを付ける。&lt;/p&gt;
+&lt;p&gt;reset が意図しないものだったとしても、2 つのコミットを取り消す前に &lt;code&gt;HEAD&lt;/code&gt; が指していた元のコミット &lt;code&gt;0254ea7&lt;/code&gt; の情報は reflog に残っている。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reset --hard 0254ea7
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;したがって、&lt;code&gt;git reset&lt;/code&gt; コマンドを使って、&lt;code&gt;master&lt;/code&gt; を過去に存在したコミットへ戻すことができる。この意味で、reflog は履歴を書き換えるときの安全網として機能する。&lt;/p&gt;
+&lt;p&gt;また、変更がローカルリポジトリにコミットされている場合にだけ reflog が安全網になること、そして reflog は &lt;code&gt;HEAD&lt;/code&gt; の移動だけを記録していることも覚えておこう。&lt;/p&gt;
+
       </description>
       
       <category>Git</category>
