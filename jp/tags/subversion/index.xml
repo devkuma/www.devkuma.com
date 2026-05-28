@@ -1,0 +1,334 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Subversion</title>
+    <link>https://www.devkuma.com/jp/tags/subversion/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/subversion/logo/180x180.jpg</url>
+      <title>Subversion</title>
+      <link>https://www.devkuma.com/jp/tags/subversion/</link>
+    </image>
+    <description>Recent content in Subversion on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/subversion/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>SVN の基本用語とコマンド</title>
+      <link>https://www.devkuma.com/jp/docs/svn/basic-commands/</link>
+      <pubDate>Sat, 17 Jul 2010 23:38:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/svn/basic-commands/</guid>
+      <description>
+        
+        
+        &lt;p&gt;SVN (Subversion) は、中央リポジトリを基準にソースコードと変更履歴を管理するバージョン管理システムである。
+Git のように各開発者がリポジトリ全体の履歴をローカルに複製する方式ではなく、中央リポジトリにあるプロジェクトを作業コピーとして取得し、修正して再度コミットする流れで使用する。&lt;/p&gt;
+&lt;p&gt;この文書では、SVN を初めて使う開発者がよく目にする用語と基本コマンドを、実務の流れに合わせて整理する。&lt;/p&gt;
+&lt;h2 id=&#34;基本用語&#34;&gt;基本用語&lt;/h2&gt;
+&lt;h3 id=&#34;repository&#34;&gt;Repository&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Repository&lt;/code&gt; は、プロジェクトのファイルと変更履歴を保存する中央保存場所である。
+ソースコードだけでなく、ファイルの追加、修正、削除、ディレクトリ構造の変更といった履歴も一緒に保存される。&lt;/p&gt;
+&lt;p&gt;SVN リポジトリは通常サーバー上に置き、複数の開発者がネットワーク経由でアクセスする。
+アクセス方式は環境に応じて &lt;code&gt;http://&lt;/code&gt;、&lt;code&gt;https://&lt;/code&gt;、&lt;code&gt;svn://&lt;/code&gt;、&lt;code&gt;svn+ssh://&lt;/code&gt;、&lt;code&gt;file://&lt;/code&gt; などを使用できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;https://svn.example.com/repos/sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn+ssh://svn.example.com/svn/sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;file:///var/svn/sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;運用環境では、プロジェクト単位でリポジトリを分けるか、1 つのリポジトリ内に複数のプロジェクトディレクトリを置くかを選択する。
+権限管理、バックアップ範囲、デプロイ単位が異なる場合は、リポジトリを分ける方が管理しやすい。&lt;/p&gt;
+&lt;h3 id=&#34;revision&#34;&gt;Revision&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Revision&lt;/code&gt; はリポジトリの変更番号である。
+SVN ではファイルごとにリビジョン番号が個別に増えるのではなく、リポジトリにコミットが 1 回発生するたびにリポジトリ全体のリビジョン番号が増える。&lt;/p&gt;
+&lt;p&gt;たとえば &lt;code&gt;sample.c&lt;/code&gt; という 1 つのファイルだけを修正してコミットしても、リポジトリのリビジョンは &lt;code&gt;r10&lt;/code&gt; から &lt;code&gt;r11&lt;/code&gt; に増える。
+このリビジョン番号を使うと、特定時点のソースを再取得したり、変更履歴を比較したりできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r 10:20
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r 10:11 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; https://svn.example.com/repos/sample/trunk sample-r10
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;trunk&#34;&gt;trunk&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;trunk&lt;/code&gt; はプロジェクトの中心となる開発ラインである。
+一般的に日常的な開発作業は &lt;code&gt;trunk&lt;/code&gt; で行う。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  trunk/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    src/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    pom.xml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;チームの規則によって異なるが、&lt;code&gt;trunk&lt;/code&gt; は常にビルド可能な状態を維持するのが望ましい。
+大きな機能開発や長期間の修正は &lt;code&gt;branches&lt;/code&gt; に分け、安定したら &lt;code&gt;trunk&lt;/code&gt; へマージする。&lt;/p&gt;
+&lt;h3 id=&#34;branches&#34;&gt;branches&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;branches&lt;/code&gt; は &lt;code&gt;trunk&lt;/code&gt; から分岐した開発ラインである。
+リリース保守、大規模な機能開発、実験的な作業のように、&lt;code&gt;trunk&lt;/code&gt; と分離して作業する必要がある場合に使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  branches/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    feature-payment/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    release-1.0/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ブランチはディレクトリのコピーのように見えるが、SVN 内部では変更履歴を保持したコピーとして管理される。
+ブランチを作成するときは通常のファイルコピーではなく &lt;code&gt;svn copy&lt;/code&gt; を使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy https://svn.example.com/repos/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  https://svn.example.com/repos/sample/branches/feature-payment &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Create feature-payment branch&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;tags&#34;&gt;tags&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;tags&lt;/code&gt; はリリース時点のソースを保存するディレクトリである。
+たとえば &lt;code&gt;0.1&lt;/code&gt;、&lt;code&gt;0.2&lt;/code&gt;、&lt;code&gt;1.0&lt;/code&gt; のようなリリースバージョンをタグとして残す。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  tags/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    0.1/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    0.2/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    1.0/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;SVN のタグも技術的にはリポジトリ内のコピーである。
+そのため、権限やチーム規則によってタグディレクトリを変更できないようにしておくのがよい。
+タグはデプロイ時点のスナップショットとして扱い、タグ配下で直接開発しない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy https://svn.example.com/repos/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  https://svn.example.com/repos/sample/tags/1.0 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Tag release 1.0&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;基本作業フロー&#34;&gt;基本作業フロー&lt;/h2&gt;
+&lt;p&gt;SVN の基本作業は、リポジトリからソースを取得し、ローカルで修正した後、変更内容を確認し、中央リポジトリへコミットする順序で進める。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add new-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add new file&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コミット前には必ず &lt;code&gt;svn update&lt;/code&gt; で最新の変更を取り込み、&lt;code&gt;svn status&lt;/code&gt; と &lt;code&gt;svn diff&lt;/code&gt; で自分が送信する変更を確認する習慣を付けるとよい。&lt;/p&gt;
+&lt;h2 id=&#34;主なコマンド&#34;&gt;主なコマンド&lt;/h2&gt;
+&lt;h3 id=&#34;import&#34;&gt;import&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn import&lt;/code&gt; は、まだ SVN で管理されていないローカルディレクトリをリポジトリに最初に登録するときに使用する。
+プロジェクトを初めてリポジトリへアップロードするときに主に使用し、すでにチェックアウトされた作業コピーで日常的に使うコマンドではない。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn import sampledir svn+ssh://svn.example.com/svn/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Initial import&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;import&lt;/code&gt; はローカルディレクトリをリポジトリへアップロードするが、そのローカルディレクトリを自動的に作業コピーへ変換するわけではない。
+初回登録後の実際の開発は、改めて &lt;code&gt;checkout&lt;/code&gt; して進める方が安全である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;checkout&#34;&gt;checkout&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn checkout&lt;/code&gt; は、リポジトリのファイルをローカル作業コピーとして取得するコマンドである。
+作業コピーには実際のソースファイルと、SVN が変更状態を追跡するためのメタデータが含まれる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;短く &lt;code&gt;co&lt;/code&gt; という別名も使用できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn co svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;チェックアウトしたディレクトリ内では、通常のファイルと同じようにコードを修正できる。
+ただし、ファイルの追加、削除、移動、名前変更は、できるだけ SVN コマンドで処理することでリポジトリ履歴を正確に残せる。&lt;/p&gt;
+&lt;h3 id=&#34;export&#34;&gt;export&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn export&lt;/code&gt; は、バージョン管理メタデータなしで純粋なファイルだけを取得するときに使用する。
+デプロイ用のソース一式や、一時的な確認用ディレクトリが必要な場合に便利である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; svn+ssh://svn.example.com/svn/sample/trunk sample-release
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定リビジョンのファイルだけを取得することもできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; svn+ssh://svn.example.com/svn/sample/trunk sample-r120
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;export&lt;/code&gt; で取得したディレクトリは作業コピーではないため、&lt;code&gt;svn update&lt;/code&gt;、&lt;code&gt;svn commit&lt;/code&gt;、&lt;code&gt;svn status&lt;/code&gt; などの操作はできない。
+継続して開発するディレクトリが必要な場合は、&lt;code&gt;export&lt;/code&gt; ではなく &lt;code&gt;checkout&lt;/code&gt; を使用する。&lt;/p&gt;
+&lt;h3 id=&#34;update&#34;&gt;update&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn update&lt;/code&gt; は、リポジトリの最新変更を現在の作業コピーに反映する。
+複数人が同じリポジトリを使う環境では、修正前とコミット前に実行するとよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;短く &lt;code&gt;up&lt;/code&gt; という別名を使用できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn up
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定リビジョンに作業コピーを合わせるときは &lt;code&gt;-r&lt;/code&gt; オプションを使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;更新中に複数人が同じファイルの同じ部分を修正していた場合、競合が発生することがある。
+競合が発生したらファイル内容を確認して手動で整理し、解決済みであることを SVN に伝えてからコミットする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn resolve --accept&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;working sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Resolve conflict in sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;status&#34;&gt;status&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn status&lt;/code&gt; は、作業コピーで変更されたファイル状態を確認する。
+コミット前に必ず確認すべきコマンドである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;よく見る状態文字は次のとおりである。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;状態&lt;/th&gt;
+          &lt;th&gt;意味&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;M&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;修正済み&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;A&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;追加予定&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;D&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;削除予定&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;?&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;SVN が追跡していないファイル&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;!&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;SVN が追跡しているがローカルから消えたファイル&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;C&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;競合発生&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;例は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;M       src/main.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;A       src/new-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;?       build.log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;?&lt;/code&gt; で表示されるファイルはコミットされない。
+新しいファイルをリポジトリへアップロードするには、先に &lt;code&gt;svn add&lt;/code&gt; を実行する。&lt;/p&gt;
+&lt;h3 id=&#34;add&#34;&gt;add&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn add&lt;/code&gt; は、新しいファイルやディレクトリをバージョン管理対象として登録する。
+登録しただけではリポジトリへすぐにアップロードされず、その後 &lt;code&gt;commit&lt;/code&gt; する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ディレクトリを追加すると内部ファイルも追加対象になることがあるため、コミット前に &lt;code&gt;svn status&lt;/code&gt; で不要なファイルが含まれていないか確認する。
+ビルド成果物、ログ、IDE 設定ファイルのようにリポジトリへ登録しないファイルは、&lt;code&gt;svn:ignore&lt;/code&gt; プロパティやクライアントの ignore 設定で除外する。&lt;/p&gt;
+&lt;h3 id=&#34;commit&#34;&gt;commit&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn commit&lt;/code&gt; は、作業コピーの変更内容をリポジトリへ反映する。
+コミットが成功するとリポジトリのリビジョンが増える。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;短く &lt;code&gt;ci&lt;/code&gt; という別名を使用できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn ci -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定のファイルだけをコミットすることもできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit src/login.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コミットメッセージは変更理由が分かるように書く。
+&lt;code&gt;fix&lt;/code&gt;、&lt;code&gt;update&lt;/code&gt;、&lt;code&gt;test&lt;/code&gt; のように意味が不足したメッセージだけを残すと、後で &lt;code&gt;svn log&lt;/code&gt; で履歴を追跡しにくくなる。&lt;/p&gt;
+&lt;p&gt;コミット前の確認フローは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;log&#34;&gt;log&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn log&lt;/code&gt; はリポジトリの変更履歴を確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;変更ファイル一覧まで見たい場合は &lt;code&gt;-v&lt;/code&gt; オプションを使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -v
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定のリビジョン範囲やファイルに関するログだけを見ることもできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r 30:100 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リモートリポジトリ URL を直接指定すると、作業コピーがない環境でも履歴を確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log https://svn.example.com/repos/sample/trunk
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;diff&#34;&gt;diff&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn diff&lt;/code&gt; は作業コピーの変更内容を比較する。
+デフォルト実行時は、ローカル変更と基準リビジョンとの差分を表示する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定ファイルだけを比較できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定リビジョンと比較するときは &lt;code&gt;-r&lt;/code&gt; または &lt;code&gt;--revision&lt;/code&gt; オプションを使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r 10:20 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コミット前には &lt;code&gt;svn status&lt;/code&gt; で変更ファイル一覧を確認し、&lt;code&gt;svn diff&lt;/code&gt; で実際のコード変更をレビューする。
+この過程でデバッグコード、一時ログ、不要なフォーマット変更が混ざっていないか確認できる。&lt;/p&gt;
+&lt;h3 id=&#34;blame&#34;&gt;blame&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn blame&lt;/code&gt; は、ファイルの各行がどのリビジョンで誰によって変更されたかを表示する。
+問題が発生したコードの変更背景を調べるときに便利である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn blame sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;一部の SVN クライアントでは &lt;code&gt;praise&lt;/code&gt;、&lt;code&gt;annotate&lt;/code&gt;、&lt;code&gt;ann&lt;/code&gt; という別名も使用できる。
+ただし、&lt;code&gt;blame&lt;/code&gt; の結果だけを見て作成者を責めるのではなく、当時のログや関連変更ファイルも一緒に確認する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; -v
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -c &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;lock-と-unlock&#34;&gt;lock と unlock&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn lock&lt;/code&gt; は、特定ファイルをロックして他のユーザーが修正できないようにするときに使用する。
+主にマージが難しいバイナリファイル、デザインファイル、文書ファイルに使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn lock sample.docx -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Edit release note&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ロックを解除するときは &lt;code&gt;svn unlock&lt;/code&gt; を使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn unlock sample.docx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;テキストソースコードは、一般的にロックよりもマージを前提に作業する方が効率的である。
+すべてのファイルを習慣的にロックすると協業速度が落ちる可能性があるため、ロックが必要なファイル種別をチーム規則として決めておくとよい。&lt;/p&gt;
+&lt;h3 id=&#34;delete-move-copy&#34;&gt;delete, move, copy&lt;/h3&gt;
+&lt;p&gt;SVN でファイルの削除、移動、コピーを行う場合、通常のファイルシステムコマンドより SVN コマンドを使用する方が安全である。
+そうすることでリポジトリ履歴を正しく残せる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn delete old-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn move old-name.c new-name.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy trunk branches/feature-a
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;削除や移動もすぐにリポジトリへ反映されるわけではない。
+作業コピーに変更予定状態として残り、&lt;code&gt;commit&lt;/code&gt; して最終的に反映される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Rename old-name.c to new-name.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;ファイルのバックアップと復旧&#34;&gt;ファイルのバックアップと復旧&lt;/h2&gt;
+&lt;p&gt;リポジトリ全体をバックアップしたり別サーバーへ移行したりするときは、&lt;code&gt;svnadmin dump&lt;/code&gt; と &lt;code&gt;svnadmin load&lt;/code&gt; を使用する。
+これらは通常の作業コピーで実行する &lt;code&gt;svn&lt;/code&gt; コマンドではなく、サーバーのリポジトリディレクトリを直接扱う管理者コマンドである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin dump /var/svn/sample &amp;gt; sample.dump
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ダンプファイルを新しいリポジトリへ復元するときは、まずリポジトリを作成してから &lt;code&gt;load&lt;/code&gt; を実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin create /var/svn/sample-new
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin load /var/svn/sample-new &amp;lt; sample.dump
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;運用リポジトリをバックアップするときは、次の点も一緒に確認する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;リポジトリパスとプロジェクト URL を混同しない。&lt;/li&gt;
+&lt;li&gt;バックアップファイルを別サーバーやストレージに保管する。&lt;/li&gt;
+&lt;li&gt;復旧テストを定期的に実施する。&lt;/li&gt;
+&lt;li&gt;リポジトリ hook、アクセス権限設定、Apache または svnserve の設定も一緒にバックアップする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;よく使う作業例&#34;&gt;よく使う作業例&lt;/h2&gt;
+&lt;h3 id=&#34;新しいファイルを作成した場合&#34;&gt;新しいファイルを作成した場合&lt;/h3&gt;
+&lt;p&gt;新しいファイルは SVN が自動的に追跡しない。
+ファイルを追加してからコミットすることで、リポジトリへアップロードされる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;touch sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;既存ファイルを修正した場合&#34;&gt;既存ファイルを修正した場合&lt;/h3&gt;
+&lt;p&gt;すでに SVN が追跡しているファイルは、修正後すぐに状態と差分を確認してコミットできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;vi sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix sample calculation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;リポジトリの最新内容を反映する場合&#34;&gt;リポジトリの最新内容を反映する場合&lt;/h3&gt;
+&lt;p&gt;他の開発者の変更を取得するときは &lt;code&gt;svn update&lt;/code&gt; を使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;競合が発生したら、競合ファイルを整理した後、解決済み状態として表示し、コミットする。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;vi sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn resolve --accept&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;working sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Resolve merge conflict&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;実務上の注意点&#34;&gt;実務上の注意点&lt;/h2&gt;
+&lt;h3 id=&#34;コミット前には-updatestatusdiff-を確認する&#34;&gt;コミット前には update、status、diff を確認する&lt;/h3&gt;
+&lt;p&gt;SVN は中央リポジトリを基準に協業するため、コミット前に最新変更を反映する習慣が重要である。
+&lt;code&gt;svn update&lt;/code&gt; なしで古い作業コピーからコミットすると、競合を遅れて発見したり、他の変更の文脈を見落としたりする可能性がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;ファイル操作は-svn-コマンドで処理する&#34;&gt;ファイル操作は SVN コマンドで処理する&lt;/h3&gt;
+&lt;p&gt;ファイル追加は &lt;code&gt;svn add&lt;/code&gt;、削除は &lt;code&gt;svn delete&lt;/code&gt;、移動と名前変更は &lt;code&gt;svn move&lt;/code&gt; を使用する。
+OS の &lt;code&gt;rm&lt;/code&gt;、&lt;code&gt;mv&lt;/code&gt;、ファイルエクスプローラーだけを使うと、SVN が意図した変更を正確に追跡できないことがある。&lt;/p&gt;
+&lt;h3 id=&#34;trunkbranchestags-の規則をチームで決める&#34;&gt;trunk、branches、tags の規則をチームで決める&lt;/h3&gt;
+&lt;p&gt;SVN はディレクトリ構造を強制しない。
+&lt;code&gt;trunk&lt;/code&gt;、&lt;code&gt;branches&lt;/code&gt;、&lt;code&gt;tags&lt;/code&gt; は広く使われる慣例だが、実際の運用方法はチーム規則として決める必要がある。&lt;/p&gt;
+&lt;p&gt;一般的な規則は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;trunk&lt;/code&gt; は常にビルド可能な状態に保つ。&lt;/li&gt;
+&lt;li&gt;長期的な機能開発は &lt;code&gt;branches&lt;/code&gt; で進める。&lt;/li&gt;
+&lt;li&gt;リリース済みソースは &lt;code&gt;tags&lt;/code&gt; に残し、修正しない。&lt;/li&gt;
+&lt;li&gt;タグ作成とリリースブランチ作成の権限を制限する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;バイナリファイルはロックポリシーを決める&#34;&gt;バイナリファイルはロックポリシーを決める&lt;/h3&gt;
+&lt;p&gt;画像、文書、デザインファイルのように自動マージが難しいファイルは、&lt;code&gt;svn lock&lt;/code&gt; を使う方が安全な場合がある。
+逆にテキストソースコードにロックを多用すると、並列開発が難しくなる。
+ファイル種別ごとにロック使用可否を決め、ロックメッセージを残す規則を設ける。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.naver.com/minishai/50014866731&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;minishai ブログ SVN 整理&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://subversion.apache.org/quick-start&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache Subversion Quick Start&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.visualsvn.com/support/svnbook/index/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SVN Book Index&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>SVN</category>
+      
+      <category>Subversion</category>
+      
+      <category>Version Control</category>
+      
+    </item>
+    
+  </channel>
+</rss>
