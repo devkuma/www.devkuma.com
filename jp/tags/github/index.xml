@@ -1,0 +1,300 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – GitHub</title>
+    <link>https://www.devkuma.com/jp/tags/github/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/github/logo/180x180.jpg</url>
+      <title>GitHub</title>
+      <link>https://www.devkuma.com/jp/tags/github/</link>
+    </image>
+    <description>Recent content in GitHub on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/github/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>GitHub Actions の紹介と基本的な使い方</title>
+      <link>https://www.devkuma.com/jp/docs/git/github-actcions/</link>
+      <pubDate>Thu, 07 Dec 2023 11:20:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/git/github-actcions/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions.png&#34; alt=&#34;GitHub Actions&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;github-actions-とは-ワークフロー自動化を実現する機能&#34;&gt;GitHub Actions とは? ワークフロー自動化を実現する機能&lt;/h2&gt;
+&lt;p&gt;GitHub Actions は、あらかじめ定義した処理と条件の組み合わせ、つまりワークフローを自動化する GitHub 公式機能である。&lt;br&gt;
+GitHub Actions では、リポジトリへの push などの処理をトリガーとして、専用 Workflow に定義した処理を自動で実行する。&lt;br&gt;
+GitHub Actions を使うと、開発で注目されている CI/CD を実現できる。&lt;/p&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;CI/CD とは?&lt;/div&gt;
+
+
+CI/CD は &#39;Continuous Integration/Continuous Delivery&#39; の略で、継続的インテグレーション/継続的デリバリーを意味する。  
+ビルド、テスト、デプロイといった開発に関する各種作業を自動化し、継続的に実行する方式である。
+
+[CI/CD - 継続的インテグレーション/継続的デリバリー](/docs/ci-cd/)
+&lt;/div&gt;
+
+&lt;h2 id=&#34;github-actions-を構成する主な要素と機能&#34;&gt;GitHub Actions を構成する主な要素と機能&lt;/h2&gt;
+&lt;p&gt;GitHub Actions は複数の構成要素と機能で構成されている。その中でも主なものは次のとおりである。&lt;/p&gt;
+&lt;h3 id=&#34;action--あらかじめ定義された作業を実行するカスタムアプリケーション&#34;&gt;Action | あらかじめ定義された作業を実行するカスタムアプリケーション&lt;/h3&gt;
+&lt;p&gt;Action は、あらかじめ定義された作業を実行する GitHub Actions 専用のカスタムアプリケーションである。既存の Action は GitHub Marketplace で探すことができ、自分で Action を作成することもできる。&lt;/p&gt;
+&lt;h4 id=&#34;主な-action&#34;&gt;主な Action&lt;/h4&gt;
+&lt;p&gt;実際にどのような Action があるのか、主な例を見てみよう。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Action の例&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Action&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;checkout&lt;/td&gt;
+					&lt;td&gt;リポジトリからファイルをチェックアウトする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;upload-artifact&lt;/td&gt;
+					&lt;td&gt;任意のファイルを成果物として保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;download-artifact&lt;/td&gt;
+					&lt;td&gt;成果物として保存されているファイルをダウンロードする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;cache&lt;/td&gt;
+					&lt;td&gt;依存関係やビルド結果をキャッシュして処理速度を上げる。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;github-script&lt;/td&gt;
+					&lt;td&gt;GitHub API を通じて GitHub の各種機能にアクセスする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;create-release&lt;/td&gt;
+					&lt;td&gt;GitHub Release API を通じてリリースを作成する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;stale&lt;/td&gt;
+					&lt;td&gt;一定期間使われていない Issue や Pull Request がある場合に警告したり閉じたりする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;labeler&lt;/td&gt;
+					&lt;td&gt;Pull Request にラベルを付与する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;delete-package-versions&lt;/td&gt;
+					&lt;td&gt;GitHub Packages からパッケージバージョンを削除する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;setup-node&lt;/td&gt;
+					&lt;td&gt;Node.js 環境を構築する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;setup-python&lt;/td&gt;
+					&lt;td&gt;Python 環境を構築する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;setup-go&lt;/td&gt;
+					&lt;td&gt;Go 環境を構築する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;setup-dotnet&lt;/td&gt;
+					&lt;td&gt;.NET CLI 環境を構築する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;setup-java&lt;/td&gt;
+					&lt;td&gt;Java 環境を構築する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;toolkit&lt;/td&gt;
+					&lt;td&gt;Action を簡単に作成するためのツールキットを利用できるようにする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;javascript-action&lt;/td&gt;
+					&lt;td&gt;JavaScript Action を作成する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;typescript-action&lt;/td&gt;
+					&lt;td&gt;TypeScript Action を作成する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;workflow--実行する処理とその条件をまとめたプロセス&#34;&gt;Workflow | 実行する処理とその条件をまとめたプロセス&lt;/h3&gt;
+&lt;p&gt;Workflow は、実行する処理と、その処理を実行する条件をまとめたプロセスである。複数の Action を組み合わせて Workflow を作成することもできる。&lt;/p&gt;
+&lt;h3 id=&#34;runner--ワークフローを実行するサーバー&#34;&gt;Runner | ワークフローを実行するサーバー&lt;/h3&gt;
+&lt;p&gt;GitHub では、Workflow を実行するサーバーまたは環境を Runner と呼ぶ。GitHub Actions を利用するときは、GitHub 公式が提供する仮想マシンを Runner として利用できる。自分で Runner を準備して使用することもできる。&lt;/p&gt;
+&lt;h3 id=&#34;job--同じ-runner-で実行されるワークフローの段階&#34;&gt;Job | 同じ Runner で実行されるワークフローの段階&lt;/h3&gt;
+&lt;p&gt;Job は、同じ Runner で実行されるワークフロー内の段階を意味する。Job はほかの Job との依存関係を設定することもできる。基本的に Job は、Job 間の依存関係がなければ並列で実行される。&lt;/p&gt;
+&lt;h2 id=&#34;github-actions-を使う利点&#34;&gt;GitHub Actions を使う利点&lt;/h2&gt;
+&lt;p&gt;GitHub Actions 以外にも、CI/CD のような自動化を実現するツールは存在する。その中でも GitHub Actions の最大の利点は、GitHub が提供する仮想サーバーを利用できる点である。&lt;/p&gt;
+&lt;p&gt;GitHub Actions を使うと、ユーザーが自分でサーバーを準備する必要がない。また、仮想サーバーではなく物理サーバーを使う必要がある場合は、ユーザーが自分でサーバーを準備して GitHub Actions を使用することもできる。&lt;/p&gt;
+&lt;p&gt;さらに、GitHub 関連の処理の自動化は公式機能であるため、GitHub Actions を通じてスムーズに実装できる。これは、ほかのツールにはない GitHub Actions ならではの利点である。&lt;/p&gt;
+&lt;h2 id=&#34;github-actions-利用時の注意点&#34;&gt;GitHub Actions 利用時の注意点&lt;/h2&gt;
+&lt;p&gt;GitHub Actions には、利用プランに応じて次のような機能制限がある。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;プラン&lt;/th&gt;
+					&lt;th&gt;最大同時 Job 数&lt;/th&gt;
+					&lt;th&gt;最大同時 Job 数 (macOS)&lt;/th&gt;
+					&lt;th&gt;利用可能な時間制限&lt;/th&gt;
+					&lt;th&gt;利用可能な保存容量&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Free&lt;/td&gt;
+					&lt;td&gt;20&lt;/td&gt;
+					&lt;td&gt;5&lt;/td&gt;
+					&lt;td&gt;2,000 分/月&lt;/td&gt;
+					&lt;td&gt;500 MB&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Pro&lt;/td&gt;
+					&lt;td&gt;40&lt;/td&gt;
+					&lt;td&gt;5&lt;/td&gt;
+					&lt;td&gt;3,000 分/月&lt;/td&gt;
+					&lt;td&gt;1 GB&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Team&lt;/td&gt;
+					&lt;td&gt;60&lt;/td&gt;
+					&lt;td&gt;5&lt;/td&gt;
+					&lt;td&gt;10,000 分/月&lt;/td&gt;
+					&lt;td&gt;2 GB&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Enterprise&lt;/td&gt;
+					&lt;td&gt;180&lt;/td&gt;
+					&lt;td&gt;50&lt;/td&gt;
+					&lt;td&gt;50,000 分/月&lt;/td&gt;
+					&lt;td&gt;50 GB&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;また、GitHub Actions は利用ポリシーの範囲内でのみ使用できる。GitHub の各プランと利用規約の詳細は、次の公式サイトで確認できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.github.com/ko/billing/managing-billing-for-github-actions/about-billing-for-github-actions?_fsi=LlxUgcTQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GitHub Actions の課金について&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/pricing?_fsi=LlxUgcTQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;プラン紹介&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.github.com/ko/site-policy/github-terms/github-terms-for-additional-products-and-features?_fsi=LlxUgcTQ&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;追加製品および機能に適用される GitHub 条項&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;github-actions-の活用例&#34;&gt;GitHub Actions の活用例&lt;/h2&gt;
+&lt;p&gt;GitHub Actions はさまざまな用途に活用できる。以下に、参考になる利用例をいくつか紹介する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;リリースノートやリリース Source などを自動生成して、ソフトウェアリリース作業を効率化する。&lt;/li&gt;
+&lt;li&gt;Java や Python などの環境を自動的に構築する。&lt;/li&gt;
+&lt;li&gt;Pull Request の内容などを Slack やメールで自動通知する。&lt;/li&gt;
+&lt;li&gt;push のたびに JavaScript Lint を実行する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ここで紹介したもの以外にも、GitHub Actions のさまざまな活用例を考えられる。&lt;/p&gt;
+&lt;h2 id=&#34;github-actions-の基本的な使用例&#34;&gt;GitHub Actions の基本的な使用例&lt;/h2&gt;
+&lt;p&gt;ここでは GitHub Actions を実際に設定しながら、基本的な使い方を確認する。&lt;/p&gt;
+&lt;p&gt;Git のインストール、GitHub アカウント作成など、GitHub 関連の初期設定は完了しているものとする。&lt;/p&gt;
+&lt;p&gt;まず、GitHub 管理画面で GitHub Actions を設定する専用リポジトリを作成する。GitHub 管理画面で &amp;lsquo;New&amp;rsquo; をクリックする。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-1.png&#34; alt=&#34;GitHub Actions 用リポジトリ&#34;&gt;&lt;/p&gt;
+&lt;p&gt;リポジトリ作成画面が表示される。リポジトリ名(&amp;lsquo;Repository name&amp;rsquo;)に任意の名前を入力し、&amp;lsquo;Create repository&amp;rsquo; をクリックする。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-2.png&#34; alt=&#34;リポジトリ名入力&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Git bash などで次のコマンドを実行し、作成したリポジトリをローカルに clone する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HTTP:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;ユーザー名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;/&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;リポジトリ名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;SSH:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone git@github.com:&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;ユーザー名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;/&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;リポジトリ名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ユーザー名が &lt;code&gt;devkuma&lt;/code&gt;、リポジトリ名が &lt;code&gt;test&lt;/code&gt; の場合、次のようなコマンドになる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HTTP:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/user/git-actions.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;SSH:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone git@github.com:devkuma/git-actions.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git clone git@github.com:devkuma/git-actions.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Cloning into &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;git-actions&amp;#39;&lt;/span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;warning: You appear to have cloned an empty repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;clone したローカルリポジトリ内に &lt;code&gt;.github/workflows&lt;/code&gt; というフォルダを作成し、そのフォルダ内に &lt;code&gt;actions-test.yml&lt;/code&gt; というファイルを 1 つ作成する。この &lt;code&gt;actions-test.yml&lt;/code&gt; が GitHub Actions のワークフローになる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; git-actions
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% mkdir -p .github/workflows
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; .github/workflows
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% touch actions-test.yml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;GitHub Actions のワークフローは &lt;code&gt;.github/workflows&lt;/code&gt; というディレクトリに保存する。
+workflow は YAML 形式(.yml)で作成する。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;次に、任意のテキストエディタで &lt;code&gt;actions-test.yml&lt;/code&gt; を次のように編集する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yml&#34; data-lang=&#34;yml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;actions-test&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;on&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;push]&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;jobs&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;check-bats-version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;runs-on&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ubuntu-latest&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;steps&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;echo &amp;#34;Hello World&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;このファイルの意味は次のとおりである。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;コード&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;name: actions-test&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;actions-test&lt;/code&gt; という名前のワークフローを作成する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;on: [push]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;push が実行されたとき。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;runs-on: ubuntu-latest&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;最新版の Ubuntu 環境を準備する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;run: echo &amp;quot;Hello World&amp;quot;&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;echo &amp;quot;Hello World&amp;quot;&lt;/code&gt; コマンドを実行する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;これで GitHub Actions のワークフローファイルが作成された。ファイル作成後、次の順序でファイル追加、コミット、push を実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git add .
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;[Add] actions test&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git push
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;この push が実行されると workflow が実行される。&lt;/p&gt;
+&lt;p&gt;実際にワークフローが実行されるか確認してみよう。GitHub 管理画面で先ほど作成したリポジトリへ移動し、&amp;lsquo;Actions&amp;rsquo; メニューを開く。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-3.png&#34; alt=&#34;Actions メニューの位置&#34;&gt;&lt;/p&gt;
+&lt;p&gt;GitHub Actions の管理画面が表示される。次のように git commit で指定したコメント名で GitHub Actions のログが記録されているため、このログをクリックして確認する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-4.png&#34; alt=&#34;GitHub Actions ログ&#34;&gt;&lt;/p&gt;
+&lt;p&gt;次に、次の順序でクリックする。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-5.png&#34; alt=&#34;Step 案内&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-6.png&#34; alt=&#34;Step 実行&#34;&gt;&lt;/p&gt;
+&lt;p&gt;次のような画面が表示され、workflow で指定したとおりに &lt;code&gt;Run echo &amp;quot;Hello world!&amp;quot;&lt;/code&gt; というコマンドが実行されたことを確認できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/git/github-actions-7.png&#34; alt=&#34;コマンド実行確認位置&#34;&gt;&lt;/p&gt;
+&lt;p&gt;今回紹介した例から分かるように、GitHub Actions の workflow では Ubuntu 環境を準備し、Ubuntu 内でさまざまなコマンドを実行することもできる。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;GitHub Actions を使うと、Push などの操作をトリガーとして指定した作業を自動実行でき、GitHub Actions を通じて CI/CD も実現できる。&lt;/p&gt;
+&lt;p&gt;GitHub Actions では GitHub が提供する仮想サーバーを利用できるため、ユーザーが実行環境を別途準備して運用する必要がない。また、GitHub 公式機能であるため GitHub との連携が容易である点も、ほかの CI/CD ツールにはない利点である。&lt;/p&gt;
+&lt;p&gt;GitHub Actions は、リリースノートの自動生成、push のたびに JavaScript Lint を自動実行するなど、さまざまな用途で便利に使える。一方で、Free プランでは同時実行できる最大 Job 数が 20 個までに制限されている点、GitHub Actions を使用するときは公式サイトにまとめられた利用規約を遵守する必要がある点にも注意する。&lt;/p&gt;
+
+      </description>
+      
+      <category>Git</category>
+      
+      <category>GitHub</category>
+      
+      <category>SCM</category>
+      
+      <category>VCS</category>
+      
+    </item>
+    
+  </channel>
+</rss>

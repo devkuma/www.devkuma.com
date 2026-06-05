@@ -1,0 +1,334 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Version Control</title>
+    <link>https://www.devkuma.com/tags/version-control/</link>
+    <image>
+      <url>https://www.devkuma.com/tags/version-control/logo/180x180.jpg</url>
+      <title>Version Control</title>
+      <link>https://www.devkuma.com/tags/version-control/</link>
+    </image>
+    <description>Recent content in Version Control on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ko-kr</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/tags/version-control/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>SVN 기본 용어와 명령어</title>
+      <link>https://www.devkuma.com/docs/svn/basic-commands/</link>
+      <pubDate>Sat, 17 Jul 2010 23:38:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/docs/svn/basic-commands/</guid>
+      <description>
+        
+        
+        &lt;p&gt;SVN(Subversion)은 중앙 저장소를 기준으로 소스 코드와 변경 이력을 관리하는 버전 관리 시스템이다.
+Git처럼 각 개발자가 전체 저장소 이력을 로컬에 복제하는 방식이 아니라, 중앙 저장소(repository)에 있는 프로젝트를 작업 사본(working copy)으로 받아와 수정하고 다시 커밋하는 흐름으로 사용한다.&lt;/p&gt;
+&lt;p&gt;이 문서는 SVN을 처음 사용하는 개발자가 자주 마주치는 용어와 기본 명령어를 실무 흐름에 맞춰 정리한다.&lt;/p&gt;
+&lt;h2 id=&#34;기본-용어&#34;&gt;기본 용어&lt;/h2&gt;
+&lt;h3 id=&#34;repository&#34;&gt;Repository&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Repository&lt;/code&gt;는 프로젝트의 파일과 변경 이력을 저장하는 중앙 저장소이다.
+소스 코드뿐 아니라 파일 추가, 수정, 삭제, 디렉토리 구조 변경 같은 이력도 함께 저장된다.&lt;/p&gt;
+&lt;p&gt;SVN 저장소는 보통 서버에 두고 여러 개발자가 네트워크를 통해 접근한다.
+접근 방식은 환경에 따라 &lt;code&gt;http://&lt;/code&gt;, &lt;code&gt;https://&lt;/code&gt;, &lt;code&gt;svn://&lt;/code&gt;, &lt;code&gt;svn+ssh://&lt;/code&gt;, &lt;code&gt;file://&lt;/code&gt; 등을 사용할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;https://svn.example.com/repos/sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn+ssh://svn.example.com/svn/sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;file:///var/svn/sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;운영 환경에서는 프로젝트 단위로 저장소를 분리하거나, 하나의 저장소 안에 여러 프로젝트 디렉토리를 두는 방식 중 하나를 선택한다.
+권한 관리, 백업 범위, 배포 단위가 다르면 저장소를 분리하는 편이 관리하기 쉽다.&lt;/p&gt;
+&lt;h3 id=&#34;revision&#34;&gt;Revision&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;Revision&lt;/code&gt;은 저장소의 변경 번호이다.
+SVN에서는 파일마다 따로 리비전 번호가 증가하는 것이 아니라, 저장소에 커밋이 한 번 발생할 때마다 저장소 전체의 리비전 번호가 증가한다.&lt;/p&gt;
+&lt;p&gt;예를 들어 &lt;code&gt;sample.c&lt;/code&gt; 한 파일만 수정해서 커밋해도 저장소 리비전은 &lt;code&gt;r10&lt;/code&gt;에서 &lt;code&gt;r11&lt;/code&gt;로 증가한다.
+이 리비전 번호를 이용하면 특정 시점의 소스를 다시 받거나, 변경 이력을 비교할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r 10:20
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r 10:11 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;10&lt;/span&gt; https://svn.example.com/repos/sample/trunk sample-r10
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;trunk&#34;&gt;trunk&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;trunk&lt;/code&gt;는 프로젝트의 중심 개발 라인이다.
+일반적으로 일상적인 개발 작업은 &lt;code&gt;trunk&lt;/code&gt;에서 진행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  trunk/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    src/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    pom.xml
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;팀 규칙에 따라 다르지만, &lt;code&gt;trunk&lt;/code&gt;는 항상 빌드 가능한 상태를 유지하는 것이 좋다.
+큰 기능 개발이나 장기간 수정은 &lt;code&gt;branches&lt;/code&gt;로 분리한 뒤 안정화되면 &lt;code&gt;trunk&lt;/code&gt;로 병합한다.&lt;/p&gt;
+&lt;h3 id=&#34;branches&#34;&gt;branches&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;branches&lt;/code&gt;는 &lt;code&gt;trunk&lt;/code&gt;에서 분기한 개발 라인이다.
+릴리스 유지보수, 대규모 기능 개발, 실험성 작업처럼 &lt;code&gt;trunk&lt;/code&gt;와 분리해서 작업해야 할 때 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  branches/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    feature-payment/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    release-1.0/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;브랜치는 디렉토리 복사처럼 보이지만 SVN 내부에서는 변경 이력을 보존하는 복사로 관리된다.
+브랜치를 만들 때는 일반 파일 복사가 아니라 &lt;code&gt;svn copy&lt;/code&gt;를 사용해야 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy https://svn.example.com/repos/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  https://svn.example.com/repos/sample/branches/feature-payment &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Create feature-payment branch&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;tags&#34;&gt;tags&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;tags&lt;/code&gt;는 릴리스 시점의 소스를 보관하는 디렉토리이다.
+예를 들어 &lt;code&gt;0.1&lt;/code&gt;, &lt;code&gt;0.2&lt;/code&gt;, &lt;code&gt;1.0&lt;/code&gt; 같은 릴리스 버전을 태그로 남긴다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sample/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  tags/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    0.1/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    0.2/
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    1.0/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;SVN의 태그도 기술적으로는 저장소 안의 복사본이다.
+따라서 권한이나 팀 규칙으로 태그 디렉토리를 수정하지 못하게 막아두는 것이 좋다.
+태그는 배포 시점의 스냅샷으로 취급하고, 태그 아래에서 직접 개발하지 않는다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy https://svn.example.com/repos/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  https://svn.example.com/repos/sample/tags/1.0 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Tag release 1.0&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;기본-작업-흐름&#34;&gt;기본 작업 흐름&lt;/h2&gt;
+&lt;p&gt;SVN의 기본 작업은 저장소에서 소스를 받고, 로컬에서 수정한 뒤, 변경 내용을 확인하고, 중앙 저장소에 커밋하는 순서로 진행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; sample
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add new-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add new file&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;커밋 전에는 항상 &lt;code&gt;svn update&lt;/code&gt;로 최신 변경을 반영하고, &lt;code&gt;svn status&lt;/code&gt;와 &lt;code&gt;svn diff&lt;/code&gt;로 내가 올릴 변경을 확인하는 습관을 들이는 것이 좋다.&lt;/p&gt;
+&lt;h2 id=&#34;주요-명령어&#34;&gt;주요 명령어&lt;/h2&gt;
+&lt;h3 id=&#34;import&#34;&gt;import&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn import&lt;/code&gt;는 아직 SVN으로 관리되지 않는 로컬 디렉토리를 저장소에 처음 등록할 때 사용한다.
+프로젝트를 최초로 저장소에 올릴 때 주로 사용하며, 이미 체크아웃된 작업 사본에서 일상적으로 사용하는 명령은 아니다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn import sampledir svn+ssh://svn.example.com/svn/sample/trunk &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Initial import&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;import&lt;/code&gt;는 로컬 디렉토리를 저장소에 올리지만, 그 로컬 디렉토리를 자동으로 작업 사본으로 바꾸지는 않는다.
+최초 등록 후 실제 개발은 다시 &lt;code&gt;checkout&lt;/code&gt;을 받아서 진행하는 것이 안전하다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;checkout&#34;&gt;checkout&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn checkout&lt;/code&gt;은 저장소의 파일을 로컬 작업 사본으로 받아오는 명령어이다.
+작업 사본에는 실제 소스 파일과 함께 SVN이 변경 상태를 추적하기 위한 메타데이터가 포함된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn checkout svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;짧게 &lt;code&gt;co&lt;/code&gt; 별칭을 사용할 수도 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn co svn+ssh://svn.example.com/svn/sample/trunk sample
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;체크아웃한 디렉토리 안에서는 일반 파일처럼 코드를 수정할 수 있다.
+다만 파일 추가, 삭제, 이동, 이름 변경은 가능한 한 SVN 명령어로 처리해야 저장소 이력이 정확히 남는다.&lt;/p&gt;
+&lt;h3 id=&#34;export&#34;&gt;export&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn export&lt;/code&gt;는 버전 관리 메타데이터 없이 순수한 파일만 가져올 때 사용한다.
+배포용 소스 묶음이나 임시 확인용 디렉토리가 필요할 때 유용하다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; svn+ssh://svn.example.com/svn/sample/trunk sample-release
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 리비전의 파일만 가져올 수도 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn &lt;span style=&#34;color:#204a87&#34;&gt;export&lt;/span&gt; -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; svn+ssh://svn.example.com/svn/sample/trunk sample-r120
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;export&lt;/code&gt;로 받은 디렉토리는 작업 사본이 아니므로 &lt;code&gt;svn update&lt;/code&gt;, &lt;code&gt;svn commit&lt;/code&gt;, &lt;code&gt;svn status&lt;/code&gt; 같은 작업을 할 수 없다.
+개발을 계속할 디렉토리가 필요하면 &lt;code&gt;export&lt;/code&gt;가 아니라 &lt;code&gt;checkout&lt;/code&gt;을 사용한다.&lt;/p&gt;
+&lt;h3 id=&#34;update&#34;&gt;update&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn update&lt;/code&gt;는 저장소의 최신 변경 사항을 현재 작업 사본에 반영한다.
+여러 사람이 같은 저장소를 사용하는 환경에서는 수정 전과 커밋 전에 실행하는 것이 좋다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;짧게 &lt;code&gt;up&lt;/code&gt; 별칭을 사용할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn up
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 리비전으로 작업 사본을 맞출 때는 &lt;code&gt;-r&lt;/code&gt; 옵션을 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;업데이트 중 같은 파일의 같은 부분을 여러 사람이 수정했다면 충돌이 발생할 수 있다.
+충돌이 발생하면 파일 내용을 확인해 직접 정리하고, 해결 상태를 SVN에 알려준 뒤 커밋한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn resolve --accept&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;working sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Resolve conflict in sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;status&#34;&gt;status&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn status&lt;/code&gt;는 작업 사본에서 변경된 파일 상태를 확인한다.
+커밋하기 전에 반드시 확인해야 하는 명령어이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;자주 보는 상태 문자는 다음과 같다.&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;상태&lt;/th&gt;
+					&lt;th&gt;의미&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;M&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;수정됨&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;A&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;추가 예약됨&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;D&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;삭제 예약됨&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;?&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;SVN이 추적하지 않는 파일&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;!&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;SVN이 추적하지만 로컬에서 사라진 파일&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;C&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;충돌 발생&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;예시는 다음과 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;M       src/main.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;A       src/new-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;?       build.log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;?&lt;/code&gt;로 표시되는 파일은 커밋되지 않는다.
+새 파일을 저장소에 올리려면 &lt;code&gt;svn add&lt;/code&gt;를 먼저 실행해야 한다.&lt;/p&gt;
+&lt;h3 id=&#34;add&#34;&gt;add&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn add&lt;/code&gt;는 새 파일이나 디렉토리를 버전 관리 대상으로 등록한다.
+등록만 한다고 저장소에 바로 올라가는 것은 아니며, 이후 &lt;code&gt;commit&lt;/code&gt;을 해야 저장소에 반영된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;디렉토리를 추가하면 내부 파일도 함께 추가 대상으로 잡힐 수 있으므로, 커밋 전 &lt;code&gt;svn status&lt;/code&gt;로 불필요한 파일이 포함되지 않았는지 확인한다.
+빌드 산출물, 로그, IDE 설정 파일처럼 저장소에 올리지 않을 파일은 &lt;code&gt;svn:ignore&lt;/code&gt; 속성이나 클라이언트 ignore 설정으로 제외한다.&lt;/p&gt;
+&lt;h3 id=&#34;commit&#34;&gt;commit&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn commit&lt;/code&gt;은 작업 사본의 변경 사항을 저장소에 반영한다.
+커밋이 성공하면 저장소 리비전이 증가한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;짧게 &lt;code&gt;ci&lt;/code&gt; 별칭을 사용할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn ci -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 파일만 커밋할 수도 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit src/login.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;커밋 메시지는 변경 이유를 알 수 있게 작성한다.
+&lt;code&gt;fix&lt;/code&gt;, &lt;code&gt;update&lt;/code&gt;, &lt;code&gt;test&lt;/code&gt;처럼 의미가 부족한 메시지만 남기면 나중에 &lt;code&gt;svn log&lt;/code&gt;로 이력을 추적하기 어렵다.&lt;/p&gt;
+&lt;p&gt;커밋 전 점검 흐름은 다음과 같다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix login validation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;log&#34;&gt;log&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn log&lt;/code&gt;는 저장소의 변경 이력을 확인한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;변경 파일 목록까지 보고 싶으면 &lt;code&gt;-v&lt;/code&gt; 옵션을 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -v
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 리비전 범위나 파일에 대한 로그만 볼 수도 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r 30:100 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;원격 저장소 URL을 직접 지정하면 작업 사본이 없는 환경에서도 이력을 확인할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log https://svn.example.com/repos/sample/trunk
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;diff&#34;&gt;diff&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn diff&lt;/code&gt;는 작업 사본의 변경 내용을 비교한다.
+기본 실행 시 로컬 변경과 기준 리비전의 차이를 보여준다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 파일만 비교할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;특정 리비전과 비교할 때는 &lt;code&gt;-r&lt;/code&gt; 또는 &lt;code&gt;--revision&lt;/code&gt; 옵션을 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt; sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -r 10:20 sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;커밋 전에는 &lt;code&gt;svn status&lt;/code&gt;로 변경 파일 목록을 확인하고, &lt;code&gt;svn diff&lt;/code&gt;로 실제 코드 변경을 검토한다.
+이 과정에서 디버그 코드, 임시 로그, 불필요한 포맷 변경이 섞여 있는지 확인할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;blame&#34;&gt;blame&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn blame&lt;/code&gt;은 파일의 각 라인이 어떤 리비전에서 누구에 의해 변경되었는지 보여준다.
+문제가 생긴 코드의 변경 배경을 찾을 때 유용하다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn blame sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;일부 SVN 클라이언트에서는 &lt;code&gt;praise&lt;/code&gt;, &lt;code&gt;annotate&lt;/code&gt;, &lt;code&gt;ann&lt;/code&gt; 별칭도 사용할 수 있다.
+단, &lt;code&gt;blame&lt;/code&gt; 결과만 보고 작성자를 비난하기보다는 당시 로그와 관련 변경 파일을 함께 확인해야 한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn log -r &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; -v
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff -c &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;120&lt;/span&gt; sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;lock과-unlock&#34;&gt;lock과 unlock&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;svn lock&lt;/code&gt;은 특정 파일을 잠가 다른 사용자가 수정하지 못하게 할 때 사용한다.
+주로 병합이 어려운 바이너리 파일, 디자인 파일, 문서 파일에 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn lock sample.docx -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Edit release note&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;잠금을 해제할 때는 &lt;code&gt;svn unlock&lt;/code&gt;을 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn unlock sample.docx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;텍스트 소스 코드는 일반적으로 잠금보다 병합을 전제로 작업하는 편이 효율적이다.
+모든 파일을 습관적으로 잠그면 협업 속도가 떨어질 수 있으므로, 잠금이 필요한 파일 유형을 팀 규칙으로 정해두는 것이 좋다.&lt;/p&gt;
+&lt;h3 id=&#34;delete-move-copy&#34;&gt;delete, move, copy&lt;/h3&gt;
+&lt;p&gt;SVN에서 파일 삭제, 이동, 복사는 일반 파일 시스템 명령어보다 SVN 명령어를 사용하는 편이 안전하다.
+그래야 저장소 이력이 올바르게 남는다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn delete old-file.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn move old-name.c new-name.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn copy trunk branches/feature-a
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;삭제나 이동도 즉시 저장소에 반영되는 것은 아니다.
+작업 사본에 변경 예약 상태로 남고, &lt;code&gt;commit&lt;/code&gt;을 해야 최종 반영된다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Rename old-name.c to new-name.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;파일-백업과-복구&#34;&gt;파일 백업과 복구&lt;/h2&gt;
+&lt;p&gt;저장소 전체를 백업하거나 다른 서버로 이전할 때는 &lt;code&gt;svnadmin dump&lt;/code&gt;와 &lt;code&gt;svnadmin load&lt;/code&gt;를 사용한다.
+이 명령은 일반 작업 사본에서 실행하는 &lt;code&gt;svn&lt;/code&gt; 명령이 아니라, 서버의 저장소 디렉토리를 직접 다루는 관리자 명령이다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin dump /var/svn/sample &amp;gt; sample.dump
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;덤프 파일을 새 저장소로 복원할 때는 먼저 저장소를 만들고 &lt;code&gt;load&lt;/code&gt;를 실행한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin create /var/svn/sample-new
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svnadmin load /var/svn/sample-new &amp;lt; sample.dump
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;운영 저장소를 백업할 때는 다음 사항을 함께 확인한다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;저장소 경로와 프로젝트 URL을 혼동하지 않는다.&lt;/li&gt;
+&lt;li&gt;백업 파일을 다른 서버나 스토리지에 보관한다.&lt;/li&gt;
+&lt;li&gt;복구 테스트를 정기적으로 수행한다.&lt;/li&gt;
+&lt;li&gt;저장소 hook, 접근 권한 설정, Apache 또는 svnserve 설정도 함께 백업한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;자주-쓰는-작업-예시&#34;&gt;자주 쓰는 작업 예시&lt;/h2&gt;
+&lt;h3 id=&#34;새-파일을-만든-경우&#34;&gt;새 파일을 만든 경우&lt;/h3&gt;
+&lt;p&gt;새 파일은 SVN이 자동으로 추적하지 않는다.
+파일을 추가한 뒤 커밋해야 저장소에 올라간다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;touch sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn add sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Add sample.c&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;기존-파일을-수정한-경우&#34;&gt;기존 파일을 수정한 경우&lt;/h3&gt;
+&lt;p&gt;이미 SVN이 추적 중인 파일은 수정 후 바로 상태와 차이를 확인하고 커밋할 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;vi sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Fix sample calculation&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;저장소의-최신-내용을-반영하는-경우&#34;&gt;저장소의 최신 내용을 반영하는 경우&lt;/h3&gt;
+&lt;p&gt;다른 개발자의 변경을 가져올 때는 &lt;code&gt;svn update&lt;/code&gt;를 사용한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;충돌이 발생하면 충돌 파일을 정리한 뒤 해결 상태로 표시하고 커밋한다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;vi sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn resolve --accept&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;working sample.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn commit sample.c -m &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;Resolve merge conflict&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;실무-주의사항&#34;&gt;실무 주의사항&lt;/h2&gt;
+&lt;h3 id=&#34;커밋-전에는-update-status-diff를-확인한다&#34;&gt;커밋 전에는 update, status, diff를 확인한다&lt;/h3&gt;
+&lt;p&gt;SVN은 중앙 저장소를 기준으로 협업하므로 커밋 전 최신 변경을 반영하는 습관이 중요하다.
+&lt;code&gt;svn update&lt;/code&gt; 없이 오래된 작업 사본에서 커밋하면 충돌을 늦게 발견하거나, 다른 변경의 맥락을 놓칠 수 있다.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn update
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;svn diff
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;파일-작업은-svn-명령어로-처리한다&#34;&gt;파일 작업은 SVN 명령어로 처리한다&lt;/h3&gt;
+&lt;p&gt;파일 추가는 &lt;code&gt;svn add&lt;/code&gt;, 삭제는 &lt;code&gt;svn delete&lt;/code&gt;, 이동과 이름 변경은 &lt;code&gt;svn move&lt;/code&gt;를 사용한다.
+운영체제의 &lt;code&gt;rm&lt;/code&gt;, &lt;code&gt;mv&lt;/code&gt;, 파일 탐색기만 사용하면 SVN이 의도한 변경을 정확히 추적하지 못할 수 있다.&lt;/p&gt;
+&lt;h3 id=&#34;trunk-branches-tags-규칙을-팀에서-정한다&#34;&gt;trunk, branches, tags 규칙을 팀에서 정한다&lt;/h3&gt;
+&lt;p&gt;SVN은 디렉토리 구조를 강제하지 않는다.
+&lt;code&gt;trunk&lt;/code&gt;, &lt;code&gt;branches&lt;/code&gt;, &lt;code&gt;tags&lt;/code&gt;는 널리 쓰이는 관례이지만, 실제 운영 방식은 팀 규칙으로 정해야 한다.&lt;/p&gt;
+&lt;p&gt;일반적인 규칙은 다음과 같다.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;trunk&lt;/code&gt;는 항상 빌드 가능한 상태로 유지한다.&lt;/li&gt;
+&lt;li&gt;장기 기능 개발은 &lt;code&gt;branches&lt;/code&gt;에서 진행한다.&lt;/li&gt;
+&lt;li&gt;배포된 소스는 &lt;code&gt;tags&lt;/code&gt;에 남기고 수정하지 않는다.&lt;/li&gt;
+&lt;li&gt;태그 생성과 릴리스 브랜치 생성 권한을 제한한다.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;바이너리-파일은-잠금-정책을-정한다&#34;&gt;바이너리 파일은 잠금 정책을 정한다&lt;/h3&gt;
+&lt;p&gt;이미지, 문서, 디자인 파일처럼 자동 병합이 어려운 파일은 &lt;code&gt;svn lock&lt;/code&gt;을 사용하는 편이 안전할 수 있다.
+반대로 텍스트 소스 코드에 잠금을 남발하면 병렬 개발이 어려워진다.
+파일 유형별로 잠금 사용 여부를 정하고, 잠금 메시지를 남기는 규칙을 둔다.&lt;/p&gt;
+&lt;h2 id=&#34;참고&#34;&gt;참고&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.naver.com/minishai/50014866731&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;minishai 블로그 SVN 정리&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://subversion.apache.org/quick-start&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache Subversion Quick Start&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.visualsvn.com/support/svnbook/index/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SVN Book Index&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>SVN</category>
+      
+      <category>Subversion</category>
+      
+      <category>Version Control</category>
+      
+    </item>
+    
+  </channel>
+</rss>

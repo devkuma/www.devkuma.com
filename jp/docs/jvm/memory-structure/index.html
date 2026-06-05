@@ -1,0 +1,1816 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="jp" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>JVM メモリ構造 | devkuma</title>
+<meta name="description" content="Java のメモリ構造">
+<meta property="og:url" content="https://www.devkuma.com/jp/docs/jvm/memory-structure/">
+	<meta property="og:site_name" content="devkuma">
+	<meta property="og:title" content="JVM メモリ構造">
+	<meta property="og:description" content="Java のメモリ構造">
+	<meta property="og:locale" content="jp">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="330_programming_jvm">
+		<meta property="article:published_time" content="2022-01-20T07:48:00+09:00">
+		<meta property="article:modified_time" content="2026-05-20T16:21:38+09:00">
+		<meta property="article:tag" content="Java">
+		<meta property="article:tag" content="JVM">
+
+	<meta itemprop="name" content="JVM メモリ構造">
+	<meta itemprop="description" content="Java のメモリ構造">
+	<meta itemprop="datePublished" content="2022-01-20T07:48:00+09:00">
+	<meta itemprop="dateModified" content="2026-05-20T16:21:38+09:00">
+	<meta itemprop="wordCount" content="190">
+	<meta itemprop="keywords" content="Java,JVM">
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="JVM メモリ構造">
+	<meta name="twitter:description" content="Java のメモリ構造">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/jp/docs/jvm/memory-structure/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/jp/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/jp/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/computer/basic/">コンピューターの基礎知識</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/spring/">Spring framework</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/programming/tools/">Programming Tools</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-database'></i>
+          <span>Data Science</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/big-data/">Big Data</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/rdb/">Relational Database</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/nosql/">NoSQL Database</a>
+					
+					<a class="dropdown-item" href="/jp/docs/category/data-science/graph-db/">Graph Databse</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/jp/docs/category/data-science/" role="button">
+          <span>Data Science</span>
+				</a>
+      </li>
+      
+			
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/jp/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+      </li>
+      
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+      </li>
+      
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">日本語</span>
+    <span class="td-lang-menu__title-code">JP</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/jvm/memory-structure/">한국어</a></li>
+      <li><a class="dropdown-item" href="/en/docs/jvm/memory-structure/">English</a></li>
+      <li><span class="dropdown-item active">日本語</span></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-jpdocsjvmmemory-structure").addClass("active");
+    $("#td-section-nav #m-jpdocsjvmmemory-structure-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-jpdocsjvmmemory-structure").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-jpdocsjvmmemory-structure-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-jpdocsjvmmemory-structure-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocscategoryprogrammingjvm-li">
+    <a href="/jp/docs/category/programming/jvm/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-jpdocscategoryprogrammingjvm"><span class="">JVM ベースのプログラミング言語</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjava-li">
+    <input type="checkbox" id="m-jpdocsjava-check"/>
+    <label for="m-jpdocsjava-check"><a href="/jp/docs/java/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjava"><span class="">Java</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavaintro-li">
+    <input type="checkbox" id="m-jpdocsjavaintro-check"/>
+    <label for="m-jpdocsjavaintro-check"><a href="/jp/docs/java/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaintro"><span class="">Java の概要</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaintro-basic-li">
+    <input type="checkbox" id="m-jpdocsjavaintro-basic-check"/>
+    <label for="m-jpdocsjavaintro-basic-check"><a href="/jp/docs/java/intro-basic/" title="Java の主な特徴、エディション、変遷" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaintro-basic"><span class="">Java 紹介</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavainstall-li">
+    <input type="checkbox" id="m-jpdocsjavainstall-check"/>
+    <label for="m-jpdocsjavainstall-check"><a href="/jp/docs/java/install/" title="Java のインストールと開発環境の作成" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavainstall"><span class="">Java インストールと開発環境</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamultiple-versions-li">
+    <input type="checkbox" id="m-jpdocsjavamultiple-versions-check"/>
+    <label for="m-jpdocsjavamultiple-versions-check"><a href="/jp/docs/java/multiple-versions/" title="Mac OS で複数バージョンの Java(JDK) をインストールして使用する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamultiple-versions"><span class="">Java Version 変更方法</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacommand-li">
+    <input type="checkbox" id="m-jpdocsjavacommand-check"/>
+    <label for="m-jpdocsjavacommand-check"><a href="/jp/docs/java/command/" title="Java コマンド - Java SE Development Kit の各種開発ツール" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacommand"><span class="">Java コマンド</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavahello-world-li">
+    <input type="checkbox" id="m-jpdocsjavahello-world-check"/>
+    <label for="m-jpdocsjavahello-world-check"><a href="/jp/docs/java/hello-world/" title="初めて作る Java アプリケーション Hello World! Java" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavahello-world"><span class="">Hello World</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavabasic-li">
+    <input type="checkbox" id="m-jpdocsjavabasic-check"/>
+    <label for="m-jpdocsjavabasic-check"><a href="/jp/docs/java/basic/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavabasic"><span class="">Javaの基本文法</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaidentifier-li">
+    <input type="checkbox" id="m-jpdocsjavaidentifier-check"/>
+    <label for="m-jpdocsjavaidentifier-check"><a href="/jp/docs/java/identifier/" title="Java 識別子 (Identifier)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaidentifier"><span class="">識別子 (Identifier)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacomment-li">
+    <input type="checkbox" id="m-jpdocsjavacomment-check"/>
+    <label for="m-jpdocsjavacomment-check"><a href="/jp/docs/java/comment/" title="Java コメント文(Comment)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacomment"><span class="">コメント文(Comment)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavakeyword-li">
+    <input type="checkbox" id="m-jpdocsjavakeyword-check"/>
+    <label for="m-jpdocsjavakeyword-check"><a href="/jp/docs/java/keyword/" title="Java 予約語(Keyword)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavakeyword"><span class="">予約語(Keyword)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavavariable-li">
+    <input type="checkbox" id="m-jpdocsjavavariable-check"/>
+    <label for="m-jpdocsjavavariable-check"><a href="/jp/docs/java/variable/" title="Java 変数(Variable)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavavariable"><span class="">変数(Variable)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacasting-li">
+    <input type="checkbox" id="m-jpdocsjavacasting-check"/>
+    <label for="m-jpdocsjavacasting-check"><a href="/jp/docs/java/casting/" title="Java 型変換(Casting) - 変数のデータ形式変換" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacasting"><span class="">型変換(Casting)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavadata-type-li">
+    <input type="checkbox" id="m-jpdocsjavadata-type-check"/>
+    <label for="m-jpdocsjavadata-type-check"><a href="/jp/docs/java/data-type/" title="Java データ型(Data type)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavadata-type"><span class="">データ型(Data type)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaliteral-li">
+    <input type="checkbox" id="m-jpdocsjavaliteral-check"/>
+    <label for="m-jpdocsjavaliteral-check"><a href="/jp/docs/java/literal/" title="Java リテラル(Literal)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaliteral"><span class="">リテラル(Literal)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaoperator-li">
+    <input type="checkbox" id="m-jpdocsjavaoperator-check"/>
+    <label for="m-jpdocsjavaoperator-check"><a href="/jp/docs/java/operator/" title="Java 演算子(Operator)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaoperator"><span class="">演算子(Operator)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaarray-li">
+    <input type="checkbox" id="m-jpdocsjavaarray-check"/>
+    <label for="m-jpdocsjavaarray-check"><a href="/jp/docs/java/array/" title="Java 配列(Array)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaarray"><span class="">配列(Array)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavacontrol-statement-li">
+    <input type="checkbox" id="m-jpdocsjavacontrol-statement-check"/>
+    <label for="m-jpdocsjavacontrol-statement-check"><a href="/jp/docs/java/control-statement/" title="Java制御文（Control statement）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavacontrol-statement"><span class="">制御文（Control statement）</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaconditional-statement-li">
+    <input type="checkbox" id="m-jpdocsjavaconditional-statement-check"/>
+    <label for="m-jpdocsjavaconditional-statement-check"><a href="/jp/docs/java/conditional-statement/" title="Java制御文（Control statement）の条件文（Conditional statement）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaconditional-statement"><span class="">条件文（Conditional statement）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaloop-control-li">
+    <input type="checkbox" id="m-jpdocsjavaloop-control-check"/>
+    <label for="m-jpdocsjavaloop-control-check"><a href="/jp/docs/java/loop-control/" title="Java制御文（Control statement）の繰り返し文（Loop Control）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaloop-control"><span class="">繰り返し文（Loop Control）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavabranching-statement-li">
+    <input type="checkbox" id="m-jpdocsjavabranching-statement-check"/>
+    <label for="m-jpdocsjavabranching-statement-check"><a href="/jp/docs/java/branching-statement/" title="Java制御文（Control statement）の分岐文（Branching statement）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavabranching-statement"><span class="">分岐文（Branching statement）</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaoop-li">
+    <input type="checkbox" id="m-jpdocsjavaoop-check"/>
+    <label for="m-jpdocsjavaoop-check"><a href="/jp/docs/java/oop/" title="Javaオブジェクト指向プログラミング（OOP）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaoop"><span class="">オブジェクト指向プログラミング（OOP）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsmodifier-li">
+    <input type="checkbox" id="m-jpdocsmodifier-check"/>
+    <label for="m-jpdocsmodifier-check"><a href="/jp/docs/modifier/" title="Java修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmodifier"><span class="">修飾子</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaaccess-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavaaccess-modifier-check"/>
+    <label for="m-jpdocsjavaaccess-modifier-check"><a href="/jp/docs/java/access-modifier/" title="Javaアクセス修飾子（Access modifiers）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaaccess-modifier"><span class="">アクセス修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaabstract-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavaabstract-modifier-check"/>
+    <label for="m-jpdocsjavaabstract-modifier-check"><a href="/jp/docs/java/abstract-modifier/" title="Java abstract修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaabstract-modifier"><span class="">abstract修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastatic-li">
+    <input type="checkbox" id="m-jpdocsjavastatic-check"/>
+    <label for="m-jpdocsjavastatic-check"><a href="/jp/docs/java/static/" title="Java static修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastatic"><span class="">static修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavafinal-li">
+    <input type="checkbox" id="m-jpdocsjavafinal-check"/>
+    <label for="m-jpdocsjavafinal-check"><a href="/jp/docs/java/final/" title="Java finalキーワード - 定数宣言" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavafinal"><span class="">finalキーワード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavatransient-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavatransient-modifier-check"/>
+    <label for="m-jpdocsjavatransient-modifier-check"><a href="/jp/docs/java/transient-modifier/" title="Java transient修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavatransient-modifier"><span class="">transient修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavavolatile-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavavolatile-modifier-check"/>
+    <label for="m-jpdocsjavavolatile-modifier-check"><a href="/jp/docs/java/volatile-modifier/" title="Java volatile修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavavolatile-modifier"><span class="">volatile修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavasynchronized-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavasynchronized-modifier-check"/>
+    <label for="m-jpdocsjavasynchronized-modifier-check"><a href="/jp/docs/java/synchronized-modifier/" title="Java synchronized修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavasynchronized-modifier"><span class="">synchronized修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavanative-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavanative-modifier-check"/>
+    <label for="m-jpdocsjavanative-modifier-check"><a href="/jp/docs/java/native-modifier/" title="Java native修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavanative-modifier"><span class="">native修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastrictfp-modifier-li">
+    <input type="checkbox" id="m-jpdocsjavastrictfp-modifier-check"/>
+    <label for="m-jpdocsjavastrictfp-modifier-check"><a href="/jp/docs/java/strictfp-modifier/" title="Java strictfp修飾子" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastrictfp-modifier"><span class="">strictfp修飾子</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavastring-li">
+    <input type="checkbox" id="m-jpdocsjavastring-check"/>
+    <label for="m-jpdocsjavastring-check"><a href="/jp/docs/java/string/" title="Java文字列" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavastring"><span class="">文字列</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastringbasic-li">
+    <input type="checkbox" id="m-jpdocsjavastringbasic-check"/>
+    <label for="m-jpdocsjavastringbasic-check"><a href="/jp/docs/java/string/basic/" title="Java文字列(String)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastringbasic"><span class="">文字列(String)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastring-class-li">
+    <input type="checkbox" id="m-jpdocsjavastring-class-check"/>
+    <label for="m-jpdocsjavastring-class-check"><a href="/jp/docs/java/string-class/" title="Java Stringクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastring-class"><span class="">Stringクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastring-buffer-class-li">
+    <input type="checkbox" id="m-jpdocsjavastring-buffer-class-check"/>
+    <label for="m-jpdocsjavastring-buffer-class-check"><a href="/jp/docs/java/string-buffer-class/" title="java.langパッケージのStringBufferクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastring-buffer-class"><span class="">StringBufferクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastring-tokenizer-class-li">
+    <input type="checkbox" id="m-jpdocsjavastring-tokenizer-class-check"/>
+    <label for="m-jpdocsjavastring-tokenizer-class-check"><a href="/jp/docs/java/string-tokenizer-class/" title="java.utilパッケージのStringTokenizerクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastring-tokenizer-class"><span class="">StringTokenizerクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastring-format-li">
+    <input type="checkbox" id="m-jpdocsjavastring-format-check"/>
+    <label for="m-jpdocsjavastring-format-check"><a href="/jp/docs/java/string-format/" title="Java String.format()メソッド" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastring-format"><span class="">String.format()メソッド</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastringequals-li">
+    <input type="checkbox" id="m-jpdocsjavastringequals-check"/>
+    <label for="m-jpdocsjavastringequals-check"><a href="/jp/docs/java/string/equals/" title="Javaの演算子==とequals()メソッドの違い" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastringequals"><span class="">==とequals()の違い</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavaclass-li">
+    <input type="checkbox" id="m-jpdocsjavaclass-check"/>
+    <label for="m-jpdocsjavaclass-check"><a href="/jp/docs/java/class/" title="Javaクラス（Class）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaclass"><span class="">クラス（Class）</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaclassbasic-li">
+    <input type="checkbox" id="m-jpdocsjavaclassbasic-check"/>
+    <label for="m-jpdocsjavaclassbasic-check"><a href="/jp/docs/java/class/basic/" title="Javaクラス（Class）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaclassbasic"><span class="">クラス（Class）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamember-variable-li">
+    <input type="checkbox" id="m-jpdocsjavamember-variable-check"/>
+    <label for="m-jpdocsjavamember-variable-check"><a href="/jp/docs/java/member-variable/" title="Javaクラスのメンバー変数（Member Variable）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamember-variable"><span class="">メンバー変数（Member Variable）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaconstructor-li">
+    <input type="checkbox" id="m-jpdocsjavaconstructor-check"/>
+    <label for="m-jpdocsjavaconstructor-check"><a href="/jp/docs/java/constructor/" title="Javaクラスのコンストラクタ（Constructor）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaconstructor"><span class="">コンストラクタ（Constructor）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamethod-li">
+    <input type="checkbox" id="m-jpdocsjavamethod-check"/>
+    <label for="m-jpdocsjavamethod-check"><a href="/jp/docs/java/method/" title="Javaクラスのメソッド（Method）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamethod"><span class="">メソッド（Method）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavainheritance-li">
+    <input type="checkbox" id="m-jpdocsjavainheritance-check"/>
+    <label for="m-jpdocsjavainheritance-check"><a href="/jp/docs/java/inheritance/" title="Javaクラスの継承（Inheritance）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavainheritance"><span class="">継承（Inheritance）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaabstract-class-li">
+    <input type="checkbox" id="m-jpdocsjavaabstract-class-check"/>
+    <label for="m-jpdocsjavaabstract-class-check"><a href="/jp/docs/java/abstract-class/" title="Javaクラスの抽象クラス（Abstract class）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaabstract-class"><span class="">抽象クラス（Abstract class）</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavainterface-li">
+    <input type="checkbox" id="m-jpdocsjavainterface-check"/>
+    <label for="m-jpdocsjavainterface-check"><a href="/jp/docs/java/interface/" title="Javaインターフェース（Interface）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavainterface"><span class="">インターフェース（Interface）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavapackage-li">
+    <input type="checkbox" id="m-jpdocsjavapackage-check"/>
+    <label for="m-jpdocsjavapackage-check"><a href="/jp/docs/java/package/" title="Javaパッケージ（Package）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavapackage"><span class="">パッケージ（Package）</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavapackageoverview-li">
+    <input type="checkbox" id="m-jpdocsjavapackageoverview-check"/>
+    <label for="m-jpdocsjavapackageoverview-check"><a href="/jp/docs/java/package/overview/" title="Javaパッケージ（Package）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavapackageoverview"><span class="">パッケージ（Package）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaimport-li">
+    <input type="checkbox" id="m-jpdocsjavaimport-check"/>
+    <label for="m-jpdocsjavaimport-check"><a href="/jp/docs/java/import/" title="Javaパッケージのインポート（import）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaimport"><span class="">パッケージのインポート（import）</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaexception-li">
+    <input type="checkbox" id="m-jpdocsjavaexception-check"/>
+    <label for="m-jpdocsjavaexception-check"><a href="/jp/docs/java/exception/" title="Java例外処理(Exception)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaexception"><span class="">例外処理(Exception)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavagenerics-li">
+    <input type="checkbox" id="m-jpdocsjavagenerics-check"/>
+    <label for="m-jpdocsjavagenerics-check"><a href="/jp/docs/java/generics/" title="Javaジェネリクス(Generics)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavagenerics"><span class="">ジェネリクス(Generics)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavaannotation-li">
+    <input type="checkbox" id="m-jpdocsjavaannotation-check"/>
+    <label for="m-jpdocsjavaannotation-check"><a href="/jp/docs/java/annotation/" title="Javaアノテーション(Annotation)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaannotation"><span class="">アノテーション(Annotation)</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaannotationstandard-li">
+    <input type="checkbox" id="m-jpdocsjavaannotationstandard-check"/>
+    <label for="m-jpdocsjavaannotationstandard-check"><a href="/jp/docs/java/annotation/standard/" title="Java標準アノテーション(Annotation)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaannotationstandard"><span class="">標準アノテーション</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaannotationinterface-li">
+    <input type="checkbox" id="m-jpdocsjavaannotationinterface-check"/>
+    <label for="m-jpdocsjavaannotationinterface-check"><a href="/jp/docs/java/annotation/interface/" title="Java @interfaceで独自アノテーションを定義" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaannotationinterface"><span class="">@interface</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaannotationuse-li">
+    <input type="checkbox" id="m-jpdocsjavaannotationuse-check"/>
+    <label for="m-jpdocsjavaannotationuse-check"><a href="/jp/docs/java/annotation/use/" title="Javaアノテーションの使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaannotationuse"><span class="">アノテーションの使い方</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavalang-package-li">
+    <input type="checkbox" id="m-jpdocsjavalang-package-check"/>
+    <label for="m-jpdocsjavalang-package-check"><a href="/jp/docs/java/lang-package/" title="Java主要クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavalang-package"><span class="">主要クラス</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaclass-class-li">
+    <input type="checkbox" id="m-jpdocsjavaclass-class-check"/>
+    <label for="m-jpdocsjavaclass-class-check"><a href="/jp/docs/java/class-class/" title="Java Classクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaclass-class"><span class="">Classクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavawrapper-class-li">
+    <input type="checkbox" id="m-jpdocsjavawrapper-class-check"/>
+    <label for="m-jpdocsjavawrapper-class-check"><a href="/jp/docs/java/wrapper-class/" title="Java Wrapperクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavawrapper-class"><span class="">Wrapperクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavabigdecimal-class-li">
+    <input type="checkbox" id="m-jpdocsjavabigdecimal-class-check"/>
+    <label for="m-jpdocsjavabigdecimal-class-check"><a href="/jp/docs/java/bigdecimal-class/" title="Java java.mathパッケージのBigDecimalクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavabigdecimal-class"><span class="">BigDecimalクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaobject-class-li">
+    <input type="checkbox" id="m-jpdocsjavaobject-class-check"/>
+    <label for="m-jpdocsjavaobject-class-check"><a href="/jp/docs/java/object-class/" title="Java java.langパッケージのObjectクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaobject-class"><span class="">Objectクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavasystem-class-li">
+    <input type="checkbox" id="m-jpdocsjavasystem-class-check"/>
+    <label for="m-jpdocsjavasystem-class-check"><a href="/jp/docs/java/system-class/" title="Java java.langパッケージのSystemクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavasystem-class"><span class="">Systemクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaruntime-class-li">
+    <input type="checkbox" id="m-jpdocsjavaruntime-class-check"/>
+    <label for="m-jpdocsjavaruntime-class-check"><a href="/jp/docs/java/runtime-class/" title="Java java.langパッケージのRuntimeクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaruntime-class"><span class="">Runtimeクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamath-class-li">
+    <input type="checkbox" id="m-jpdocsjavamath-class-check"/>
+    <label for="m-jpdocsjavamath-class-check"><a href="/jp/docs/java/math-class/" title="Java java.langパッケージのMathクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamath-class"><span class="">Mathクラス</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavacollection-framework-li">
+    <input type="checkbox" id="m-jpdocsjavacollection-framework-check"/>
+    <label for="m-jpdocsjavacollection-framework-check"><a href="/jp/docs/java/collection-framework/" title="Java コレクションフレームワーク" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavacollection-framework"><span class="">コレクションフレームワーク</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacollection-li">
+    <input type="checkbox" id="m-jpdocsjavacollection-check"/>
+    <label for="m-jpdocsjavacollection-check"><a href="/jp/docs/java/collection/" title="Java Collection" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacollection"><span class="">Collection</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacollection-frameworklist-li">
+    <input type="checkbox" id="m-jpdocsjavacollection-frameworklist-check"/>
+    <label for="m-jpdocsjavacollection-frameworklist-check"><a href="/jp/docs/java/collection-framework/list/" title="Java - List インターフェースと関連クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacollection-frameworklist"><span class="">List インターフェースと関連クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacollection-frameworkconvert-list-to-array-li">
+    <input type="checkbox" id="m-jpdocsjavacollection-frameworkconvert-list-to-array-check"/>
+    <label for="m-jpdocsjavacollection-frameworkconvert-list-to-array-check"><a href="/jp/docs/java/collection-framework/convert-list-to-array/" title="Java - List を Array に変換" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacollection-frameworkconvert-list-to-array"><span class="">List を Array に変換</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavalist-concat-li">
+    <input type="checkbox" id="m-jpdocsjavalist-concat-check"/>
+    <label for="m-jpdocsjavalist-concat-check"><a href="/jp/docs/java/list-concat/" title="Java - List の一覧を結合する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavalist-concat"><span class="">List の一覧を結合する</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaset-li">
+    <input type="checkbox" id="m-jpdocsjavaset-check"/>
+    <label for="m-jpdocsjavaset-check"><a href="/jp/docs/java/set/" title="Java - Set インターフェースと関連クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaset"><span class="">Set インターフェースと関連クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamap-li">
+    <input type="checkbox" id="m-jpdocsjavamap-check"/>
+    <label for="m-jpdocsjavamap-check"><a href="/jp/docs/java/map/" title="Java - Map インターフェースと関連クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamap"><span class="">Map インターフェースと関連クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaqueue-li">
+    <input type="checkbox" id="m-jpdocsjavaqueue-check"/>
+    <label for="m-jpdocsjavaqueue-check"><a href="/jp/docs/java/queue/" title="Java - Queue インターフェースと関連クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaqueue"><span class="">Queue インターフェースと関連クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaconvert-array-to-list-li">
+    <input type="checkbox" id="m-jpdocsjavaconvert-array-to-list-check"/>
+    <label for="m-jpdocsjavaconvert-array-to-list-check"><a href="/jp/docs/java/convert-array-to-list/" title="Java - Array を List に変換" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaconvert-array-to-list"><span class="">Array を List に変換</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaconvert-array-to-set-li">
+    <input type="checkbox" id="m-jpdocsjavaconvert-array-to-set-check"/>
+    <label for="m-jpdocsjavaconvert-array-to-set-check"><a href="/jp/docs/java/convert-array-to-set/" title="Java - Array を Set(HashSet) に変換" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaconvert-array-to-set"><span class="">Array を Set(HashSet) に変換</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacollection-frameworkarray-fill-li">
+    <input type="checkbox" id="m-jpdocsjavacollection-frameworkarray-fill-check"/>
+    <label for="m-jpdocsjavacollection-frameworkarray-fill-check"><a href="/jp/docs/java/collection-framework/array-fill/" title="Java - Arrays.fill() による Array の一括初期化" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacollection-frameworkarray-fill"><span class="">Arrays.fill() による配列の一括初期化</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavautility-li">
+    <input type="checkbox" id="m-jpdocsjavautility-check"/>
+    <label for="m-jpdocsjavautility-check"><a href="/jp/docs/java/utility/" title="Java ユーティリティ" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavautility"><span class="">ユーティリティ</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavarandom-class-li">
+    <input type="checkbox" id="m-jpdocsjavarandom-class-check"/>
+    <label for="m-jpdocsjavarandom-class-check"><a href="/jp/docs/java/random-class/" title="Java java.util パッケージの Random クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavarandom-class"><span class="">Random クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavapattern-class-li">
+    <input type="checkbox" id="m-jpdocsjavapattern-class-check"/>
+    <label for="m-jpdocsjavapattern-class-check"><a href="/jp/docs/java/pattern-class/" title="Java java.util.regex パッケージの Pattern クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavapattern-class"><span class="">Pattern クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavamatcher-class-li">
+    <input type="checkbox" id="m-jpdocsjavamatcher-class-check"/>
+    <label for="m-jpdocsjavamatcher-class-check"><a href="/jp/docs/java/matcher-class/" title="Java java.util.regex パッケージの Matcher クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavamatcher-class"><span class="">Matcher クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaoptional-li">
+    <input type="checkbox" id="m-jpdocsjavaoptional-check"/>
+    <label for="m-jpdocsjavaoptional-check"><a href="/jp/docs/java/optional/" title="Java java.util パッケージの Optional クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaoptional"><span class="">Optional クラス</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavafile-li">
+    <input type="checkbox" id="m-jpdocsjavafile-check"/>
+    <label for="m-jpdocsjavafile-check"><a href="/jp/docs/java/file/" title="Javaファイル(Java File)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavafile"><span class="">ファイル</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavastream-li">
+    <input type="checkbox" id="m-jpdocsjavastream-check"/>
+    <label for="m-jpdocsjavastream-check"><a href="/jp/docs/java/stream/" title="Java ストリーム(Java Stream)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavastream"><span class="">ストリーム</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavabyte-stream-li">
+    <input type="checkbox" id="m-jpdocsjavabyte-stream-check"/>
+    <label for="m-jpdocsjavabyte-stream-check"><a href="/jp/docs/java/byte-stream/" title="Java バイトストリーム" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavabyte-stream"><span class="">バイトストリーム</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavafile-input-output-stream-li">
+    <input type="checkbox" id="m-jpdocsjavafile-input-output-stream-check"/>
+    <label for="m-jpdocsjavafile-input-output-stream-check"><a href="/jp/docs/java/file-input-output-stream/" title="Java バイトストリーム FileInputStream/FileOutputStream" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavafile-input-output-stream"><span class="">FileInputStream/FileOutputStream</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavafilter-input-output-stream-li">
+    <input type="checkbox" id="m-jpdocsjavafilter-input-output-stream-check"/>
+    <label for="m-jpdocsjavafilter-input-output-stream-check"><a href="/jp/docs/java/filter-input-output-stream/" title="Java バイトストリーム FilterInputStream/FilterOutputStream" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavafilter-input-output-stream"><span class="">FilterInputStream/FilterOutputStream</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavabuffered-input-output-stream-li">
+    <input type="checkbox" id="m-jpdocsjavabuffered-input-output-stream-check"/>
+    <label for="m-jpdocsjavabuffered-input-output-stream-check"><a href="/jp/docs/java/buffered-input-output-stream/" title="Java バイトストリーム BufferedInputStream/BufferedOutputStream" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavabuffered-input-output-stream"><span class="">BufferedInputStream/BufferedOutputStream</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavadata-input-output-stream-li">
+    <input type="checkbox" id="m-jpdocsjavadata-input-output-stream-check"/>
+    <label for="m-jpdocsjavadata-input-output-stream-check"><a href="/jp/docs/java/data-input-output-stream/" title="Java バイトストリーム DataInputStream/DataOutputStream" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavadata-input-output-stream"><span class="">DataInputStream/DataOutputStream</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaobject-input-output-stream-li">
+    <input type="checkbox" id="m-jpdocsjavaobject-input-output-stream-check"/>
+    <label for="m-jpdocsjavaobject-input-output-stream-check"><a href="/jp/docs/java/object-input-output-stream/" title="Java バイトストリーム ObjectInputStream/ObjectOutputStream" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaobject-input-output-stream"><span class="">ObjectInputStream/ObjectOutputStream</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacharacter-stream-li">
+    <input type="checkbox" id="m-jpdocsjavacharacter-stream-check"/>
+    <label for="m-jpdocsjavacharacter-stream-check"><a href="/jp/docs/java/character-stream/" title="Java 文字ストリーム" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacharacter-stream"><span class="">文字ストリーム</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavabuffered-reader-writer-li">
+    <input type="checkbox" id="m-jpdocsjavabuffered-reader-writer-check"/>
+    <label for="m-jpdocsjavabuffered-reader-writer-check"><a href="/jp/docs/java/buffered-reader-writer/" title="Java 文字ストリーム BufferedReader/BufferedWriter" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavabuffered-reader-writer"><span class="">BufferedReader/BufferedWriter</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavainput-output-stream-reader-writer-li">
+    <input type="checkbox" id="m-jpdocsjavainput-output-stream-reader-writer-check"/>
+    <label for="m-jpdocsjavainput-output-stream-reader-writer-check"><a href="/jp/docs/java/input-output-stream-reader-writer/" title="Java 文字ストリーム InputStreamReader/OutputStreamWriter" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavainput-output-stream-reader-writer"><span class="">InputStreamReader/OutputStreamWriter</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavafile-reader-writer-li">
+    <input type="checkbox" id="m-jpdocsjavafile-reader-writer-check"/>
+    <label for="m-jpdocsjavafile-reader-writer-check"><a href="/jp/docs/java/file-reader-writer/" title="Java 文字ストリーム FileReader/FileWriter" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavafile-reader-writer"><span class="">FileReader/FileWriter</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavalamda-li">
+    <input type="checkbox" id="m-jpdocsjavalamda-check"/>
+    <label for="m-jpdocsjavalamda-check"><a href="/jp/docs/java/lamda/" title="Java Lambda関数 Function、Consumer、Supplier、Predicate" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavalamda"><span class="">Lambda関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavahttp-li">
+    <input type="checkbox" id="m-jpdocsjavahttp-check"/>
+    <label for="m-jpdocsjavahttp-check"><a href="/jp/docs/java/http/" title="Java HTTP通信" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavahttp"><span class="">HTTP通信</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaurl-connection-class-li">
+    <input type="checkbox" id="m-jpdocsjavaurl-connection-class-check"/>
+    <label for="m-jpdocsjavaurl-connection-class-check"><a href="/jp/docs/java/url-connection-class/" title="Java URLConnectionクラス - HTTP通信の実行" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaurl-connection-class"><span class="">URLConnectionクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavahttp-client-class-li">
+    <input type="checkbox" id="m-jpdocsjavahttp-client-class-check"/>
+    <label for="m-jpdocsjavahttp-client-class-check"><a href="/jp/docs/java/http-client-class/" title="Java HttpClientクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavahttp-client-class"><span class="">HttpClientクラス</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavastream-api-li">
+    <input type="checkbox" id="m-jpdocsjavastream-api-check"/>
+    <label for="m-jpdocsjavastream-api-check"><a href="/jp/docs/java/stream-api/" title="Java Stream API" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavastream-api"><span class="">Stream API</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastream-apioveview-li">
+    <input type="checkbox" id="m-jpdocsjavastream-apioveview-check"/>
+    <label for="m-jpdocsjavastream-apioveview-check"><a href="/jp/docs/java/stream-api/oveview/" title="Java Stream APIの使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastream-apioveview"><span class="">Stream API</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastream-apiint-stream-li">
+    <input type="checkbox" id="m-jpdocsjavastream-apiint-stream-check"/>
+    <label for="m-jpdocsjavastream-apiint-stream-check"><a href="/jp/docs/java/stream-api/int-stream/" title="Java IntStreamの使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastream-apiint-stream"><span class="">IntStream</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavadata-time-li">
+    <input type="checkbox" id="m-jpdocsjavadata-time-check"/>
+    <label for="m-jpdocsjavadata-time-check"><a href="/jp/docs/java/data-time/" title="Java 日付/時刻" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavadata-time"><span class="">日付/時刻</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavadate-class-li">
+    <input type="checkbox" id="m-jpdocsjavadate-class-check"/>
+    <label for="m-jpdocsjavadate-class-check"><a href="/jp/docs/java/date-class/" title="Java日付 - java.util.Dateクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavadate-class"><span class="">Dateクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacalendar-class-li">
+    <input type="checkbox" id="m-jpdocsjavacalendar-class-check"/>
+    <label for="m-jpdocsjavacalendar-class-check"><a href="/jp/docs/java/calendar-class/" title="Java日付 - java.util.Calendarクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacalendar-class"><span class="">Calendarクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavatimestamp-li">
+    <input type="checkbox" id="m-jpdocsjavatimestamp-check"/>
+    <label for="m-jpdocsjavatimestamp-check"><a href="/jp/docs/java/timestamp/" title="Java日付 - java.sql.Timestampクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavatimestamp"><span class="">java.sql.Timestampクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavadata-time-api-li">
+    <input type="checkbox" id="m-jpdocsjavadata-time-api-check"/>
+    <label for="m-jpdocsjavadata-time-api-check"><a href="/jp/docs/java/data-time-api/" title="Java日付 - Date-Time API" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavadata-time-api"><span class="">Date-Time API</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaexecute-time-li">
+    <input type="checkbox" id="m-jpdocsjavaexecute-time-check"/>
+    <label for="m-jpdocsjavaexecute-time-check"><a href="/jp/docs/java/execute-time/" title="Javaコードの実行時間を求める（時間測定）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaexecute-time"><span class="">Java実行時間を求める</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaconvert-between-date-to-localdatetime-li">
+    <input type="checkbox" id="m-jpdocsjavaconvert-between-date-to-localdatetime-check"/>
+    <label for="m-jpdocsjavaconvert-between-date-to-localdatetime-check"><a href="/jp/docs/java/convert-between-date-to-localdatetime/" title="Java - DateをLocalDateTimeへ変換、LocalDateTimeをDateへ変換" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaconvert-between-date-to-localdatetime"><span class="">Date, LocalDateTime変換</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavathread-li">
+    <input type="checkbox" id="m-jpdocsjavathread-check"/>
+    <label for="m-jpdocsjavathread-check"><a href="/jp/docs/java/thread/" title="Javaスレッド（Thread）" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavathread"><span class="">スレッド（Thread）</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavathread-class-li">
+    <input type="checkbox" id="m-jpdocsjavathread-class-check"/>
+    <label for="m-jpdocsjavathread-class-check"><a href="/jp/docs/java/thread-class/" title="Java Threadクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavathread-class"><span class="">Threadクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavathreadrunable-li">
+    <input type="checkbox" id="m-jpdocsjavathreadrunable-check"/>
+    <label for="m-jpdocsjavathreadrunable-check"><a href="/jp/docs/java/thread/runable/" title="Javaスレッド（Thread）Runnableインターフェース" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavathreadrunable"><span class="">Runnableインターフェース</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavathreadpriority-li">
+    <input type="checkbox" id="m-jpdocsjavathreadpriority-check"/>
+    <label for="m-jpdocsjavathreadpriority-check"><a href="/jp/docs/java/thread/priority/" title="Javaスレッド（Thread）Thread優先順位" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavathreadpriority"><span class="">Thread優先順位</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavathreadwait-notify-li">
+    <input type="checkbox" id="m-jpdocsjavathreadwait-notify-check"/>
+    <label for="m-jpdocsjavathreadwait-notify-check"><a href="/jp/docs/java/thread/wait-notify/" title="Java Thread wait notify" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavathreadwait-notify"><span class="">wait notify</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavasynchronized-li">
+    <input type="checkbox" id="m-jpdocsjavasynchronized-check"/>
+    <label for="m-jpdocsjavasynchronized-check"><a href="/jp/docs/java/synchronized/" title="Java synchronized修飾子/ブロック - マルチスレッド環境での排他制御" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavasynchronized"><span class="">synchronized</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavareentrantlock-class-li">
+    <input type="checkbox" id="m-jpdocsjavareentrantlock-class-check"/>
+    <label for="m-jpdocsjavareentrantlock-class-check"><a href="/jp/docs/java/reentrantLock-class/" title="Java ReentrantLockクラス - 明示的にロックを取得" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavareentrantlock-class"><span class="">ReentrantLockクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaatomic-class-li">
+    <input type="checkbox" id="m-jpdocsjavaatomic-class-check"/>
+    <label for="m-jpdocsjavaatomic-class-check"><a href="/jp/docs/java/atomic-class/" title="Java ロックなしの同期処理を実装するAtomicクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaatomic-class"><span class="">Atomicクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavacompletable-future-li">
+    <input type="checkbox" id="m-jpdocsjavacompletable-future-check"/>
+    <label for="m-jpdocsjavacompletable-future-check"><a href="/jp/docs/java/completable-future/" title="Java CompletableFutureの使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavacompletable-future"><span class="">CompletableFutureの使い方</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjavaetc-li">
+    <input type="checkbox" id="m-jpdocsjavaetc-check"/>
+    <label for="m-jpdocsjavaetc-check"><a href="/jp/docs/java/etc/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavaetc"><span class="">その他</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavajar-extract-li">
+    <input type="checkbox" id="m-jpdocsjavajar-extract-check"/>
+    <label for="m-jpdocsjavajar-extract-check"><a href="/jp/docs/java/jar-extract/" title="JavaでJARを展開する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavajar-extract"><span class="">JARを展開する</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavajar-war-ear-li">
+    <input type="checkbox" id="m-jpdocsjavajar-war-ear-check"/>
+    <label for="m-jpdocsjavajar-war-ear-check"><a href="/jp/docs/java/jar-war-ear/" title="JAR、WAR、EARの違いと共通点" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavajar-war-ear"><span class="">Jar, War, Ear</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavareflection-li">
+    <input type="checkbox" id="m-jpdocsjavareflection-check"/>
+    <label for="m-jpdocsjavareflection-check"><a href="/jp/docs/java/reflection/" title="Java Reflection" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavareflection"><span class="">Reflection</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavarmi-li">
+    <input type="checkbox" id="m-jpdocsjavarmi-check"/>
+    <label for="m-jpdocsjavarmi-check"><a href="/jp/docs/java/rmi/" title="Java RMIサーバーを作成する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavarmi"><span class="">RMIサーバーを作成する</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaversion-li">
+    <input type="checkbox" id="m-jpdocsjavaversion-check"/>
+    <label for="m-jpdocsjavaversion-check"><a href="/jp/docs/java/version/" title="Java 8から17までの機能を素早く見る" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaversion"><span class="">Java 8〜17までの機能まとめ</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavaunsupported-major-minor-version-xx-0-error-li">
+    <input type="checkbox" id="m-jpdocsjavaunsupported-major-minor-version-xx-0-error-check"/>
+    <label for="m-jpdocsjavaunsupported-major-minor-version-xx-0-error-check"><a href="/jp/docs/java/unsupported-major-minor-version-XX-0-error/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavaunsupported-major-minor-version-xx-0-error"><span class="">Unsupported major.minor version XX.0エラー</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavastring-validator-li">
+    <input type="checkbox" id="m-jpdocsjavastring-validator-check"/>
+    <label for="m-jpdocsjavastring-validator-check"><a href="/jp/docs/java/string-validator/" title="Java StringValidator 文字列バリデーションの例" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjavastring-validator"><span class="">文字列バリデーション</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjsp-servlet-li">
+    <input type="checkbox" id="m-jpdocsjsp-servlet-check"/>
+    <label for="m-jpdocsjsp-servlet-check"><a href="/jp/docs/jsp-servlet/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servlet"><span class="">JSP/Servlet</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletgoogle-app-engine-eab09cebb09c-eca480ebb984-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletgoogle-app-engine-eab09cebb09c-eca480ebb984-check"/>
+    <label for="m-jpdocsjsp-servletgoogle-app-engine-eab09cebb09c-eca480ebb984-check"><a href="/jp/docs/jsp-servlet/google-app-engine-%EA%B0%9C%EB%B0%9C-%EC%A4%80%EB%B9%84/" title="JSP/Servlet | Google App Engine開発の準備" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletgoogle-app-engine-eab09cebb09c-eca480ebb984"><span class="">Google App Engine開発の準備</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletgae-ec95a0ed948ceba6acecbc80ec9db4ec8598-ec839dec84b1-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletgae-ec95a0ed948ceba6acecbc80ec9db4ec8598-ec839dec84b1-check"/>
+    <label for="m-jpdocsjsp-servletgae-ec95a0ed948ceba6acecbc80ec9db4ec8598-ec839dec84b1-check"><a href="/jp/docs/jsp-servlet/gae-%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EC%83%9D%EC%84%B1/" title="JSP/Servlet | GAEアプリケーションの作成" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletgae-ec95a0ed948ceba6acecbc80ec9db4ec8598-ec839dec84b1"><span class="">GAEアプリケーションの作成</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletjsp-java-server-pages-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletjsp-java-server-pages-check"/>
+    <label for="m-jpdocsjsp-servletjsp-java-server-pages-check"><a href="/jp/docs/jsp-servlet/jsp-java-server-pages/" title="JSP/Servlet | JSP(Java Server Pages)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletjsp-java-server-pages"><span class="">JSP(Java Server Pages)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servleted81b4eb9dbcec9db4ec96b8ed8ab8ec9980-ec849cebb284-ec82acec9db4ec9d98-eab092-eca084eb8bac-li">
+    <input type="checkbox" id="m-jpdocsjsp-servleted81b4eb9dbcec9db4ec96b8ed8ab8ec9980-ec849cebb284-ec82acec9db4ec9d98-eab092-eca084eb8bac-check"/>
+    <label for="m-jpdocsjsp-servleted81b4eb9dbcec9db4ec96b8ed8ab8ec9980-ec849cebb284-ec82acec9db4ec9d98-eab092-eca084eb8bac-check"><a href="/jp/docs/jsp-servlet/%ED%81%B4%EB%9D%BC%EC%9D%B4%EC%96%B8%ED%8A%B8%EC%99%80-%EC%84%9C%EB%B2%84-%EC%82%AC%EC%9D%B4%EC%9D%98-%EA%B0%92-%EC%A0%84%EB%8B%AC/" title="JSP/Servlet | クライアントとサーバー間の値の受け渡し" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servleted81b4eb9dbcec9db4ec96b8ed8ab8ec9980-ec849cebb284-ec82acec9db4ec9d98-eab092-eca084eb8bac"><span class="">クライアントとサーバー間の値の受け渡し</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletec84b8ec8598eab3bc-ecbfa0ed82a4-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletec84b8ec8598eab3bc-ecbfa0ed82a4-check"/>
+    <label for="m-jpdocsjsp-servletec84b8ec8598eab3bc-ecbfa0ed82a4-check"><a href="/jp/docs/jsp-servlet/%EC%84%B8%EC%85%98%EA%B3%BC-%EC%BF%A0%ED%82%A4/" title="JSP/Servlet | セッションとCookie" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletec84b8ec8598eab3bc-ecbfa0ed82a4"><span class="">セッションとCookie</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletec849cebb894eba6bf-servlet-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletec849cebb894eba6bf-servlet-check"/>
+    <label for="m-jpdocsjsp-servletec849cebb894eba6bf-servlet-check"><a href="/jp/docs/jsp-servlet/%EC%84%9C%EB%B8%94%EB%A6%BF-servlet/" title="JSP/Servlet | サーブレット(Servlet)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletec849cebb894eba6bf-servlet"><span class="">サーブレット(Servlet)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletec849cebb894eba6bfeab3bc-jsphtml-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletec849cebb894eba6bfeab3bc-jsphtml-check"/>
+    <label for="m-jpdocsjsp-servletec849cebb894eba6bfeab3bc-jsphtml-check"><a href="/jp/docs/jsp-servlet/%EC%84%9C%EB%B8%94%EB%A6%BF%EA%B3%BC-jsp/html/" title="JSP/Servlet | サーブレットとJSP/HTML" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletec849cebb894eba6bfeab3bc-jsphtml"><span class="">サーブレットとJSP/HTML</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletweb-xml-ebb284eca084ebb384-dtd-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletweb-xml-ebb284eca084ebb384-dtd-check"/>
+    <label for="m-jpdocsjsp-servletweb-xml-ebb284eca084ebb384-dtd-check"><a href="/jp/docs/jsp-servlet/web-xml-%EB%B2%84%EC%A0%84%EB%B3%84-dtd/" title="JSP/Servlet | web.xmlのバージョン別DTD" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletweb-xml-ebb284eca084ebb384-dtd"><span class="">web.xmlのバージョン別DTD</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servlethttpservletrequest-eba994ec868ceb939c-li">
+    <input type="checkbox" id="m-jpdocsjsp-servlethttpservletrequest-eba994ec868ceb939c-check"/>
+    <label for="m-jpdocsjsp-servlethttpservletrequest-eba994ec868ceb939c-check"><a href="/jp/docs/jsp-servlet/httpservletrequest-%EB%A9%94%EC%86%8C%EB%93%9C/" title="JSP/Servlet | HTTPServletRequestメソッド" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servlethttpservletrequest-eba994ec868ceb939c"><span class="">HTTPServletRequestメソッド</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjsp-servletjstl-jsp-standard-tag-library-li">
+    <input type="checkbox" id="m-jpdocsjsp-servletjstl-jsp-standard-tag-library-check"/>
+    <label for="m-jpdocsjsp-servletjstl-jsp-standard-tag-library-check"><a href="/jp/docs/jsp-servlet/jstl-jsp-standard-tag-library/" title="JSP/Servlet | JSTL(JSP Standard Tag Library)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjsp-servletjstl-jsp-standard-tag-library"><span class="">JSTL(JSP Standard Tag Library)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavadoc-li">
+    <input type="checkbox" id="m-jpdocsjavadoc-check"/>
+    <label for="m-jpdocsjavadoc-check"><a href="/jp/docs/javadoc/" title="Javadocの作成" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavadoc"><span class="">Javadoc</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjava-fx-li">
+    <input type="checkbox" id="m-jpdocsjava-fx-check"/>
+    <label for="m-jpdocsjava-fx-check"><a href="/jp/docs/java-fx/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjava-fx"><span class="">JavaFX</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjavalombok-li">
+    <input type="checkbox" id="m-jpdocsjavalombok-check"/>
+    <label for="m-jpdocsjavalombok-check"><a href="/jp/docs/java/lombok/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjavalombok"><span class="">Java Lombok</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsguava-li">
+    <input type="checkbox" id="m-jpdocsguava-check"/>
+    <label for="m-jpdocsguava-check"><a href="/jp/docs/guava/" title="GoogleのJavaライブラリ「Guava」の使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsguava"><span class="">Google Guava</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-commons-li">
+    <input type="checkbox" id="m-jpdocsapache-commons-check"/>
+    <label for="m-jpdocsapache-commons-check"><a href="/jp/docs/apache-commons/" title="JavaライブラリApache Commonsの使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsapache-commons"><span class="">Apache Commons</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsapache-thrift-li">
+    <input type="checkbox" id="m-jpdocsapache-thrift-check"/>
+    <label for="m-jpdocsapache-thrift-check"><a href="/jp/docs/apache-thrift/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsapache-thrift"><span class="">Apache Thrift</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocseffective-java3e-li">
+    <input type="checkbox" id="m-jpdocseffective-java3e-check"/>
+    <label for="m-jpdocseffective-java3e-check"><a href="/jp/docs/effective-java/3e/" title="Effective Java 3/E" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocseffective-java3e"><span class="">Effective Java</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlin-li">
+    <input type="checkbox" id="m-jpdocskotlin-check"/>
+    <label for="m-jpdocskotlin-check"><a href="/jp/docs/kotlin/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlin"><span class="">Kotlin</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapteroverview-li">
+    <input type="checkbox" id="m-jpdocskotlinchapteroverview-check"/>
+    <label for="m-jpdocskotlinchapteroverview-check"><a href="/jp/docs/kotlin/chapter/overview/" title="Kotlin概要" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapteroverview"><span class="">概要</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinintro-li">
+    <input type="checkbox" id="m-jpdocskotlinintro-check"/>
+    <label for="m-jpdocskotlinintro-check"><a href="/jp/docs/kotlin/intro/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinintro"><span class="">Kotlin概要</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlininstall-li">
+    <input type="checkbox" id="m-jpdocskotlininstall-check"/>
+    <label for="m-jpdocskotlininstall-check"><a href="/jp/docs/kotlin/install/" title="Kotlin開発環境とインストール" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlininstall"><span class="">開発環境とインストール</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterbasic-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterbasic-check"/>
+    <label for="m-jpdocskotlinchapterbasic-check"><a href="/jp/docs/kotlin/chapter/basic/" title="Kotlin基本" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterbasic"><span class="">基本</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinbasic-li">
+    <input type="checkbox" id="m-jpdocskotlinbasic-check"/>
+    <label for="m-jpdocskotlinbasic-check"><a href="/jp/docs/kotlin/basic/" title="Kotlinコードを簡単に見てみる" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinbasic"><span class="">コードを簡単に見てみる</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlindatatype-li">
+    <input type="checkbox" id="m-jpdocskotlindatatype-check"/>
+    <label for="m-jpdocskotlindatatype-check"><a href="/jp/docs/kotlin/datatype/" title="Kotlinデータ型" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlindatatype"><span class="">データ型</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlindatatypeprimitive-reference-li">
+    <input type="checkbox" id="m-jpdocskotlindatatypeprimitive-reference-check"/>
+    <label for="m-jpdocskotlindatatypeprimitive-reference-check"><a href="/jp/docs/kotlin/datatype/primitive-reference/" title="Kotlinの基本型（Primitive type）と参照型（Reference type）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlindatatypeprimitive-reference"><span class="">基本型と参照型</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinvariable-li">
+    <input type="checkbox" id="m-jpdocskotlinvariable-check"/>
+    <label for="m-jpdocskotlinvariable-check"><a href="/jp/docs/kotlin/variable/" title="Kotlin変数宣言" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinvariable"><span class="">変数宣言</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinoperators-li">
+    <input type="checkbox" id="m-jpdocskotlinoperators-check"/>
+    <label for="m-jpdocskotlinoperators-check"><a href="/jp/docs/kotlin/operators/" title="Kotlin演算子（Operators）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinoperators"><span class="">演算子（Operators）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinoperator-overloading-li">
+    <input type="checkbox" id="m-jpdocskotlinoperator-overloading-check"/>
+    <label for="m-jpdocskotlinoperator-overloading-check"><a href="/jp/docs/kotlin/operator-overloading/" title="Kotlinの演算子オーバーロード（Operator overloading）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinoperator-overloading"><span class="">演算子オーバーロード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlincontrol-statement-li">
+    <input type="checkbox" id="m-jpdocskotlincontrol-statement-check"/>
+    <label for="m-jpdocskotlincontrol-statement-check"><a href="/jp/docs/kotlin/control-statement/" title="Kotlin制御構文（Control statement）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlincontrol-statement"><span class="">制御構文</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinexception-li">
+    <input type="checkbox" id="m-jpdocskotlinexception-check"/>
+    <label for="m-jpdocskotlinexception-check"><a href="/jp/docs/kotlin/exception/" title="Kotlin例外処理（try, catch, finally）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinexception"><span class="">例外処理</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlindest-decl-li">
+    <input type="checkbox" id="m-jpdocskotlindest-decl-check"/>
+    <label for="m-jpdocskotlindest-decl-check"><a href="/jp/docs/kotlin/dest-decl/" title="Kotlinの分解宣言（destructuring declarations）でPairとTripleの要素を分解する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlindest-decl"><span class="">分解宣言</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterfunction-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterfunction-check"/>
+    <label for="m-jpdocskotlinchapterfunction-check"><a href="/jp/docs/kotlin/chapter/function/" title="Kotlin関数" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterfunction"><span class="">関数</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinfunctions-li">
+    <input type="checkbox" id="m-jpdocskotlinfunctions-check"/>
+    <label for="m-jpdocskotlinfunctions-check"><a href="/jp/docs/kotlin/functions/" title="Kotlin関数（Functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinfunctions"><span class="">関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinpackages-li">
+    <input type="checkbox" id="m-jpdocskotlinpackages-check"/>
+    <label for="m-jpdocskotlinpackages-check"><a href="/jp/docs/kotlin/packages/" title="Kotlinパッケージとインポート（Packages）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinpackages"><span class="">パッケージとインポート</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterclasse-object-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterclasse-object-check"/>
+    <label for="m-jpdocskotlinchapterclasse-object-check"><a href="/jp/docs/kotlin/chapter/classe-object/" title="Kotlin クラスとオブジェクト" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterclasse-object"><span class="">クラスとオブジェクト</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinnull-safety-li">
+    <input type="checkbox" id="m-jpdocskotlinnull-safety-check"/>
+    <label for="m-jpdocskotlinnull-safety-check"><a href="/jp/docs/kotlin/null-safety/" title="Kotlin Null安全性（Null Safety）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinnull-safety"><span class="">Null安全性</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlateinit-by-lazy-li">
+    <input type="checkbox" id="m-jpdocskotlinlateinit-by-lazy-check"/>
+    <label for="m-jpdocskotlinlateinit-by-lazy-check"><a href="/jp/docs/kotlin/lateinit-by-lazy/" title="Kotlin 初期化の遅延（lateinit, by lazy）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlateinit-by-lazy"><span class="">初期化の遅延</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinclasses-li">
+    <input type="checkbox" id="m-jpdocskotlinclasses-check"/>
+    <label for="m-jpdocskotlinclasses-check"><a href="/jp/docs/kotlin/classes/" title="Kotlin クラス（Class）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinclasses"><span class="">クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinvisibility-modifiers-li">
+    <input type="checkbox" id="m-jpdocskotlinvisibility-modifiers-check"/>
+    <label for="m-jpdocskotlinvisibility-modifiers-check"><a href="/jp/docs/kotlin/visibility-modifiers/" title="Kotlin アクセス修飾子（Visibility modifiers）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinvisibility-modifiers"><span class="">アクセス修飾子</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinabstract-classes-li">
+    <input type="checkbox" id="m-jpdocskotlinabstract-classes-check"/>
+    <label for="m-jpdocskotlinabstract-classes-check"><a href="/jp/docs/kotlin/abstract-classes/" title="Kotlin 抽象クラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinabstract-classes"><span class="">抽象クラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinobject-keyword-li">
+    <input type="checkbox" id="m-jpdocskotlinobject-keyword-check"/>
+    <label for="m-jpdocskotlinobject-keyword-check"><a href="/jp/docs/kotlin/object-keyword/" title="Kotlin Object キーワード" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinobject-keyword"><span class="">Object キーワード</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapteradvanced-function-li">
+    <input type="checkbox" id="m-jpdocskotlinchapteradvanced-function-check"/>
+    <label for="m-jpdocskotlinchapteradvanced-function-check"><a href="/jp/docs/kotlin/chapter/advanced-function/" title="Kotlin 高度な関数" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapteradvanced-function"><span class="">高度な関数</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinscope-functions-li">
+    <input type="checkbox" id="m-jpdocskotlinscope-functions-check"/>
+    <label for="m-jpdocskotlinscope-functions-check"><a href="/jp/docs/kotlin/scope-functions/" title="Kotlin スコープ関数（Scope functions） | let, with, run, apply, also" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinscope-functions"><span class="">スコープ関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlininfix-functions-li">
+    <input type="checkbox" id="m-jpdocskotlininfix-functions-check"/>
+    <label for="m-jpdocskotlininfix-functions-check"><a href="/jp/docs/kotlin/infix-functions/" title="Kotlin 中置記法関数（Infix functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlininfix-functions"><span class="">中置記法関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlininline-functions-li">
+    <input type="checkbox" id="m-jpdocskotlininline-functions-check"/>
+    <label for="m-jpdocskotlininline-functions-check"><a href="/jp/docs/kotlin/inline-functions/" title="Kotlin インライン関数（Inline functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlininline-functions"><span class="">インライン関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinextension-functions-li">
+    <input type="checkbox" id="m-jpdocskotlinextension-functions-check"/>
+    <label for="m-jpdocskotlinextension-functions-check"><a href="/jp/docs/kotlin/extension-functions/" title="Kotlin 拡張関数（Extension functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinextension-functions"><span class="">拡張関数</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterfunctional-programming-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterfunctional-programming-check"/>
+    <label for="m-jpdocskotlinchapterfunctional-programming-check"><a href="/jp/docs/kotlin/chapter/functional-programming/" title="Kotlin関数型プログラミング" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterfunctional-programming"><span class="">関数型プログラミング</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinfirst-class-functions-li">
+    <input type="checkbox" id="m-jpdocskotlinfirst-class-functions-check"/>
+    <label for="m-jpdocskotlinfirst-class-functions-check"><a href="/jp/docs/kotlin/first-class-functions/" title="Kotlin第一級関数（First-class functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinfirst-class-functions"><span class="">第一級関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinhigher-order-functions-li">
+    <input type="checkbox" id="m-jpdocskotlinhigher-order-functions-check"/>
+    <label for="m-jpdocskotlinhigher-order-functions-check"><a href="/jp/docs/kotlin/higher-order-functions/" title="Kotlin高階関数（Higher-Order Functions）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinhigher-order-functions"><span class="">高階関数</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlambda-expression-li">
+    <input type="checkbox" id="m-jpdocskotlinlambda-expression-check"/>
+    <label for="m-jpdocskotlinlambda-expression-check"><a href="/jp/docs/kotlin/lambda-expression/" title="Kotlinラムダ式（Lambda expression）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlambda-expression"><span class="">ラムダ式</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinspecial-class-li">
+    <input type="checkbox" id="m-jpdocskotlinspecial-class-check"/>
+    <label for="m-jpdocskotlinspecial-class-check"><a href="/jp/docs/kotlin/special-class/" title="Kotlin 特別なクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinspecial-class"><span class="">特別なクラス</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlindata-classes-li">
+    <input type="checkbox" id="m-jpdocskotlindata-classes-check"/>
+    <label for="m-jpdocskotlindata-classes-check"><a href="/jp/docs/kotlin/data-classes/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlindata-classes"><span class="">Kotlin データクラス</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinenum-classes-li">
+    <input type="checkbox" id="m-jpdocskotlinenum-classes-check"/>
+    <label for="m-jpdocskotlinenum-classes-check"><a href="/jp/docs/kotlin/enum-classes/" title="Kotlin 列挙型クラス（Enum Classes）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinenum-classes"><span class="">列挙型クラス（Enum Classes）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinsealed-classes-li">
+    <input type="checkbox" id="m-jpdocskotlinsealed-classes-check"/>
+    <label for="m-jpdocskotlinsealed-classes-check"><a href="/jp/docs/kotlin/sealed-classes/" title="Kotlin Sealedクラス" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinsealed-classes"><span class="">Sealedクラス</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterstring-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterstring-check"/>
+    <label for="m-jpdocskotlinchapterstring-check"><a href="/jp/docs/kotlin/chapter/string/" title="Kotlin文字列" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterstring"><span class="">文字列</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinstring-template-li">
+    <input type="checkbox" id="m-jpdocskotlinstring-template-check"/>
+    <label for="m-jpdocskotlinstring-template-check"><a href="/jp/docs/kotlin/string-template/" title="Kotlin文字列テンプレート（string template）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinstring-template"><span class="">文字列テンプレート</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinstring-to-int-li">
+    <input type="checkbox" id="m-jpdocskotlinstring-to-int-check"/>
+    <label for="m-jpdocskotlinstring-to-int-check"><a href="/jp/docs/kotlin/string-to-int/" title="Kotlinで文字列を整数に変換する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinstring-to-int"><span class="">文字列を整数に変換</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchaptercollections-li">
+    <input type="checkbox" id="m-jpdocskotlinchaptercollections-check"/>
+    <label for="m-jpdocskotlinchaptercollections-check"><a href="/jp/docs/kotlin/chapter/collections/" title="Kotlinコレクション" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchaptercollections"><span class="">コレクション</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlincollections-li">
+    <input type="checkbox" id="m-jpdocskotlincollections-check"/>
+    <label for="m-jpdocskotlincollections-check"><a href="/jp/docs/kotlin/collections/" title="Kotlinコレクション（Collection）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlincollections"><span class="">コレクション（Collection）</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinarray-li">
+    <input type="checkbox" id="m-jpdocskotlinarray-check"/>
+    <label for="m-jpdocskotlinarray-check"><a href="/jp/docs/kotlin/array/" title="Kotlin配列（Array）の宣言、初期化、主な関数" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinarray"><span class="">配列の宣言、初期化</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinarray-get-min-max-li">
+    <input type="checkbox" id="m-jpdocskotlinarray-get-min-max-check"/>
+    <label for="m-jpdocskotlinarray-get-min-max-check"><a href="/jp/docs/kotlin/array-get-min-max/" title="Kotlin配列（Array）で最小値と最大値を探す" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinarray-get-min-max"><span class="">配列で最小値と最大値を探す</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlist-li">
+    <input type="checkbox" id="m-jpdocskotlinlist-check"/>
+    <label for="m-jpdocskotlinlist-check"><a href="/jp/docs/kotlin/list/" title="Kotlinリスト（List）の宣言、初期化" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlist"><span class="">リスト（List）の宣言、初期化</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlist-distinct-li">
+    <input type="checkbox" id="m-jpdocskotlinlist-distinct-check"/>
+    <label for="m-jpdocskotlinlist-distinct-check"><a href="/jp/docs/kotlin/list-distinct/" title="Kotlin List Distinctで重複要素を削除する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlist-distinct"><span class="">List Distinctで重複要素を削除</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlist-to-set-li">
+    <input type="checkbox" id="m-jpdocskotlinlist-to-set-check"/>
+    <label for="m-jpdocskotlinlist-to-set-check"><a href="/jp/docs/kotlin/list-to-set/" title="Kotlinリスト（List）をSetに変換する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlist-to-set"><span class="">リスト（List）をSetに変換</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinlist-array-length-li">
+    <input type="checkbox" id="m-jpdocskotlinlist-array-length-check"/>
+    <label for="m-jpdocskotlinlist-array-length-check"><a href="/jp/docs/kotlin/list-array-length/" title="Kotlinリストと配列の長さを取得する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinlist-array-length"><span class="">リストと配列の長さを取得</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinmap-li">
+    <input type="checkbox" id="m-jpdocskotlinmap-check"/>
+    <label for="m-jpdocskotlinmap-check"><a href="/jp/docs/kotlin/map/" title="Kotlin Mapのさまざまな使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinmap"><span class="">Mapの使い方</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinset-li">
+    <input type="checkbox" id="m-jpdocskotlinset-check"/>
+    <label for="m-jpdocskotlinset-check"><a href="/jp/docs/kotlin/set/" title="Kotlin Setのさまざまな使い方" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinset"><span class="">Setの使い方</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinset-to-list-li">
+    <input type="checkbox" id="m-jpdocskotlinset-to-list-check"/>
+    <label for="m-jpdocskotlinset-to-list-check"><a href="/jp/docs/kotlin/set-to-list/" title="Kotlin SetをListに変換する" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinset-to-list"><span class="">SetをListに変換</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterannotations-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterannotations-check"/>
+    <label for="m-jpdocskotlinchapterannotations-check"><a href="/jp/docs/kotlin/chapter/annotations/" title="Kotlin アノテーション" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterannotations"><span class="">アノテーション</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinannotationsbasic-li">
+    <input type="checkbox" id="m-jpdocskotlinannotationsbasic-check"/>
+    <label for="m-jpdocskotlinannotationsbasic-check"><a href="/jp/docs/kotlin/annotations/basic/" title="Kotlin アノテーション（Annotations）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinannotationsbasic"><span class="">アノテーション</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterclass-hierarchy-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterclass-hierarchy-check"/>
+    <label for="m-jpdocskotlinchapterclass-hierarchy-check"><a href="/jp/docs/kotlin/chapter/class-hierarchy/" title="Kotlin クラス階層" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterclass-hierarchy"><span class="">クラス階層</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlininterfaces-li">
+    <input type="checkbox" id="m-jpdocskotlininterfaces-check"/>
+    <label for="m-jpdocskotlininterfaces-check"><a href="/jp/docs/kotlin/interfaces/" title="Kotlin インターフェース" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlininterfaces"><span class="">インターフェース</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlindelegation-li">
+    <input type="checkbox" id="m-jpdocskotlindelegation-check"/>
+    <label for="m-jpdocskotlindelegation-check"><a href="/jp/docs/kotlin/delegation/" title="Kotlin 委譲（Delegation）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlindelegation"><span class="">委譲（Delegation）</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapterthread-concurrency-li">
+    <input type="checkbox" id="m-jpdocskotlinchapterthread-concurrency-check"/>
+    <label for="m-jpdocskotlinchapterthread-concurrency-check"><a href="/jp/docs/kotlin/chapter/thread-concurrency/" title="Kotlin スレッドと並行性" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapterthread-concurrency"><span class="">スレッドと並行性</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinthreads-li">
+    <input type="checkbox" id="m-jpdocskotlinthreads-check"/>
+    <label for="m-jpdocskotlinthreads-check"><a href="/jp/docs/kotlin/threads/" title="Kotlin Threadの作成と実行" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinthreads"><span class="">Threadの作成と実行</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlincoroutine-li">
+    <input type="checkbox" id="m-jpdocskotlincoroutine-check"/>
+    <label for="m-jpdocskotlincoroutine-check"><a href="/jp/docs/kotlin/coroutine/" title="Kotlin コルーチン（Coroutines）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlincoroutine"><span class="">コルーチン</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchaptergeneric-li">
+    <input type="checkbox" id="m-jpdocskotlinchaptergeneric-check"/>
+    <label for="m-jpdocskotlinchaptergeneric-check"><a href="/jp/docs/kotlin/chapter/generic/" title="Kotlin ジェネリクス" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchaptergeneric"><span class="">ジェネリクス</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlingenericsbasic-li">
+    <input type="checkbox" id="m-jpdocskotlingenericsbasic-check"/>
+    <label for="m-jpdocskotlingenericsbasic-check"><a href="/jp/docs/kotlin/generics/basic/" title="Kotlin ジェネリック（Generic）" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlingenericsbasic"><span class="">ジェネリック</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlingenericsvariant-li">
+    <input type="checkbox" id="m-jpdocskotlingenericsvariant-check"/>
+    <label for="m-jpdocskotlingenericsvariant-check"><a href="/jp/docs/kotlin/generics/variant/" title="Kotlin ジェネリクス（Generic） - 共変（covariant）と不変（invariant）の理解" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlingenericsvariant"><span class="">共変と不変</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchapteradvanced-keyword-li">
+    <input type="checkbox" id="m-jpdocskotlinchapteradvanced-keyword-check"/>
+    <label for="m-jpdocskotlinchapteradvanced-keyword-check"><a href="/jp/docs/kotlin/chapter/advanced-keyword/" title="Kotlin 高度なキーワード" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchapteradvanced-keyword"><span class="">高度なキーワード</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinexternal-li">
+    <input type="checkbox" id="m-jpdocskotlinexternal-check"/>
+    <label for="m-jpdocskotlinexternal-check"><a href="/jp/docs/kotlin/external/" title="Kotlin externalキーワード" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinexternal"><span class="">externalキーワード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinreified-li">
+    <input type="checkbox" id="m-jpdocskotlinreified-check"/>
+    <label for="m-jpdocskotlinreified-check"><a href="/jp/docs/kotlin/reified/" title="Kotlin reifiedキーワード" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinreified"><span class="">reifiedキーワード</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinexpect-actual-li">
+    <input type="checkbox" id="m-jpdocskotlinexpect-actual-check"/>
+    <label for="m-jpdocskotlinexpect-actual-check"><a href="/jp/docs/kotlin/expect-actual/" title="Kotlin expect、actualキーワード" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinexpect-actual"><span class="">expect、actualキーワード</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocskotlinchaptertesting-li">
+    <input type="checkbox" id="m-jpdocskotlinchaptertesting-check"/>
+    <label for="m-jpdocskotlinchaptertesting-check"><a href="/jp/docs/kotlin/chapter/testing/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocskotlinchaptertesting"><span class="">Kotlin テスティング</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinkotest-li">
+    <input type="checkbox" id="m-jpdocskotlinkotest-check"/>
+    <label for="m-jpdocskotlinkotest-check"><a href="/jp/docs/kotlin/kotest/" title="Kotlin テスティングフレームワーク - Kotest" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinkotest"><span class="">Kotest</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsgroovy-li">
+    <input type="checkbox" id="m-jpdocsgroovy-check"/>
+    <label for="m-jpdocsgroovy-check"><a href="/jp/docs/groovy/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsgroovy"><span class="">Groovy</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsmybatis-li">
+    <input type="checkbox" id="m-jpdocsmybatis-check"/>
+    <label for="m-jpdocsmybatis-check"><a href="/jp/docs/mybatis/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatis"><span class="">MyBatis</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisintro-li">
+    <input type="checkbox" id="m-jpdocsmybatisintro-check"/>
+    <label for="m-jpdocsmybatisintro-check"><a href="/jp/docs/mybatis/intro/" title="MyBatis | MyBatisとは" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisintro"><span class="">MyBatisとは</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisec84a4eca095-ed8c8cec9dbc-li">
+    <input type="checkbox" id="m-jpdocsmybatisec84a4eca095-ed8c8cec9dbc-check"/>
+    <label for="m-jpdocsmybatisec84a4eca095-ed8c8cec9dbc-check"><a href="/jp/docs/mybatis/%EC%84%A4%EC%A0%95-%ED%8C%8C%EC%9D%BC/" title="MyBatis | 設定ファイル" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisec84a4eca095-ed8c8cec9dbc"><span class="">設定ファイル</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisoutput-executed-sql-to-the-log-li">
+    <input type="checkbox" id="m-jpdocsmybatisoutput-executed-sql-to-the-log-check"/>
+    <label for="m-jpdocsmybatisoutput-executed-sql-to-the-log-check"><a href="/jp/docs/mybatis/output-executed-sql-to-the-log/" title="MyBatis | 実行されるSQLをログに出力" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisoutput-executed-sql-to-the-log"><span class="">実行されるSQLをログに出力</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisselect-li">
+    <input type="checkbox" id="m-jpdocsmybatisselect-check"/>
+    <label for="m-jpdocsmybatisselect-check"><a href="/jp/docs/mybatis/select/" title="MyBatis SELECT検索" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisselect"><span class="">SELECT検索</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatismap-search-results-to-an-arbitrary-java-object-li">
+    <input type="checkbox" id="m-jpdocsmybatismap-search-results-to-an-arbitrary-java-object-check"/>
+    <label for="m-jpdocsmybatismap-search-results-to-an-arbitrary-java-object-check"><a href="/jp/docs/mybatis/map-search-results-to-an-arbitrary-java-object/" title="MyBatis | 検索結果を任意のJavaオブジェクトにマッピング" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatismap-search-results-to-an-arbitrary-java-object"><span class="">検索結果を任意のJavaオブジェクトにマッピング</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisinsert-li">
+    <input type="checkbox" id="m-jpdocsmybatisinsert-check"/>
+    <label for="m-jpdocsmybatisinsert-check"><a href="/jp/docs/mybatis/insert/" title="MyBatis | INSERT登録" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisinsert"><span class="">INSERT登録</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisupdate-li">
+    <input type="checkbox" id="m-jpdocsmybatisupdate-check"/>
+    <label for="m-jpdocsmybatisupdate-check"><a href="/jp/docs/mybatis/update/" title="MyBatis | UPDATEによる変更" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisupdate"><span class="">UPDATEによる変更</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisdelete-li">
+    <input type="checkbox" id="m-jpdocsmybatisdelete-check"/>
+    <label for="m-jpdocsmybatisdelete-check"><a href="/jp/docs/mybatis/delete/" title="MyBatis | DELETE削除" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisdelete"><span class="">DELETE削除</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisbatch-insert-li">
+    <input type="checkbox" id="m-jpdocsmybatisbatch-insert-check"/>
+    <label for="m-jpdocsmybatisbatch-insert-check"><a href="/jp/docs/mybatis/batch-insert/" title="MyBatis | バッチ更新" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisbatch-insert"><span class="">バッチ更新</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatismapper-li">
+    <input type="checkbox" id="m-jpdocsmybatismapper-check"/>
+    <label for="m-jpdocsmybatismapper-check"><a href="/jp/docs/mybatis/mapper/" title="MyBatis | Mapper" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatismapper"><span class="">Mapper</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisdynamic-sql-li">
+    <input type="checkbox" id="m-jpdocsmybatisdynamic-sql-check"/>
+    <label for="m-jpdocsmybatisdynamic-sql-check"><a href="/jp/docs/mybatis/dynamic-sql/" title="MyBatis | 動的SQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisdynamic-sql"><span class="">動的SQL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisdynamically-generate-sql-in-a-program-li">
+    <input type="checkbox" id="m-jpdocsmybatisdynamically-generate-sql-in-a-program-check"/>
+    <label for="m-jpdocsmybatisdynamically-generate-sql-in-a-program-check"><a href="/jp/docs/mybatis/dynamically-generate-sql-in-a-program/" title="MyBatis | プログラムでSQLを動的に生成" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisdynamically-generate-sql-in-a-program"><span class="">プログラムでSQLを動的に生成</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmybatisintegration-with-spring-boot-li">
+    <input type="checkbox" id="m-jpdocsmybatisintegration-with-spring-boot-check"/>
+    <label for="m-jpdocsmybatisintegration-with-spring-boot-check"><a href="/jp/docs/mybatis/integration-with-spring-boot/" title="MyBatis | Spring Bootとの連携" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsmybatisintegration-with-spring-boot"><span class="">Spring Bootとの連携</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-jpdocsjvm-li">
+    <input type="checkbox" id="m-jpdocsjvm-check"/>
+    <label for="m-jpdocsjvm-check"><a href="/jp/docs/jvm/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-jpdocsjvm"><span class="">JVM メモリ</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjvmmemory-structure-li">
+    <input type="checkbox" id="m-jpdocsjvmmemory-structure-check"/>
+    <label for="m-jpdocsjvmmemory-structure-check"><a href="/jp/docs/jvm/memory-structure/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjvmmemory-structure"><span class="">JVM メモリ構造</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjvmheap-memory-li">
+    <input type="checkbox" id="m-jpdocsjvmheap-memory-check"/>
+    <label for="m-jpdocsjvmheap-memory-check"><a href="/jp/docs/jvm/heap-memory/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjvmheap-memory"><span class="">JVM ヒープメモリ</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjvmgarbage-collection-li">
+    <input type="checkbox" id="m-jpdocsjvmgarbage-collection-check"/>
+    <label for="m-jpdocsjvmgarbage-collection-check"><a href="/jp/docs/jvm/garbage-collection/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjvmgarbage-collection"><span class="">JVM ガベージコレクション</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjvmstring-constant-pool-li">
+    <input type="checkbox" id="m-jpdocsjvmstring-constant-pool-check"/>
+    <label for="m-jpdocsjvmstring-constant-pool-check"><a href="/jp/docs/jvm/string-constant-pool/" title="Java String 定数プール" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjvmstring-constant-pool"><span class="">String 定数プール</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsjvmclass-loader-li">
+    <input type="checkbox" id="m-jpdocsjvmclass-loader-check"/>
+    <label for="m-jpdocsjvmclass-loader-check"><a href="/jp/docs/jvm/class-loader/" title="Java ClassLoader" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsjvmclass-loader"><span class="">ClassLoader</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsktor-li">
+    <input type="checkbox" id="m-jpdocsktor-check"/>
+    <label for="m-jpdocsktor-check"><a href="/jp/docs/ktor/" title="Ktor プロジェクトの作成" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsktor"><span class="">Ktor</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocslogback-li">
+    <input type="checkbox" id="m-jpdocslogback-check"/>
+    <label for="m-jpdocslogback-check"><a href="/jp/docs/logback/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocslogback"><span class="">Logback</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocsmapstruct-li">
+    <input type="checkbox" id="m-jpdocsmapstruct-check"/>
+    <label for="m-jpdocsmapstruct-check"><a href="/jp/docs/mapstruct/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocsmapstruct"><span class="">MapStruct</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-jpdocskotlinexposed-li">
+    <input type="checkbox" id="m-jpdocskotlinexposed-check"/>
+    <label for="m-jpdocskotlinexposed-check"><a href="/jp/docs/kotlin/exposed/" title="Kotlin Exposed" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-jpdocskotlinexposed"><span class="">Kotlin SQL ライブラリ Exposed</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#jvmjava-virtual-machine">JVM(Java Virtual Machine)</a></li>
+    <li><a href="#java-メモリ領域の構造">Java メモリ領域の構造</a>
+      <ul>
+        <li><a href="#メソッドmethod領域--static-領域">メソッド(method)領域 / Static 領域</a></li>
+        <li><a href="#ヒープheap領域">ヒープ(heap)領域</a></li>
+        <li><a href="#スタックstack領域">スタック(stack)領域</a></li>
+        <li><a href="#pc-register">PC Register</a></li>
+        <li><a href="#native-method-stack-area">Native Method Stack Area</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">39</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">Android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/calibre/" data-taxonomy-term="calibre"><span class="taxonomy-label">Calibre</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/claude/" data-taxonomy-term="claude"><span class="taxonomy-label">Claude</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/claude-code/" data-taxonomy-term="claude-code"><span class="taxonomy-label">Claude Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud-Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">186</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">26</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/docusaurus/" data-taxonomy-term="docusaurus"><span class="taxonomy-label">Docusaurus</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/epub/" data-taxonomy-term="epub"><span class="taxonomy-label">EPub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage Collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/github/" data-taxonomy-term="github"><span class="taxonomy-label">GitHub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/grpc/" data-taxonomy-term="grpc"><span class="taxonomy-label">GRPC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/it%E7%94%A8%E8%AA%9E/" data-taxonomy-term="it%E7%94%A8%E8%AA%9E"><span class="taxonomy-label">IT用語</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">332</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">43</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">JQuery</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">78</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">160</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">50</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/lua/" data-taxonomy-term="lua"><span class="taxonomy-label">Lua</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/makefile/" data-taxonomy-term="makefile"><span class="taxonomy-label">Makefile</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">Markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">Mockk</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">14</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">38</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">55</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">Php</span><span class="taxonomy-count">15</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">59</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sigil/" data-taxonomy-term="sigil"><span class="taxonomy-label">Sigil</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">118</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">41</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/sre/" data-taxonomy-term="sre"><span class="taxonomy-label">SRE</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/subversion/" data-taxonomy-term="subversion"><span class="taxonomy-label">Subversion</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/typescript/" data-taxonomy-term="typescript"><span class="taxonomy-label">TypeScript</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vectordb/" data-taxonomy-term="vectordb"><span class="taxonomy-label">VectorDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/version-control/" data-taxonomy-term="version-control"><span class="taxonomy-label">Version Control</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">WEB</span><span class="taxonomy-count">127</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0/" data-taxonomy-term="%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0"><span class="taxonomy-label">アルゴリズム</span><span class="taxonomy-count">55</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%82%B2%E3%83%BC%E3%83%A0/" data-taxonomy-term="%E3%82%B2%E3%83%BC%E3%83%A0"><span class="taxonomy-label">ゲーム</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%AD%E3%83%A5%E3%83%BC/" data-taxonomy-term="%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E3%82%AD%E3%83%A5%E3%83%BC"><span class="taxonomy-label">メッセージキュー</span><span class="taxonomy-count">6</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/category/programming/jvm/">JVM ベースのプログラミング言語</a></li>
+  <li class="breadcrumb-item">
+    <a href="/jp/docs/jvm/">JVM メモリ</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    JVM メモリ構造</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>JVM メモリ構造</h1>
+	<div class="lead">Java のメモリ構造</div>
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/jp/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<p>Java で使用されるメモリモデルの構造を理解しておくと、Java プログラムを作成するうえで大いに役立つ。</p>
+<h2 id="jvmjava-virtual-machine">JVM(Java Virtual Machine)</h2>
+<p>Java プロセスは JVM という仮想システム上で実行される。この構造により、コンパイルされた Java クラスファイル（bytecode）をさまざまな OS 環境で実行できる。</p>
+<p><img src="/docs/java/jvm/java_compile_jvm.png" alt="JVM"></p>
+<div class="alert alert-primary" role="alert"><div class="h4 alert-heading" role="heading">Java バイトコード(Java bytecode)</div>
+
+
+Java バイトコード（Java bytecode）とは、Java 仮想マシンが理解できる言語に変換された Java ソースコードを意味する。  
+Java コンパイラによって変換されるコードの命令サイズが 1 byte であるため、Java バイトコードと呼ばれている。  
+この Java バイトコードの拡張子は `.class` である。  
+Java バイトコードは、Java 仮想マシンさえインストールされていれば、どのオペレーティングシステムでも実行できる。
+</div>
+
+<h2 id="java-メモリ領域の構造">Java メモリ領域の構造</h2>
+<p>すべての Java プログラムは Java 仮想マシン（JVM）を通じて実行される。Java プログラムが実行されると、JVM はそのプログラムを実行するために必要なメモリをオペレーティングシステムから割り当てられる。</p>
+<p>JVM は割り当てられたメモリを効率よく使うため、用途に応じて次のように複数の領域に分けて管理する。</p>
+<p><img src="/docs/java/jvm/java_jvm_runtime_data_area.png" alt="JVM Runtime Data Area"></p>
+<p>Runtime Data Area はオペレーティングシステムから割り当てられたメモリ領域であり、Java アプリケーションを実行するときに使用されるデータを格納する領域である。<br>
+大きく Method Area、Heap Area、Stack Area、PC Register、Native Method Stack に分けられる。</p>
+<h3 id="メソッドmethod領域--static-領域">メソッド(method)領域 / Static 領域</h3>
+<p>メソッド領域は、Java プログラムで使用されるクラスに関する情報と、クラス変数（static variable）が保存される領域である。<br>
+JVM は Java プログラムで特定のクラスが使用されると、そのクラス、つまり Java バイトコードであるクラスファイル（<code>*.class</code>）を読み込み、ロードされたクラスとインターフェースに対するランタイム定数プール（runtime constant pool）、メンバ変数（フィールド）、クラス変数（static 変数）、コンストラクタ、メソッドを保存する。</p>
+<p>この領域に保存された内容は、プログラム開始前にロードされ、プログラム終了時に消滅する。<br>
+ランタイム定数プールには、コンパイル時に分かっている数値リテラルから、実行時に解決される必要があるメソッドやフィールドの参照まで、さまざまな定数が含まれる。</p>
+<blockquote>
+<p>リテラル（literal）は、コンピュータサイエンス分野で固定された値を意味する。定数は変わらない変数を指し、リテラルは変わらない値（データ）を指す。</p>
+</blockquote>
+<h3 id="ヒープheap領域">ヒープ(heap)領域</h3>
+<p>ヒープ領域は、Java プログラムで使用されるすべてのクラスオブジェクト（インスタンス）変数が保存される領域であり、JVM が管理するプログラム上でデータを保存するために実行時に動的に割り当てて使用する領域である。</p>
+<p>プロセス実行中に動的に変化するデータは、基本的にここに割り当てられる。つまり、Java プログラムで <code>new</code> 演算子を使ってインスタンスが生成されると、JVM はそのインスタンスの情報をヒープ領域に保存する。<br>
+ヒープ領域は、メモリの低いアドレスから高いアドレス方向へ割り当てられる。</p>
+<p>そして、スタック領域の変数がヒープ領域のインスタンスを参照していたものの、以後参照しなくなった場合、そのインスタンスは Java 仮想マシンのガベージコレクションによって削除される。</p>
+<blockquote>
+<p>ガベージコレクションは、インスタンスが参照されなくなるたびに実行されるわけではない。
+そうすると、ガベージコレクションの呼び出しだけで多くのリソースを使うことになり、プログラムの性能が低下する。
+そのため、ガベージコレクションアルゴリズムに従って実行される。</p>
+</blockquote>
+<p>ヒープ領域の使用期間およびスレッド共有範囲は次のとおりである。</p>
+<ul>
+<li>オブジェクトがこれ以上使用されない、または明示的に null 宣言された場合</li>
+<li>GC（Garbage Collection）の対象</li>
+<li>構成方法や GC 方法は JVM ベンダーごとに異なる場合がある。</li>
+<li>すべてのスレッドで共有する。</li>
+</ul>
+<p>長時間同じプロセスとして実行されるアプリケーションでは、このヒープ領域のメモリ使用を最適化することが重要である。割り当てるサイズを指定するオプションは次のとおりである。</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>-Xms20m -Xmx100m
+</span></span></code></pre></div><p>上記のように指定すると、次の設定になる。</p>
+<ul>
+<li>ヒープ領域に割り当てるメモリの初期サイズ: 20MB</li>
+<li>ヒープ領域に割り当てるメモリの最大サイズ: 100MB</li>
+</ul>
+<h3 id="スタックstack領域">スタック(stack)領域</h3>
+<p>スタック領域は、Java プログラムでメソッドが呼び出されるときに、そのメソッドのスタックフレームが保存される領域である。</p>
+<p>JVM は Java プログラムでメソッドが呼び出されると、メソッド呼び出しに関係するローカル変数とパラメータをスタック領域に保存する。
+このようにスタック領域はメソッド呼び出しとともに割り当てられ、メソッド呼び出しが完了すると消滅する。スタック領域に保存されるメソッド呼び出し情報をスタックフレーム（stack frame）という。</p>
+<p>スタック領域は Push でデータを入力し、Pop でデータを出力する。このスタックは LIFO（Last-In First-Out）方式で動作するため、最後に保存されたデータが最初に取り出される。</p>
+<p>スタック領域は、メモリの高いアドレスから低いアドレス方向へ割り当てられる。</p>
+<h3 id="pc-register">PC Register</h3>
+<ul>
+<li>現在実行中の JVM 命令アドレスを持つ。CPU の PC と同じ役割だと言える。</li>
+<li>プログラムの実行は CPU がインストラクション（Instruction）を実行することで進む。</li>
+<li>CPU はインストラクションの実行中に必要な情報を、CPU 内部の記憶装置であるレジスタに保存する。</li>
+<li>演算結果をメモリに渡す前に保存する CPU 内部の記憶装置である。
+（通常、CPU が命令を処理する過程で必要な情報は Register という CPU 内部の記憶装置に保存される。これは CPU に依存せざるを得ない。そのため、Java の思想を実現するには、この CPU 内 Register の役割を JVM 上の論理的なメモリ領域として実装する必要がある。）</li>
+</ul>
+<h3 id="native-method-stack-area">Native Method Stack Area</h3>
+<p>Java 以外の言語で書かれたネイティブコードのための Stack である。<br>
+つまり、JNI（Java Native Interface）を通じて呼び出される C、C++ などのコードを実行するためのスタックである。<br>
+ネイティブメソッドのパラメータ、ローカル変数などをバイトコードとして保存する。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://dzone.com/articles/permgen-and-metaspace" target="_blank" rel="noopener">PermGen and Metaspace<i class="fas fa-external-link-alt"></i></a></li>
+<li><a href="https://www.baeldung.com/java-stack-heap" target="_blank" rel="noopener">Stack Memory and Heap Space in Java<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

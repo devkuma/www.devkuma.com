@@ -1,0 +1,714 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Redis</title>
+    <link>https://www.devkuma.com/jp/tags/redis/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/redis/logo/180x180.jpg</url>
+      <title>Redis</title>
+      <link>https://www.devkuma.com/jp/tags/redis/</link>
+    </image>
+    <description>Recent content in Redis on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Redis の概要</title>
+      <link>https://www.devkuma.com/jp/docs/redis/overview/</link>
+      <pubDate>Mon, 24 May 2021 10:12:26 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/redis/overview/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;概要&#34;&gt;概要&lt;/h2&gt;
+&lt;p&gt;Redis は Remote Dictionary Server の略であり、「キー・値」構造の非定型データを保存、管理するためのオープンソースベースの非リレーショナルデータベース管理システムである。2009年に Salvatore Sanfilippo が初めて開発した。2015年から Redis Labs が支援している。さまざまなサービスで Redis が自由に使用されている。&lt;/p&gt;
+&lt;h3 id=&#34;pareto-principleパレートの法則&#34;&gt;Pareto principle(パレートの法則)&lt;/h3&gt;
+&lt;p&gt;社会で起こる現象の80%は、20%の原因によって発生するという法則である。Web サイトへのアクセスにもパレートの法則がよく当てはまる。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;インターネット通信の80%は、わずか20%のサイトへのアクセスと推定され、この20%の Web サイトデータをキャッシュしておけば効率を劇的に向上できる。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;とされる。&lt;/p&gt;
+&lt;p&gt;(インフラエンジニアの教科書 - ネットワーク編, 2017, Gilbut)&lt;/p&gt;
+&lt;p&gt;したがって、共通で使用されるデータを Redis を利用してキャッシュとして保存しておくことは、リソースを効率的に利用する方法になり得る。&lt;/p&gt;
+&lt;h2 id=&#34;redis-の特徴&#34;&gt;Redis の特徴&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis は key-value store NoSQL DB である。
+&lt;ul&gt;
+&lt;li&gt;単純な string に対する key-value 構造をサポート&lt;/li&gt;
+&lt;li&gt;バイナリデータの書き込み&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Single Thread で動作する。
+&lt;ul&gt;
+&lt;li&gt;シングルスレッドで動作するため、演算の原子性を保証する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;多様なデータ構造をサポートする。
+&lt;ul&gt;
+&lt;li&gt;collection サポート: List、Set、Sorted Set、Hash などのデータ構造をサポート&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;高速
+&lt;ul&gt;
+&lt;li&gt;秒間 100,000 QPS レベルの性能を誇る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Disk 保存
+&lt;ul&gt;
+&lt;li&gt;Disk に永続的に保存できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;レプリケーション(replication)
+&lt;ul&gt;
+&lt;li&gt;他のノードへ内容を複製できる master/slave 構造をサポートする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Sharding サポート
+&lt;ul&gt;
+&lt;li&gt;Redis Cluster を通じてデータ sharding をサポートする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Publish/Subscribe サポート
+&lt;ul&gt;
+&lt;li&gt;メッセージブローカーとして使用可能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Expire(有効期限)
+&lt;ul&gt;
+&lt;li&gt;key に expire を設定し、古くなったデータを自動削除できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;データのスナップショットまたは AOF ログによって復旧できるため、ある程度の永続性も保証される。&lt;/li&gt;
+&lt;li&gt;Java Spring では、セッション管理やキャッシュによく使用される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;なぜ-collection-が重要なのか&#34;&gt;なぜ Collection が重要なのか?&lt;/h3&gt;
+&lt;p&gt;Redis は &lt;strong&gt;In-Memory データベース&lt;/strong&gt; である。つまり、すべてのデータをメモリに保存して照会する。既存のリレーショナルデータベース(Oracle、MySQL)よりはるかに高速だが、その理由はメモリアクセスがディスクアクセスより速いためである。ただし、速いという点は Redis のいくつかの特徴の一部に過ぎない。他の In-Memory データベース、たとえば Memcached との最大の違いは、&lt;strong&gt;&lt;code&gt;多様なデータ構造&lt;/code&gt;&lt;/strong&gt; をサポートする点である。Redis は以下のように、さまざまなデータ構造を Key-Value 形式で保存する。&lt;/p&gt;
+&lt;p&gt;Redis は基本的に String、Bitmap、Hash、List、Set、Sorted Set を提供しており、バージョンが上がるにつれて現在は Geospatial Index、HyperLogLog、Stream などのデータ型もサポートしている。&lt;/p&gt;
+&lt;p&gt;では、このように多様なデータ構造を提供することがなぜ重要なのだろうか。それは &lt;strong&gt;開発の利便性と難易度&lt;/strong&gt; のためである。&lt;/p&gt;
+&lt;p&gt;たとえば、リアルタイムランキングサーバーを実装するときにリレーショナル DBMS を利用するなら、DB にデータを保存し、保存された SCORE 値でソートして再度読み出す過程が必要になる。件数が増えると速度が遅くなりがちだが、この過程でディスクを使用するためである。In-memory ベースでサーバー側のデータ処理を直接実装することもできるが、Redis の Sorted-Set を利用する方がより速く簡単な方法である。&lt;/p&gt;
+&lt;h3 id=&#34;redis-persistence&#34;&gt;Redis Persistence&lt;/h3&gt;
+&lt;p&gt;Redis はディスクにデータを保存する方法として、RDB(Snapshot) と AOF(Append Only File) 方式を使用する。&lt;br&gt;
+どちらの方式も内部的に &lt;code&gt;fork()&lt;/code&gt; 関数を使用するため、十分なメモリが必要である。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RDB(Snapshot)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;メモリ上のデータをディスクへ移す方式である。&lt;/li&gt;
+&lt;li&gt;スナップショット方式はメモリの状態をそのまま取得するため、特定時点のバックアップと復旧に有利であり、AOF 方式に比べてより速くデータをメモリに読み込める。&lt;/li&gt;
+&lt;li&gt;サーバーがダウンすると、バックアップされたスナップショット間に変更されたデータは失われる。&lt;/li&gt;
+&lt;li&gt;2つの方式がある。
+&lt;ul&gt;
+&lt;li&gt;SAVE: blocking 方式で、順次すべての Redis 動作を停止し、その時点の Snapshot を Disk に保存する。&lt;/li&gt;
+&lt;li&gt;BGSAVE: non-blocking 方式で、別プロセスを通じて実行時点のメモリ snapshot をディスクに保存する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;AOF(Append Only File)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis のすべての write/update 演算を log ファイル形式で記録する方法である。&lt;/li&gt;
+&lt;li&gt;サーバーが起動すると、順次演算を再実行してデータを復旧する。&lt;/li&gt;
+&lt;li&gt;演算処理が実行されるたびに記録するため、現在時点までのログを残すことができる。&lt;/li&gt;
+&lt;li&gt;ログファイルに対して append のみを実行するため write 速度が速く、サーバーがダウンしてもデータ損失が発生しない。&lt;/li&gt;
+&lt;li&gt;すべての演算についてログを残すため、データ量が非常に大きい。&lt;/li&gt;
+&lt;li&gt;サーバー再起動時、すべての演算を再実行するため restart 速度が遅い。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;redis-をクラウドで使用&#34;&gt;Redis をクラウドで使用&lt;/h2&gt;
+&lt;p&gt;アプリケーション開発に Amazon Web Services や Microsoft Azure を使用する場合、各クラウドサービスは Redis サービスを提供しているため、それを活用できる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;クラウドサービス&lt;/th&gt;
+					&lt;th&gt;サービス名&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Amazon Web Services&lt;/td&gt;
+					&lt;td&gt;Amazon ElastiCache for Redis&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Microsoft Azure&lt;/td&gt;
+					&lt;td&gt;Azure Redis Cache&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;もちろん各クラウドサービスのコンピュータインスタンスに直接 Redis をインストールすることもできるが、管理コストを考えるとこれらのサービスを選択するのがよい。&lt;/p&gt;
+&lt;h2 id=&#34;参照&#34;&gt;参照&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ko.wikipedia.org/wiki/%EB%A0%88%EB%94%94%EC%8A%A4&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Redis | Wikipedia&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;[redisgate][http://redisgate.kr/]&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Redis</category>
+      
+      <category>NoSQL</category>
+      
+    </item>
+    
+    <item>
+      <title>Redis を Docker でインストール</title>
+      <link>https://www.devkuma.com/jp/docs/redis/install/</link>
+      <pubDate>Fri, 31 Mar 2023 17:46:26 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/redis/install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;redis-docker-インストール&#34;&gt;Redis Docker インストール&lt;/h2&gt;
+&lt;p&gt;学習や検証のために簡単に使うのであれば、Docker を使って Redis をインストールする方法を推奨する。&lt;/p&gt;
+&lt;h3 id=&#34;redis-docker-イメージのダウンロード&#34;&gt;Redis Docker イメージのダウンロード&lt;/h3&gt;
+&lt;p&gt;次のコマンドを実行して Redis Docker をダウンロードする。ここでは alpine バージョンを取得した。&lt;/p&gt;
+&lt;p&gt;別のバージョンタグが必要な場合は、https://hub.docker.com/_/redis/tags を参照するとよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker pull redis:alpine
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ダウンロード後にイメージを確認すると、以下のように一覧を確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker images
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;REPOSITORY         TAG       IMAGE ID       CREATED        SIZE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis              alpine    a4cf5af74f5e   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt; days ago     30.4MB
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;redis-docker-コンテナの作成と実行&#34;&gt;Redis Docker コンテナの作成と実行&lt;/h3&gt;
+&lt;p&gt;次のコマンドを実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run -d -p 6379:6379 --name&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;redis redis:alpine 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-p&lt;/code&gt;: host に公開するポートを指定&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--name&lt;/code&gt;: コンテナ名を指定&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;実行後、実行中のコンテナを確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker container ls
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1df277cb625c   redis:alpine   &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;docker-entrypoint.s…&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt; seconds ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;29&lt;/span&gt; seconds   0.0.0.0:6379-&amp;gt;6379/tcp   redis
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;redis-docker-への接続&#34;&gt;Redis Docker への接続&lt;/h2&gt;
+&lt;h3 id=&#34;redis-docker-コンテナ内部への接続&#34;&gt;Redis Docker コンテナ内部への接続&lt;/h3&gt;
+&lt;p&gt;Redis に接続する前に、Redis がインストールされた Docker コンテナの内部へ接続する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it redis /bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;もし以下のようなエラーメッセージが出る場合は、&lt;code&gt;/bin/sh&lt;/code&gt; で接続してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OCI runtime &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; failed: &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; failed: unable to start container process: exec: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/bin/bash&amp;#34;&lt;/span&gt;: stat /bin/bash: no such file or directory: unknown
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker &lt;span style=&#34;color:#204a87&#34;&gt;exec&lt;/span&gt; -it redis /bin/sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;redis-へ接続&#34;&gt;Redis へ接続&lt;/h3&gt;
+&lt;p&gt;コンテナ内部へ接続できたら、Redis に接続してみる。&lt;code&gt;redis-cli&lt;/code&gt; コマンドで Redis に接続する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/data &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# redis-cli&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;接続できると、上記のように &lt;code&gt;IP:port&amp;gt;&lt;/code&gt; プロンプトへ変更される。&lt;/p&gt;
+&lt;p&gt;Redis の情報を確認するには、以下のように &lt;code&gt;info&lt;/code&gt; を入力すればよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; info
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Server&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_version:7.0.10
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;抜けるには &lt;code&gt;Ctrl+C&lt;/code&gt; を押せばよい。&lt;/p&gt;
+
+      </description>
+      
+      <category>Redis</category>
+      
+      <category>NoSQL</category>
+      
+    </item>
+    
+    <item>
+      <title>Redis redis-cli</title>
+      <link>https://www.devkuma.com/jp/docs/redis/redis-cli/</link>
+      <pubDate>Fri, 10 Mar 2023 14:39:26 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/redis/redis-cli/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;redis-cli-インストール&#34;&gt;redis-cli インストール&lt;/h2&gt;
+&lt;p&gt;macOS 環境に Homebrew でインストールする方法は以下のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew tap aoki/redis-cli
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew update &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; brew doctor
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;brew install redis-cli
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a href=&#34;https://github.com/aoki/homebrew-redis-cli&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;github.com/aoki/homebrew-redis-cli&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;サーバー制御&#34;&gt;サーバー制御&lt;/h2&gt;
+&lt;h3 id=&#34;redis-cli-接続&#34;&gt;redis-cli 接続&lt;/h3&gt;
+&lt;p&gt;ホスト名とポート番号を省略すると、localhost の 6379 に接続される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ redis-cli
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;リモート接続は以下のように行う。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ redis-cli -h &lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;#{ホスト名} -p #{ポート番号}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;その他の主なオプションは以下のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-n&lt;/code&gt;: database 番号&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-a&lt;/code&gt;: パスワード&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-s&lt;/code&gt;: ソケット&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-u&lt;/code&gt;: サーバー URL など、接続時にさまざまなオプション設定が使用可能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;サーバー情報の照会&#34;&gt;サーバー情報の照会&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis-cli info
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; info
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# Server&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_version:6.0.9
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_git_sha1:00000000
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_git_dirty:0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_build_id:ffd199d8341c2d8f
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis_mode:standalone
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 以下省略 ....
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;接続中クライアント一覧の照会&#34;&gt;接続中クライアント一覧の照会&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; client list
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;接続中クライアントの切断&#34;&gt;接続中クライアントの切断&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; client &lt;span style=&#34;color:#204a87&#34;&gt;kill&lt;/span&gt; 10.0.0.8:33333
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;コマンド実行後に受信したリクエストをすべてダンプ&#34;&gt;コマンド実行後に受信したリクエストをすべてダンプ&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;redis-cli monitor
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; monitor
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;key-操作&#34;&gt;Key 操作&lt;/h2&gt;
+&lt;h3 id=&#34;keyvalue-の設定&#34;&gt;key、value の設定&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;set&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;value&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; &lt;span style=&#34;color:#204a87&#34;&gt;set&lt;/span&gt; key01 value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-で-value-を照会&#34;&gt;key で value を照会&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; get key01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value01
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-一覧の照会&#34;&gt;key 一覧の照会&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; keys *
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;key01
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-の削除&#34;&gt;key の削除&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; del key01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-が存在するか確認1なら-true&#34;&gt;key が存在するか確認。1なら true&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exists &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;value&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; exists key01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-がまだ存在しない場合にデータをセット&#34;&gt;key がまだ存在しない場合にデータをセット&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;setnx &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;value&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; setnx key01 value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; setnx key01 value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;結果が 0 であれば、key が存在するためデータが更新されなかったことを意味する。&lt;/p&gt;
+&lt;h3 id=&#34;既存-key-名の変更&#34;&gt;既存 key 名の変更&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;rename &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;以前の key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;新しい key名&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; rename key01 key02 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; rename key03 key04
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERR no such key
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;現在のデータベースの-key-数を返す&#34;&gt;現在のデータベースの key 数を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; dbsize
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;特定-key-を別のデータベースへ移動&#34;&gt;特定 key を別のデータベースへ移動&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; move key01 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;db-番号の選択&#34;&gt;DB 番号の選択&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;select&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;現在のデータベースの-key-をすべて削除&#34;&gt;現在のデータベースの key をすべて削除&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; flushdb
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;すべてのデータベースの-key-をすべて削除&#34;&gt;すべてのデータベースの key をすべて削除&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; flushall
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;正規表現&#34;&gt;正規表現&lt;/h3&gt;
+&lt;p&gt;Redis で使用できる正規表現は次のみである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[]&lt;/code&gt;: 括弧内の文字のいずれか1つ&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;*&lt;/code&gt;: 任意の文字列&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;?&lt;/code&gt;: 単一文字&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;使用例&#34;&gt;使用例&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# すべての Key 一覧を照会する。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ keys *
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# 数字で始まる key を照会する。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ keys &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;0-9&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;*
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;multiple-key&#34;&gt;Multiple Key&lt;/h2&gt;
+&lt;h3 id=&#34;複数の-key-値をまとめて設定&#34;&gt;複数の key 値をまとめて設定&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; mset key01 value01 key02 value02 key03 value03 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;複数の-key-値を一度に照会&#34;&gt;複数の key 値を一度に照会&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; mget key01 key02 key03
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value03
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;expire&#34;&gt;expire&lt;/h2&gt;
+&lt;h3 id=&#34;有効期限を設定して-key-を設定&#34;&gt;有効期限を設定して key を設定&lt;/h3&gt;
+&lt;p&gt;以下の例では 60 秒に設定している。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; setex key01 60 value01 
+OK
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;既存-key-の有効期限設定&#34;&gt;既存 key の有効期限設定&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; expire key02 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;math&#34;&gt;Math&lt;/h2&gt;
+&lt;h3 id=&#34;key-値に-1-を加える&#34;&gt;key 値に 1 を加える&lt;/h3&gt;
+&lt;p&gt;以下の例では &lt;code&gt;key02&lt;/code&gt; に 1 を設定し、1 を増加させる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; &lt;span style=&#34;color:#204a87&#34;&gt;set&lt;/span&gt; key02 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; incr key02 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-値に指定した数を加える&#34;&gt;key 値に指定した数を加える&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; incrby key02 100 
+102
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;key-値から-1-を引く&#34;&gt;key 値から 1 を引く&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; decr key02 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;101&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;key-値から指定した数を引く&#34;&gt;key 値から指定した数を引く&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; decrby key02 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;51&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;50&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;list&#34;&gt;List&lt;/h2&gt;
+&lt;h3 id=&#34;list-の先頭に値を追加&#34;&gt;List の先頭に値を追加&lt;/h3&gt;
+&lt;p&gt;空白で区切って複数の値を指定できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; lpush list01 value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;list-の末尾に値を追加&#34;&gt;List の末尾に値を追加&lt;/h3&gt;
+&lt;p&gt;空白で区切って複数の値を指定できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; rpush list01 value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;list-要素の数を返す&#34;&gt;List 要素の数を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; llen list01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;list-で指定番号の要素を返す&#34;&gt;List で指定番号の要素を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; lindex list01 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value01
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;list-で指定した開始番号から終了番号までの要素を返す&#34;&gt;List で指定した開始番号から終了番号までの要素を返す&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; lrange list01 0 1
+value01
+value02
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;list-の指定番号の要素を指定値へ変更&#34;&gt;List の指定番号の要素を指定値へ変更&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; lset list01 1 value03
+OK
+&amp;gt; lindex list01 1
+value03
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;list-の最初の要素を返して削除&#34;&gt;List の最初の要素を返して削除&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; lpop list01
+value01
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;list-の最後の要素を返して削除&#34;&gt;List の最後の要素を返して削除&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;&amp;gt; rpop list01
+value03
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;list-で指定した開始番号から終了番号までの要素だけを残す形でリストを変更&#34;&gt;List で指定した開始番号から終了番号までの要素だけを残す形でリストを変更&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; ltrim list01 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;hash&#34;&gt;Hash&lt;/h2&gt;
+&lt;p&gt;親 Key、子 Key(field)、値(value)によって管理されるデータ形式である。たとえば、親 Key を製品 ID、子 Key を製品属性情報の保存に使うと、RDB のデータ管理に近い考え方で使用できる。&lt;/p&gt;
+&lt;h3 id=&#34;hash-の指定フィールドに値を追加&#34;&gt;Hash の指定フィールドに値を追加&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hset hash01 field01 value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の指定フィールドの値を返す&#34;&gt;Hash の指定フィールドの値を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hget hash01 field01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;value01&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の複数フィールドに追加&#34;&gt;Hash の複数フィールドに追加&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hmset hash01 field02 value02 field03 value03
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の複数フィールドの値を返す&#34;&gt;Hash の複数フィールドの値を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hmget hash01 field01 field02 field03
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value03
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-フィールドをすべて返す&#34;&gt;Hash フィールドをすべて返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hkeys hash01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;field01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;field02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;field03
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-フィールドの値をすべて返す&#34;&gt;Hash フィールドの値をすべて返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hvals hash01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value02
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;value03
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の指定フィールドの値に指定数を加算&#34;&gt;Hash の指定フィールドの値に指定数を加算&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hincrby hash01 field04 &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;100&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;101&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の指定フィールドが存在するか確認&#34;&gt;Hash の指定フィールドが存在するか確認&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hexists hash01 field01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-フィールド数を返す&#34;&gt;Hash フィールド数を返す&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hlen hash01
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;hash-の指定フィールドを削除&#34;&gt;Hash の指定フィールドを削除&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&amp;gt; hdel hash01 field04
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;その他の操作&#34;&gt;その他の操作&lt;/h2&gt;
+&lt;h3 id=&#34;keys-を使用できないときに-key-を検索する方法&#34;&gt;keys を使用できないときに key を検索する方法&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;scan &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; match devkuma-* count &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;key 名は wildcard 検索でき、&lt;code&gt;devkuma-*&lt;/code&gt; は &lt;code&gt;devkuma-&lt;/code&gt; で始まる key を検索する。&lt;/p&gt;
+
+      </description>
+      
+      <category>Redis</category>
+      
+      <category>NoSQL</category>
+      
+    </item>
+    
+    <item>
+      <title>Redis データ構造(Structure)の照会と保存</title>
+      <link>https://www.devkuma.com/jp/docs/redis/data-structure/</link>
+      <pubDate>Fri, 31 Mar 2023 17:46:26 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/redis/data-structure/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;データ構造collection&#34;&gt;データ構造(Collection)&lt;/h2&gt;
+&lt;p&gt;Redis はさまざまなデータ構造(Structure)を提供する。&lt;/p&gt;
+&lt;p&gt;Redis でのデータ表現の基本型は、1つの Key と1つ以上の Field/Element 値で構成される。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Key
+&lt;ul&gt;
+&lt;li&gt;ASCII value を保存する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Value (Field/Element)
+&lt;ul&gt;
+&lt;li&gt;基本的に String データを保存する。&lt;/li&gt;
+&lt;li&gt;Container タイプのデータを保存する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Container タイプ
+&lt;ul&gt;
+&lt;li&gt;Hash、List、Set、Sorted Set などを含む。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;strings&#34;&gt;Strings&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/redis/redis-data-structure-strings.png&#34; alt=&#34;Redis データ型 Strings&#34;&gt;&lt;/p&gt;
+&lt;p&gt;String は Redis value のもっとも基本的なデータ型である。value に文字や数字などを保存する。保存時に数字と文字を別途区別しない。&lt;br&gt;
+Redis String は binary safe である。これは Redis string が JPEG image や serialized Ruby object のようなあらゆる種類の data を含められることを意味する。&lt;/p&gt;
+&lt;p&gt;String value は最大 512 MB の長さを持つことができる。&lt;/p&gt;
+&lt;h3 id=&#34;strings-redis-コマンド&#34;&gt;Strings Redis コマンド&lt;/h3&gt;
+&lt;p&gt;キー・値構造でデータを保存し、照会してみる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;コマンド&lt;/th&gt;
+					&lt;th&gt;文法&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;set&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;set key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;key-value を保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;get&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;get key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;key に該当する value を照会する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;del&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;del key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;key を削除する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; &lt;span style=&#34;color:#204a87&#34;&gt;set&lt;/span&gt; devkuma &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;OK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; get devkuma
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;1000&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; del devkuma
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; get devkuma
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;nil&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;lists&#34;&gt;Lists&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/redis/redis-data-structure-lists.png&#34; alt=&#34;Redis データ型 Lists&#34;&gt;&lt;/p&gt;
+&lt;p&gt;List は単純に挿入順で整列された String list である。String 型が配列構造になったものと考えればよい。&lt;br&gt;
+新しい要素を list の前または後ろに追加できる。最大約40億要素まで保持できるとされる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;コマンド&lt;/th&gt;
+					&lt;th&gt;文法&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;lpush&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;LPUSH key element [element ...]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;left push であり、左から、index は 0 からデータを保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;lpop&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;LPOP key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;left pop であり、list の index 0 からデータを抽出する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;rpush&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;RPUSH key element [element ...]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;right push であり、右から、つまり index last からデータを保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;rpop&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;RPOP key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;right pop であり、list の index last からデータを抽出する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;lrange&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;LRANGE key start stop&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;list のデータを start から end まで抽出する。&lt;br&gt;lrange で end を -1 と宣言すると、その list のデータをすべて抽出する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;LPUSH コマンドは新しい要素を head の前に追加し、RPUSH は後ろに追加する。empty key に実行される場合は new list が作成されて追加される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; lpush fruit apple
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; lpush fruit banana
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; lpush fruit orange
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;3&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; lrange fruit &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;orange&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;banana&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;3&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;apple&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sets&#34;&gt;Sets&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/redis/redis-data-structure-sets.png&#34; alt=&#34;Redis データ型 Sets&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Set は整列されていない String collection である。List 型からインデックスがなくなった型である。Value に重複がない。Lists より高速に処理できる。&lt;/p&gt;
+&lt;p&gt;ランダムにデータを抽出できるという意味では、機械学習などに使用できるかもしれない。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;コマンド&lt;/th&gt;
+					&lt;th&gt;文法&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;sadd&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;SADD key member [member...]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;set の key に member を追加する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;srem&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;SREM key member [member...]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;set の key から member を削除する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;smembers&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;SMEMBERS key&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;set の key のすべての member を照会する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;code&gt;sadd&lt;/code&gt; コマンドで key &lt;code&gt;animal&lt;/code&gt; に要素を追加してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; sadd animal dog
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; smembers animal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dog&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; sadd animal cat cow
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; smembers animal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dog&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;cat&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;3&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;cow&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;srem&lt;/code&gt; コマンドで key &lt;code&gt;animal&lt;/code&gt; から要素を削除してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; srem animal cat
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; smembers animal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;dog&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;cow&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;全体を削除するには &lt;code&gt;del&lt;/code&gt; コマンドを使用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; del animal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;integer&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt; smembers animal
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;empty array&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;127.0.0.1:6379&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sorted-sets&#34;&gt;Sorted Sets&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/redis/redis-data-structure-stored-sets.png&#34; alt=&#34;Redis データ型 Sorted Sets&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Sorted set は Redis set と似た、重複しない String の集合である。
+Set 型に score という概念が付いたものである。ここでも Value に重複はない。score 順に整列したり、score に対してしきい値処理をしたりできる。ゲームのリアルタイムランキング表示などに使えそうである。&lt;/p&gt;
+&lt;h2 id=&#34;hashes&#34;&gt;Hashes&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/redis/redis-data-structure-hashs.png&#34; alt=&#34;Redis データ型 Hashes&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Hashes の場合、key 1つに複数の field と value のペアで構成される。Set に文字列で指定できる field という概念が付いたものである。&lt;/p&gt;
+&lt;p&gt;すべての hash は最大 2^32 - 1 個の field-value ペア、つまり約40億個以上を保存できる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;コマンド&lt;/th&gt;
+					&lt;th&gt;文法&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;hset&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;HSET key field [field value...]&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;1つまたは複数の値を設定する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;&lt;code&gt;hget&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;HGET key field&lt;/code&gt;&lt;/td&gt;
+					&lt;td&gt;1つまたは複数の値を取得する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;bitmaps-and-hyperloglogs&#34;&gt;Bitmaps and HyperLogLogs&lt;/h2&gt;
+&lt;p&gt;Redis はまた、実際には String base type を基盤としながら独自の意味を持つ data type である Bitmap および HyperLogLogs もサポートする。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://redis.io/docs/data-types/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Redis data types | Redis&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Redis</category>
+      
+      <category>NoSQL</category>
+      
+    </item>
+    
+    <item>
+      <title>Redis Command SETEX key Seconds value</title>
+      <link>https://www.devkuma.com/jp/docs/redis/setex/</link>
+      <pubDate>Fri, 31 Mar 2023 17:46:26 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/redis/setex/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;setex&#34;&gt;SETEX&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;SETEX&lt;/code&gt; コマンドは、文字列値に key と秒数(second)を指定する。指定した秒数の後にデータが削除される。&lt;br&gt;
+有効期限を持つデータを保存するときに便利に使われる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用可能バージョン: version 2.0.0 以降&lt;/li&gt;
+&lt;li&gt;論理的な処理時間計算量: O(1)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;以下2つのコマンドと同じように動作する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;SET mykey value
+EXPIRE mykey seconds
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;setex-の使い方&#34;&gt;SETEX の使い方&lt;/h2&gt;
+&lt;p&gt;使い方は以下のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;SETEX [key] [seconds] [value]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2&gt;&lt;/h2&gt;
+&lt;p&gt;文字列値を保存する key を作成するとき、タイムアウト(timeout)も設定できる。key はタイムアウト時間が経過した後に削除される。以下2つのコマンドと同じ効果である。&lt;/p&gt;
+&lt;p&gt;指定した時間後にデータが削除される: 秒単位で指定。
+指定した秒(second)の後にデータが削除される。
+有効期限を持つデータを保存するときに便利に使われる。
+使い方は &lt;code&gt;SETEX key seconds value&lt;/code&gt; である。&lt;/p&gt;
+&lt;p&gt;Example
+Command&amp;gt; setex key 5 value
+Result&amp;gt; OK
+Command&amp;gt; ttl key
+Result&amp;gt; 2   残り時間を秒(second)で知らせる
+Command&amp;gt; get key
+Result&amp;gt; (nil)   5秒が経過してデータが削除された
+アニメーションを見る&lt;/p&gt;
+&lt;p&gt;TTL コマンドは残り時間を秒(second)で知らせる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Redis</category>
+      
+      <category>NoSQL</category>
+      
+    </item>
+    
+  </channel>
+</rss>

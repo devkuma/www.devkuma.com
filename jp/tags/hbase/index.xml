@@ -1,0 +1,1754 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – HBase</title>
+    <link>https://www.devkuma.com/jp/tags/hbase/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/hbase/logo/180x180.jpg</url>
+      <title>HBase</title>
+      <link>https://www.devkuma.com/jp/tags/hbase/</link>
+    </image>
+    <description>Recent content in HBase on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/hbase/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Apache HBase 概要</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/overview/</link>
+      <pubDate>Fri, 08 Jul 2022 09:37:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/overview/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;hbase-とは&#34;&gt;HBase とは？&lt;/h2&gt;
+&lt;p&gt;Apache HBase は、米国 Apache Software Foundation が開発し公開しているオープンソースの分散データベース管理システムである。データベースの主流であるリレーショナルデータベースとは異なる構造を持つ NoSQL システムの一つである。&lt;/p&gt;
+&lt;p&gt;Google が開発し社内システムで内部的に使用している BigTable をモデルに、類似した構造や機能を持つデータベース管理システムをオープンソースソフトウェアとして再現したものである。&lt;/p&gt;
+&lt;p&gt;同じく ASF が開発して公開している分散ファイルシステム HDFS (Hadoop Distributed File System) を基盤としてデータベースを構築する。リレーショナルデータベースと同じようにテーブル形式でデータを構造化するが、一般的な RDBMS とは異なり、各カラムの値をまとめてストレージ上に記録する。この方式をカラム指向型と呼ぶ。&lt;/p&gt;
+&lt;p&gt;テーブルの各行 (row) には、カラム名に相当する qualifier と、フィールド値に相当する cell という単位のデータのペアを単位としてデータを保存する。そして、複数の qualifier が column family としてグループ化されている。cell のデータは自動的に履歴管理され、過去の任意時点のデータを呼び出すことができる。&lt;/p&gt;
+&lt;p&gt;複数のサーバーコンピュータで 1 つのデータベースを管理する分散環境を前提に設計されており、データを複数ノードに分散して記録するシャーディングを自動的に実行する。そのため、アプリケーション側で対象を意識する必要がなく、データの一貫性も強く確保され、処理中に古いデータが外部から参照されないようになっている。&lt;/p&gt;
+&lt;p&gt;データベース操作は、RDB のような SQL ではなく、Java API や RESTful API などの形式で提供される API をアプリケーションから呼び出して行う。Apache Hadoop の MapReduce など、ビッグデータの大規模分散処理に適している。&lt;/p&gt;
+&lt;p&gt;HBase は SQL データベースを置き換えるソリューションではないが、Apache Phoenix のようなソフトウェアを使って SQL レイヤーを追加できる。SQL レイヤーを追加すると、JDBC ドライバなどを使い、さまざまな分析作業を慣れた方法で簡単に処理できる。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/apache/hbase&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache HBase|GitHub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;hbase-の歴史&#34;&gt;HBase の歴史&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;年&lt;/th&gt;
+					&lt;th&gt;イベント&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2006年11月&lt;/td&gt;
+					&lt;td&gt;Google が BigTable の論文を発表した。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2007年2月&lt;/td&gt;
+					&lt;td&gt;初期 HBase プロトタイプが Hadoop へのコントリビューションとして作成された。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2007年10月&lt;/td&gt;
+					&lt;td&gt;Hadoop 0.15.0 とともに利用可能な最初の HBase がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2008年1月&lt;/td&gt;
+					&lt;td&gt;HBase は Hadoop のサブプロジェクトになった。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2008年10月&lt;/td&gt;
+					&lt;td&gt;HBase 0.18.1 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2009年1月&lt;/td&gt;
+					&lt;td&gt;HBase 0.19.0 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2009年9月&lt;/td&gt;
+					&lt;td&gt;HBase 0.20.0 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2010年5月&lt;/td&gt;
+					&lt;td&gt;HBase は Apache トップレベルプロジェクトになった。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2010年6月&lt;/td&gt;
+					&lt;td&gt;最初の開発者版である HBase 0.89.20100621 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2011年1月&lt;/td&gt;
+					&lt;td&gt;HBase 0.90.0 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2011年半ば&lt;/td&gt;
+					&lt;td&gt;HBase 0.92.0 がリリースされた。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;hbase-の特徴&#34;&gt;HBase の特徴&lt;/h2&gt;
+&lt;p&gt;Apache HBase の重要な特徴をいくつか示す。&lt;/p&gt;
+&lt;h3 id=&#34;分散-distributed&#34;&gt;分散 (Distributed)&lt;/h3&gt;
+&lt;p&gt;Apache HBase は、疑似分散 (Pseudo-distributed) モードと完全分散 (Fully distributed) モードの 2 つのモードで実行できる。疑似分散モードはテスト目的で使用され、単一ノードで実行される。一方、完全分散モードは本番環境で使用され、ノードクラスタ上で実行される。&lt;/p&gt;
+&lt;h3 id=&#34;ビッグデータストア&#34;&gt;ビッグデータストア&lt;/h3&gt;
+&lt;p&gt;Apache HBase は、数十億行と数百万または数十億カラムを持つテーブルに非常に大きなデータを保存できるように設計されている。Hadoop HDFS 上で実行されるため、低レイテンシでデータに対するリアルタイムの読み書きが可能である。テーブルに保存された膨大なデータの読み取り処理に対して、より良い性能を提供する。&lt;/p&gt;
+&lt;h3 id=&#34;非リレーショナル-non-relational&#34;&gt;非リレーショナル (Non-Relational)&lt;/h3&gt;
+&lt;p&gt;すでに述べたように、Apache HBase は非リレーショナルデータベースであるため、リレーショナルデータベースモデルには従わない。リレーショナルデータベース管理では、データは行と列の形でテーブルに保存される。そのデータへアクセスするには SQL 言語を使用できるが、Apache HBase の場合、データストレージは固定形式ではなく、独自のストレージおよびクエリメカニズムを使用する。Apache HBase ではスキーマは柔軟であり、要件に応じて拡張できる。&lt;/p&gt;
+&lt;h3 id=&#34;柔軟なデータモデル&#34;&gt;柔軟なデータモデル&lt;/h3&gt;
+&lt;p&gt;Apache HBase は、テーブルにデータを保存できる柔軟なデータモデルを提供する。テーブルには 1 つ以上の column family がある。ユーザーのデータは、key/value ペアの集合である row に保存される。テーブル内の row は row key によって一意に識別される。&lt;/p&gt;
+&lt;h3 id=&#34;拡張可能-scalable&#34;&gt;拡張可能 (Scalable)&lt;/h3&gt;
+&lt;p&gt;Apache HBase の Region は、行が Region ごとに分散されるため水平スケールが可能である。テーブルは複数の Region に保存でき、Region が非常に大きくなると、同じ中央の row key を基準にデータが 2 つの Region に分割される。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-の機能&#34;&gt;HBase の機能&lt;/h2&gt;
+&lt;p&gt;Apache HBase の機能は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;線形およびモジュール式のスケーラビリティをサポートする。&lt;/li&gt;
+&lt;li&gt;読み取りと書き込みの厳密な一貫性を提供する。&lt;/li&gt;
+&lt;li&gt;自動かつ設定可能なテーブルシャーディングを提供する。&lt;/li&gt;
+&lt;li&gt;RegionServer 間の自動 failover をサポートする。&lt;/li&gt;
+&lt;li&gt;Apache HBase テーブルで Hadoop MapReduce ジョブをサポートするための便利な基本クラスを提供する。&lt;/li&gt;
+&lt;li&gt;クライアントアクセスのために Java API を簡単に利用できる。&lt;/li&gt;
+&lt;li&gt;リアルタイムクエリのためのブロックキャッシュと Bloom filter を提供する。&lt;/li&gt;
+&lt;li&gt;サーバーサイドフィルタを通じてクエリ述語プッシュダウンを提供する。&lt;/li&gt;
+&lt;li&gt;拡張可能な JRuby ベース (JIRB) シェルを提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;hbase-の長所と短所&#34;&gt;HBase の長所と短所&lt;/h2&gt;
+&lt;h3 id=&#34;hbase-の長所&#34;&gt;HBase の長所&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;大容量データを安定して扱うのに効果的である。
+&lt;ul&gt;
+&lt;li&gt;中央で分散システム全体を制御する Master を置き、全体データの一貫性を管理することで、複製データ間の一貫性を保証する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;大量データの分析処理支援に適している。
+&lt;ul&gt;
+&lt;li&gt;MapReduce の input として使いやすい。&lt;/li&gt;
+&lt;li&gt;HDFS、MapReduce などと一緒に使用するのに最適化されている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;性能問題が発生した場合、Region server を追加するだけで性能を維持できる。&lt;/li&gt;
+&lt;li&gt;failover が容易で管理しやすい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;hbase-の短所&#34;&gt;HBase の短所&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;MapReduce の input として使いやすいが、同時にファイル input と一緒に使用すると CPU 使用率が高くなり、Region server が容易に down する。&lt;/li&gt;
+&lt;li&gt;適切な HBase setting のための条件に関する資料はあるが、Cluster の規模や基本 Spec が異なるため、そのまま適用するのは難しい。&lt;/li&gt;
+&lt;li&gt;特定 Region server に特定 table の Region が集中しやすく、性能低下につながる。
+&lt;ul&gt;
+&lt;li&gt;構成時には HBase の適切な設計が必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rdbms-と-hbase-の違い&#34;&gt;RDBMS と HBase の違い&lt;/h2&gt;
+&lt;p&gt;リレーショナルデータベースと HBase の主な違いを見てみる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;RDBMS&lt;/th&gt;
+					&lt;th&gt;HBase&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;テーブルをデータベースとして使用する。&lt;/td&gt;
+					&lt;td&gt;Region をデータベースとして使用する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;サポートされるファイルシステムは FAT、NTFS、EXT である。&lt;/td&gt;
+					&lt;td&gt;サポートされるファイルシステムは HDFS である。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;コミットログを使用してログを保存する。&lt;/td&gt;
+					&lt;td&gt;WAL (Write-Ahead Logs) を使用してログを保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;使用される参照システムは coordinate system である。&lt;/td&gt;
+					&lt;td&gt;ZooKeeper で使用される参照システムである。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Primary key を使用する。&lt;/td&gt;
+					&lt;td&gt;Row key を使用する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Partitioning がサポートされる。&lt;/td&gt;
+					&lt;td&gt;Sharding がサポートされる。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Row、Column、Cell を使用する。&lt;/td&gt;
+					&lt;td&gt;Row、Column family、Column、Cell を使用する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;hdfs-と-hbase-の違い&#34;&gt;HDFS と HBase の違い&lt;/h2&gt;
+&lt;p&gt;HDFS と HBase の主な違いを見てみる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;HDFS&lt;/th&gt;
+					&lt;th&gt;HBase&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;HDFS は分散保存のためのファイルシステムを提供する。&lt;/td&gt;
+					&lt;td&gt;HBase はテーブル形式のカラムベースデータストレージを提供する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;HDFS は大容量ファイルに最適化されたストレージを提供する。&lt;/td&gt;
+					&lt;td&gt;HBase はテーブル形式データに対する最適化を提供する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;フラットファイルを使用する。&lt;/td&gt;
+					&lt;td&gt;key-value ペアのデータを使用する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;データモデルは柔軟ではない。&lt;/td&gt;
+					&lt;td&gt;柔軟なデータモデルを提供する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;ファイルシステムと処理フレームワークを使用する。&lt;/td&gt;
+					&lt;td&gt;Hadoop MapReduce サポートを内蔵したテーブル形式ストレージを使用する。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;ほとんど write-once-read-many に最適化されている。&lt;/td&gt;
+					&lt;td&gt;多くの読み書きの両方に最適化されている。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;行指向データストアとカラム指向データストアの違い&#34;&gt;行指向データストアとカラム指向データストアの違い&lt;/h2&gt;
+&lt;p&gt;行指向 (Row-oriented) データストアとカラム指向 (Column-oriented) データストアの主な違いを見てみる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;行指向データストア&lt;/th&gt;
+					&lt;th&gt;カラム指向データストア&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;行指向データストアはレコードの追加/修正に効率的である。&lt;/td&gt;
+					&lt;td&gt;カラム指向データストアはデータ読み取りに効率的である。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;行全体を含むページを読み取る。&lt;/td&gt;
+					&lt;td&gt;必要なカラムだけを読み取る。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;OLTP システムに最も適している。&lt;/td&gt;
+					&lt;td&gt;まだ OLTP システムには適していない。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;行全体の値をシリアライズする。&lt;/td&gt;
+					&lt;td&gt;カラム全体の値をシリアライズする。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;メモリの連続ページに行を保存する。&lt;/td&gt;
+					&lt;td&gt;ページのカラムをメモリに保存する。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;OLTP (Online Transactional Processing) とは、オンライントランザクション処理を意味し、ネットワーク上のオンラインユーザーによる Database に対する一括トランザクション処理を指す。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;カラム指向データベースの長所と短所&#34;&gt;カラム指向データベースの長所と短所&lt;/h2&gt;
+&lt;p&gt;カラム指向データベースの長所と短所を見てみる。&lt;/p&gt;
+&lt;h3 id=&#34;長所&#34;&gt;長所&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;効率性およびデータ圧縮に対するサポート機能が組み込まれている。&lt;/li&gt;
+&lt;li&gt;高速なデータ検索をサポートする。&lt;/li&gt;
+&lt;li&gt;カラム指向データベースでは管理と構成が単純化される。&lt;/li&gt;
+&lt;li&gt;COUNT、SUM、AVG、MIN、MAX などの集計クエリに対する高性能に適している。&lt;/li&gt;
+&lt;li&gt;より大きな Region をより小さな Region に分配する自動シャーディングメカニズムを提供するため、partitioning に効率的である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;短所&#34;&gt;短所&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;複数テーブルの JOIN クエリおよびデータが最適化されていない。&lt;/li&gt;
+&lt;li&gt;頻繁な削除と更新のために partition を作成する必要があり、ストレージ効率が低下する。&lt;/li&gt;
+&lt;li&gt;非リレーショナルな特性上、partition と index の設計が非常に難しい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;hbase-のユースケース&#34;&gt;HBase のユースケース&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;データ一貫性を保証するため、または分析などの用途で使用する。
+&lt;ul&gt;
+&lt;li&gt;例: Facebook、eBay、Adobe、LINE など。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;監視システム (Monitoring system)。&lt;/li&gt;
+&lt;li&gt;ユーザー操作の追跡 (Tracking user actions)。&lt;/li&gt;
+&lt;li&gt;監査ログシステム (Audit logging systems)。&lt;/li&gt;
+&lt;li&gt;リアルタイム分析 (Real-time analytics)。
+&lt;ul&gt;
+&lt;li&gt;Hadoop を使用して大量データを分析する必要がある場合。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;大規模 SNS サービスのメインストレージとして利用。
+&lt;ul&gt;
+&lt;li&gt;メッセージ中心システム (Twitter に似たメッセージおよびステータス)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;HBase からコンテンツを提供するコンテンツ管理システム。&lt;/li&gt;
+&lt;li&gt;Web クローリング中の Web ページ保存のような標準的なユースケース。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考資料&#34;&gt;参考資料&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.cloudduggu.com/hbase/introduction/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache HBase Introduction&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://hbase.apache.org/book.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache HBase ™ Reference Guide&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache HBase アーキテクチャ</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/architecture/</link>
+      <pubDate>Fri, 08 Jul 2022 09:40:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/architecture/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;apache-hbase-architecture&#34;&gt;Apache HBase Architecture&lt;/h2&gt;
+&lt;p&gt;Apache HBase は NoSQL データベースである。NoSQL は、データベースが SQL を基本アクセス言語としてサポートする RDBMS ではないことを示す一般的な表現である。Apache HBase は、従来の意味でのデータベースというよりデータストアである。HBase はクラスタに汎用ノードを追加することで、線形かつモジュール式に拡張できる。ノードを 20 個から 40 個に増やすと、HBase クラスタのストレージと容量も同時に増加する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;HBase クラスタアーキテクチャ&lt;/strong&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-cluster-architure.jpg&#34; alt=&#34;HBase クラスタアーキテクチャ&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;apache-hbase-の構成要素&#34;&gt;Apache HBase の構成要素&lt;/h2&gt;
+&lt;p&gt;HBase は Master server と Region server の 2 種類のサーバーで構成される。&lt;br&gt;
+Region server を増設することで簡単にスケールアウトできる構造になっている。
+HBase のデータは Region という単位に分割されており、Region の扱い方によってサーバーの種類が分かれる。&lt;/p&gt;
+&lt;h3 id=&#34;master-server---hbase-hmaster&#34;&gt;Master server - HBase HMaster&lt;/h3&gt;
+&lt;p&gt;Apache HBase HMaster は、RegionServer の監視、障害処理、Region 分割管理を担当する HBase クラスタの重要な構成要素である。&lt;/p&gt;
+&lt;p&gt;各テーブルのデータは RegionServer が管理し、クラスタ全体は HMaster が管理する。&lt;br&gt;
+HMaster は、HBase のすべてのデータ (Region) がどの Region server に保存されているかというメタ情報を管理するサーバーである。&lt;br&gt;
+Region server に Region を割り当て、Region server の障害を検知する。&lt;/p&gt;
+&lt;p&gt;HMaster の機能は次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;RegionServer を監視する。
+&lt;ul&gt;
+&lt;li&gt;Region server を調整する。&lt;/li&gt;
+&lt;li&gt;Region の起動を管理する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RegionServer の failover を処理する。&lt;/li&gt;
+&lt;li&gt;Region を割り当て、または解除する。&lt;/li&gt;
+&lt;li&gt;クラスタ内のすべての Region server を監視する。
+&lt;ul&gt;
+&lt;li&gt;管理機能。&lt;/li&gt;
+&lt;li&gt;テーブルの作成、削除、更新。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;メタデータ変更を処理するために使用される。&lt;/li&gt;
+&lt;li&gt;すべてのメタデータ変更に対するインターフェースを提供する。&lt;/li&gt;
+&lt;li&gt;アイドル時間にリバランシングを実行するために使用される。&lt;/li&gt;
+&lt;li&gt;HMaster は HBase クラスタに関する情報を表示する Web ユーザーインターフェースを提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-hmaster.png&#34; alt=&#34;HBase HMaster&#34;&gt;&lt;/p&gt;
+&lt;p&gt;これらの作業は、Master server 内で動作している ZooKeeper というソフトウェアが担当している。&lt;br&gt;
+ZooKeeper は HBase 以外にも多くの分散アプリケーションで使用されるソフトウェアである。&lt;/p&gt;
+&lt;h3 id=&#34;region-server---hbase-region-server&#34;&gt;Region server - HBase Region Server&lt;/h3&gt;
+&lt;p&gt;RegionServer は、Master server から割り当てられた実データの保存を担当する。Hadoop クラスタと同じように、NameNode はメタデータを保存し、DataNode は実データを保存する。HBase でも同様に、Master はメタデータを保持し、RegionServer は実データを保存する。RegionServer は分散クラスタ環境の DataNode 上で実行される。&lt;/p&gt;
+&lt;p&gt;RegionServer は次の作業を行う。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;割り当てられた regions (tables) を処理する。&lt;/li&gt;
+&lt;li&gt;クライアントが実行する読み取りおよび書き込み要求を処理する。&lt;/li&gt;
+&lt;li&gt;キャッシュを HDFS に flush する。&lt;/li&gt;
+&lt;li&gt;Region 分割処理を担当する。&lt;/li&gt;
+&lt;li&gt;HLog を維持管理する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;クライアントはまず Master server、正確には ZooKeeper に問い合わせ、対象データ (Region) を保持している Region server の位置を取得する。&lt;/p&gt;
+&lt;p&gt;その後、その Region server がクライアントの要求を担当する。&lt;br&gt;
+Region は常に単一の Region server によって管理され、読み取りと書き込みに対するデータ一貫性を維持する。&lt;/p&gt;
+&lt;p&gt;Region server が down すると、割り当てられていた Region は別の Region server に failover される。この作業は Master server が実行する。&lt;br&gt;
+ただし、failover が完了するまで、クライアントは対象 Region に対して読み書きできない。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-region-server.png&#34; alt=&#34;HBase Region Server&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;regionserver-の構成要素&#34;&gt;RegionServer の構成要素&lt;/h4&gt;
+&lt;p&gt;RegionServer の構成要素を見てみる。&lt;/p&gt;
+&lt;h5 id=&#34;wal-write-ahead-logging&#34;&gt;WAL (Write-Ahead Logging)&lt;/h5&gt;
+&lt;p&gt;WAL とは、データ整合性を保証する標準的な方法であり、DB で使用される方式である。WAL を使用するシステムでは、データを修正する前にまず WAL に記録する。この記録を利用して、どの時点で障害が発生したか、どこまで成功し、どこから後続作業を実行すべきかを知ることができる。&lt;/p&gt;
+&lt;p&gt;PostgreSQL、HBase、MongoDB など、さまざまな DB システムで WAL 方式が使用される。&lt;/p&gt;
+&lt;p&gt;Apache HBase WAL は、編集ログファイルとも呼ばれる中間ファイルである。HBase でデータを読み取ったり修正したりするとき、ディスクに直接書き込むのではなく、一定時間メモリに保持する。そのため、システムが down するとメモリ上のデータが失われる可能性がある。この問題を克服するため、Apache HBase はデータをメモリに記録する前に、まず Write-Ahead Logging ファイルに記録する。&lt;/p&gt;
+&lt;h5 id=&#34;hfile&#34;&gt;HFile&lt;/h5&gt;
+&lt;p&gt;HFile は HBase にデータを保存するためのフォーマットであり、Column Family に属する。Column Family は複数の HFile を持つことができる。
+Row データが物理的に保存される実ファイルであり、データは Key/Value 形式で保存される。
+MemStore が十分に満たされると、HDFS に新しい HFile を作成して保存する。&lt;br&gt;
+ランダムアクセスを最小化する構造のため、この処理は非常に高速に行われる。&lt;/p&gt;
+&lt;h5 id=&#34;store&#34;&gt;Store&lt;/h5&gt;
+&lt;p&gt;HBase のテーブルに対する Column family に該当する。ここに HFile が保存される。&lt;/p&gt;
+&lt;h5 id=&#34;memstore&#34;&gt;MemStore&lt;/h5&gt;
+&lt;p&gt;MemStore はメインメモリに常駐し、現在のデータ操作を記録する。データが WAL に保存されると、Region Server のメモリストアに key/value データをソートして保存する。このデータをそのまま HFile に保存する。
+1 つの Column Family ごとに 1 つの MemStore が存在する。&lt;/p&gt;
+&lt;h5 id=&#34;region&#34;&gt;Region&lt;/h5&gt;
+&lt;p&gt;Region は、key を基準に分割され、RegionServer でホストされるテーブルの分割単位である。&lt;/p&gt;
+&lt;h3 id=&#34;クライアント&#34;&gt;クライアント&lt;/h3&gt;
+&lt;p&gt;クライアントは Java またはその他の言語で作成でき、外部 API を使用して実際の row データを管理する RegionServer に接続できる。クライアントは Region を探すために catalog table に問い合わせ、Region が見つかると、RegionServer に直接接続してデータ操作を実行し、高速検索のためにデータをキャッシュする。&lt;/p&gt;
+&lt;h3 id=&#34;catalog-table&#34;&gt;Catalog table&lt;/h3&gt;
+&lt;p&gt;Catalog table は、すべての RegionServer および Region に関するメタデータを維持するために使用される。&lt;/p&gt;
+&lt;p&gt;HBase には 2 種類の catalog table がある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;-ROOT-&lt;/strong&gt; このテーブルには META テーブルの位置に関する情報がある。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;.META&lt;/strong&gt; このテーブルにはすべての Region とその位置に関する情報が含まれている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;zookeeper&#34;&gt;ZooKeeper&lt;/h3&gt;
+&lt;p&gt;Apache ZooKeeper は HBase のコーディネータのようなものである。HBase は ZooKeeper を利用して、クラスタを構成するサーバーの状態を管理する。
+構成情報の維持、命名、分散同期の提供、サーバーエラー通知などのサービスを提供する。クライアントは ZooKeeper を通じて Region server と通信する。&lt;/p&gt;
+&lt;p&gt;Apache ZooKeeper は、HBase に分散同期とグループサービスを提供する分散アプリケーション向けの高性能な集中型多重調整サービスシステムである。クラスタ調整を担いながら、ユーザーがアプリケーションロジックに集中できるようにする。また、ユーザーが Master server と連携できる API も提供する。&lt;/p&gt;
+&lt;p&gt;Apache ZooKeeper API は、一貫性、順序付け、耐久性を提供し、分散クラスタシステムに対する同期と同時実行性も提供する。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-データの書き込み読み取りプロセス&#34;&gt;HBase データの書き込み/読み取りプロセス&lt;/h2&gt;
+&lt;p&gt;HBase でデータを読み書きする過程について説明する。&lt;/p&gt;
+&lt;h3 id=&#34;hbase-データ書き込み&#34;&gt;HBase データ書き込み&lt;/h3&gt;
+&lt;p&gt;HBase でデータを保存するときは、WAL (Write Ahead Log) と Region server の MemStore の 2 か所にデータを保存する。&lt;/p&gt;
+&lt;p&gt;この 2 つを利用し、WAL と MemStore の両方で変更が発生した時点で書き込み処理が正常に完了したことになる。&lt;/p&gt;
+&lt;p&gt;HBase にデータ投入要求が来ると、まず適切な Region server を探す。Region server を見つけると Commit log を追加し、メモリ内の MemStore に追加される。
+MemStore に保存されていたデータは、設定された値に従っていっぱいになると HFile という形式でディスクに flush され、メモリを空けて再び要求を待つ。同時に WAL にもこれに関する記録を残す。
+MemStore flush は &lt;code&gt;hbase.hregion.memstore.flush.size&lt;/code&gt; の値を超える場合に発生し、単位は byte で 134217728 (128 MB) に設定されている。&lt;/p&gt;
+&lt;p&gt;MemStore は Region server のメモリ領域であり、キャッシュのような機能を持つ。
+そして、MemStore のデータが一定量集まった時点で、ディスク上に HFile としてデータを書き出して永続化する。&lt;br&gt;
+ただし、HFile に書き出す前のデータはサーバーのメモリ (MemStore) に保存されているため、サーバーが down すると消える。
+そのため、HBase はデータを書き込むときに HLog というログを残し、サーバーが down した場合は HLog をもとにデータを復旧できる。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-データ読み取り&#34;&gt;HBase データ読み取り&lt;/h2&gt;
+&lt;p&gt;HBase でデータを読み取る過程は、前述した HBase データ書き込み過程と似ている。&lt;/p&gt;
+&lt;p&gt;HBase に要求が入ると、まず MemStore を確認する。MemStore で目的のデータを見つけると、そのデータを返す。
+そうでない場合は、最近 flush されたファイルから古い順に、クエリを満たす適切なデータを見つけるか、これ以上 flush ファイルがなくなるまで繰り返す。&lt;/p&gt;
+&lt;h2 id=&#34;参考資料&#34;&gt;参考資料&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.joinc.co.kr/w/man/12/hadoop/hbase/about&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;HBase 紹介|joinc.co.kr&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>Apache HBase リージョン(Regions)</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/regions/</link>
+      <pubDate>Wed, 21 Jun 2023 11:05:33 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/regions/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Apache HBase は、行キーで辞書順にソートされたテーブルに大容量データを保存する。テーブルは複数のリージョン(Region)に分散され、リージョンはさらに複数の RegionServer に分散される。Apache HBase でテーブルを作成すると、デフォルトリージョンが割り当てられる。&lt;/p&gt;
+&lt;p&gt;Apache HBase リージョンは水平方向に拡張可能である。これには開始キーと終了キーが含まれ、該当する行を基準にソートされ、連続した形式で保存される。HBase は強い一貫性を提供するため、複数のリージョンに同じ行キーを保存しない。リージョンは複数の RegionServer に負荷を分散し、要件に応じて負荷分散とフェイルオーバーも行う。データが増加する場合、リージョンは手動または自動で分割される。&lt;/p&gt;
+&lt;h2 id=&#34;リージョン数&#34;&gt;リージョン数&lt;/h2&gt;
+&lt;p&gt;RegionServer ごとに中大規模(5-20GB)のリージョンを少数(20-200個)使用することが推奨される。リージョンの標準数は100個である。&lt;/p&gt;
+&lt;p&gt;リージョンを考慮する際のいくつかの要素を見てみよう。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;リージョン数を選択する際の制限要因は、利用可能なヒープ領域である。MemStore にはリージョンごと、カラムファミリーごとにほぼ 2MB が必要であり、リージョンが100個、リージョンごとに3つのカラムファミリーがある場合、MemStore のヒープ領域要件は 600MB である。リージョンが少ないほど MemStore のヒープ要件は少なくなる。&lt;/li&gt;
+&lt;li&gt;多数のリージョンは、多数の小さな flush を生成する。各 flush が StoreFile を作成すると多数の StoreFile が作成されるため、より多くの compaction が必要になる。また、MemStore および StoreFile インデックスにはより多くのヒープ領域が必要である。&lt;/li&gt;
+&lt;li&gt;master が RegionServers にリージョンを割り当て、再割り当てする必要があるため、多数のリージョンは master に負荷を生む。また、master はロードバランシングのためにリージョンを移動する必要がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;リージョン割り当てregion-assignment&#34;&gt;リージョン割り当て(Region Assignment)&lt;/h2&gt;
+&lt;p&gt;Apache HBase でリージョンは、以下のように master によって割り当てられる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;master は assignment manager を開始する。&lt;/li&gt;
+&lt;li&gt;assignment manager は hbase:meta メタデータで既存の割り当てを確認する。&lt;/li&gt;
+&lt;li&gt;RegionServer が利用可能な場合、割り当ては保存される。&lt;/li&gt;
+&lt;li&gt;RegionServer がオンライン状態でなければ、load balancer が呼び出され、リージョンを別の RegionServer に割り当てる。&lt;/li&gt;
+&lt;li&gt;hbase:meta メタデータが新しい割り当てで更新される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;リージョンフェイルオーバーregion-failover&#34;&gt;リージョンフェイルオーバー(Region failover)&lt;/h2&gt;
+&lt;p&gt;RegionServer は失敗する可能性があり、複数の RegionServer がデータを提供するため、RegionServer のリージョンが利用できなくなることがある。ZooKeeper は RegionServer のエラーを検出し、master はリージョンに類似した Row Key を持つ別の RegionServer でフェイルオーバーを開始する。&lt;/p&gt;
+&lt;h2 id=&#34;リージョンローカリティregion-locality&#34;&gt;リージョンローカリティ(Region Locality)&lt;/h2&gt;
+&lt;p&gt;Region Locality は、RegionServer に対するリージョンの近接性を示す。これはクラスター全体で HDFS ブロックレプリケーションによって達成される。&lt;/p&gt;
+&lt;p&gt;レプリカ配置ポリシーは HDFS のレプリカ配置ポリシーであり、次のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1つ目のレプリカはローカルノードに配置される。&lt;/li&gt;
+&lt;li&gt;2つ目のレプリカは別ラック(rack)の任意ノードに配置される。&lt;/li&gt;
+&lt;li&gt;3つ目のレプリカは2つ目のレプリカと同じラック(rack)に配置されるが、このときは別ノードに配置される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;リージョンの利点benefits-of-regions&#34;&gt;リージョンの利点(Benefits of Regions)&lt;/h2&gt;
+&lt;p&gt;リージョンの利点は、分散データストア、パーティショニング、自動シャーディングと拡張性、リージョン分割である。&lt;/p&gt;
+&lt;p&gt;それぞれ詳しく見てみよう。&lt;/p&gt;
+&lt;h3 id=&#34;分散データストア&#34;&gt;分散データストア&lt;/h3&gt;
+&lt;p&gt;分散データストアの設計は、テーブルに複数のリージョンを使用する Apache HBase の設計と一致する。ノードクラスター全体に大きなテーブルのリージョンを分散すると、高可用性を得られる。&lt;/p&gt;
+&lt;h3 id=&#34;パーティショニング&#34;&gt;パーティショニング&lt;/h3&gt;
+&lt;p&gt;データテーブルは複数のリージョンに保存され、リージョンはデータを分割する。これで該当テーブルのデータにアクセスするには、別のリージョンからアクセスする必要がある。複数のリージョンがあれば、データを高速に配信できる利点がある。&lt;/p&gt;
+&lt;h3 id=&#34;自動シャーディングと拡張性&#34;&gt;自動シャーディングと拡張性&lt;/h3&gt;
+&lt;p&gt;自動シャーディングプロセスは、リージョンの行キー数が多くなりすぎたときに、リージョンをおよそ2つの半分に分割するために使用される。HBase で水平拡張性の基本単位はリージョンであり、リージョンごとに行を共有する。&lt;/p&gt;
+&lt;h3 id=&#34;リージョン分割&#34;&gt;リージョン分割&lt;/h3&gt;
+&lt;p&gt;しきい値を超えるとリージョンが分割される。これはリージョンを分割し、分割されたリージョンをオフラインにする RegionServer によって処理される。その後、2つの分割リージョンが hbase:meta に追加され、RegionServer で開かれ、master に報告される。リージョン分割は基本的に自動だが、手動で実行することもできる。HBase リージョン分割ポリシーは &lt;code&gt;hbase.regionserver.region.split.policy&lt;/code&gt; で構成される。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase データモデル</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/data-model/</link>
+      <pubDate>Tue, 20 Jun 2023 19:07:12 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/data-model/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;データ構造&#34;&gt;データ構造&lt;/h2&gt;
+&lt;p&gt;HBase テーブルには型がなく、バイト配列(byte[])として保存される。&lt;br&gt;
+HBase の行は一意な行キーで昇順にソートされ、テーブルの値を読み書きするときはこの行キーを通じて行われる。&lt;br&gt;
+前述したように、HBase が管理するデータは一定範囲ごとにリージョンという単位で分割され、テーブルには複数のリージョンがある。
+また、HBase の列は Column Family という単位でグループ化される。&lt;br&gt;
+テーブルのデータはリージョンごとに分かれ、Column Family ごとに分かれてファイルへ出力される。
+ファイルは別々だが、同じリージョンであれば同じ Region Server に保存される。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-table.png&#34; alt=&#34;HBase Table&#34;&gt;&lt;/p&gt;
+&lt;p&gt;HBase データ、つまりセル値にはそれぞれ timestamp が付与されており、バージョンが管理されている。
+ファイルは次の形式で保存される。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Row(Row Key): Column family: Column: timestamp: 値
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;データモデル&#34;&gt;データモデル&lt;/h2&gt;
+&lt;p&gt;Apache HBase データモデルは、列(Column) key、行(Row) key、および timestamp によってインデックスが作成される分散型、多次元型、永続型、ソート済みの map であり、これが Apache HBase が key-value ストレージシステムとも呼ばれる理由である。&lt;/p&gt;
+&lt;p&gt;HBase の基本単位は Column であり、この Column が集まって Column Family を構成し、この Column Family が集まってテーブルを構成する。テーブルに入る各 Row は Row Key を持ち、識別できる。以下の図を見てみよう。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-column-family.png&#34; alt=&#34;HBase Column family&#34;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;このテーブルは Customer と Sales の2つの Column Family を持つ。&lt;/li&gt;
+&lt;li&gt;Customer Column Family は Name と City の2つの Column を持つ。&lt;/li&gt;
+&lt;li&gt;Sales Column Family は Product と Amount の2つの Column を持つ。&lt;/li&gt;
+&lt;li&gt;Row は Row Key、Customer CF、Sales CF で構成される。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;次は Apache HBase で使用されるデータモデル用語である。&lt;/p&gt;
+&lt;h3 id=&#34;table&#34;&gt;Table&lt;/h3&gt;
+&lt;p&gt;Apache HBase テーブルは複数の Row で構成される。文字で構成され、ファイルシステムと一緒に使用しやすいテーブルとしてデータを構成する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Row の集合。Row Key があり、多数の column family で構成される。&lt;/li&gt;
+&lt;li&gt;Schema 定義では Column Family のみを定義する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;row&#34;&gt;Row&lt;/h3&gt;
+&lt;p&gt;Apache HBase は行(Row)を基準にデータを保存し、各行には一意な Row Key がある。Row Key はバイト配列で表される。&lt;/p&gt;
+&lt;h4 id=&#34;row-key&#34;&gt;Row Key&lt;/h4&gt;
+&lt;p&gt;Row Key を基準にデータが集まるため、Row Key は適切にデータが分散されるよう設計する必要がある。Row Key 設計の目標は、似た Row が互いに近くなる方式でデータを保存することである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;任意の Byte 列として辞書順にソートされる。&lt;/li&gt;
+&lt;li&gt;空の Byte 文字列はテーブルの開始と終了を意味する。&lt;/li&gt;
+&lt;li&gt;文字列、整数バイナリ、シリアライズされたデータ構造まで、どのようなものでも Row Key になり得る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;一般的に Row Key パターンは Web サイトドメイン形式で構成することもできる。&lt;code&gt;org.apache.mair&lt;/code&gt;、&lt;code&gt;org.apache.jira&lt;/code&gt; のようにドメインを逆順に保存すると、apache ドメインは近い位置にデータを保存できる。&lt;/p&gt;
+&lt;h3 id=&#34;column&#34;&gt;Column&lt;/h3&gt;
+&lt;p&gt;Column Family と Column Qualifier で構成される。&lt;/p&gt;
+&lt;h4 id=&#34;column-family&#34;&gt;Column Family&lt;/h4&gt;
+&lt;p&gt;Column Family は Row を保存するために使用され、Apache HBase にデータを保存する構造も提供する。&lt;/p&gt;
+&lt;p&gt;文字と文字列で構成され、ファイルシステムパスと一緒に使用できる。テーブルの各行は同じ column family を持つが、すべての column family に行を保存する必要はない。&lt;/p&gt;
+&lt;h4 id=&#34;column-qualifier&#34;&gt;Column Qualifier&lt;/h4&gt;
+&lt;p&gt;Column Qualifier は Column Family に保存されたデータに対するインデックスを提供する。Column qualifier は固定値ではないため、さまざまなデータを入力できる。map オブジェクトと考えられる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Column のグループであり、すべての ColumnFamily の Member は同じ prefix を使用する。&lt;/li&gt;
+&lt;li&gt;NOSQL:Cassandra と NOSQL:HBASE は NOSQL という Column Family の member column である。&lt;/li&gt;
+&lt;li&gt;ColumnFamily prefix は必ず表示可能な文字で構成する。&lt;/li&gt;
+&lt;li&gt;テーブルスキーマで定義の一部を先に指定する必要がある。&lt;/li&gt;
+&lt;li&gt;すべての ColumnFamily member は物理的にファイルシステムで一緒に保存される。&lt;/li&gt;
+&lt;li&gt;新しい ColumnFamily member は動的に追加可能である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;cell&#34;&gt;Cell&lt;/h3&gt;
+&lt;p&gt;Cell は Column family、Row key、Column qualifier で構成されるデータ単位であり、各 Column の値を Cell という。&lt;/p&gt;
+&lt;p&gt;データ Cell には value(値)と timestamp(値のバージョン)を含む。timestamp があるため、以前の値も一緒に保存され、一定期間その値を保持する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ROW KEY、Column、Version が明示された tuple。&lt;/li&gt;
+&lt;li&gt;値は任意の Byte 列であり Timestamp。&lt;/li&gt;
+&lt;li&gt;テーブル Cell はバージョン管理される。Cell のみである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;timestamp&#34;&gt;Timestamp&lt;/h4&gt;
+&lt;p&gt;Cell に同じデータが保存された値にはバージョンが指定され、各バージョンは生成時間に割り当てられたバージョン番号で識別される。データを書き込むときに Timestamp を明示しなければ、現在時刻が指定される。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-データ型data-types&#34;&gt;HBase データ型(Data Types)&lt;/h2&gt;
+&lt;p&gt;Apache HBase にはデータ型の概念がない。すべてバイト配列である。値が挿入されると、&lt;code&gt;Put&lt;/code&gt; および &lt;code&gt;Result&lt;/code&gt; インターフェースを使用してバイト配列へ変換される、一種の byte-in and byte-out データベースである。Apache HBase はシリアライズフレームワークを使用して、ユーザーデータをバイト配列へ変換する。&lt;/p&gt;
+&lt;p&gt;Apache HBase Cell には最大 10から15MB の値を保存できる。値がより大きい場合は Hadoop HDFS に保存し、ファイルパスメタデータ情報を Apache HBase に保存できる。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-データストア&#34;&gt;HBase データストア&lt;/h2&gt;
+&lt;p&gt;次は Apache HBase の物理的に保存される形式について紹介する。&lt;/p&gt;
+&lt;h3 id=&#34;概念的観点&#34;&gt;概念的観点&lt;/h3&gt;
+&lt;p&gt;テーブルが概念レベルで一連の Row として表示されることがわかる。&lt;/p&gt;
+&lt;p&gt;次はデータが HBase に保存される方式の概念図である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase_conceptual_view.png&#34; alt=&#34;概念的観点&#34; width=&#34;70%&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;物理的観点&#34;&gt;物理的観点&lt;/h3&gt;
+&lt;p&gt;Physical view テーブルは column family によって物理的に保存される。&lt;/p&gt;
+&lt;p&gt;次の例は、Column Family ベースのテーブルとして保存されるテーブルを表す。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hase_physical_view1.png&#34; alt=&#34;物理的観点&#34; width=&#34;50%&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hase_physical_view2.png&#34; alt=&#34;物理的観点&#34; width=&#34;40%&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;ネームスペース&#34;&gt;ネームスペース&lt;/h2&gt;
+&lt;p&gt;ネームスペースはテーブルの論理グループである。関連テーブルをグループ化するリレーショナルデータベースに似ている。&lt;/p&gt;
+&lt;p&gt;ネームスペースの表現を見てみよう。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HBase Namespaces
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- Table
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- Region Server Group
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- Permission
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- Quota
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ネームスペース空間の各構成要素を見てみよう。&lt;/p&gt;
+&lt;h3 id=&#34;table-1&#34;&gt;Table&lt;/h3&gt;
+&lt;p&gt;すべてのテーブルはネームスペースの一部である。定義されたネームスペースがなければ、テーブルは default ネームスペースに割り当てられる。&lt;/p&gt;
+&lt;h3 id=&#34;regionserver-group&#34;&gt;RegionServer group&lt;/h3&gt;
+&lt;p&gt;ネームスペースに対するデフォルト RegionServer group を持つことができる。この場合、作成されたテーブルは RegionServer の構成員になる。&lt;/p&gt;
+&lt;h3 id=&#34;permission&#34;&gt;Permission&lt;/h3&gt;
+&lt;p&gt;ネームスペースを使用して、ユーザーは読み取り、削除、更新権限などのアクセス制御リストを定義でき、書き込み権限を使用してテーブルを作成できる。&lt;/p&gt;
+&lt;h3 id=&#34;quota&#34;&gt;Quota&lt;/h3&gt;
+&lt;p&gt;この構成要素は、ネームスペースがテーブルおよびリージョンに対して含められる割り当て量を定義するために使用される。&lt;/p&gt;
+&lt;h3 id=&#34;事前定義された-namespaces&#34;&gt;事前定義された namespaces&lt;/h3&gt;
+&lt;p&gt;事前定義された2つの特殊ネームスペースがある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;hbase&lt;/strong&gt;: HBase 内部テーブルを含めるために使用されるシステムネームスペースである。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;default&lt;/strong&gt;: このネームスペースは、ネームスペースが定義されていないすべてのテーブルのためのものである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;データモデル操作&#34;&gt;データモデル操作&lt;/h2&gt;
+&lt;p&gt;主要な作業データモデルは Get、Put、Scan、Delete である。これらの操作を使用してテーブルからレコードを読み、書き、削除できる。&lt;/p&gt;
+&lt;p&gt;各操作を詳しく見てみよう。&lt;/p&gt;
+&lt;h3 id=&#34;get&#34;&gt;Get&lt;/h3&gt;
+&lt;p&gt;Get 操作はリレーショナルデータベースの Select 文に似ている。HBase テーブルの内容を取得するために使用される。&lt;/p&gt;
+&lt;p&gt;以下のように HBase Shell で Get コマンドを実行できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main) :001:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; get &amp;#39;table name&amp;#39;, &amp;#39;row key&amp;#39; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;filters&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;put&#34;&gt;Put&lt;/h3&gt;
+&lt;p&gt;Put 操作はテーブルにデータを書き込むために使用される。&lt;/p&gt;
+&lt;h3 id=&#34;scan&#34;&gt;Scan&lt;/h3&gt;
+&lt;p&gt;Scan 操作はテーブルの複数行を読むために使用される。読み取る行集合を指定する必要がある Get とは異なる。Scan を使用すると、行範囲またはテーブルのすべての行を反復できる。&lt;/p&gt;
+&lt;h3 id=&#34;delete&#34;&gt;Delete&lt;/h3&gt;
+&lt;p&gt;Delete 操作は HBase テーブルから行または行集合を削除するために使用される。&lt;code&gt;HTable.delete()&lt;/code&gt; によって実行できる。&lt;/p&gt;
+&lt;p&gt;削除コマンドが実行されると削除マークで表示され、compaction が発生すると該当行がテーブルから最終削除される。&lt;/p&gt;
+&lt;p&gt;内部削除の種類は以下のとおりである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Delete&lt;/strong&gt;: 特定バージョンの Column に使用される。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Delete column&lt;/strong&gt;: すべての列バージョンに使用できる。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Delete family&lt;/strong&gt;: 特定 ColumnFamily のすべての列に使用される。&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>ローカル練習用 HBase Docker インストール</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/docker-install/</link>
+      <pubDate>Tue, 13 Jun 2023 18:40:33 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/docker-install/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;hbase-を-docker-にインストール&#34;&gt;HBase を Docker にインストール&lt;/h2&gt;
+&lt;p&gt;以下の Docker イメージを利用して、Docker 環境に HBase をインストールしてみる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;インストールする HBase Docker image
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://hub.docker.com/r/dajobe/hbase&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://hub.docker.com/r/dajobe/hbase&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;hbase-docker-実行コマンドのダウンロード&#34;&gt;HBase Docker 実行コマンドのダウンロード&lt;/h2&gt;
+&lt;p&gt;以下の GitHub から HBase Docker 実行コマンドをダウンロード、つまり clone する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GitHub
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/dajobe/hbase-docker&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://github.com/dajobe/hbase-docker&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone git@github.com:dajobe/hbase-docker.git
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;hbase-docker-の実行&#34;&gt;HBase Docker の実行&lt;/h2&gt;
+&lt;p&gt;Docker が起動した状態で、以下のコマンドをそのまま実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;./start-hbase.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コンテナを起動し、すべてのローカル API ポートと Web UI を調べ、まだ存在しない場合はコンテナ IP への alias を追加するために /etc/hosts の編集を提案する start-hbase.sh スクリプトを使用することが推奨される。&lt;/p&gt;
+&lt;p&gt;コンテナを起動して、すべてのローカル API ポートと Web UI を決定し、まだ存在しない場合はコンテナ IP への alias を追加するために /etc/hosts の編集を提案する start-hbase.sh スクリプトを使用することが推奨される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% ./start-hbase.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;start-hbase.sh: Starting HBase container
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Error: No such container: hbase-docker
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Unable to find image &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;dajobe/hbase:latest&amp;#39;&lt;/span&gt; locally
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;latest: Pulling from dajobe/hbase
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;6cf436f81810: Pulling fs layer
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;... 中間省略 ...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;159beed970fa: Pull &lt;span style=&#34;color:#204a87&#34;&gt;complete&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Digest: sha256:daa36a6d90b118ced866b6c76fcd918e7da73302b0e4971f506f0f61f645a9fe
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Status: Downloaded newer image &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; dajobe/hbase:latest
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WARNING: The requested image&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;s platform &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;linux/amd64&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; does not match the detected host platform &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;linux/arm64/v8&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; and no specific platform was requested
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;start-hbase.sh: Container has ID 3804d552250334cc850189e076b77cb0d3066850cef332bec7a125dc29228361
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;./start-hbase.sh: line 32: python: &lt;span style=&#34;color:#204a87&#34;&gt;command&lt;/span&gt; not found
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ここでコンテナ ID は &lt;code&gt;3804d552250334cc850189e076b77cb0d3066850cef332bec7a125dc29228361&lt;/code&gt; である。Shell 実行時に必要なので記録しておこう。&lt;/p&gt;
+&lt;p&gt;上記コマンドを実行すると、実行した現在のパスに &lt;code&gt;data&lt;/code&gt; が作成され、port が開かれて HBase が実行される。&lt;/p&gt;
+&lt;h3 id=&#34;手動で実行する方法&#34;&gt;手動で実行する方法&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker run --name&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;hbase-docker &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -h hbase-docker &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -p 9095:9095 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -p 8085:8085 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -p 16010:16010  &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -v &lt;span style=&#34;color:#000&#34;&gt;$PWD&lt;/span&gt;/data:/data &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  -d dajobe/hbase
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;hbase-shell-の実行&#34;&gt;HBase Shell の実行&lt;/h2&gt;
+&lt;p&gt;次に、Docker イメージを利用して HBase に接続できる Shell コマンドを実行してみる。&lt;/p&gt;
+&lt;p&gt;上で記録したコンテナ ID を &lt;code&gt;$id&lt;/code&gt; に入れて実行する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker run --rm -it --link &lt;span style=&#34;color:#000&#34;&gt;$id&lt;/span&gt;:hbase-docker dajobe/hbase hbase shell
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;macOS Apple Chip(M1, M2) の場合は、以下のようなエラーが出ることがある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run --rm -it --link 3804d552250334cc850189e076b77cb0d3066850cef332bec7a125dc29228361:hbase-docker dajobe/hbase hbase shell
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WARNING: The requested image&lt;span style=&#34;color:#a40000&#34;&gt;&amp;#39;&lt;/span&gt;s platform &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;linux/amd64&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; does not match the detected host platform &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;linux/arm64/v8&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt; and no specific platform was requested
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;その場合、すでに実行された Docker を削除し、&lt;code&gt;--platform linux/amd64&lt;/code&gt; オプションを入れて再実行すると動作するはずである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run --rm -it --platform linux/amd64 --link 3804d552250334cc850189e076b77cb0d3066850cef332bec7a125dc29228361:hbase-docker dajobe/hbase hbase shell
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2023-06-16 09:38:17,680 WARN  &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;main&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt; util.NativeCodeLoader: Unable to load native-hadoop library &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; your platform... using builtin-java classes where applicable
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HBase Shell
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;help&amp;#34;&lt;/span&gt; to get list of supported commands.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Use &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;exit&amp;#34;&lt;/span&gt; to quit this interactive shell.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;For Reference, please visit: http://hbase.apache.org/2.0/book.html#shell
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Version 2.1.2, r1dfc418f77801fbfb59a125756891b9100c1fc6d, Sun Dec &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt; 21:45:09 PST &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2018&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0480 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;main&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:001:0&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Shell から抜けるコマンドは &lt;code&gt;quit&lt;/code&gt; である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;(&lt;/span&gt;main&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;)&lt;/span&gt;:005:0&amp;gt; quit
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;em&gt;Command の使用方法は次のページで説明する。&lt;/em&gt;&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase 一般 Shell コマンド - status, version, whoami</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/general-shell-commands/</link>
+      <pubDate>Fri, 16 Jun 2023 14:55:22 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/general-shell-commands/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;general-hbase-shell-commands&#34;&gt;General HBase shell commands&lt;/h2&gt;
+&lt;p&gt;ここでは HBase の一般コマンドについて紹介する。&lt;/p&gt;
+&lt;h2 id=&#34;status&#34;&gt;&lt;code&gt;status&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;cluster 状態を表示する。追加オプション(&lt;code&gt;&amp;quot;summary&amp;quot;&lt;/code&gt;, &lt;code&gt;&amp;quot;simple&amp;quot;&lt;/code&gt;, &lt;code&gt;&amp;quot;detailed&amp;quot;&lt;/code&gt;)を通じて詳細情報を確認できる。デフォルトは &lt;code&gt;&amp;quot;summary&amp;quot;&lt;/code&gt; である。&lt;/p&gt;
+&lt;p&gt;status コマンドでクラスターの状態を確認できる。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;オプション&lt;/th&gt;
+					&lt;th&gt;説明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;simple&lt;/td&gt;
+					&lt;td&gt;サーバー情報&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;summary&lt;/td&gt;
+					&lt;td&gt;サーバー数、ロード負荷&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;detailed&lt;/td&gt;
+					&lt;td&gt;サーバー情報、メタ情報&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;replication&lt;/td&gt;
+					&lt;td&gt;ソース、シンク情報&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;status&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):001:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; status
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 servers, 0 dead, 2.0000 average load
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;status &#39;simple&#39;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):002:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; status &amp;#39;simple&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 live servers
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    532f4d895a98:40371 1686636094968
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        requestsPerSecond=0.0, numberOfOnlineRegions=2, usedHeapMB=19, maxHeapMB=966, numberOfStores=2, numberOfStorefiles=2, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, storefileIndexSizeMB=0, readRequestsCount=42, writeRequestsCount=5, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, coprocessors=[]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 dead servers
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Aggregate load: 0, regions: 2
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;status &#39;summary&#39;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):003:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; status &amp;#39;summary&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 servers, 0 dead, 2.0000 average load
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;&lt;code&gt;status &#39;detailed&#39;&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):004:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; status &amp;#39;detailed&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;version 2.0.0-SNAPSHOT
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 regionsInTransition
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;master coprocessors: []
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 live servers
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    532f4d895a98:40371 1686636094968
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        requestsPerSecond=0.0, numberOfOnlineRegions=2, usedHeapMB=21, maxHeapMB=966, numberOfStores=2, numberOfStorefiles=2, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, storefileIndexSizeMB=0, readRequestsCount=42, writeRequestsCount=5, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, coprocessors=[]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hbase:meta,,1&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            numberOfStores=1, numberOfStorefiles=1, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, storefileIndexSizeMB=0, readRequestsCount=36, writeRequestsCount=3, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, completeSequenceId=10
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;hbase:namespace,,1686636105191.93358ca1f9bf1816320d88c48e39a3b4.&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;            numberOfStores=1, numberOfStorefiles=1, storefileUncompressedSizeMB=0, storefileSizeMB=0, memstoreSizeMB=0, storefileIndexSizeMB=0, readRequestsCount=6, writeRequestsCount=2, rootIndexSizeKB=0, totalStaticIndexSizeKB=0, totalStaticBloomSizeKB=0, totalCompactingKVs=0, currentCompactedKVs=0, compactionProgressPct=NaN, completeSequenceId=8
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 dead servers
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;version&#34;&gt;version&lt;/h2&gt;
+&lt;p&gt;インストールされた HBase のバージョン情報を確認する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;version&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):001:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;2.0.0-SNAPSHOT, r31ed817447b4c3edef2019d1580aa3ede83a82da, Fri Sep 26 02:07:26 UTC 2014
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;whoami&#34;&gt;whoami&lt;/h3&gt;
+&lt;p&gt;現在の HBase ユーザーを確認する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;whoami&lt;/code&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):008:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; whoami
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;root (auth:SIMPLE)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    groups: root
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase テーブル管理コマンド - create, list, exists, disable/enable, describe, alter, drop</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/table-management-commands/</link>
+      <pubDate>Fri, 16 Jun 2023 14:55:22 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/table-management-commands/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;table-management-commands&#34;&gt;Table Management commands&lt;/h2&gt;
+&lt;p&gt;ここでは、テーブル管理に関する HBase Shell コマンドを紹介する。&lt;/p&gt;
+&lt;h2 id=&#34;create---テーブル作成&#34;&gt;create - テーブル作成&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;create&lt;/code&gt; コマンドを使用してテーブルを作成できる。ここでは、テーブル名と Column Family 名を指定する必要がある。HBase shell でテーブルを作成する構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;order&lt;/code&gt; というテーブルのサンプルスキーマである。ここには &lt;code&gt;customer&lt;/code&gt; と &lt;code&gt;sales&lt;/code&gt; という 2 つの column family がある。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-column-family.png&#34; alt=&#34;HBase Column family&#34;&gt;&lt;/p&gt;
+&lt;p&gt;次のように HBase shell でこのテーブルを作成できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;order&amp;#39;, &amp;#39;customer&amp;#39;, &amp;#39;sales&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;実行すると次のように表示される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):002:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; create &amp;#39;order&amp;#39;, &amp;#39;customer&amp;#39;, &amp;#39;sales&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Created table order
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 2.4344 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; Hbase::Table - order
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;create-オプション&#34;&gt;create オプション&lt;/h3&gt;
+&lt;p&gt;テーブルを作成するときにオプションを追加することもできる。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;t1&lt;/code&gt; を作成しながら、最新の &lt;code&gt;version&lt;/code&gt; を最大 5 個まで保存する column family &lt;code&gt;cf1&lt;/code&gt; を作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;f1&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 5}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;t1&lt;/code&gt; を作成しながら、column family &lt;code&gt;cf1&lt;/code&gt;、&lt;code&gt;cf2&lt;/code&gt;、&lt;code&gt;cf3&lt;/code&gt; を作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;f1&amp;#39;, NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;f2&amp;#39;, NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;f3&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;その他のオプションを指定したコマンドである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;cf2&amp;#39;, VERSION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 1, TTL =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 2592000, BLOCKCACHE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;true} 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;cf2&amp;#39;, CONFIGURATION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; {&amp;#39;hbase.hstore.blockingStoreFiles&amp;#39; =&amp;#39;10&amp;#39;}} 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;list---テーブル一覧照会&#34;&gt;list - テーブル一覧照会&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;list&lt;/code&gt; は、HBase のすべてのテーブルを一覧表示するために使用されるコマンドである。list コマンドの構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;list
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;このコマンドを入力し、HBase プロンプトで実行すると、次のように HBase のすべてのテーブル一覧が表示される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):004:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; list
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;TABLE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;order
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s) in 0.1070 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;order&amp;#34;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次のようにオプションを付けることもできる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):005:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; list &amp;#39;customer.*&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;TABLE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;order
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s) in 0.0140 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;order&amp;#34;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;exists---テーブル存在確認&#34;&gt;exists - テーブル存在確認&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;exists&lt;/code&gt; コマンドを使用してテーブルの存在を確認できる。次はテーブルの存在を確認する構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;exists &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では、&lt;code&gt;order&lt;/code&gt; テーブルが存在するかを確認している。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):022:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; exists &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Table order does exist
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0680 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では、&lt;code&gt;user&lt;/code&gt; テーブルが存在するかを確認しているが、実際には存在しない場合である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):023:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; exists &amp;#39;user&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Table user does not exist
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0110 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;disable---テーブル無効化&#34;&gt;disable - テーブル無効化&lt;/h2&gt;
+&lt;p&gt;テーブルを削除したり設定を変更したりするには、まず &lt;code&gt;disable&lt;/code&gt; コマンドを使用してテーブルを無効化する必要がある。&lt;code&gt;enable&lt;/code&gt; コマンドを使用すると再び有効化できる。&lt;/p&gt;
+&lt;p&gt;テーブルを無効化する構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;disable &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;order&lt;/code&gt; テーブルを無効化する方法を示す例である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):004:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; disable &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 1.4570 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;テーブルを無効化した後でも、&lt;code&gt;list&lt;/code&gt; および &lt;code&gt;exists&lt;/code&gt; コマンドでテーブルの存在を確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):009:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; list
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;TABLE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;order
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s) in 0.0140 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;order&amp;#34;&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;無効化されたテーブルは scan できない。次のようなエラーが発生する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):010:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                                         COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ERROR: order is disabled.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// omitted
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;is_disabled&#34;&gt;is_disabled&lt;/h3&gt;
+&lt;p&gt;このコマンドは、テーブルが無効化されているかを確認するために使用される。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;is_disabled &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では、&lt;code&gt;order&lt;/code&gt; というテーブルが無効化されているかどうかを確認する。無効化されていれば &lt;code&gt;true&lt;/code&gt; を返し、そうでなければ &lt;code&gt;false&lt;/code&gt; を返す。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):011:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; is_disabled &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0360 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;disable_all&#34;&gt;disable_all&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;disable_all&lt;/code&gt; コマンドは、指定した正規表現に一致するすべてのテーブルを無効化するために使用される。&lt;code&gt;disable_all&lt;/code&gt; コマンドの構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;disable_all ‘&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;regex table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;’ 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;簡単な例を次に示す。次のコマンドは &lt;code&gt;r&lt;/code&gt; で始まるすべてのテーブルを無効化する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;disable_all &amp;#39;r.*&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;HBase に &lt;code&gt;dev_follow&lt;/code&gt;、&lt;code&gt;dev_friend&lt;/code&gt;、&lt;code&gt;dev_test&lt;/code&gt;、&lt;code&gt;dev_user&lt;/code&gt; という &lt;code&gt;dev&lt;/code&gt; で始まる 4 つのテーブルがあると仮定する。次のコードは &lt;code&gt;dev&lt;/code&gt; で始まるすべてのテーブルを無効化する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):017:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; disable_all &amp;#39;dev.*&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;dev_follow
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;dev_friend
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;dev_test
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;dev_user
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disable the above 4 tables (y/n)?
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;y
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;4 tables successfully disabled
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;enable---テーブル有効化&#34;&gt;enable - テーブル有効化&lt;/h2&gt;
+&lt;p&gt;無効化されたテーブルを有効化するには、&lt;code&gt;enable&lt;/code&gt; コマンドを使用する。次はテーブルを有効化する構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;enable &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次はテーブルを有効化する例である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):018:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; enable &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.6580 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;テーブルを有効化した後に scan する。エラーが発生しなければ、テーブルが正常に有効化されたということである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):020:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                                         COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0730 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;is_enabled&#34;&gt;is_enabled&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;is_enabled&lt;/code&gt; コマンドは、テーブルが有効化されているかを確認するために使用される。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;is_enabled &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次のコマンドは、&lt;code&gt;order&lt;/code&gt; というテーブルが有効化されているかどうかを確認する。有効化されていれば &lt;code&gt;true&lt;/code&gt; を返し、そうでなければ &lt;code&gt;false&lt;/code&gt; を返す。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):021:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; is_enabled &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0750 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;describe---テーブル説明&#34;&gt;describe - テーブル説明&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;describe&lt;/code&gt; コマンドは、テーブルに関する説明を返す。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;describe &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;order&lt;/code&gt; テーブルに対する &lt;code&gt;describe&lt;/code&gt; コマンドの出力である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):006:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; describe &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DESCRIPTION                                                                                                  ENABLED
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &amp;#39;order&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;customer&amp;#39;, DATA_BLOCK_ENCODING =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, BLOOMFILTER =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;ROW&amp;#39;, REPLICATION_SCO true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; PE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;1&amp;#39;, COMPRESSION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, MIN_VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, TTL =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;FOREVER&amp;#39;, KEEP_DELETED_CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; S =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKSIZE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;65536&amp;#39;, IN_MEMORY =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKCACHE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;true&amp;#39;}, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;sales&amp;#39;, DATA_BLO
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; CK_ENCODING =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, BLOOMFILTER =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;ROW&amp;#39;, REPLICATION_SCOPE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;1&amp;#39;, COMPRESSION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NON
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; E&amp;#39;, MIN_VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, TTL =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;FOREVER&amp;#39;, KEEP_DELETED_CELLS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKSIZE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;65536&amp;#39;, IN_MEMORY =
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKCACHE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;true&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s) in 0.1450 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;alter---テーブル変更&#34;&gt;alter - テーブル変更&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;alter&lt;/code&gt; は既存のテーブルを変更するために使用されるコマンドである。このコマンドを使用して、column family の最大 cell 数を変更したり、テーブルスコープ演算子を設定および削除したり、テーブルから column family を削除したりできる。&lt;/p&gt;
+&lt;h3 id=&#34;column-family-の最大-cell-数変更&#34;&gt;Column Family の最大 cell 数変更&lt;/h3&gt;
+&lt;p&gt;次は column family の最大 cell 数を変更する構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;alter &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 5 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では最大 cell 数を 5 に設定する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):007:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;alter &amp;#39;order&amp;#39;, NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;customer&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 5
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Updating all regions with the new schema...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Done.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 2.4240 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):009:0&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;テーブルスコープ演算子&#34;&gt;テーブルスコープ演算子&lt;/h3&gt;
+&lt;p&gt;alter を使用すると、&lt;code&gt;MAX_FILESIZE&lt;/code&gt;、&lt;code&gt;READONLY&lt;/code&gt;、&lt;code&gt;MEMSTORE_FLUSHSIZE&lt;/code&gt;、&lt;code&gt;DEFERRED_LOG_FLUSH&lt;/code&gt; などのテーブルスコープ演算子を設定および削除できる。&lt;/p&gt;
+&lt;h4 id=&#34;readonly---読み取り専用設定&#34;&gt;READONLY - 読み取り専用設定&lt;/h4&gt;
+&lt;p&gt;次はテーブルを読み取り専用にする構文である。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;alter &amp;#39;&amp;lt;table name&amp;gt;&amp;#39;, READONLY(option)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;次の例では、&lt;code&gt;order&lt;/code&gt; テーブルを読み取り専用にしている。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):009:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; alter &amp;#39;order&amp;#39;, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Updating all regions with the new schema...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Done.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 2.3650 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;max_filesize---region-設定変更&#34;&gt;MAX_FILESIZE - region 設定変更&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;MAX_FILESIZE&lt;/code&gt; で region 設定を変更する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;alter &amp;#39;t1&amp;#39;, MAX_FILESIZE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;123217728&amp;#39; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;region の最大サイズを 128 MB に変更する。&lt;/p&gt;
+&lt;h3 id=&#34;column-family-削除&#34;&gt;Column Family 削除&lt;/h3&gt;
+&lt;p&gt;alter を使用すると column family を削除することもできる。次は alter を使用して column family を削除する構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;alter &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;delete&amp;#39; =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;order&lt;/code&gt; テーブルから column family を削除する例である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):010:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; alter &amp;#39;order&amp;#39;, &amp;#39;delete&amp;#39; =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;sales&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Updating all regions with the new schema...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1/1 regions updated.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Done.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 2.3790 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;describe&lt;/code&gt; コマンドで確認すると、&lt;code&gt;&#39;sales&#39;&lt;/code&gt; が消えたことがわかる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):011:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; describe &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;DESCRIPTION                                                                                                  ENABLED
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &amp;#39;order&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;READONLY&amp;#39;, DATA_BLOCK_ENCODING =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, BLOOMFILTER =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;ROW&amp;#39;, REPLICATION_SCO true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; PE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, COMPRESSION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;1&amp;#39;, TTL =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;FOREVER&amp;#39;, MIN_VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, KEEP_DELETED_CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; S =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKSIZE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;65536&amp;#39;, IN_MEMORY =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKCACHE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;true&amp;#39;}, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;customer&amp;#39;, DATA_
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; BLOCK_ENCODING =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;NONE&amp;#39;, BLOOMFILTER =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;ROW&amp;#39;, REPLICATION_SCOPE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;5&amp;#39;, COMPRESSION =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; NONE&amp;#39;, MIN_VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;0&amp;#39;, TTL =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;FOREVER&amp;#39;, KEEP_DELETED_CELLS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKSIZE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;65536&amp;#39;, IN_MEMOR
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; Y =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;false&amp;#39;, BLOCKCACHE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;true&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s) in 0.0850 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;drop---テーブル削除&#34;&gt;drop - テーブル削除&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;drop&lt;/code&gt; コマンドを使用してテーブルを削除できる。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;drop &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;テーブルを削除する前に無効化する必要がある。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):024:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; disable &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 1.3960 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):025:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; drop &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.2860 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;exists&lt;/code&gt; コマンドを使用して、テーブルが削除されたかを確認する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):026:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; exists &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Table order does not exist
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s) in 0.0710 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;drop_all&#34;&gt;drop_all&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;drop_all&lt;/code&gt; コマンドは、指定した正規表現に一致するすべてのテーブルを削除するために使用される。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;drop_all &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;regex table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;簡単な例を次に示す。次のコマンドは &lt;code&gt;t&lt;/code&gt; で始まるすべてのテーブルを削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;drop_all &amp;#39;t.*&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;参考: 対象のすべてのテーブルは、削除する前に無効化する必要がある。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase データ操作コマンド - put, get, delete, deleteall, scan, count, truncate</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/data-manipulation-commands/</link>
+      <pubDate>Fri, 16 Jun 2023 14:55:22 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/data-manipulation-commands/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;data-manipulation-commands&#34;&gt;Data Manipulation commands&lt;/h2&gt;
+&lt;p&gt;ここでは、データを操作する HBase Shell コマンドを紹介する。&lt;/p&gt;
+&lt;h2 id=&#34;put---データ登録変更&#34;&gt;put - データ登録/変更&lt;/h2&gt;
+&lt;p&gt;ここでは、HBase テーブルでデータを作成および変更する方法を紹介する。&lt;/p&gt;
+&lt;p&gt;HBase に次のようなテーブルを作成する。&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-column-family.png&#34; alt=&#34;HBase Column family&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;put&lt;/code&gt; コマンドを使用して、テーブルに row を登録および変更できる。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;row id&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;value&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;最初の-row-登録&#34;&gt;最初の row 登録&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;order&amp;#39;, &amp;#39;customer&amp;#39;, &amp;#39;sales&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:name&amp;#39;, &amp;#39;John White&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:city&amp;#39;, &amp;#39;Los Angeles&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:product&amp;#39;, &amp;#39;Chairs&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:amount&amp;#39;, &amp;#39;400.00&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;まずテーブルを作成する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):001:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; create &amp;#39;order&amp;#39;, &amp;#39;customer&amp;#39;, &amp;#39;sales&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Created table order
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 5.0510 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; Hbase::Table - order
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最初の row の値をテーブルに登録する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):002:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:name&amp;#39;, &amp;#39;John White&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.6725 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):003:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:city&amp;#39;, &amp;#39;Los Angeles&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0318 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):004:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:product&amp;#39;, &amp;#39;Chairs&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0988 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):005:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:amount&amp;#39;, &amp;#39;400.00&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0423 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;テーブル全体を scan すると、次のような結果が表示される。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):006:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                               COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:city, timestamp=1686908392705, value=Los Angeles
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:name, timestamp=1686908388954, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:amount, timestamp=1686908401071, value=400.00
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:product, timestamp=1686908398256, value=Chairs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.4121 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;データ変更&#34;&gt;データ変更&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;put&lt;/code&gt; コマンドを使用して既存 cell の値を変更できる。構文はデータを登録するときと同じである。&lt;/p&gt;
+&lt;p&gt;次のように新しい値を指定すればよい。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;,&amp;#39;101&amp;#39;,&amp;#39;customer:city&amp;#39;,&amp;#39;LA&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;コマンド実行は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):007:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; put &amp;#39;order&amp;#39;,&amp;#39;101&amp;#39;,&amp;#39;customer:city&amp;#39;,&amp;#39;LA&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0677 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):008:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                               COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:city, timestamp=1686909532774, value=LA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:name, timestamp=1686908388954, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:amount, timestamp=1686908401071, value=400.00
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:product, timestamp=1686908398256, value=Chairs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.1186 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;get---データ照会&#34;&gt;get - データ照会&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;get&lt;/code&gt; コマンドは、HBase のテーブルからデータを読み取るために使用される。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;row id&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では、&lt;code&gt;get&lt;/code&gt; コマンドを使用して &lt;code&gt;order&lt;/code&gt; テーブルの &lt;code&gt;101&lt;/code&gt; row を照会している。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):009:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; get &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;COLUMN                            CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; customer:city                    timestamp=1686909532774, value=LA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; customer:name                    timestamp=1686908388954, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; sales:amount                     timestamp=1686908401071, value=400.00
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; sales:product                    timestamp=1686908398256, value=Chairs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.3162 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;特定-row-照会&#34;&gt;特定 row 照会&lt;/h3&gt;
+&lt;p&gt;次は、get コマンドを使用して特定 column を照会する構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;row id&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, {COLUMN =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は HBase テーブルの特定 column を照会する例である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):010:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; get &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, {COLUMN =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;customer:name&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;COLUMN                            CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; customer:name                    timestamp=1686908388954, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.1450 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;delete---テーブルの特定-cell-削除&#34;&gt;delete - テーブルの特定 cell 削除&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;delete&lt;/code&gt; コマンドを使用して、テーブルの特定 cell を削除できる。&lt;code&gt;delete&lt;/code&gt; コマンドの構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;delete &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;row id&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;timestamp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は特定 cell を削除する例である。ここでは &lt;code&gt;city&lt;/code&gt; を削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):011:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; delete &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:city&amp;#39;, 1686909532774
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0917 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;再度照会すると、前の &lt;code&gt;put&lt;/code&gt; コマンドで変更した &lt;code&gt;&#39;LA&#39;&lt;/code&gt; 値が削除され、既存の &lt;code&gt;&#39;Los Angeles&#39;&lt;/code&gt; 値が再び表示されることがわかる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):012:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; get &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;COLUMN                            CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; customer:city                    timestamp=1686908392705, value=Los Angeles
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; customer:name                    timestamp=1686908388954, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; sales:amount                     timestamp=1686908401071, value=400.00
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; sales:product                    timestamp=1686908398256, value=Chairs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.2196 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;deleteall---テーブル-row-のすべての-cell-削除&#34;&gt;deleteall - テーブル row のすべての cell 削除&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;deleteall&lt;/code&gt; コマンドを使用して、row のすべての cell を削除できる。次は &lt;code&gt;deleteall&lt;/code&gt; コマンドの構文である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deleteall &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;, &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;row id&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;order&lt;/code&gt; テーブルの 1 行のすべての cell を削除する &lt;code&gt;deleteall&lt;/code&gt; コマンドの例である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):013:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; deleteall &amp;#39;order&amp;#39;,&amp;#39;101&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.1271 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):015:0&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;scan&lt;/code&gt; コマンドを使用してテーブルを確認する。テーブルデータを削除した後のスナップショットは次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):015:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                               COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.0518 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;scan---データ照会&#34;&gt;scan - データ照会&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;scan&lt;/code&gt; コマンドは HTable のデータを見るために使用される。&lt;code&gt;scan&lt;/code&gt; コマンドを使用してテーブルデータを取得できる。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;scan &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;まず次のようにデータを入れる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:name&amp;#39;, &amp;#39;John White&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;customer:city&amp;#39;, &amp;#39;Los Angeles&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:product&amp;#39;, &amp;#39;Chairs&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;put &amp;#39;order&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;sales:amount&amp;#39;, &amp;#39;400.00&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次の例では、&lt;code&gt;scan&lt;/code&gt; コマンドを使用してテーブルからデータを照会している。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):019:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                               COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:city, timestamp=1686912065208, value=Los Angeles
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=customer:name, timestamp=1686912059341, value=John White
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:amount, timestamp=1686912074891, value=400.00
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 101                              column=sales:product, timestamp=1686912070718, value=Chairs
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.2649 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;count---データ数照会&#34;&gt;count - データ数照会&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;count&lt;/code&gt; コマンドを使用して、テーブルの行数を数えることができる。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;count ‘&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):020:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; count &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.2992 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 1
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;truncate---すべて削除&#34;&gt;truncate - すべて削除&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;truncate&lt;/code&gt; コマンドは、テーブルを無効化、削除、再作成する。&lt;code&gt;truncate&lt;/code&gt; の構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;truncate ‘&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;次は &lt;code&gt;truncate&lt;/code&gt; コマンドの例である。ここでは &lt;code&gt;order&lt;/code&gt; テーブルを削除して再作成した。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):021:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; truncate &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Truncating &amp;#39;order&amp;#39; table (it may take a while):
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disabling table...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Truncating table...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 5.6828 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;truncate&lt;/code&gt; でテーブルデータを削除した後、&lt;code&gt;scan&lt;/code&gt; コマンドを使用して確認する。テーブルに行がないことを確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):023:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; scan &amp;#39;order&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ROW                               COLUMN+CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;0 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 1.6790 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase セキュリティコマンド(Security tools) - grant, revoke, user_permission</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/security-tools/</link>
+      <pubDate>Sun, 18 Jun 2023 16:13:38 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/security-tools/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;security-tools&#34;&gt;Security tools&lt;/h2&gt;
+&lt;p&gt;HBase では、ユーザーに権限を付与したり取り消したりできる。セキュリティ目的の3つのコマンドがある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;grant&lt;/li&gt;
+&lt;li&gt;revoke&lt;/li&gt;
+&lt;li&gt;user_permission&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;grant---権限付与&#34;&gt;grant - 権限付与&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;grant&lt;/code&gt; コマンドは、ユーザーにテーブルに対する読み取り、書き込み、実行、管理などの特定権限を付与する。権限付与コマンドの構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grant &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;user&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;permissions&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; [&amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; [&amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39; [&amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column; qualifier&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;]]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;RWXCA を使用してユーザーに権限を付与できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;R: READ、読み取り権限&lt;/li&gt;
+&lt;li&gt;W: WRITE、書き込み権限&lt;/li&gt;
+&lt;li&gt;X: EXEC、実行権限&lt;/li&gt;
+&lt;li&gt;C: CREATE、作成権限&lt;/li&gt;
+&lt;li&gt;A: ADMIN、管理者権限&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grant &amp;#39;devkuma&amp;#39;, &amp;#39;RWXCA&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grant &amp;#39;devkuma&amp;#39;, &amp;#39;RW&amp;#39; &amp;#39;t1&amp;#39;, &amp;#39;cf1&amp;#39;, &amp;#39;qualifier1&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;revoke---権限削除&#34;&gt;revoke - 権限削除&lt;/h2&gt;
+&lt;p&gt;ユーザーのアクセス権限を削除する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;revoke &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;user&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;lt;permissions&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column family&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;column; qualifier&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;]]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;revoke &amp;#39;devkuma&amp;#39;, &amp;#39;t1&amp;#39;, &amp;#39;cf1&amp;#39;, &amp;#39;qualifier1&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;user_permission---特定テーブルに対する権限照会&#34;&gt;user_permission - 特定テーブルに対する権限照会&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;user_permission&lt;/code&gt; コマンドは、特定テーブルに対するすべての権限を照会するために使用される。構文は次のとおりである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;user_permission &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;table name&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;特定テーブルに存在するすべての権限を表示する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;user_permission &amp;#39;t1&amp;#39; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase 圧縮、コンパクション、およびデータブロックエンコーディング</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/compression/</link>
+      <pubDate>Thu, 22 Jun 2023 19:13:23 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/compression/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;圧縮とコンパクション&#34;&gt;圧縮とコンパクション&lt;/h2&gt;
+&lt;p&gt;HBase RegionServer に保存される Region には、Column Family ごとに HStore があり、HStore はその CF の MemStore と HFile で構成される。&lt;/p&gt;
+&lt;p&gt;MemStore はメモリ上の Column Family データであり、HFile はローカルディスク、つまり HDFS に保存される Column Family データである。このような階層構造になっている理由は、HBase のテーブル構造上、データを Row key でソートする必要があり、ディスクへ直接書き込むのではなく、まずメモリ上でソートする必要があるためである。&lt;/p&gt;
+&lt;p&gt;HBase で put や update などの書き込み処理が行われると、データはまず WAL (Write Ahead Log) に記録され、その後 MemStore に書き込まれる。scan などの読み取り処理では、まず MemStore を確認し、次に HFile から要求された内容を検索する。&lt;/p&gt;
+&lt;p&gt;書き込みが繰り返されて MemStore のデータサイズが設定されたしきい値を超えると、MemStore のデータは HFile として保存される。多くの HFile で構成された Region では、HFile が増えるにつれてコンパクションが発生し、複数の HFile がより大きな HFile にマージされる。その結果、多数の小さな HFile は、少数の大きな HFile に整理される。この処理をコンパクションと呼ぶ。&lt;/p&gt;
+&lt;p&gt;HBase のコンパクションは、Minor Compaction と Major Compaction として実行される。&lt;/p&gt;
+&lt;h3 id=&#34;minor-compaction&#34;&gt;Minor Compaction&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Minor compaction は、最近作成された複数の小さなファイルを、設定されたより大きな HFile サイズへマージする処理である。&lt;/li&gt;
+&lt;li&gt;データが挿入されると、小さな HFile が多数作成される。ファイル数が多すぎると性能が低下する可能性があるため、HBase は複数の HFile を少数の大きな HFile に作り直し、HFile 数を自動的に管理する。&lt;/li&gt;
+&lt;li&gt;HFile に保存されたデータはソートされているため、マージソートを使って高速にマージできる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-minor-compaction.png&#34; alt=&#34;Minor Compaction&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;major-compaction&#34;&gt;Major Compaction&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Major compaction は、特定 Region 内の Column Family に属するすべての HFile を集め、Column ごとに 1 つの HFile を作成する。デフォルトでは 7 日に 1 回実行される。&lt;/li&gt;
+&lt;li&gt;この処理中に不要な Cell や期限切れの Cell が削除され、全体的な読み取り性能が改善される。Tombstone Marker が付いたデータも、この時点で最終的に削除される。&lt;/li&gt;
+&lt;li&gt;この作業が実行されると、大量のファイル読み書きが発生するため、ディスク I/O とネットワークトラフィックが増加する可能性がある。&lt;/li&gt;
+&lt;li&gt;自動実行をスケジュールできるため、週末や夜間に実行するように設定し、急激な I/O 増加がサービスに与える影響を最小化できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-majar-compaction.png&#34; alt=&#34;Major Compaction&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;コンパクション設定&#34;&gt;コンパクション設定&lt;/h2&gt;
+&lt;p&gt;Minor compaction では、コンパクション対象となる HFile 数を次の設定で指定する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;hbase.hstore.compaction.min&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Minor compaction の最小 HFile 数を設定する。&lt;/li&gt;
+&lt;li&gt;デフォルトは 3 で、2 以上に設定する必要がある。&lt;/li&gt;
+&lt;li&gt;値が大きすぎると Minor compaction が遅延し、後でまとめて処理される際に負荷が発生する可能性がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbase.hstore.compaction.max&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;Minor compaction の最大 HFile 数を設定する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;次の設定では、コンパクション対象となる HFile サイズを指定する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;hbase.hstore.compaction.min.size&lt;/code&gt;: この値より小さい HFile は、ExploringCompactionPolicy によって Minor compaction を検索するとき常に含まれる。この値は &lt;code&gt;hbase.hstore.compaction.ratio&lt;/code&gt; と併用され、コンパクション対象の HFile を選択するために使われる。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbase.hstore.compaction.max.size&lt;/code&gt;: このサイズより大きい HFile は Minor compaction から除外される。Minor compaction が頻繁に発生しても効果が小さい場合、この値を小さくして大きなファイルを Minor compaction から除外できる。デフォルト: &lt;code&gt;9223372036854775807&lt;/code&gt;, LONG.MAX_VALUE, bytes。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;その他の設定:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;hbase.hregion.majorcompaction&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;HBase では、1 つの Region に複数の StoreFile が存在することがある。性能改善のため、定期的にこれらのファイルを集め、より大きな 1 つのファイルにまとめる。この処理では CPU 使用量とディスク I/O が大きく、応答時間が低下する場合がある。そのため、応答時間が重要な場合は、ピーク時間を避けて Major compaction を手動実行する方がよい。&lt;/li&gt;
+&lt;li&gt;デフォルトは 86,400,000 ms である。この値を 0 に変更すると、定期的な Major Compaction は実行されない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;hbase.hregion.majorcompaction.jitter&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;このプロパティのデフォルトは 0.2、つまり 20% である。保存された各ファイルで Major compaction が実行されるタイミングを分散させる。&lt;/li&gt;
+&lt;li&gt;これがない場合、Major compaction は 24 時間ごとに同時実行される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;hbase-圧縮およびデータブロックエンコーディング&#34;&gt;HBase 圧縮およびデータブロックエンコーディング&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;このセクションで言及する codec は、データブロックまたは row key のエンコードとデコードのためのものである。レプリケーション codec の詳細については、&lt;a href=&#34;https://hbase.apache.org/book.html#cluster.replication.preserving.tags&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;cluster.replication.preserving.tags&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; を参照する。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;HBase は、ColumnFamily に対して有効化できる複数の圧縮アルゴリズムをサポートしている。データブロックエンコーディングは、ソート済み row key や対象テーブルのスキーマなど、HBase の基盤設計とパターンを利用して、key 内の情報重複を抑える。Compressor は Cell 内の大きな不透明バイト配列のサイズを削減し、未圧縮データに必要な保存領域を大幅に削減できる。&lt;/p&gt;
+&lt;p&gt;Compressor とデータブロックエンコーディングは、同じ ColumnFamily で併用できる。&lt;/p&gt;
+&lt;h3 id=&#34;変更はコンパクション中に適用される&#34;&gt;変更はコンパクション中に適用される&lt;/h3&gt;
+&lt;p&gt;ColumnFamily の圧縮またはエンコーディングを変更した場合、その変更はコンパクション中に適用される。&lt;/p&gt;
+&lt;p&gt;一部の codec は、GZip 圧縮のように Java に組み込まれた機能を使用する。他の codec はネイティブライブラリに依存する。ネイティブライブラリは、HBase ライブラリディレクトリにインストールされた codec 依存関係として提供できるほか、Hadoop codec を使う場合は Hadoop の一部として提供される。Hadoop codec には通常ネイティブコードコンポーネントがあるため、HBase で Hadoop ネイティブライブラリを使用するには、&lt;a href=&#34;https://hbase.apache.org/book.html#hadoop.native.lib&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hadoop native binary support installation instructions&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; に従う。&lt;/p&gt;
+&lt;p&gt;このセクションでは、HBase で一般的に使用され、テストされている codec について説明する。&lt;/p&gt;
+&lt;p&gt;どの codec を使用する場合でも、その codec が正しくインストールされ、クラスタ内のすべてのノードで利用可能であることをテストする必要がある。新しくデプロイされたノードで codec の利用可否を確認するには、追加の運用手順が必要になる場合がある。指定した codec が正しくインストールされていることを確認するには、&lt;a href=&#34;https://hbase.apache.org/book.html#compression.test&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;compression.test&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; ユーティリティを使用できる。&lt;/p&gt;
+&lt;p&gt;HBase で compressor を使用する設定については &lt;a href=&#34;https://hbase.apache.org/book.html#compressor.install&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;compressor.install&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; を参照する。ColumnFamily で compressor を有効にする方法については &lt;a href=&#34;https://hbase.apache.org/book.html#changing.compression&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;changing.compression&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; を参照する。ColumnFamily でデータブロックエンコーディングを有効にする方法については &lt;a href=&#34;https://hbase.apache.org/book.html#data.block.encoding.enable&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;data.block.encoding.enable&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; を参照する。&lt;/p&gt;
+&lt;h3 id=&#34;block-compressors&#34;&gt;Block Compressors&lt;/h3&gt;
+&lt;h4 id=&#34;none&#34;&gt;NONE&lt;/h4&gt;
+&lt;p&gt;この圧縮タイプ定数は圧縮なしを選択し、デフォルトである。&lt;/p&gt;
+&lt;h4 id=&#34;brotli&#34;&gt;BROTLI&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Brotli&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Brotli&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; は汎用の可逆圧縮アルゴリズムである。LZ77 の現代的な変種、Huffman coding、二次コンテキストモデリングを組み合わせ、現在利用できる最良の汎用圧縮方式に匹敵する圧縮率を提供する。速度は GZ と同程度だが、より高密度に圧縮できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;bzip2&#34;&gt;BZIP2&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Bzip2 は Burrows-Wheeler block-sorting text compression algorithm と Huffman coding を使用してファイルを圧縮する。通常、LZ のような辞書ベース圧縮より圧縮率はかなり良いが、圧縮と展開はいずれも他の選択肢より遅い場合がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;gzgzip&#34;&gt;GZ(GZIP)&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;圧縮率を重視する。&lt;/li&gt;
+&lt;li&gt;gzip は、LZ77 と Huffman coding の組み合わせである DEFLATE アルゴリズムに基づいている。このアルゴリズムは Java ランタイム環境で普遍的に利用できるため、最小公分母として使いやすい選択肢である。ただし、Zstandard などの新しいアルゴリズムと比べるとかなり遅い。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;lz4&#34;&gt;LZ4&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;圧縮/展開速度を重視する。&lt;/li&gt;
+&lt;li&gt;LZ4 は、圧縮と展開速度を重視した可逆データ圧縮アルゴリズムである。Brotli、DEFLATE、Zstandard と同じく LZ77 系の圧縮アルゴリズムに属する。マイクロベンチマークでは、LZ4 はその系列の中で圧縮と展開の両方が最も高速であり、一般的に推奨される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;lzma&#34;&gt;LZMA&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;LZMA は LZ77 にやや似た辞書圧縮方式である。計算コストの高い予測モデルと可変サイズの圧縮辞書により非常に高い圧縮率を実現しながら、一般的に使われる他の圧縮アルゴリズムと同程度の展開速度を維持する。典型的な圧縮率では LZMA は他のすべての選択肢を上回るが、compressor としては非常に遅く、特に高い圧縮レベルで動作するように設定した場合は遅くなることがある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;lzo&#34;&gt;LZO&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;圧縮/展開速度を重視し、追加ライブラリのインストールが必要である。&lt;/li&gt;
+&lt;li&gt;LZO は、展開速度を重視して実装された別の LZ 系データ圧縮アルゴリズムである。LZ4 ほど速くはないが、それに近い性能を持つ。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;snappy&#34;&gt;SNAPPY&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;圧縮/展開速度を重視する。&lt;/li&gt;
+&lt;li&gt;SNAPPY は LZ77 の考え方に基づくが、非常に高速な圧縮速度に最適化されており、その代わり圧縮率は妥当な水準にとどまる。LZ4 と同程度に高速だが、圧縮率はそれほど高くない。HBase は pure Java Snappy codec を提供しており、すべてのハードウェアアーキテクチャ上のすべての Java ランタイムで普遍的に利用できる選択肢として、GZ の代わりに使用できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;zstd&#34;&gt;ZSTD&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Zstandard は、辞書マッチング段階 (LZ77) と、大きな検索ウィンドウ、および finite-state entropy と Huffman coding の両方を使用する高速なエントロピーコーディング段階を組み合わせる。圧縮速度は最速レベルと最遅レベルで 20 倍以上異なる場合があるが、展開は一貫して高速で、最速レベルと最遅レベルの差は 20% 未満である。&lt;/li&gt;
+&lt;li&gt;ZStandard は、利用可能な圧縮 codec の中で最も柔軟な選択肢である。レベル 1 では LZ4 と同程度の圧縮率を提供し、性能はわずかに低い。中間レベルでは DEFLATE と同程度の圧縮率をより良い性能で提供し、高レベルでは LZMA に似た圧縮速度で LZMA と同程度の高密度圧縮を提供しながら、展開は常に高速である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;データブロックエンコーディングタイプ&#34;&gt;データブロックエンコーディングタイプ&lt;/h3&gt;
+&lt;p&gt;HBase は 5 種類のデータブロックエンコーディングを提供する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NONE&lt;/li&gt;
+&lt;li&gt;Prefix&lt;/li&gt;
+&lt;li&gt;Diff&lt;/li&gt;
+&lt;li&gt;Fast Diff&lt;/li&gt;
+&lt;li&gt;Prefix Tree&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;none-1&#34;&gt;None&lt;/h4&gt;
+&lt;p&gt;None はエンコーディングを適用しないことを意味し、デフォルトである。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;エンコーディングなしの ColumnFamily&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;次の表は、データブロックエンコーディングを使用しない仮想的な ColumnFamily を示している。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Value Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Value&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey:Family:Qualifier0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey:Family:Qualifier1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;25&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey:Family:QualifierN&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;25&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey2:Family:Qualifier1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;25&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey2:Family:Qualifier2&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;prefix&#34;&gt;Prefix&lt;/h4&gt;
+&lt;p&gt;通常、key は同じ prefix を持ち、最後の部分だけが異なることが多い。&lt;/p&gt;
+&lt;p&gt;たとえば、最初の key が &lt;code&gt;RowKey:Family:Qualifier0&lt;/code&gt; で、次の key が &lt;code&gt;RowKey:Family:Qualifier1&lt;/code&gt; であるとする。Prefix encoding は、現在の key と直前の key の間で共有される prefix の長さを格納する拡張カラムを追加する。この例で、最初の key が直前の key と完全に異なる場合、prefix length は 0 である。2 番目の key の最初の 23 文字が同じであるため、prefix length は 23 になる。&lt;/p&gt;
+&lt;p&gt;もちろん、2 つの key に共通部分がない場合、Prefix の利点はない。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Prefix encoding を適用した ColumnFamily&lt;/strong&gt;&lt;br&gt;
+次は、同じデータに Prefix data encoding を適用したものである。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Value Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Prefix Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Value&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey:Family:Qualifier0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;23&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;23&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;N&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;19&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;6&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;2:Family:Qualifier1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;diff&#34;&gt;Diff&lt;/h4&gt;
+&lt;p&gt;Diff encoding は Prefix encoding を拡張したものである。Key を 1 つのバイト列として扱うのではなく、各 Key Field に分割し、Key の各部分をより効率的に圧縮できるようにする。&lt;/p&gt;
+&lt;p&gt;timestamp と type という 2 つの新しいフィールドが追加される。&lt;/p&gt;
+&lt;p&gt;ColumnFamily が直前の行と同じ場合、現在の行では省略される。key length、value length、type が直前の行と同じ場合、それらのフィールドは省略される。&lt;/p&gt;
+&lt;p&gt;また、圧縮を改善するため、timestamp は完全な値として保存されず、直前の行の timestamp との差分として保存される。prefix の例で、2 つの row key があり、timestamp が完全に一致し、type も同じである場合、2 番目の行では value length や type を保存する必要がなく、2 番目の行の timestamp 値は完全な timestamp ではなく 0 になる。&lt;/p&gt;
+&lt;p&gt;write と scan の速度が遅くなるため、より多くのデータをキャッシュできるにもかかわらず、Diff encoding はデフォルトで無効になっている。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Diff encoding を適用した ColumnFamily&lt;/strong&gt;&lt;br&gt;
+この表は、同じ ColumnFamily に Diff encoding を適用したものを示している。&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Flags&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Value Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Prefix Length&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Key&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Timestamp&lt;/th&gt;
+					&lt;th style=&#34;text-align: center&#34;&gt;Type Value&lt;/th&gt;
+					&lt;th&gt;&lt;/th&gt;
+					&lt;th&gt;&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;512&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;RowKey:Family:Qualifier0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1340466835163&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;4&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;5&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;320&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;23&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;3&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;23&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;N&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;120&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;8&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;0&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;25&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;576&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;6&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;2:Family:Qualifier1&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;25&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;4&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;5&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;3384&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;24&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;2&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;1124&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;-&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td style=&#34;text-align: center&#34;&gt;&amp;hellip;&lt;/td&gt;
+					&lt;td&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;fast-diff&#34;&gt;Fast Diff&lt;/h4&gt;
+&lt;p&gt;Fast Diff は Diff と同じように動作するが、より高速に実装されている。また、データ自体が直前の行と同じかどうかを追跡する 1 ビットを保存するフィールドが 1 つ追加される。同じであれば、データは再度保存されない。&lt;/p&gt;
+&lt;p&gt;key が長い場合や column が多い場合は、Fast Diff codec を使用する。&lt;/p&gt;
+&lt;p&gt;データ形式は Diff encoding とほぼ同じであるため、説明用の別画像はない。&lt;/p&gt;
+&lt;h4 id=&#34;prefix-tree&#34;&gt;Prefix Tree&lt;/h4&gt;
+&lt;p&gt;Prefix Tree encoding は、HBase 0.96 で実験的機能として導入された。Prefix Tree encoding は、Prefix、Diff、Fast Diff encoder と同様のメモリ節約を提供しながら、エンコード速度が遅くなる代わりに、より高速なランダムアクセスを提供する。よいアイデアではあったが、ほとんど使用されず、HBase 2.0.0 で削除された。&lt;/p&gt;
+&lt;h2 id=&#34;参考資料&#34;&gt;参考資料&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://hbase.apache.org/book.html#compression&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Appendix D: Compression and Data Block Encoding In HBase&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase データバージョニング(Data Versioning)</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/data-versioning/</link>
+      <pubDate>Thu, 22 Jun 2023 19:13:23 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/data-versioning/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;データバージョニングdata-versioning&#34;&gt;データバージョニング(Data Versioning)&lt;/h2&gt;
+&lt;p&gt;HBase の特別な機能の1つとして、各セル(cell)の特定 column 値に複数のバージョンを保存できる。&lt;/p&gt;
+&lt;p&gt;各バージョンには timestamp を使用して実装されており、降順にソートされる。long integer 型として、millisecond に換算した UnixTime を使用する。&lt;/p&gt;
+&lt;p&gt;HBase は基本的にデータバージョン管理を行う。データが同じ Row key で保存されると、最新データが timestamp でバージョニングされ、降順に保存されるため、ストレージファイルから読み取るときにもっとも新しい値を先に見つける。&lt;/p&gt;
+&lt;p&gt;Timestamp は明示的に入力することも可能だが、デフォルトで HBase は各 cell の変更を3個まで保持し、基本的に scan で照会すると降順であるため最新データが照会される。&lt;/p&gt;
+&lt;p&gt;また、以下のように保存されているすべての version のデータを照会することも可能である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &amp;#39;t1&amp;#39;, &amp;#39;rowkey1&amp;#39;, {COLUMN =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;cf1&amp;#39;, TIMESTAMP =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; ts1}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;timestamp 範囲を設定して、その時点の値を見ることも可能である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &amp;#39;t1&amp;#39;, &amp;#39;rowkey1&amp;#39;, {TIMERANGE =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; [start_timestamp, end_timestamp]}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;バージョニングは既存では自動で指定されるが、手動で指定することもできる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自動バージョニング
+&lt;ul&gt;
+&lt;li&gt;クラスター内サーバー時間が同一でない場合、バージョン差が発生する可能性がある。&lt;/li&gt;
+&lt;li&gt;Put メソッド実行時に timestamp を設定できるが、一般的にはサーバー内の自動バージョニングを推奨する。&lt;/li&gt;
+&lt;li&gt;基本的に最近3個のバージョンを管理するが、Major Compaction 機能が長い周期を持つため、まだ削除されていない過去バージョンが存在することがある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;手動バージョニング
+&lt;ul&gt;
+&lt;li&gt;timestamp をオーバーライドして実装可能である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-data-versioning.png&#34; alt=&#34;Data Versioning&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;hbase-versions1-の場合でも削除すると列の以前のバージョンが表示される&#34;&gt;HBase VERSIONS=1 の場合でも削除すると列の以前のバージョンが表示される?&lt;/h2&gt;
+&lt;p&gt;前でバージョンは基本的に最近3個のバージョンを管理するが、Major Compaction 機能が長い周期を持つため、まだ削除されていない過去バージョンが存在することがあると述べた。&lt;/p&gt;
+&lt;p&gt;これに関連して発生する問題について紹介する。&lt;/p&gt;
+&lt;h3 id=&#34;versions-適用&#34;&gt;VERSIONS 適用&lt;/h3&gt;
+&lt;p&gt;以下のように ColumnFamily に &lt;code&gt;VERSIONS&lt;/code&gt; を適用する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;, {NAME =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;f1&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 2}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hbase(main):001:0&amp;gt; create &amp;#39;t1&amp;#39;, {NAME =&amp;gt; &amp;#39;f1&amp;#39;, VERSIONS =&amp;gt; 2}
+Created table t1
+Took 5.9091 seconds
+=&amp;gt; Hbase::Table - t1
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;次にデータを順番に登録する。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test1&amp;#39;
+put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test2&amp;#39;
+put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test2&amp;#39;
+put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test4&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hbase(main):002:0&amp;gt; put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test1&amp;#39;
+Took 0.7153 seconds
+hbase(main):003:0&amp;gt; put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test2&amp;#39;
+Took 0.0318 seconds
+hbase(main):004:0&amp;gt; put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test3&amp;#39;
+Took 0.0418 seconds
+hbase(main):005:0&amp;gt; put &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;, &amp;#39;test4&amp;#39;
+Took 0.0255 seconds
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;そして &lt;code&gt;delete&lt;/code&gt; コマンドで1つずつ順番に削除しながら確認してみる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;delete &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;hbase(main):013:0&amp;gt; scan &amp;#39;t1&amp;#39;
+ROW                                                                  COLUMN+CELL
+ 101                                                                 column=f1:name1, timestamp=1687426826665, value=test4
+1 row(s)
+Took 0.3049 seconds
+hbase(main):014:0&amp;gt; delete &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;
+Took 0.0160 seconds
+hbase(main):015:0&amp;gt; scan &amp;#39;t1&amp;#39;
+ROW                                                                  COLUMN+CELL
+ 101                                                                 column=f1:name1, timestamp=1687426822568, value=test3
+1 row(s)
+Took 0.1760 seconds
+hbase(main):016:0&amp;gt; delete &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;
+Took 0.0605 seconds
+hbase(main):017:0&amp;gt; scan &amp;#39;t1&amp;#39;
+ROW                                                                  COLUMN+CELL
+ 101                                                                 column=f1:name1, timestamp=1687426817569, value=test2
+1 row(s)
+Took 0.0710 seconds
+hbase(main):018:0&amp;gt; delete &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, &amp;#39;f1:name1&amp;#39;
+Took 0.0337 seconds
+hbase(main):019:0&amp;gt; scan &amp;#39;t1&amp;#39;
+ROW                                                                  COLUMN+CELL
+ 101                                                                 column=f1:name1, timestamp=1687426813634, value=test1
+1 row(s)
+Took 0.0265 seconds
+hbase(main):020:0&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;すると、その直前に登録したデータが順番に照会されることがわかる。&lt;/p&gt;
+&lt;h2 id=&#34;versions-に関する疑問&#34;&gt;VERSIONS に関する疑問&lt;/h2&gt;
+&lt;p&gt;ここでの疑問は、明らかに &lt;code&gt;VERSIONS&lt;/code&gt; は1個だけ保存されると言われているのに、&lt;code&gt;VERSIONS =&amp;gt; 2&lt;/code&gt; と指定してもそれ以上のバージョンの列が保持されているように見える点である。一見するとバグではないかと疑われる。&lt;/p&gt;
+&lt;p&gt;検索してみると、以下のように同じ疑問を持った人を見つけることができた。&lt;br&gt;
+&lt;a href=&#34;https://user.hbase.apache.narkive.com/VnZTqJHA/delete-reveals-older-version-of-a-column-even-when-versions-1&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Delete reveals older version of a column even when VERSIONS=1&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;上記質問には以下のような回答がある。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;圧縮が行われるまでは以前のバージョンが実際には消えないという。圧縮は major compaction 設定を変更していない場合、またはリージョンが分割されるたびに、1日に1回実行されるべきだという。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;これは Major Compaction がまだ行われていないために発生する問題である。&lt;/p&gt;
+&lt;h2 id=&#34;versions-適用の確認方法&#34;&gt;VERSIONS 適用の確認方法&lt;/h2&gt;
+&lt;p&gt;では、&lt;code&gt;VERSIONS&lt;/code&gt; はどう確認できるだろうか。方法は &lt;code&gt;get&lt;/code&gt; コマンドを利用して &lt;code&gt;VERSIONS =&amp;gt; 4&lt;/code&gt; のように詳細照会してみれば確認できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;get &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, {COLUMN=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;f1:name1&amp;#39;,VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 4 }
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):005:0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; get &amp;#39;t1&amp;#39;, &amp;#39;101&amp;#39;, {COLUMN=&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;f1:name1&amp;#39;, VERSIONS =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; 4 }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;COLUMN                                                               CELL
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; f1:name1                                                            timestamp=1687427184339, value=test4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; f1:name1                                                            timestamp=1687427181122, value=test2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1 row(s)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Took 0.5028 seconds
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hbase(main):006:0&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;すると上記のように、テーブル作成時に指定した &lt;code&gt;VERSIONS =&amp;gt; 2&lt;/code&gt; どおり2件が出ることがわかる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>HBase ブルームフィルター(BloomFilter)</title>
+      <link>https://www.devkuma.com/jp/docs/hbase/bloom-filter/</link>
+      <pubDate>Fri, 23 Jun 2023 19:01:58 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/hbase/bloom-filter/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;bloomfilter-とは&#34;&gt;BloomFilter とは?&lt;/h2&gt;
+&lt;p&gt;BloomFilter は、1970年に Bloom が提案した多重ハッシュ関数マッピングのための高速検索アルゴリズムである。
+このアルゴリズムは、一般的に要素が集合に属するかどうかを素早く判断する必要がある状況で使用されるが、厳密に100%正確である必要はないという考えから始まっている。&lt;/p&gt;
+&lt;p&gt;詳しい理論は &lt;a href=&#34;https://www.devkuma.com/docs/data-structure/bloom-filter/&#34;&gt;わかりやすく説明するブルームフィルター(Bloom Filter)データ構造&lt;/a&gt; ページを参照すること。&lt;/p&gt;
+&lt;h2 id=&#34;hbase-bloomfilter&#34;&gt;HBase BloomFilter&lt;/h2&gt;
+&lt;p&gt;HBase の BloomFilter のデータは StoreFile のメタデータに保存され、一度作成されると StoreFile は変更できないため更新できない。&lt;/p&gt;
+&lt;p&gt;BloomFilter は Column family レベルの構成属性である。テーブルに BloomFilter が設定されている場合、HBase は MetaBlock と呼ばれる StoreFile を作成するときに BloomFilter 構造のデータ断片を含める。
+MetaBlock および DataBlock(実際の KeyValue データ)は LRU BlockCacheMaintenance で一緒に使用される。&lt;/p&gt;
+&lt;p&gt;したがって、BloomFilter を設定すると、特定のストレージおよびメモリキャッシュのオーバーヘッドが発生する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/hbase/hbase-bloom-filter.png&#34; alt=&#34;BloomFilter&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;hbase-bloomfilter-の設定方法&#34;&gt;HBase BloomFilter の設定方法&lt;/h2&gt;
+&lt;p&gt;特定の Row key を含んでいるかを探索するとき、既存のブロックインデックスに比べて不要なブロックロードを減らし、クラスター全体のスループットを改善する。&lt;/p&gt;
+&lt;p&gt;セルサイズ、セル数、データ保存方式、読み取り方式などに応じてブルームフィルターを選択する必要がある。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;HBase ドキュメントによれば、ほとんどの場合 BloomFilter の使用が推奨されている。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;BloomFilter には &lt;code&gt;NONE&lt;/code&gt;(デフォルト)、&lt;code&gt;ROW&lt;/code&gt;、&lt;code&gt;ROWCOL&lt;/code&gt; の3つのパラメータがある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ROW&lt;/code&gt;: KeyValue の行(Row)を基準に StoreFile をフィルタリングする行レベル Bloom フィルターを示す。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ROWCOL&lt;/code&gt;: KeyValue の行(Row) + 列(Column)に従って StoreFile をフィルタリングする列レベル Bloom フィルターを示す。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;したがって、&lt;code&gt;ROWCOL&lt;/code&gt; の空間オーバーヘッドは &lt;code&gt;ROW&lt;/code&gt; より高い。&lt;/p&gt;
+&lt;p&gt;該当リージョンに StoreFile が多いほど BloomFilter の効果は高く、リージョンの StoreFile 数が少ないほど HBase の読み取り性能は向上する。&lt;/p&gt;
+&lt;p&gt;次のように BloomFilter コマンドを有効にするため、HBase で Column family を設定する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-cmd&#34; data-lang=&#34;cmd&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create &amp;#39;t1&amp;#39;,{name =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;c1&amp;#39;, BLOOMFILTER =&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt; &amp;#39;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;ROW または ROWCOL&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&amp;#39;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>HBase</category>
+      
+    </item>
+    
+  </channel>
+</rss>
