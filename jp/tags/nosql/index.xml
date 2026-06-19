@@ -1270,6 +1270,452 @@
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第02章 データモデルとクエリ言語</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/02/</link>
+      <pubDate>Thu, 17 Feb 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/02/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: キム・ジョンス、パク・スミン&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.devkuma.com/docs/data-intensive-application/02_ppt.pptx&#34;&gt;発表資料&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;章の目的&#34;&gt;章の目的&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;各データモデルの違いと特徴を理解する。&lt;/li&gt;
+&lt;li&gt;作ろうとしているアプリケーションに、どのデータモデルが適しているか判断できるようにする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rdb-vs-nosql&#34;&gt;RDB vs NoSQL&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;第2章ではデータモデルの違いだけに集中する。
+&lt;ul&gt;
+&lt;li&gt;その他の内容: 耐障害性（第5章）、並行性制御（第7章）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;NoSQL
+&lt;ul&gt;
+&lt;li&gt;スキーマの柔軟性と、局所性に起因するより高い性能&lt;/li&gt;
+&lt;li&gt;一部のアプリケーションでは、アプリケーションが使うデータ構造により近い&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RDB
+&lt;ul&gt;
+&lt;li&gt;結合、N:1、N:Nの関係をうまくサポートする&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;nosql&#34;&gt;NoSQL&lt;/h2&gt;
+&lt;p&gt;文書に似た構造を複数のテーブルに分割するリレーショナル手法の問題点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;扱いにくいスキーマ&lt;/li&gt;
+&lt;li&gt;不要で複雑なアプリケーションコードが発生する&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;ドキュメントモデルの制限&#34;&gt;ドキュメントモデルの制限&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;文書内のネストされた項目を直接参照できない。リレーショナルモデルでは、関連するキーさえあれば直接参照できるが、キーを探すために不要な巡回が発生することもある。
+&lt;ul&gt;
+&lt;li&gt;例: ユーザーの詳細住所を参照する場合
+&lt;ul&gt;
+&lt;li&gt;user.address.road.detail&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ネストが深すぎなければ、一般的には問題にならない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;結合サポートが不十分
+&lt;ul&gt;
+&lt;li&gt;アプリケーションによって、問題になる場合もあればならない場合もある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;多対多の関係が必要な場合は非効率
+&lt;ul&gt;
+&lt;li&gt;アプリケーションの複雑度が上がる。&lt;/li&gt;
+&lt;li&gt;アプリケーション側で処理する方法は、データベース内部の特化したコードで実行するより性能が悪い。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+相互接続が多い場合:
+
+グラフモデル &gt; リレーショナルモデル &gt;&gt;&gt; ドキュメントモデル
+&lt;/div&gt;
+
+&lt;h3 id=&#34;スキーマの柔軟性&#34;&gt;スキーマの柔軟性&lt;/h3&gt;
+&lt;p&gt;特定のスキーマを強制しない。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;任意のキーと値を文書に追加できる。&lt;/li&gt;
+&lt;li&gt;文書に含まれるフィールドの存在は保証されない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+スキーマを強制しないのであって、スキーマがないわけではない。
+
+- リレーショナルモデル = 書き込み時スキーマ（schema-on-write）
+  - データ構造は明示的である。
+  - データベースはすべてのデータがスキーマに従うことを保証する。
+- ドキュメントモデル = 読み取り時スキーマ（schema-on-read）
+  - データ構造は暗黙的である。
+  - データを読むときだけ解釈される。書き込みには制約がない。
+&lt;/div&gt;
+
+&lt;p&gt;アプローチによる処理方法の違い:&lt;/p&gt;
+&lt;p&gt;例: userにfirst_nameを追加する場合&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// ドキュメントモデル
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// アプリケーションでデータを読む場合を処理するコードだけあればよい。
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// （データベースの変更を要求しない方法だが、よい方法には見えない。方法の違いを理解する程度にとどめよう。）
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;if (user?.name &amp;amp;&amp;amp; user?.first_name == null) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    user.first_name = user.name.split(&amp;#34; &amp;#34;)[0]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// リレーショナルモデル
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// 別途スキーマ変更とデータマイグレーション作業が必要
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ALTER TABLE users ADD COLUMN first_name test;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;UPDATE users SET first_name = substring_index(name, &amp;#39; &amp;#39;, 2);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+スキーマ変更は遅く、停止時間を要求する。
+
+- 例外的に、MySQLの場合はスキーマ変更の性能が非常に悪い。
+&lt;/div&gt;
+
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+カラムを追加する場合、既存のすべてのレコードにはそのデータがないため:
+
+1. まずnullable属性にしてnullデータを持てるようにする。
+2. データを更新する。データベースが大きい場合、更新作業に長い時間がかかることがある。
+3. 再び本来の属性、nullableまたはnon-nullに戻す。
+&lt;/div&gt;
+
+&lt;h3 id=&#34;ストレージ局所性&#34;&gt;ストレージ局所性&lt;/h3&gt;
+&lt;p&gt;局所性: データやプログラムなどについて、特定の部分に集中的にアクセスする性質。&lt;/p&gt;
+&lt;p&gt;文書全体に頻繁にアクセスする必要がある場合、ストレージ局所性を活用できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;正規化されたリレーショナルモデルの構造より、非正規化されたドキュメントモデルの構造のほうが性能上の利点がある。
+&lt;ul&gt;
+&lt;li&gt;リレーショナルモデルは検索のために複数のインデックス検索が必要で、より多くのディスクシークと時間が必要になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;一度にその文書の多くの部分を必要とする場合にだけ適用される。
+&lt;ul&gt;
+&lt;li&gt;ドキュメントモデルでは、小さな部分だけにアクセスする必要がある場合でも文書全体を保存しなければならないため、大きな文書では無駄になり得る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;一般的には、文書をできるだけ小さく保ち、文書サイズの増加を最小化することが推奨される。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;このような性能上の制限により、ドキュメントモデルが有用な状況は大きく減る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+リレーショナルモデルにも局所性が適用された概念が存在する。
+
+- Spanner（Googleのデータベース）: インターリーブテーブル
+  - https://cloud.google.com/spanner/docs/schema-and-data-model#creating-interleaved-tables
+- Oracle: 複数テーブル索引クラスタ表
+- Cassandra、HBase: カラムファミリ
+&lt;/div&gt;
+
+&lt;h2 id=&#34;rdbとnosqlの統合&#34;&gt;RDBとNoSQLの統合&lt;/h2&gt;
+&lt;p&gt;互いに似た機能を提供するという意味である。&lt;/p&gt;
+&lt;p&gt;RDB&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MySQLを除くほとんどのRDBはXMLをサポートしており、ドキュメントモデルと非常に似たデータモデルを使用できる。&lt;/li&gt;
+&lt;li&gt;PostgreSQL 9.3+、MySQL 5.7+、DB2 10.5+は、JSON文書に対して似た機能を提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;NoSQL&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;RethinkDB: クエリでリレーショナル結合をサポートする。&lt;/li&gt;
+&lt;li&gt;MongoDB: ドライバーがデータベース参照を自動で解決する。結合はクライアント側で実行され、追加のネットワーク往復が必要で、最適化も不十分なため結合性能はよくない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;クエリ言語&#34;&gt;クエリ言語&lt;/h2&gt;
+&lt;h2 id=&#34;宣言型-vs-命令型&#34;&gt;宣言型 vs 命令型&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;SQLは宣言型である。&lt;/li&gt;
+&lt;li&gt;IMS、CODASYLは命令型であるが、ここでは重要ではない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;宣言型クエリ言語の利点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;知りたいデータのパターンだけを指定すればよい。どのインデックスや結合関数を使うか、どの順序で実行するかは、データベースのクエリ最適化器の仕事である。
+&lt;ul&gt;
+&lt;li&gt;満たすべき条件&lt;/li&gt;
+&lt;li&gt;データの変換、つまりソート、グループ化、集計など&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;一般的に命令型クエリAPIより簡潔で扱いやすい。&lt;/li&gt;
+&lt;li&gt;データベースエンジンの詳細な実装が抽象化されているため、クエリを変更せずにデータベース性能を向上させることができる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Webの例:&lt;/p&gt;
+&lt;p&gt;HTMLにstyleを適用する場合:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CSSは宣言型である。&lt;/li&gt;
+&lt;li&gt;JSでDOM APIを使う方法は命令型である。&lt;/li&gt;
+&lt;li&gt;宣言型は命令型より、可読性、生産性、保守性に優れている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+データベースでも、SQLのような宣言型クエリ言語は命令型クエリAPIより「はるかに」よいと言われている。
+&lt;/div&gt;
+
+&lt;h3 id=&#34;mapreduceクエリ&#34;&gt;MapReduceクエリ&lt;/h3&gt;
+&lt;p&gt;ここでは重要ではない。&lt;/p&gt;
+&lt;p&gt;関数型プログラミングにあるmap、reduce関数を基盤にしている。&lt;/p&gt;
+&lt;p&gt;欠点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;クエリを書くより難しい。&lt;/li&gt;
+&lt;li&gt;宣言型クエリ言語は、クエリ最適化器にクエリ性能を高める機会を与える。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;MongoDB 2.2では、aggregate pipelineという宣言型クエリ言語のサポートが追加された。&lt;/p&gt;
+&lt;h2 id=&#34;グラフ型データモデル&#34;&gt;グラフ型データモデル&lt;/h2&gt;
+&lt;p&gt;アプリケーションのデータモデルが主に1:N、つまりツリー構造のデータである場合、またはエンティティ間に関係がない場合は、ドキュメントモデルが適している。&lt;/p&gt;
+&lt;p&gt;しかし、N:Nの関係が非常に一般的な場合は、グラフモデルが適している。&lt;/p&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+リレーショナルモデルは単純なN:N関係までは適しているが、それ以上の複雑なN:N関係を扱うには適していない。複雑度が上がるためである。
+&lt;/div&gt;
+
+&lt;h3 id=&#34;グラフの構成要素&#34;&gt;グラフの構成要素&lt;/h3&gt;
+&lt;p&gt;頂点（Vertex、またはノードやエンティティ）。
+Spring Dataではノードエンティティと呼ぶ（@NodeEntity）。
+辺（Edge、または関係や弧 arc）。&lt;/p&gt;
+&lt;p&gt;例:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ソーシャルグラフ
+&lt;ul&gt;
+&lt;li&gt;頂点 = 人、辺 = 友人関係&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Webグラフ
+&lt;ul&gt;
+&lt;li&gt;頂点 = Webページ、辺 = リンク&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;道路ネットワーク
+&lt;ul&gt;
+&lt;li&gt;頂点 = 交差点、辺 = 道路&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Facebook
+&lt;ul&gt;
+&lt;li&gt;複数種類の頂点と辺を単一のグラフとして保持する。&lt;/li&gt;
+&lt;li&gt;頂点 = 人、場所、イベント、チェックイン、コメントなど&lt;/li&gt;
+&lt;li&gt;辺 = 人同士の関係、チェックインが発生した位置、誰がどの投稿にコメントしたか、誰がイベントに参加したかなど&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;もしFacebookをリレーショナルモデルで作るなら？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;人、場所、イベント、チェックイン、コメントなどがすべてテーブルとして定義されるだろう。&lt;/li&gt;
+&lt;li&gt;そして各テーブル間に非常に複雑な関係が必要になるだろう。&lt;/li&gt;
+&lt;li&gt;グラフモデルを適用した瞬間、このような複雑さは単純化される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;グラフモデルの種類&#34;&gt;グラフモデルの種類&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;プロパティグラフモデル&lt;/li&gt;
+&lt;li&gt;トリプルストアモデル。ここでは重要ではない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;グラフ用の宣言型クエリ言語&#34;&gt;グラフ用の宣言型クエリ言語&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Cypher&lt;/li&gt;
+&lt;li&gt;SPARQL&lt;/li&gt;
+&lt;li&gt;Datalog&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;プロパティグラフ&#34;&gt;プロパティグラフ&lt;/h3&gt;
+&lt;p&gt;頂点の構成要素:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;id&lt;/li&gt;
+&lt;li&gt;出力（outgoing）辺の集合&lt;/li&gt;
+&lt;li&gt;入力（incoming）辺の集合&lt;/li&gt;
+&lt;li&gt;プロパティのコレクション、キーと値のペア&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;辺の構成要素:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;id&lt;/li&gt;
+&lt;li&gt;辺が始まる頂点（tail vertex）&lt;/li&gt;
+&lt;li&gt;辺が終わる頂点（head vertex）&lt;/li&gt;
+&lt;li&gt;2つの頂点間の関係タイプを説明するラベル&lt;/li&gt;
+&lt;li&gt;プロパティのコレクション、キーと値のペア&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Tip&lt;/div&gt;
+
+
+辺の方向はtail -&gt; headである。そのためtailが開始、headが終点である。
+&lt;/div&gt;
+
+&lt;p&gt;リレーショナルスキーマを使ってプロパティグラフを表現する:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-SQL&#34; data-lang=&#34;SQL&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;CREATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;TABLE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertices&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertex_id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;integer&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;PRIMARY&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;KEY&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;properties&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;json&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;CREATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;TABLE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edges&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edge_id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;integer&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;PRIMARY&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;KEY&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;tail_vertex&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;integer&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;REFERENCES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertices&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertex_id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;head_vertex&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;integer&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;REFERENCES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertices&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;vertex_id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;label&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;text&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;properties&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;json&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;CREATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;INDEX&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edges_tails&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ON&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edges&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;tail_vertex&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;CREATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;INDEX&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edges_heads&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ON&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;edges&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;head_vertex&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;頂点は他の頂点と辺で接続される。
+&lt;ul&gt;
+&lt;li&gt;どの型と関連するかを制限するスキーマはない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ある頂点が与えられれば、その頂点の入力辺と出力辺を効率よく探すことができ、グラフを走査できる。&lt;/li&gt;
+&lt;li&gt;関係の種類ごとに異なるラベルを使うことで、単一のグラフに異なる種類の情報を保存しながら、データモデルをきれいに保てる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;このような機能により、グラフはデータモデリングに多くの&lt;strong&gt;柔軟性&lt;/strong&gt;を提供する。&lt;/p&gt;
+&lt;p&gt;グラフは発展性が高く、アプリケーションに機能を追加する場合でも、データ構造の変更を受け入れやすいように簡単に拡張できる。&lt;/p&gt;
+&lt;h3 id=&#34;cypher&#34;&gt;Cypher&lt;/h3&gt;
+&lt;p&gt;プロパティグラフのための宣言型クエリ言語。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Neo4jグラフデータベース用に作られた。&lt;/li&gt;
+&lt;li&gt;Wiki: Cypherは、パターンで表現されるプロパティグラフを効率よく問い合わせ、更新できる宣言型グラフクエリ言語である。Cypherは比較的単純だが非常に強力な言語であり、非常に複雑なデータベースクエリもCypherで簡単に表現できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データモデルの作成:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;CREATE
+(NAmerica:Location {name:&amp;#39;North America&amp;#39;, type:&amp;#39;continent&amp;#39;}),
+(USA:Location {name:&amp;#39;United States&amp;#39;, type:&amp;#39;country&amp;#39;}),
+(Idaho:Location {name:&amp;#39;Idaho&amp;#39;, type:&amp;#39;state&amp;#39;}),
+(Lucy:Person {name:&amp;#39;Lucy&amp;#39;}),
+(Idaho) -[:WITHIN]-&amp;gt; (USA) -[:WITHIN]-&amp;gt; (NAmerica),
+(Lucy) -[:BORN_IN]-&amp;gt; (Idaho)
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;問題: アメリカからヨーロッパへ移住したすべての人の名前を探す。&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;MATCH
+(person) -[:BORN_IN]-&amp;gt; () -[:WITHIN*0..]-&amp;gt; (USA:Location {name:&amp;#39;United States&amp;#39;}),
+(person) -[:LIVES_IN]-&amp;gt; () -[:WITHIN*0..]-&amp;gt; (EU:Location {name:&amp;#39;Europe&amp;#39;})
+RETURN person.name
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;クエリの実行方法:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;すべての人の検索から始め、出生地と居住地を確認し、条件に合う人だけを返す。&lt;/li&gt;
+&lt;li&gt;2つのLocationから始め、アメリカとヨーロッパのすべての位置を探し、leafに該当する頂点のうち、BORN_IN、LIVES_INの入力辺を通じて見つかった人を返す。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;宣言型の利点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;実行方法を詳しく記述する必要がない。&lt;/li&gt;
+&lt;li&gt;クエリ最適化器が最も効率的な戦略を自動で選択する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;リレーショナルモデルで上のクエリを行うなら？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可能ではあるが難しい。&lt;/li&gt;
+&lt;li&gt;通常、リレーショナルモデルではクエリに必要な結合を事前に知っている。FROM句で宣言するためである。&lt;/li&gt;
+&lt;li&gt;しかしグラフクエリでは、探している頂点のために複数の辺を走査しなければならない。
+&lt;ul&gt;
+&lt;li&gt;何回走査するか分からない。&lt;/li&gt;
+&lt;li&gt;結合数を事前に固定できない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Cypherクエリでは、&lt;code&gt;-[:WITHIN*0..]-&amp;gt;&lt;/code&gt;によって走査を非常に簡潔に表現する。&lt;code&gt;*0&lt;/code&gt;は0回以上を意味する。&lt;/p&gt;
+&lt;p&gt;SQL:1999以降、可変長の走査経路に対するクエリは、再帰共通テーブル式（Recursive common table expression、以下Recursive CTE）、つまりWITH RECURSIVE文を使って表現できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PostgreSQL、DB2、Oracle、SQL Serverでサポートされる。&lt;/li&gt;
+&lt;li&gt;MySQL 5.7+でサポートされる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;トリプルストアとsparql&#34;&gt;トリプルストアとSPARQL&lt;/h3&gt;
+&lt;p&gt;ここでは重要ではない。&lt;/p&gt;
+&lt;p&gt;プロパティグラフモデルとほぼ同じである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同じ概念に対する用語だけが異なる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データを主語（subject）、述語（predicate）、目的語（object）という非常に単純な三部構文（three-part statements）形式で保存する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;主語 = 頂点&lt;/li&gt;
+&lt;li&gt;目的語 = 別の頂点、またはプリミティブデータ型のデータ&lt;/li&gt;
+&lt;li&gt;述語 = 辺&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Turtle&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Wiki: Terse RDF Triple Language、つまりTurtleは、Resource Description Frameworkデータモデルでデータを表現するための構文およびファイル形式である。Turtle構文は、RDFクエリ言語であるSPARQLの構文に似ている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;SPARQLは、RDFデータモデルを使用するトリプルストアクエリ言語である。&lt;/p&gt;
+&lt;h3 id=&#34;datalog&#34;&gt;Datalog&lt;/h3&gt;
+&lt;p&gt;データモデルはトリプルストアモデルに似ている。&lt;/p&gt;
+&lt;p&gt;主語、述語、目的語 -&amp;gt; 述語（主語、目的語）&lt;/p&gt;
+&lt;h3 id=&#34;グラフデータベースランキング&#34;&gt;グラフデータベースランキング&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://db-engines.com/en/ranking/graph&amp;#43;dbms&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://db-engines.com/en/ranking/graph+dbms&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;一行要約: グラフデータベースを使いたい場合はNeo4jを使えばよい。&lt;/p&gt;
+&lt;h3 id=&#34;neo4j&#34;&gt;Neo4j&lt;/h3&gt;
+&lt;p&gt;Spring Dataがサポートしている。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://spring.io/guides/gs/accessing-data-neo4j/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://spring.io/guides/gs/accessing-data-neo4j/&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;spring-boot-starter-data-neo4j
+&lt;/code&gt;&lt;/pre&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-kotlin&#34; data-lang=&#34;kotlin&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@NodeEntity&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;data&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Food&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Id&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Long&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;?&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;interface&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;FoodRepository&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Neo4jRepository&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Food&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Long&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@NodeEntity&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;data&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Store&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Id&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Long&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;?&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#5c35cc;font-weight:bold&#34;&gt;@Relationship&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;has&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;foods&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Food&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;interface&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;StoreRepository&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Neo4jRepository&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Store&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#000&#34;&gt;Long&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;歴史的には、データを1つの大きなツリーとして表現しようとしてきた。&lt;/li&gt;
+&lt;li&gt;N:N関係の表現には適していなかったため、リレーショナルモデルが登場した。&lt;/li&gt;
+&lt;li&gt;最近になって、リレーショナルモデルにも適していないアプリケーションがあることが分かり、非リレーショナルデータモデルであるNoSQLが登場した。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;NoSQLには2つの主要な系統がある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ドキュメントモデル
+&lt;ul&gt;
+&lt;li&gt;すべてのデータが文書に含まれ、文書間の関係がほとんどない場合に使う。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;グラフモデル
+&lt;ul&gt;
+&lt;li&gt;ドキュメントモデルとは正反対に、すべてが潜在的に関連している場合に使う。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3つのモデルはいずれも現在広く使われている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;あるモデルで別のモデルをまねることはできるが、多くの場合その結果は混乱したものになる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ドキュメントモデル、グラフモデルの利点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;保存するデータのためのスキーマを強制しないため、変化する要件に合わせてアプリケーションを簡単に変更できる。&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB のアクセス制御（ユーザー認証）を有効にする方法</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/enable-auth-control/</link>
       <pubDate>Fri, 14 Jan 2022 08:53:00 +0900</pubDate>
@@ -2035,6 +2481,94 @@ value03
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第03章 ストレージと検索</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/03/</link>
+      <pubDate>Wed, 23 Feb 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/03/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: キム・ギョンチョル、キム・ミンギュ&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;この章では、データベースがデータをどのように保存し、要求されたときにどのように探し出すのかを扱う。特定のワークロードでよい性能を得るには、ストレージエンジンの内部で行われている処理を大まかに理解しておく必要がある。&lt;/p&gt;
+&lt;p&gt;主に、ログ構造化ストレージエンジンと、Bツリーのようなページ指向ストレージエンジンを比較する。&lt;/p&gt;
+&lt;h2 id=&#34;データベースを強力にするデータ構造&#34;&gt;データベースを強力にするデータ構造&lt;/h2&gt;
+&lt;p&gt;最も単純なキー・バリューストアは、次の2つのシェル関数で実装できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;db_set&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#204a87&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$1&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;, &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$2&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;&lt;/span&gt; &amp;gt;&amp;gt; database
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;db_get&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    grep &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;^&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$1&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;,&amp;#34;&lt;/span&gt; database &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; sed -e &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;S/^&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$1&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;,//&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; tail -n &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;db_set&lt;/code&gt;はキーと値をファイル末尾に追記する。&lt;code&gt;db_get&lt;/code&gt;はファイル全体を走査し、指定されたキーの最新値を返す。追記は速いが、検索はファイル全体を読む必要があるため遅い。計算量で表すと検索コストは&lt;code&gt;O(n)&lt;/code&gt;である。&lt;/p&gt;
+&lt;p&gt;そのためデータベースにはインデックスが必要になる。インデックスは主データから派生した追加のメタデータであり、レコードを効率よく見つけるために使われる。インデックスは読み取りを速くする一方で、書き込みのたびに更新が必要になるため書き込みを遅くする。どのインデックスを作るかは、アプリケーションの典型的なクエリパターンに基づくトレードオフである。&lt;/p&gt;
+&lt;h3 id=&#34;ハッシュインデックス&#34;&gt;ハッシュインデックス&lt;/h3&gt;
+&lt;p&gt;キー・バリューデータでよく使われる方法は、キーからデータファイル内の最新値のバイトオフセットへの対応を、メモリ上のハッシュマップとして保持することである。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_1.png&#34; alt=&#34;図3-1&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-1. CSVに似た形式のキー・バリューペアのログを、メモリ上のハッシュマップでインデックス化する。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;新しいキー・バリューペアを追記すると、直前に書き込んだオフセットでハッシュマップを更新する。読み取りでは、メモリ上のハッシュマップでオフセットを探し、その位置から値を読む。RiakのBitcaskストレージエンジンはこの方式を使っている。すべてのキーがRAMに収まり、値が頻繁に更新される用途に向いている。&lt;/p&gt;
+&lt;p&gt;ログを追記し続けるだけでは、いずれディスク容量が不足する。一般的な解決策はログをセグメントに分割し、定期的にコンパクションすることである。コンパクションでは重複キーの古い値を捨て、各キーの最新値だけを残す。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_2.png&#34; alt=&#34;図3-2&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-2. キー・バリュー更新ログをコンパクションし、各キーの最新値だけを残す。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;セグメントはバックグラウンドでマージすることもできる。古いセグメントは不変なので、新しい圧縮済みセグメントを作成している間も読み書きを継続できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_3.png&#34; alt=&#34;図3-3&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-3. コンパクションとセグメントマージを同時に行う。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;実装では、ファイル形式、削除を表すトゥームストーン、クラッシュ復旧、部分的に書き込まれたレコード、チェックサム、並行性制御などを考慮する必要がある。追記専用ログは、逐次書き込みが速く、不変セグメントにより復旧が単純になり、マージによって断片化を抑えられるため有用である。&lt;/p&gt;
+&lt;p&gt;ただしハッシュインデックスには制約がある。キーをメモリに保持する必要があり、範囲検索には向かない。範囲検索では個々のキーをすべて調べなければならない。&lt;/p&gt;
+&lt;h3 id=&#34;sstableとlsmツリー&#34;&gt;SSTableとLSMツリー&lt;/h3&gt;
+&lt;p&gt;SSTable（Sorted String Table）は、キー・バリューペアをキー順に並べて保存する。マージされたセグメント内では各キーは一度だけ現れる。ソートされているため、効率的なマージ、疎なメモリ上インデックス、圧縮ブロックが可能になる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_4.png&#34; alt=&#34;図3-4&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-4. 複数のSSTableセグメントをマージし、各キーの最新値だけを残す。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;キーがソートされていれば、すべてのキーをインデックスに持つ必要はない。目的のキーが2つのインデックス項目の間にあると分かれば、その小さな範囲だけをスキャンすればよい。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_5.png&#34; alt=&#34;図3-5&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-5. メモリ上インデックスを持つSSTable。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;書き込みはまずmemtableと呼ばれるメモリ上の平衡木に挿入される。memtableが一定サイズに達すると、SSTableとしてディスクに書き出される。読み取りではmemtable、新しいセグメント、古いセグメントの順に確認する。バックグラウンドコンパクションはセグメントをマージし、上書き済みまたは削除済みの値を除去する。&lt;/p&gt;
+&lt;p&gt;この系統の技術はLSMツリーとして知られる。LevelDB、RocksDB、Cassandra、HBase、Lucene、Elasticsearch、Solrなどは関連する設計を使っている。存在しないキーに対する不要なディスク読み取りを避けるため、Bloomフィルタもよく使われる。&lt;/p&gt;
+&lt;h3 id=&#34;bツリー&#34;&gt;Bツリー&lt;/h3&gt;
+&lt;p&gt;Bツリーはリレーショナルデータベースで最も広く使われるインデックス構造である。データを通常4KB程度の固定サイズページに分け、親ページから子ページへの参照を保持する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_6.png&#34; alt=&#34;図3-6&#34;&gt;&lt;br&gt;
+&lt;em&gt;図3-6. Bツリーインデックスでキーを探す。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;値を更新するには、データベースがリーフページを探して変更する。ページが満杯であれば分割し、親ページを更新する。Bツリーは木のバランスを保つため、大規模なデータでも検索が効率的である。&lt;/p&gt;
+&lt;p&gt;更新はページをその場で上書きするため、クラッシュ復旧は複雑になる。多くのデータベースは、途中で中断された操作を再実行できるようにwrite-ahead logを使う。並行性についても、読み手が不整合な木を観測しないように慎重なラッチが必要になる。&lt;/p&gt;
+&lt;h3 id=&#34;bツリーとlsmツリーの比較&#34;&gt;BツリーとLSMツリーの比較&lt;/h3&gt;
+&lt;p&gt;LSMツリーはランダム書き込みを逐次書き込みに変換し、バックグラウンドでコンパクションするため、一般に書き込みスループットが高い。圧縮しやすく断片化も避けやすいが、コンパクションは前面の読み書きと競合することがあり、コンパクションが終わるまで同じキーが複数セグメントに存在することもある。&lt;/p&gt;
+&lt;p&gt;Bツリーは、キーが明確に1つの場所にあるため、読み取り中心のワークロードで有利なことが多い。同じキーが同じインデックス位置に対応するので、トランザクション分離も実装しやすい。&lt;/p&gt;
+&lt;p&gt;どちらが常に優れているわけではない。適切な選択はワークロード、ハードウェア、コンパクションの挙動、レイテンシ要件によって変わる。&lt;/p&gt;
+&lt;h2 id=&#34;その他のインデックス構造&#34;&gt;その他のインデックス構造&lt;/h2&gt;
+&lt;p&gt;主インデックスは行を識別するが、セカンダリインデックスは別のフィールドによる検索を可能にする。セカンダリインデックスは結合や検索条件に不可欠であり、行を直接指す場合も、該当する行識別子を保持する場合もある。&lt;/p&gt;
+&lt;p&gt;インデックスはキーだけでなく値も一緒に保存できる。これはカバリングインデックスと呼ばれる。複合インデックスは複数フィールドにまたがるクエリを支援する。全文検索、あいまい検索、地理空間検索、多次元クエリには専用の構造が使われる。&lt;/p&gt;
+&lt;p&gt;全文検索エンジンは綴りの違いを許容し、関連度で結果を順位付けすることが多い。地理空間インデックスは二次元または多次元の範囲を検索する必要があり、Rツリーや空間充填曲線のような構造が使われる。&lt;/p&gt;
+&lt;h2 id=&#34;すべてをメモリに置く&#34;&gt;すべてをメモリに置く&lt;/h2&gt;
+&lt;p&gt;メモリが安価になるにつれ、ほとんどまたはすべてのデータをRAMに保持するデータベースも増えている。インメモリデータベースは高速になり得るが、耐久性はログ、スナップショット、レプリケーション、ディスクからの復旧に依存する。主な利点は、単にディスクI/Oを避けることではなく、ディスクページに合わせて符号化する必要のないデータ構造を使える点にある。&lt;/p&gt;
+&lt;h2 id=&#34;トランザクション処理と分析&#34;&gt;トランザクション処理と分析&lt;/h2&gt;
+&lt;p&gt;OLTP（online transaction processing）システムは、ユーザー向けの低レイテンシな読み書きを支える。OLAP（online analytical processing）システムは、大量データに対する複雑なスキャンや集計を支える。&lt;/p&gt;
+&lt;p&gt;分析ワークロードでは、OLTPシステムからデータを抽出、変換、ロードするデータウェアハウスがよく使われる。これにより、本番のトランザクションシステムへ影響を与えずに重い分析クエリを実行できる。&lt;/p&gt;
+&lt;h3 id=&#34;スタースノーフレーク列指向ストレージ&#34;&gt;スター、スノーフレーク、列指向ストレージ&lt;/h3&gt;
+&lt;p&gt;データウェアハウスでは、中心に大きなファクトテーブルを置き、その周囲にディメンションテーブルを配置するスター・スキーマがよく使われる。スノーフレーク・スキーマはディメンションをさらに正規化する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/03_star-schema.jpg&#34; alt=&#34;Star schema&#34;&gt;&lt;/p&gt;
+&lt;p&gt;分析クエリは、多数の行に対して少数の列だけを読むことが多い。列指向ストレージは列ごとにデータをまとめて保存するため、I/Oを削減でき、同じ列の値は似ていることが多いので圧縮も効きやすい。&lt;/p&gt;
+&lt;p&gt;列圧縮、ビットマップ符号化、ベクトル化処理、CPUキャッシュに適した配置は、分析クエリの性能を大きく改善できる。&lt;/p&gt;
+&lt;h3 id=&#34;マテリアライズドビューとデータキューブ&#34;&gt;マテリアライズドビューとデータキューブ&lt;/h3&gt;
+&lt;p&gt;マテリアライズドビューはクエリ結果を事前計算して保存する。データキューブは複数の次元にまたがる事前集計である。事前計算はよく使うクエリを高速化するが、柔軟性を下げ、元データが変わったときのメンテナンスコストを増やす。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;ストレージエンジンは、読み取り性能、書き込み性能、ディスク配置、メモリ使用量、クラッシュ復旧、クエリの柔軟性のバランスを取る。ログ構造化エンジンとBツリーは異なるトレードオフを持つ。分析システムは、ポイント更新ではなくスキャンと集計に合わせてデータを構成することで、さらに別のトレードオフを選んでいる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB の基本的な使い方</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/how-to-use/</link>
       <pubDate>Mon, 10 Jan 2022 09:30:00 +0900</pubDate>
@@ -2641,6 +3175,384 @@ Set 型に score という概念が付いたものである。ここでも Value
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第04章 エンコーディングと発展</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/04/</link>
+      <pubDate>Fri, 04 Mar 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/04/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: ファン・ユンホ&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;アプリケーションは時間の経過とともに必然的に変化する。&lt;br&gt;
+新しい製品をリリースしたり、ユーザー要件やビジネス環境が変わったりすると、アプリケーションの機能は追加または変更される。&lt;/p&gt;
+&lt;p&gt;この変化にはDBの変化も含まれ、カラムやフィールドが追加または削除されることもある。&lt;br&gt;
+このようなDB視点の変更はすぐに適用できる。しかし、applicationのコードは多くの場合すぐには適用されない。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Applicationコードがすぐに適用されない理由&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;codeのupdate方式はrolling update方式で進められる。&lt;/li&gt;
+&lt;li&gt;clientの場合、すぐにアップデートしないユーザーもいるためである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;互換性&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;後方互換性
+&lt;ul&gt;
+&lt;li&gt;新しいコードは、古いコードが記録したデータを読めなければならない。&lt;/li&gt;
+&lt;li&gt;新しいコードは既存データを知っているため、大きな問題にはなりにくい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;前方互換性
+&lt;ul&gt;
+&lt;li&gt;古いコードは、新しいコードが記録したデータを読めなければならない。&lt;/li&gt;
+&lt;li&gt;新しいバージョンで追加されたものを無視できなければならないため、適用が難しい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;データエンコーディング形式&#34;&gt;データエンコーディング形式&lt;/h2&gt;
+&lt;p&gt;プログラムは通常、2つの形で表現されたデータを使って動作する。&lt;br&gt;
+メモリ上では、オブジェクト、構造体、リスト、配列、ハッシュテーブル、ツリーなどとしてデータが保持される。&lt;br&gt;
+このようなデータ構造は、CPUが効率よくアクセスして操作できるように最適化される。&lt;/p&gt;
+&lt;p&gt;データをファイルに書き込んだりネットワーク経由で送信したりするには、自分自身を含む一連のバイト列の形にエンコードしなければならない。&lt;br&gt;
+ポインタは別のプロセスが理解できないため、この一連のバイト列は通常、メモリで使うデータ構造とはかなり異なる。&lt;/p&gt;
+&lt;p&gt;インメモリ表現からバイト列への変換をエンコーディング、シリアライゼーション、またはマーシャリングという。&lt;br&gt;
+その逆をデコーディング、パース、デシリアライゼーション、アンマーシャリングという。&lt;/p&gt;
+&lt;p&gt;例: Java Serializable、Ruby Marshal、Python pickleなど。&lt;/p&gt;
+&lt;h3 id=&#34;jsonとxmlバイナリ変種&#34;&gt;JSONとXML、バイナリ変種&lt;/h3&gt;
+&lt;p&gt;標準化されたエンコーディングとして、JSONとXMLは人気のあるテキスト形式である。
+JSONとXMLは広く知られており多くの場所でサポートされているが、その分好みが分かれることもある。&lt;br&gt;
+特にXMLは、不要で複雑だと批判される。&lt;br&gt;
+強力ではないが、CSVも人気のある言語非依存の形式である。&lt;/p&gt;
+&lt;p&gt;数値のエンコーディングには多くの曖昧さがある。整数と浮動小数点数を区別せず、精度も指定しない。&lt;br&gt;
+この曖昧さは大きな数を扱うときに問題になる。2^53より大きい整数を扱うと不正確になることがある。&lt;br&gt;
+JSONとXMLはUnicode文字列をよくサポートするが、バイナリ文字列はサポートしない。&lt;/p&gt;
+&lt;p&gt;このような欠点があっても、JSON、XML、CSVは十分に使いやすく人気がある。&lt;br&gt;
+特にデータ交換形式として非常に適している。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Binary Encoding（バイナリエンコーディング）&lt;/strong&gt;&lt;br&gt;
+JSONやXMLと比べて、より少ない領域で済み、より簡潔で、パースも高速である。データセットが小さければ大きな意味はないが、テラバイト級になると話は変わる。&lt;br&gt;
+JSONもバイナリ形式と比べるとより多くの領域を使う。&lt;br&gt;
+この観点から、JSONで利用できるMessagePack、BSON、BJSON、BISON、Smileなどのバイナリエンコーディングが開発された。&lt;/p&gt;
+&lt;p&gt;ただし、JSONほど使われてはいない。&lt;/p&gt;
+&lt;p&gt;例4-1:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;{ //1 byte
+	&amp;#34;userName&amp;#34; :&amp;#34;Martin&amp;#34;, // 20 byte
+	&amp;#34;favoriteNumber&amp;#34; :1337, // 22  byte
+	&amp;#34;interests&amp;#34;:[&amp;#34;daydreaming&amp;#34;, &amp;#34;hacking&amp;#34;] // 37 byte
+} // 1 byte
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;JSONをバイナリエンコードしても、オブジェクトのフィールド名を含めなければならない。これは81バイトになる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/04-1.png&#34; alt=&#34;図4-1&#34;&gt;&lt;br&gt;
+&lt;em&gt;図4-1. MessagePackでエンコードしたサンプルレコード（例4-1）&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;JSONバイナリエンコーディングは66バイト、16進数。&lt;/p&gt;
+&lt;p&gt;参考:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;0x83 = 0x80（オブジェクト）、0x03（フィールド）: 3つのフィールドを持つオブジェクト&lt;/li&gt;
+&lt;li&gt;0xa8 = 0xa0（文字列）、0x08（8バイト）&lt;/li&gt;
+&lt;li&gt;cd = 16バイトの数値、16^2 * 5 = 1280。16 * 3 = 48。9 = 1337&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href=&#34;https://ko.wikipedia.org/wiki/ASCII&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;ASCII - 위키백과, 우리 모두의 백과사전&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;
+&lt;a href=&#34;https://github.com/msgpack/msgpack/blob/master/spec.md#int-format-family&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;msgpack/spec.md at master | msgpack/msgpack | GitHub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;thriftとprotocol-buffers&#34;&gt;ThriftとProtocol Buffers&lt;/h3&gt;
+&lt;p&gt;Apache ThriftとProtocol Buffersは、同じ原理に基づくバイナリエンコーディングライブラリである。&lt;br&gt;
+Protocol BuffersはGoogleが開発し、ThriftはFacebookが開発した。現在はいずれもオープンソースである。&lt;br&gt;
+どちらもエンコードするデータのためのスキーマが必要である。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# Thrift schema
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;struct Person {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	1:required string userName, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	2:optional i64 favoriteNumber, 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	3:optional list&amp;lt;string&amp;gt; interests 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;# Protocol Buffers schema
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;message Person {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	required string user_name = 1; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	optional int64 favorite_number = 2; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	repeated string interests = 3; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/04-3.png&#34; alt=&#34;図4-3&#34;&gt;&lt;br&gt;
+&lt;em&gt;図4-3. ThriftのCompact Protocolを使ったエンコーディング例&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/04-4.png&#34; alt=&#34;図4-4&#34;&gt;&lt;br&gt;
+&lt;em&gt;図4-4. Protocol Buffersを使ってエンコードしたサンプルレコード&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;どちらのプロトコルも、スキーマを使うことでバイト数が大幅に減る。&lt;br&gt;
+最も大きな違いは、フィールド名の代わりにフィールドタグ、つまり1、2、3を含める点である。&lt;br&gt;
+この数字はスキーマ定義に現れる数字である。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;フィールドタグとスキーマ発展&lt;/strong&gt;&lt;br&gt;
+スキーマは時間の経過とともに必然的に変化する。これをスキーマ発展という。&lt;br&gt;
+どのように前方互換性と後方互換性を維持しながら変更するのか。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前方互換性（古いコードは現在のデータを読めなければならない）
+&lt;ul&gt;
+&lt;li&gt;新しいコードで記録したデータを読もうとするとき、認識できるtag番号かどうかだけを確認し、認識できなければ自然に無視する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;後方互換性（現在のコードは古いコードで生成したデータを読めなければならない）
+&lt;ul&gt;
+&lt;li&gt;最初のデプロイ後はrequiredとしてfieldを追加できない。古いコードで生成したデータを読めなくなるためである。&lt;/li&gt;
+&lt;li&gt;optional fieldだけを削除できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;avro&#34;&gt;Avro&lt;/h3&gt;
+&lt;p&gt;Apache Avroは、Protocol BuffersやThriftとは異なるが、それらに対抗できるもう一つのバイナリエンコーディング形式である。&lt;br&gt;
+ThriftがHadoopのユースケースに合わなかったため、2009年にHadoopのサブプロジェクトとして始まった。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;record Person {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	string userName;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	union { null, long } favoriteNumber = null;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	array&amp;lt;string&amp;gt; interests;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &amp;#34;type&amp;#34;: &amp;#34;record&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &amp;#34;name&amp;#34;: &amp;#34;Person&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &amp;#34;fields&amp;#34;: [
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {&amp;#34;name&amp;#34;: &amp;#34;userName&amp;#34;, &amp;#34;type&amp;#34;: &amp;#34;string&amp;#34;},
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {&amp;#34;name&amp;#34;: &amp;#34;favoriteNumber&amp;#34;, &amp;#34;type&amp;#34;: [&amp;#34;null&amp;#34;,&amp;#34;long&amp;#34;], &amp;#34;default&amp;#34;: null},
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    {&amp;#34;name&amp;#34;: &amp;#34;interests&amp;#34;,&amp;#34;type&amp;#34;: {&amp;#34;type&amp;#34;: &amp;#34;array&amp;#34;,&amp;#34;items&amp;#34;: &amp;#34;string&amp;#34;}}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  ]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/04-4.png&#34; alt=&#34;図4-5&#34;&gt;&lt;br&gt;
+&lt;em&gt;図4-5. Avroを使ってエンコードしたサンプルレコード&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;32バイトで最も短い。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;フィールドやデータ型を識別するための情報がない。&lt;/li&gt;
+&lt;li&gt;Avroを使ってparsingするには、schemaを先に読み、各フィールドのデータ型を覚えておく必要がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;書き込みスキーマと読み取りスキーマ&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;file、db、networkを通じて送信する目的でエンコードするために使う。&lt;/li&gt;
+&lt;li&gt;applicationをビルドする間にスキーマを生成する。&lt;/li&gt;
+&lt;li&gt;書き込みと読み取りのスキーマは異なっていてもよい。また、フィールドの順序が違っても問題ない。&lt;/li&gt;
+&lt;li&gt;存在しないフィールドを作る場合、このフィールドを無視した後、デフォルト値で埋める。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Avroのスキーマ発展ルール:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前方互換性
+&lt;ul&gt;
+&lt;li&gt;新しいバージョンの書き込みスキーマと、古いバージョンの読み取りスキーマを持てる。&lt;/li&gt;
+&lt;li&gt;フィールド名は変更できない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;後方互換性（古いデータを現在も読める）
+&lt;ul&gt;
+&lt;li&gt;新しいバージョンの読み取りスキーマと、古いバージョンの書き込みスキーマを持てる。&lt;/li&gt;
+&lt;li&gt;フィールド名の変更を追跡できるため、フィールド名の変更が可能である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;この互換性を維持するため、defaultがあるフィールドだけを追加・削除できる。&lt;br&gt;
+古いスキーマにない値が読み取りスキーマにある場合は、デフォルト値に置き換える。&lt;br&gt;
+Avroはスキーマが動的に変更される可能性を考慮して設計されている。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;コード生成と動的型付け言語&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ThriftとProtocol Buffersはコード生成に依存する。
+&lt;ul&gt;
+&lt;li&gt;Java、C++、C#のような静的型付け言語で有用である。&lt;/li&gt;
+&lt;li&gt;スキーマが変更されると再コンパイルが必要である。
+Avroはこの観点から、コンパイル言語とインタプリタ言語を選択して使える。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;スキーマの利点&#34;&gt;スキーマの利点&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Protocol Buffers、Thrift、Avroはスキーマを使ってバイナリエンコーディング形式を記述する。&lt;/li&gt;
+&lt;li&gt;このスキーマ言語はXMLやJSONスキーマよりはるかに単純で、より詳細な検証ルールをサポートする。&lt;/li&gt;
+&lt;li&gt;エンコードされたデータではフィールド名を省略できるため、dataサイズをJSONより小さくできる。&lt;/li&gt;
+&lt;li&gt;schema databaseを使えば、前方互換性と後方互換性を確認できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;データフローモード&#34;&gt;データフローモード&lt;/h2&gt;
+&lt;p&gt;あるプロセスから別のプロセスへデータを渡す方法:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DBを通じて&lt;/li&gt;
+&lt;li&gt;サービス呼び出しを通じて&lt;/li&gt;
+&lt;li&gt;非同期メッセージ送信を通じて&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;データベースを通じたデータフロー&#34;&gt;データベースを通じたデータフロー&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;データベースに記録するプロセスはデータをエンコードし、読むプロセスはデコードする。&lt;/li&gt;
+&lt;li&gt;単一プロセスでDBにアクセス
+&lt;ul&gt;
+&lt;li&gt;DBに保存することは、未来の自分にメッセージを送ることである。&lt;/li&gt;
+&lt;li&gt;後方互換性が明らかに必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;さまざまなプロセスがDBにアクセス
+&lt;ul&gt;
+&lt;li&gt;一般的なapplicationやサービスの方式である。&lt;/li&gt;
+&lt;li&gt;ローリング方式でデプロイする場合、新しいバージョンをデプロイしているいくつかのinstanceは、古いコードでデータを保存し更新している可能性がある。&lt;/li&gt;
+&lt;li&gt;前方互換性が必要である。&lt;/li&gt;
+&lt;li&gt;エンコーディングは知らないフィールドを触らないが、DB視点ではデータが失われることがある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/04-7.png&#34; alt=&#34;図4-7&#34;&gt;&lt;br&gt;
+&lt;em&gt;図4-7. 新しいバージョンのアプリケーションが記録したデータを古いバージョンのアプリケーションが更新した場合、注意しないとデータが失われることがある。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;注意しないと、このようにデータ更新時に新しいフィールドのデータが失われることがある。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;さまざまな時点に記録されたさまざまな値&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;DBはいつでもデータを更新できる。&lt;/li&gt;
+&lt;li&gt;このデータは5年前のデータかもしれないし、5ミリ秒前に記録されたものかもしれない。&lt;/li&gt;
+&lt;li&gt;DBで特別な機能を実行しなければ、元のエンコーディングのまま保持されているはずである。&lt;/li&gt;
+&lt;li&gt;データを新しいスキーマで再記録することはできるが、マイグレーション作業には大きな費用がかかる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;アーカイブ保存&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;バックアップ目的やデータウェアハウスへのロードのため、データベースのスナップショットを随時作成する。&lt;/li&gt;
+&lt;li&gt;この場合、最新スキーマを使ってエンコードする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;サービスを通じたデータフロー-restとrpc&#34;&gt;サービスを通じたデータフロー: RESTとRPC&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ネットワークを通じて通信しなければならないプロセスがあるとき、その通信を配置する方法はいくつかある。&lt;/li&gt;
+&lt;li&gt;最も一般的な方法は、クライアントとサーバーという2つの役割に配置することである。&lt;/li&gt;
+&lt;li&gt;サーバーがネットワークを通じてAPIを公開し、クライアントはこのAPIにリクエストを作ってサーバーへ接続する。&lt;/li&gt;
+&lt;li&gt;サーバーが公開したAPIをサービスという。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Webは次のように動作する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;クライアントはWebサーバーへリクエストを送る。&lt;/li&gt;
+&lt;li&gt;GETリクエストを送り、HTML、CSS、JS、Imageなどを受け取る。&lt;/li&gt;
+&lt;li&gt;サーバーはデータ送信のためにPOSTリクエストを受け取る。&lt;/li&gt;
+&lt;li&gt;WebでWebブラウザだけが唯一のclientではない。
+&lt;ul&gt;
+&lt;li&gt;モバイルデバイスやデスクトップネイティブアプリもサーバーへネットワークリクエストを送れる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;サーバー自体が別のサービスのクライアントになることもある。
+&lt;ul&gt;
+&lt;li&gt;例えば、あるサービスが別のサービスの一部機能やデータを必要とするなら、そのサービスにリクエストを送る。&lt;/li&gt;
+&lt;li&gt;このapplication開発方式は伝統的にサービス指向設計（SOA）と呼ばれた。&lt;/li&gt;
+&lt;li&gt;最近ではこれをさらに改善し、マイクロサービス設計という名前で再登場した。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;サービスとDatabaseはいくつかの面で似ている。ただし違いは、serviceはビジネスロジックに基づいて入出力を制限し、定められた入出力だけを許可してAPIを公開することである。&lt;br&gt;
+MSA、SOAの目標は、サービスをデプロイと変更に対して独立させ、applicationの保守をより簡単にすることにある。&lt;br&gt;
+つまり頻繁な変更に対応するためのものであり、新しいバージョンのリリースが速いためAPI間の互換性が必要である。この点が本章の核心である。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Webサービス&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;サービスと通信するための基本プロトコルとしてHTTPを使う場合、これをWebサービスという。&lt;/li&gt;
+&lt;li&gt;Webサービスには、RESTとSOAPという2つの代表的な方式がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;REST&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTPの原則を基に設計した原則である。&lt;/li&gt;
+&lt;li&gt;単純なデータ型を重視する。&lt;/li&gt;
+&lt;li&gt;URLを使ってResourceを識別し、キャッシュ制御、認証、コンテンツタイプネゴシエーションを行う。&lt;/li&gt;
+&lt;li&gt;SOAPより人気がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;SOAP&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ネットワークAPIリクエストのためのXMLベースのプロトコルである。&lt;/li&gt;
+&lt;li&gt;一般的にはHTTP上で使うが、HTTPとは独立しておりHTTP機能を使わない。&lt;/li&gt;
+&lt;li&gt;その代わり、多様な機能を追加した広範囲で複雑な関連標準を提供する。&lt;/li&gt;
+&lt;li&gt;人が読めないように設計されており、ツールやIDEに大きく依存する。&lt;/li&gt;
+&lt;li&gt;多くの場合、RESTful APIによる単純なアプローチが好まれる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;リモートプロシージャ呼び出し（RPC）の問題&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Webサービスは、network上でAPIを呼び出すいくつかの技術のうち、最も新しい形にすぎない。&lt;/li&gt;
+&lt;li&gt;Webサービスは、1970年代から使われてきたリモートプロシージャ呼び出し（RPC）の考え方を基盤にしている。&lt;/li&gt;
+&lt;li&gt;RPCモデルは、リモートnetworkサービスへのリクエストを、同じprocess内で特定のmethodを呼び出すかのように使えるようにする。&lt;/li&gt;
+&lt;li&gt;RPCは最初は便利に見えるが、RPCアプローチには根本的な欠陥がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;ローカル関数呼び出しは、結果を返すことも、例外を返さないこともある。&lt;/li&gt;
+&lt;li&gt;失敗したネットワークリクエストを再試行するとき、実際にはリクエストが処理され、応答だけが失われた可能性がある。&lt;/li&gt;
+&lt;li&gt;ローカル関数を呼び出すたび、通常ほぼ同じ実行時間がかかる。&lt;/li&gt;
+&lt;li&gt;ローカル関数を呼び出す場合、参照、つまりポインタをローカルメモリ上のオブジェクトに効率よく渡せる。&lt;/li&gt;
+&lt;li&gt;クライアントとサービスは異なるプログラミング言語で実装できる。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;RPCの現在の方向&lt;/strong&gt;
+このような問題にもかかわらずRPCは消えておらず、ここまで述べたバイナリエンコーディングの上にRPCフレームワークが開発されている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Thrift、AvroはRPCサポート機能を内蔵している。&lt;/li&gt;
+&lt;li&gt;gRPCはProtocol Buffersを使ってRPCを実装した。&lt;/li&gt;
+&lt;li&gt;FinagleはThriftを使い、Rest.liはHTTP上でJSONを使う。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;データエンコーディングとRPCの発展&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;発展性を持たせるには、RPC clientとサーバーを独立して変更し、デプロイできなければならない。&lt;/li&gt;
+&lt;li&gt;データベースを通じたデータフローと比べると、発展性に関する仮定を単純化できる。&lt;/li&gt;
+&lt;li&gt;すべてのサーバーを先に更新し、その後すべてのクライアントを更新しても問題ないと仮定する。&lt;/li&gt;
+&lt;li&gt;すると、リクエストには後方互換性だけが必要で、レスポンスには前方互換性だけが必要になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;APIバージョン管理が必ずどの方式で動作すべきかについて合意はないが、一般的にはHTTP Acceptヘッダーにバージョン番号を使う方式がよく使われる。&lt;/p&gt;
+&lt;h3 id=&#34;メッセージ送信データフロー&#34;&gt;メッセージ送信データフロー&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;メッセージ送信データフローは、RPCとデータベースの間にある非同期メッセージ送信システムである。&lt;/li&gt;
+&lt;li&gt;クライアントリクエストを低いレイテンシで別のプロセスへ渡すという点でRPCに似ている。&lt;/li&gt;
+&lt;li&gt;メッセージを直接ネットワーク接続で送信しない。
+&lt;ul&gt;
+&lt;li&gt;一時的にメッセージを保存するメッセージブローカーを利用する。&lt;/li&gt;
+&lt;li&gt;または、メッセージ指向ミドルウェアという中間段階を経由して送信する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Message brokerを使ったときの利点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;受信者が利用できない、または過負荷状態なら、メッセージブローカーがバッファのように動作できる。&lt;/li&gt;
+&lt;li&gt;死んだプロセスにメッセージを再送信できるため、メッセージ損失を防げる。&lt;/li&gt;
+&lt;li&gt;送信者は受信者のIPアドレスやポート番号を知る必要がない。&lt;/li&gt;
+&lt;li&gt;1つのメッセージを複数の受信者へ送信できる。&lt;/li&gt;
+&lt;li&gt;論理的に送信者は受信者から分離されているだけで、誰が消費するかを気にしない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;メッセージ送信通信は、一般的に一方向である点がRPCと異なる。つまり、送信プロセスは通常、メッセージへの応答を期待しない。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;メッセージブローカー&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;最近ではRabbitMQ、ActiveMQ、HornetQ、Apache Kafkaのようなオープンソース実装が普及した。&lt;/li&gt;
+&lt;li&gt;詳細な配信セマンティクスは実装と設定によってさまざまである。&lt;/li&gt;
+&lt;li&gt;しかし、一般的なメッセージブローカーは次のように使う。
+&lt;ul&gt;
+&lt;li&gt;メッセージ名が指定されたキューやトピックへ送信される。&lt;/li&gt;
+&lt;li&gt;ブローカーは、そのキューやトピックの1つ以上のコンシューマーまたは購読者へメッセージを配信する。&lt;/li&gt;
+&lt;li&gt;同じトピックに複数の生産者と消費者が存在できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;トピックは一方向のデータフローだけを提供する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;分散アクターフレームワーク&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;アクターモデルは、単一プロセス内での並行性のためのプログラミングモデルである。&lt;/li&gt;
+&lt;li&gt;スレッド競合条件、ロック、デッドロックを直接扱う代わりに、ロジックがアクターにカプセル化される。&lt;/li&gt;
+&lt;li&gt;各アクターは1つのクライアントまたはエンティティを表す。&lt;/li&gt;
+&lt;li&gt;アクターはローカル状態を持つことができ、非同期メッセージの送受信によって他のアクターと通信する。&lt;/li&gt;
+&lt;li&gt;アクターはメッセージ送信を保証しない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;分散アクターフレームワークはノード間でapplicationを拡張するために使われ、送信者と受信者が同じノードかどうかに関係なく、同じメッセージ送信構造を使う。別のノードであれば、メッセージはエンコードされ、networkを通じて送信される。&lt;/p&gt;
+&lt;p&gt;アクターモデルはメッセージが失われるという仮定を持つため、位置透過性はRPCよりactorモデルでうまく機能する。つまりローカル通信とリモート通信の不一致を減らす。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;さまざまなデータエンコーディング形式と互換性の性質:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;プログラミング言語に特化したエンコーディングは単一のプログラミング言語に制限され、前方互換性と後方互換性を提供できない場合がある。&lt;/li&gt;
+&lt;li&gt;JSON、XML、CSVのようなテキスト形式は広く使われている。
+&lt;ul&gt;
+&lt;li&gt;これらの互換性はデータ型の使い方に依存するため、スキーマがあれば有用な場合もあるが、逆に不便な場合もある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Thrift、Protocol Buffers、Avroのようなバイナリスキーマベースの形式は、短い長さでエンコードされるため効率的である。
+&lt;ul&gt;
+&lt;li&gt;ただし、バイナリエンコーディングを人が読めるようにするにはデコード過程が必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データエンコーディングに関するシナリオ、data flow mode:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データベースに記録するプロセスがエンコードし、データベースから読むプロセスがデコードするデータベース。&lt;/li&gt;
+&lt;li&gt;クライアントがリクエストをエンコードし、サーバーがリクエストをデコードしてレスポンスをエンコードし、最終的にレスポンスをデコードするRPCとREST API。&lt;/li&gt;
+&lt;li&gt;送信者がエンコードし、受信者がデコードするメッセージを互いに送信してノード間通信を行う非同期メッセージ送信。メッセージブローカーやアクターを利用する。&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB mongo コマンドの使い方</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/how-to-use-mongo/</link>
       <pubDate>Tue, 11 Jan 2022 18:21:00 +0900</pubDate>
@@ -3024,6 +3936,92 @@ Result&amp;gt; (nil)   5秒が経過してデータが削除された
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第05章 レプリケーション</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/05/</link>
+      <pubDate>Thu, 17 Feb 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/05/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: イ・ホジュン、チョ・ソンジク&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;part-2-分散データ&#34;&gt;Part 2. 分散データ&lt;/h2&gt;
+&lt;p&gt;第1部では、単一のマシンにデータを保存する場合のデータシステムを見た。第2部では、複数のマシンが関与する場合を扱う。&lt;/p&gt;
+&lt;p&gt;データを分散する理由はいくつかある。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;スケーラビリティ&lt;/strong&gt;&lt;br&gt;
+データ量や読み書き負荷が1台のマシンで扱える範囲を超える場合、負荷を複数のマシンに分散する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;耐障害性と高可用性&lt;/strong&gt;&lt;br&gt;
+1台のマシンが停止しても、他のマシンがあればアプリケーションは動作を継続できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/05_Availability.png&#34; alt=&#34;可用性&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;レイテンシ&lt;/strong&gt;&lt;br&gt;
+世界中にユーザーがいる場合、ユーザーに近いデータセンターにデータを置くことで応答時間を短縮できる。&lt;/p&gt;
+&lt;h3 id=&#34;垂直スケーリングと水平スケーリング&#34;&gt;垂直スケーリングと水平スケーリング&lt;/h3&gt;
+&lt;p&gt;垂直スケーリング、つまりスケールアップは、より強力なマシンを使うことである。多くのCPU、メモリ、ディスクを1つのOSイメージにまとめる。共有メモリや共有ディスクのアーキテクチャは有用な場合もあるが、高価であり、耐障害性とスケーラビリティには限界がある。&lt;/p&gt;
+&lt;p&gt;水平スケーリング、つまりスケールアウトは、独立した多数のノードを使うことである。各ノードは独自のCPU、メモリ、ディスクを持ち、ネットワーク越しにソフトウェアで協調する。コスト効率のよいハードウェアを使え、地理的にデータを分散でき、データセンター全体の障害の影響も減らせる。ただし、分散システム特有の制約とトレードオフも発生する。&lt;/p&gt;
+&lt;h2 id=&#34;レプリケーション&#34;&gt;レプリケーション&lt;/h2&gt;
+&lt;p&gt;レプリケーションとは、ネットワークで接続された複数のマシンに同じデータのコピーを保持することである。ユーザーに地理的に近い場所へデータを置く、一部のシステムが故障しても動作を継続する、読み取りクエリに答えるマシンを増やして読み取りスループットを上げる、といった目的で使われる。&lt;/p&gt;
+&lt;p&gt;レプリケーションが難しいのは、データが変更されるからである。中心的な課題は、複製されたデータの変更をどう処理するかである。&lt;/p&gt;
+&lt;p&gt;代表的なアルゴリズムには、単一リーダー、複数リーダー、リーダーレスのレプリケーションがある。それぞれ長所と短所が異なる。&lt;/p&gt;
+&lt;h2 id=&#34;リーダーとフォロワー&#34;&gt;リーダーとフォロワー&lt;/h2&gt;
+&lt;p&gt;レプリカとは、データベースのコピーを保存するノードである。リーダーベースレプリケーションでは、1つのレプリカがリーダーに指定される。クライアントは書き込みをリーダーへ送り、リーダーは変更をフォロワーへ送る。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/05-1.png&#34; alt=&#34;図5-1&#34;&gt;&lt;br&gt;
+&lt;em&gt;図5-1. リーダーベースレプリケーション。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;リーダーはプライマリまたはマスターとも呼ばれ、書き込みと多くの場合読み取りを処理する。フォロワーはリードレプリカ、スレーブ、セカンダリ、ホットスタンバイとも呼ばれ、リーダーの変更ログを受け取ってローカルコピーを更新する。多くのRDBMS、NoSQLシステム、メッセージブローカーがこの方式を使っている。&lt;/p&gt;
+&lt;h3 id=&#34;同期レプリケーションと非同期レプリケーション&#34;&gt;同期レプリケーションと非同期レプリケーション&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/05-2.png&#34; alt=&#34;図5-2&#34;&gt;&lt;br&gt;
+&lt;em&gt;図5-2. 1つのフォロワーは同期式、もう1つは非同期式。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;同期レプリケーションでは、リーダーはフォロワーが書き込みを受信したことを確認してからクライアントへ成功を返す。フォロワーが最新データを持つことは保証されるが、フォロワーが遅い、または利用できない場合は書き込みがブロックされる。&lt;/p&gt;
+&lt;p&gt;非同期レプリケーションでは、リーダーはフォロワーを待たない。レイテンシが低く可用性も高いが、変更がフォロワーへ届く前にリーダーが失敗すると、確認済みの書き込みが失われる可能性がある。&lt;/p&gt;
+&lt;p&gt;半同期構成では、1つのフォロワーを同期式にし、残りを非同期式にする。同期フォロワーが使えなくなれば別のフォロワーを同期式にできる。完全な非同期レプリケーションは、多数のフォロワーや地理的に分散したノードがある場合によく使われるが、耐久性の保証は弱くなる。&lt;/p&gt;
+&lt;h3 id=&#34;新しいフォロワーの設定&#34;&gt;新しいフォロワーの設定&lt;/h3&gt;
+&lt;p&gt;読み取り能力を増やす場合や故障ノードを置き換える場合、新しいフォロワーが必要になる。単にデータファイルをコピーするだけでは不十分である。コピー中にも書き込みが続くためである。データベースをロックすれば可用性を損なう。&lt;/p&gt;
+&lt;p&gt;一般的な手順は、書き込みを止めずにリーダーの一貫したスナップショットを取得し、それを新しいフォロワーへコピーし、その後スナップショット以降のすべての変更をリーダーへ要求することである。バックログを処理し終えれば、フォロワーは追いついた状態になり、以後の変更を処理できる。&lt;/p&gt;
+&lt;h3 id=&#34;ノード停止の処理&#34;&gt;ノード停止の処理&lt;/h3&gt;
+&lt;p&gt;フォロワー障害はキャッチアップ復旧で処理する。フォロワーは受信した変更ログをローカルに保存する。再起動または再接続後、最後に処理したトランザクション以降の変更をリーダーへ要求し、それらを適用する。&lt;/p&gt;
+&lt;p&gt;リーダー障害ではフェイルオーバーが必要になる。フォロワーの1つを新しいリーダーへ昇格させ、クライアントはそこへ書き込みを送り、他のフォロワーは新リーダーから変更を受け取る。フェイルオーバーは手動でも自動でも行える。&lt;/p&gt;
+&lt;p&gt;自動フェイルオーバーでは、リーダー障害を検出し、新しいリーダーを選び、クライアントとフォロワーを再設定する必要がある。障害検出にはタイムアウトがよく使われるが、誤検出も起こり得る。&lt;/p&gt;
+&lt;h3 id=&#34;フェイルオーバーの問題&#34;&gt;フェイルオーバーの問題&lt;/h3&gt;
+&lt;p&gt;非同期書き込みが古いリーダーで確認済みだが新しいリーダーへ複製されていなかった場合、フェイルオーバーでデータが失われる可能性がある。死んだと判断された旧リーダーが戻ってくると、2つのリーダーが書き込みを受け付けるスプリットブレインが発生することもある。短すぎるタイムアウトは不要なフェイルオーバーを起こし、長すぎるタイムアウトは停止時間を延ばすため、設定は難しい。&lt;/p&gt;
+&lt;h2 id=&#34;レプリケーションログの実装&#34;&gt;レプリケーションログの実装&lt;/h2&gt;
+&lt;p&gt;レプリケーションはいくつかの方法で実装できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;文ベースレプリケーション&lt;/strong&gt;はSQL文をフォロワーへ送るが、非決定的関数、自動採番、トリガー、副作用によって不整合が起こり得る。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;write-ahead logの配送&lt;/strong&gt;はストレージエンジンの低レベルなログレコードを送る。この方式はレプリケーションをストレージ形式に強く結び付ける。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;論理ログレプリケーション&lt;/strong&gt;は挿入、更新、削除された行を表す行レベルのレコードを使う。バージョン間の互換性を保ちやすい。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;トリガーベースレプリケーション&lt;/strong&gt;はアプリケーションコードで変更を捕捉して複製するが、複雑で遅くなりやすい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;レプリケーションラグの問題&#34;&gt;レプリケーションラグの問題&lt;/h2&gt;
+&lt;p&gt;非同期レプリケーションでは、フォロワーがリーダーより遅れるレプリケーションラグが発生する。その結果、ユーザーが古いデータを読むことがある。&lt;/p&gt;
+&lt;p&gt;read-after-write一貫性は、ユーザーが自分自身の書き込みを読めることを保証する。単調読み取りは、新しいレプリカを読んだ後に古いレプリカを読んで時間が戻ったように見えることを防ぐ。一貫したプレフィックス読み取りは、因果関係のある書き込みが正しい順序で観測されることを保証する。&lt;/p&gt;
+&lt;p&gt;読み取りをフォロワーへ分散してスケールさせる場合、レプリケーションラグは特に目立つ。アプリケーションは、より強いユーザー体験上の保証を提供するため、ルーティング、タイムスタンプ、バージョン追跡、セッションアフィニティなどを必要とすることがある。&lt;/p&gt;
+&lt;h2 id=&#34;複数リーダーレプリケーション&#34;&gt;複数リーダーレプリケーション&lt;/h2&gt;
+&lt;p&gt;複数リーダーレプリケーションでは、複数のノードが書き込みを受け付ける。各リーダーは自分の変更を他のリーダーへ送る。複数データセンター間では、ユーザーが近いデータセンターへ書き込め、別のデータセンターが利用できなくても動作を続けられるため有用である。&lt;/p&gt;
+&lt;p&gt;主な問題は書き込み競合である。2つのリーダーが同じデータを同時に更新することがある。競合は、レコードごとに同じリーダーへ書き込みを送って回避する、決定的な規則で自動収束させる、競合バージョンをすべて残してアプリケーションに解決させる、または独自の競合解決ロジックを使う、といった方法で処理する。&lt;/p&gt;
+&lt;p&gt;複数リーダーレプリケーションは、オフライン対応クライアントや共同編集にも使われる。複数のレプリカが独立して変更を受け付け、後で同期するためである。&lt;/p&gt;
+&lt;h2 id=&#34;リーダーレスレプリケーション&#34;&gt;リーダーレスレプリケーション&lt;/h2&gt;
+&lt;p&gt;リーダーレスレプリケーションでは、クライアントが複数のレプリカへ直接書き込むか、コーディネータが代行する。読み取りも複数のレプリカへ問い合わせ、返されたバージョンを突き合わせる。&lt;/p&gt;
+&lt;p&gt;レプリカ数を&lt;code&gt;n&lt;/code&gt;、書き込みクォーラムを&lt;code&gt;w&lt;/code&gt;、読み取りクォーラムを&lt;code&gt;r&lt;/code&gt;とすると、&lt;code&gt;w + r &amp;gt; n&lt;/code&gt;であれば読み取りは直近の成功した書き込みと重なるはずである。たとえば&lt;code&gt;n = 3&lt;/code&gt;、&lt;code&gt;w = 2&lt;/code&gt;、&lt;code&gt;r = 2&lt;/code&gt;なら、少なくとも1つの読み取りレプリカは最新値を含むはずである。&lt;/p&gt;
+&lt;p&gt;ただしクォーラムは完全な一貫性保証ではない。同時書き込み、sloppy quorum、ネットワーク分断、遅延した修復によって、古い値や競合する値が生じることがある。&lt;/p&gt;
+&lt;h3 id=&#34;sloppy-quorumとhinted-handoff&#34;&gt;Sloppy quorumとhinted handoff&lt;/h3&gt;
+&lt;p&gt;ネットワーク障害中、クライアントが十分な数の本来のレプリカへ到達できないことがある。sloppy quorumでは、到達可能な別のノードが書き込みを受け付ける。後でhinted handoffにより、その書き込みを本来のレプリカへ戻す。可用性は高まるが、一貫性保証は弱くなる。&lt;/p&gt;
+&lt;h3 id=&#34;同時書き込みの検出&#34;&gt;同時書き込みの検出&lt;/h3&gt;
+&lt;p&gt;リーダーレスシステムでは、同時書き込みを検出して解決する必要がある。last-write-winsは単純だがデータを失う可能性がある。より安全な方法は、複数のバージョンを保持し、クライアントにマージさせることである。happens-before関係とバージョンベクタは、ある書き込みが別の書き込みを上書きするのか、2つの書き込みが同時なのかを判断する助けになる。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;レプリケーションは局所性、可用性、読み取りスケーラビリティを改善するが、ラグ、フェイルオーバーの複雑さ、競合処理を持ち込む。単一リーダーレプリケーションは単純だがリーダーのフェイルオーバー問題がある。複数リーダーレプリケーションは地理的可用性を高めるが競合解決が必要である。リーダーレスレプリケーションはクォーラムにより高可用性を提供するが、アプリケーションは同時バージョンを理解し処理しなければならない。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB でインデックスを適用する方法</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/create-index/</link>
       <pubDate>Wed, 12 Jan 2022 08:39:00 +0900</pubDate>
@@ -3137,6 +4135,285 @@ Result&amp;gt; (nil)   5秒が経過してデータが削除された
       <category>NoSQL</category>
       
       <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>データ指向アプリケーションデザイン | 第06章 パーティショニング</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/06/</link>
+      <pubDate>Fri, 18 Mar 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/06/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: パク・ヒョンド、イ・スンイク&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;パーティショニング&#34;&gt;パーティショニング&lt;/h2&gt;
+&lt;p&gt;データセットが非常に大きい場合、またはクエリ処理量が非常に高い場合、レプリケーションだけでは不十分で、データをパーティションに分割する必要がある。この作業をパーティショニング、またはシャーディングと呼ぶ。&lt;/p&gt;
+&lt;p&gt;パーティションを分けるときは、通常、各データ単位（レコード、行、ドキュメント）が一つのパーティションに属するようにする。データベースが複数のパーティションを同時に扱う操作をサポートする場合もあるが、結果的に各パーティションはそれ自体が小さなデータベースになる。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;つまり、テーブルは論理的には一つのテーブルだが、物理的には複数のテーブルに分離して管理できるようにする機能である。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_partition.png&#34; alt=&#34;パーティション&#34;&gt;&lt;br&gt;
+&lt;em&gt;出典: Real MySQL 8.0&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;パーティショニングを行う主な理由&#34;&gt;パーティショニングを行う主な理由&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;スケーラビリティ&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;シェアードナッシングクラスタでは、異なるパーティションを異なるノードに保存できる。そのため、大容量データセットを複数のディスクに分散でき、クエリ負荷を複数のプロセッサに分散できる。&lt;/li&gt;
+&lt;li&gt;単一パーティションで実行されるクエリを考えると、各ノードは自分のパーティションに該当するクエリを独立して実行できるため、ノードを追加することでクエリ処理量を増やせる。大きく複雑なクエリははるかに難しいが、複数ノードで並列実行できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;履歴データの効率的な管理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;不要なデータ削除作業は、単にパーティションを追加または削除する方式で簡単かつ高速に解決できる。&lt;/li&gt;
+&lt;li&gt;例: ログデータは短期間に大量に蓄積され、一定期間が過ぎると不要になるデータであり、削除やバックアップ時に高負荷な作業になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;パーティショニングとレプリケーション&#34;&gt;パーティショニングとレプリケーション&lt;/h2&gt;
+&lt;p&gt;通常、レプリケーションとパーティショニングを組み合わせて、各パーティションのコピーを複数ノードに保存する。各レコードは正確に一つのパーティションに属していても、それを複数の別ノードに保存することで耐障害性を保証できるという意味である。&lt;/p&gt;
+&lt;p&gt;一つのノードに複数のパーティションを保存することもできる。リーダー・フォロワーレプリケーションモデルを使用する場合、パーティショニングとレプリケーションの組み合わせは次のような形になる。&lt;/p&gt;
+&lt;p&gt;各パーティションのリーダーは一つのノードに割り当てられ、フォロワーは別のノードに割り当てられる。&lt;/p&gt;
+&lt;p&gt;各ノードは、あるパーティションではリーダーであり、別のパーティションではフォロワーになることができる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_Partitioning_copy.png&#34; alt=&#34;パーティショニングとレプリケーション&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;キーバリューデータのパーティショニング&#34;&gt;キー・バリューデータのパーティショニング&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;skewed（偏り）: パーティショニングが均等に行われず、他のパーティションより多くのデータを持つ、または多くのクエリを受けるパーティションがある場合。&lt;/li&gt;
+&lt;li&gt;hotspot（ホットスポット）: 不均衡に負荷が高いパーティションを指す用語。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;キー範囲によるパーティショニング&#34;&gt;キー範囲によるパーティショニング&lt;/h3&gt;
+&lt;p&gt;各パーティションに連続したキー範囲を割り当てる方式である。これにより、各範囲の境界を把握でき、どのキーがどのパーティションに属するかを簡単に見つけられる。また、どのパーティションがどのノードに割り当てられているか分かれば、適切なノードへ直接リクエストを送れる。&lt;br&gt;
+例: ある最小値から最大値まで。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;CREATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;TABLE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;employees&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;INT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;NOT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;NULL&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;first_name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;VARCHAR&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;last_name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;VARCHAR&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;reg_date&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;DATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;NOT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;NULL&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;DEFAULT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;1970-01-01&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;....&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PARTITION&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;BY&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;RANGE&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;YEAR&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;hired&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PARTITION&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;p0&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;VALUES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;LESS&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;THAN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2000&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PARTITION&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;p1&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;VALUES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;LESS&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;THAN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2010&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PARTITION&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;p2&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;VALUES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;LESS&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;THAN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;2020&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;),&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;PARTITION&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;p3&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;VALUES&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;LESS&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;THAN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;MAXVALUE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_partition_insert.png&#34; alt=&#34;パーティション insert&#34;&gt;&lt;br&gt;
+&lt;em&gt;出典: Real MySQL 8.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;利点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;各パーティション内ではキーをソート順に保存できる。これにより範囲スキャンが容易になり、キーを連結インデックスとみなして、一つのクエリで関連レコードを複数読み取るために利用できる。&lt;/li&gt;
+&lt;li&gt;例: アプリケーションで&lt;code&gt;reg_date&lt;/code&gt;カラムのdate typeをキーとして使う場合、範囲スキャンは有用である。範囲スキャンを使えば、特定年のすべてのデータを簡単に読める。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;欠点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;特定のアクセスパターンがホットスポットを引き起こす。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;reg_date&lt;/code&gt;がキーなら、パーティションは年の範囲に対応する。たとえば1年分のデータを一つのパーティションが担当する形である。&lt;/li&gt;
+&lt;li&gt;データを更新するたびにデータベースへ記録するため、書き込み操作がすべて同じパーティション、つまり該当するyearへ送られ、そのパーティションだけが過負荷になり、他のパーティションはアイドル状態のままになる可能性がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;キーのハッシュ値によるパーティショニング&#34;&gt;キーのハッシュ値によるパーティショニング&lt;/h3&gt;
+&lt;p&gt;ハッシュパーティションは、特定のハッシュ関数によってレコードを保存するパーティションを決定する方法である。&lt;/p&gt;
+&lt;p&gt;パーティショニング用のハッシュ関数は暗号学的に強力である必要はない。たとえばCassandraとMongoDBはMD5を使い、VoldemortはFowler-Noll-Vo関数を使用する。MySQLは式の結果値をパーティション数で割った余りで、保存先パーティションを決定する。&lt;/p&gt;
+&lt;p&gt;例: 文字列を入力として受け取る32ビットハッシュ関数があるとする。この関数に文字列を入れると、見かけ上は0から2の32乗-1までのランダムな数値を返す。入力文字列がほぼ同じでも、ハッシュ値は数値範囲内で均等に分散される。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_hash.png&#34; alt=&#34;ハッシュ&#34;&gt;&lt;br&gt;
+&lt;em&gt;図6-3. キーのハッシュ値によるパーティショニング&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;利点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;偏りとホットスポットの危険を減らし、偏ったデータを入力として受け取って均等に分散させる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;欠点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;範囲クエリを効率的に実行できるキー範囲パーティショニングのよい性質を失う。&lt;/li&gt;
+&lt;li&gt;以前は隣接していたキーが、すべてのパーティションに散らばるため、ソート順が維持されない。&lt;/li&gt;
+&lt;li&gt;MongoDBではハッシュベースのシャーディングモードを有効化すると、範囲クエリをすべてのパーティションへ送信する必要がある。Riak、Couchbase、Voldemortでは主キーに対する範囲クエリがサポートされない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Θ Cassandra&lt;br&gt;
+Cassandraは二つのパーティショニング戦略の間で妥協する。Cassandraでテーブルを宣言するとき、複数カラムを含む&lt;strong&gt;複合主キー&lt;/strong&gt;を指定できる。&lt;br&gt;
+キーの最初の部分だけにハッシュを適用してパーティション決定に使い、残りのカラムはCassandraのSSTableでデータをソートする連結インデックスとして使う。&lt;br&gt;
+&lt;strong&gt;つまり、複合キーの最初のカラムについては値範囲で検索するクエリを使えないが、最初のカラムに固定値を指定すれば、キーの他のカラムについては範囲スキャンを効率的に実行できる。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;例: ソーシャルメディアサイトで、一人のユーザーが編集した複数の文書を投稿する場合がある。&lt;/p&gt;
+&lt;p&gt;特定のユーザーが特定の時間区間で編集したすべての文書を、タイムスタンプ順にソートして読み取れる。別のユーザーが編集した情報は別パーティションに保存される場合もあるが、一人のユーザーが編集した情報は一つのパーティション内でタイムスタンプ順に保存される。&lt;br&gt;
+主キー: &lt;code&gt;(user_id, update_timestamp)&lt;/code&gt;&lt;/p&gt;
+&lt;h3 id=&#34;偏ったワークロードとホットスポットの緩和&#34;&gt;偏ったワークロードとホットスポットの緩和&lt;/h3&gt;
+&lt;p&gt;前述のように、キーをハッシュしてパーティションを決めるとホットスポットの削減に役立つ。しかし、ホットスポットを完全に取り除くことはできない。常に同じキーを読み書きする極端な状況では、すべてのリクエストが同じパーティションに集中する。&lt;br&gt;
+例: ソーシャルメディアサイトで、数百万人のフォロワーを持つ有名人が何かをすると、大きな反応が発生する。その有名人が行った操作により、同じキーへ膨大な量のデータを書き込む必要があるかもしれない。&lt;br&gt;
+キーはおそらく有名人のユーザーID、または人々がコメントするアクションのIDである。同じIDのハッシュ値は同じなので、ハッシュは役に立たない。&lt;/p&gt;
+&lt;p&gt;本で提案されている解決策:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;各キーの先頭または末尾にランダムな数値を付ける。ランダムな10進数を2桁付けるだけでも、一つのキーへの書き込み作業が100個の別キーに均等に分散され、それらのキーは別パーティションへ分散され得る。&lt;/li&gt;
+&lt;li&gt;しかし、別キーに分割して書くと、読み取り時に追加作業が必要になる。100個のキーに該当するデータを読んで組み合わせる必要があるためである。追加で保存すべき情報もある。&lt;/li&gt;
+&lt;li&gt;この技法はリクエストが集中する少数のキーだけに適用するのが妥当である。書き込み処理量が低い大多数のキーにも適用すると不要なオーバーヘッドが生じる。そのため、どのキーが分割されたか追跡する方法も必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;パーティショニングとセカンダリインデックス&#34;&gt;パーティショニングとセカンダリインデックス&lt;/h2&gt;
+&lt;p&gt;基本的にレコードへ主キーでのみアクセスするなら、キーからパーティションを決定し、それを使って該当キーを担当するパーティションへ読み書きリクエストを送れる。&lt;br&gt;
+しかし、特定の値が発生した項目を検索する手段であるセカンダリインデックスが関係すると複雑になる。&lt;br&gt;
+&lt;strong&gt;セカンダリインデックスはパーティションにきれいに対応しないという問題があるためである。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;ドキュメント基準のセカンダリインデックスパーティショニング&#34;&gt;ドキュメント基準のセカンダリインデックスパーティショニング&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_document_index.png&#34; alt=&#34;ドキュメント基準インデックス&#34;&gt;&lt;/p&gt;
+&lt;p&gt;各パーティションに属するドキュメントだけを担当し、完全に独立して動作するインデックス方法をローカルインデックス（Local Index）という。&lt;br&gt;
+データベースにドキュメント追加、削除、更新などの書き込み作業を実行するときは、書き込もうとするドキュメントIDを含むパーティションだけを扱えばよい。他のパーティションにどのデータが保存されているかを気にしない。&lt;br&gt;
+例: 中古車を販売するWebサイトを運営する。各項目にはDocument IDという固有IDがあり、データベースをドキュメントID基準でパーティショニングする。Document ID 0〜499はパーティション0、Document ID 500〜999はパーティション1である。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;color&lt;/code&gt;と&lt;code&gt;make&lt;/code&gt;にセカンダリインデックスを作成する必要がある。インデックスを宣言すると、データベースが自動でインデックスを生成できる。たとえば赤い車がデータベースに追加されると、データベースパーティションは自動的にそれを&lt;code&gt;color:red&lt;/code&gt;インデックス項目のドキュメントID一覧へ追加する。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ドキュメントIDに特別な処理をしなければ、特定の色または特定メーカーの車が同じパーティションに保存される保証はない。&lt;/li&gt;
+&lt;li&gt;上の画像を見ると、赤い車はパーティション0にもパーティション1にもある。&lt;/li&gt;
+&lt;li&gt;したがって赤い車を探したい場合、すべてのパーティションにクエリを送り、得られた結果をすべて集めなければならない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;パーティション化されたデータベースにこのようにクエリを送る方法は、scatter/gatherとも呼ばれる。セカンダリインデックスを使って読み取るクエリは大きなコストがかかる。&lt;br&gt;
+複数パーティションでクエリを並列実行しても、scatter/gatherはテールレイテンシ増幅が発生しやすい。それでもセカンダリインデックスをドキュメント基準でパーティショニングする場合は多い。&lt;br&gt;
+例: MongoDB、Riak、Cassandra、Elasticsearch、SolrCloud、VoltDB。&lt;/p&gt;
+&lt;p&gt;MySQLの場合、パーティションテーブルのインデックスはすべてローカルインデックスに該当する。パーティションに関係なく、テーブル全体単位でグローバルに一つの統合インデックスをサポートしない。&lt;br&gt;
+そのため、&lt;code&gt;WHERE&lt;/code&gt;条件に一致するレコードをソート順に読みながら、優先順位キュー（Priority Queue）に一時保存する。そして優先順位キューから再び必要な順序でデータを取り出す。&lt;br&gt;
+結果として、パーティションテーブルでインデックススキャンによりレコードを読むとき、MySQLサーバーは別途ソート作業を行わない。通常テーブルのインデックススキャンのように結果を直接返すのではなく、内部的にキュー処理が一度必要になる。&lt;/p&gt;
+&lt;h3 id=&#34;用語基準のセカンダリインデックスパーティショニング&#34;&gt;用語基準のセカンダリインデックスパーティショニング&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_term_index.png&#34; alt=&#34;用語基準インデックス&#34;&gt;&lt;/p&gt;
+&lt;p&gt;ローカルインデックスとは異なり、すべてのパーティションのデータを担当するインデックスをグローバルインデックス（Global Index）という。&lt;br&gt;
+この方法で一つのノードだけにインデックスを保存すると、そのノードがボトルネックになり、パーティショニングの目的を損なうため、複数ノードに分けて保存する。&lt;/p&gt;
+&lt;p&gt;検索したい用語によってインデックスのパーティションが決まるため、このようなインデックスは用語基準でパーティショニングされた（term-partitioned）という。ここでは&lt;code&gt;color:red&lt;/code&gt;が用語の例である。&lt;/p&gt;
+&lt;p&gt;例: すべてのパーティションにある赤い車の情報は、インデックスの&lt;code&gt;color:red&lt;/code&gt;項目に保存されるが、色インデックスはaからrまでの文字で始まる色をパーティション0に、sからzまでの文字で始まる色をパーティション1に保存するようにパーティショニングされる。&lt;/p&gt;
+&lt;p&gt;自動車メーカーインデックスも同じようにパーティショニングされる。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特徴&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前と同様、インデックスをパーティショニングするとき、用語そのものを使うことも、用語のハッシュ値を使うこともできる。用語そのものでパーティショニングすると範囲スキャン、たとえば車の販売希望価格のような数値属性に有用であり、用語のハッシュ値を使うと負荷がより均等に分散される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;利点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ドキュメントパーティショニングインデックスに比べ、グローバル（用語パーティショニング）インデックスの利点は&lt;strong&gt;読み取りが効率的&lt;/strong&gt;なことである。&lt;/li&gt;
+&lt;li&gt;クライアントはすべてのパーティションにscatter/gatherを実行する必要がなく、目的の用語を含むパーティションにだけリクエストを送ればよい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;欠点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;単一ドキュメントを書き込むとき、そのインデックスの複数パーティションに影響する可能性があり、書き込みは遅く複雑になる。&lt;/li&gt;
+&lt;li&gt;ドキュメント内のすべての用語が、別ノード上の別パーティションに属する場合もある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;理想的には、インデックスは常に最新状態であり、データベースに記録されたすべてのドキュメントはすぐにインデックスへ反映されるべきである。&lt;br&gt;
+しかし、用語パーティショニングインデックスでそうするには、書き込みの影響を受けるすべてのパーティションにまたがる分散トランザクションを実行しなければならず、すべてのデータベースが分散トランザクションをサポートしているわけではない。&lt;/p&gt;
+&lt;p&gt;現実には、グローバルセカンダリインデックスはたいてい非同期で更新される。つまり、書き込みを実行した直後にインデックスを読むと、変更内容がまだインデックスに反映されていない場合がある。&lt;br&gt;
+例: Amazon DynamoDBは通常の状況ではグローバルセカンダリインデックスを1秒未満で更新するが、インフラに障害が発生すると反映遅延が長くなる可能性がある。&lt;/p&gt;
+&lt;p&gt;グローバル用語パーティショニングインデックスの他の使用例として、Riakの検索機能とOracle Data Warehouseがある。Oracle Data Warehouseではローカルインデックスとグローバルインデックスの間で選択できる。&lt;/p&gt;
+&lt;p&gt;Q. Local IndexとGlobal Indexのどちらが使いやすいか。&lt;br&gt;
+A. もちろんサービス構造など多くの点を考慮する必要があるが、一般的にはパーティションの特性上、特定パーティションに該当する作業（追加、削除）を多く行うため、その作業対象パーティションのインデックスだけに影響するローカルインデックスがよく使われる。グローバルインデックスの場合、パーティションに該当する作業をするとき全体的な再調整が必要になるため負荷が大きい。&lt;/p&gt;
+&lt;h2 id=&#34;パーティション再均衡化&#34;&gt;パーティション再均衡化&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;概要&lt;/strong&gt;
+データベースの物理機器に変化が発生する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CPU、RAM、DISKの追加&lt;/li&gt;
+&lt;li&gt;新しいノードの追加&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_node_move.png&#34; alt=&#34;ノード移動&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;再均衡化（rebalancing）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;クラスタで一つのノードが担当していた負荷を別ノードへ移す過程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;再均衡化の要件&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;負荷の均等化&lt;/li&gt;
+&lt;li&gt;瞬断なし&lt;/li&gt;
+&lt;li&gt;データ移動の最小化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;再均衡化戦略&#34;&gt;再均衡化戦略&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;ハッシュ値にmod N（ノード数）演算&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_mode_calc_1.png&#34; alt=&#34;mod演算1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_mode_calc_2.png&#34; alt=&#34;mod演算2&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;mod N方式の問題点&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ノード数Nが変わると、ほとんどのキーをノード間で移動しなければならないため、再均衡化コストが上がる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;静的パーティショニング（パーティション数固定）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_partition_fix_1.png&#34; alt=&#34;パーティション固定1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_partition_fix_2.png&#34; alt=&#34;パーティション固定2&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Riak、Elasticsearch、Couchbase、Voldemortで使用される。&lt;/li&gt;
+&lt;li&gt;全体データセットのサイズ変動が大きい場合、適切なパーティション数を決めるのは難しい。&lt;/li&gt;
+&lt;li&gt;パーティションが大きくなりすぎると、再均衡化および障害復旧コストが大きい。&lt;/li&gt;
+&lt;li&gt;適切なサイズを決めるのが最善だが、難しい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;動的パーティショニング&lt;/strong&gt;
+リスティング開発チーム &amp;gt; 06. パーティショニング &amp;gt; 動的パーティショニング1.png&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_dynamic_artitioning_1.png&#34; alt=&#34;動的パーティショニング1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_dynamic_artitioning_2.png&#34; alt=&#34;動的パーティショニング2&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;パーティション数が全体データ容量に合わせて調整される。サイズを制限し、数を増やす。&lt;/li&gt;
+&lt;li&gt;空のデータベースの場合、パーティション境界の設定値に達するまではパーティションが1個である。
+&lt;ul&gt;
+&lt;li&gt;HBaseとMongoDBは空のデータベースに初期パーティション集合を設定できる。これは事前分割（pre-splitting）である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;静的パーティショニングと動的パーティショニングの特徴まとめ&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;静的パーティショニング: パーティションサイズがデータサイズに比例する。&lt;/li&gt;
+&lt;li&gt;動的パーティショニング: パーティション数がデータサイズに比例する。&lt;/li&gt;
+&lt;li&gt;どちらもノードとは関係がない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;ノード比例パーティショニング&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_node_partitioning_1.png&#34; alt=&#34;ノード比例パーティショニング1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_node_partitioning_2.png&#34; alt=&#34;ノード比例パーティショニング2&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;運用-自動再均衡化と手動再均衡化&#34;&gt;運用: 自動再均衡化と手動再均衡化&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;完全自動再均衡化&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;管理者の介入なしに、システムが自動で再均衡化する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;完全手動再均衡化&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;管理者が明示的にパーティションをノードに割り当て、管理者が再設定したときだけパーティション割り当てが変更される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;リクエストルーティング&#34;&gt;リクエストルーティング&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06_request_routing.png&#34; alt=&#34;リクエストルーティング&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;パーティションが再均衡化されると、ノードに割り当てられるパーティションが変わる。つまりデータの位置が変わる。&lt;/li&gt;
+&lt;li&gt;パーティション割り当て情報をリアルタイムに把握している必要が生じる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Service discovery&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データベースに限られない一般的な問題。&lt;/li&gt;
+&lt;li&gt;高可用性を目指すソフトウェアならすべて持っている問題。
+&lt;ul&gt;
+&lt;li&gt;高可用性とは、事実上、分散ネットワークシステムである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://mangchhe.github.io/springcloud/2021/04/07/ServiceDiscoveryConcept&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://mangchhe.github.io/springcloud/2021/04/07/ServiceDiscoveryConcept&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;ルーティング判断を行うコンポーネントの位置によるアプローチ&lt;/strong&gt;
+ルーティング判断を行うコンポーネントとは、位置情報のことである。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06-7.png&#34; alt=&#34;図6-7&#34;&gt;&lt;br&gt;
+&lt;em&gt;図6-7. リクエストを正しいノードへルーティングする三つの方法&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;重要情報を管理する方法&lt;/strong&gt;
+すべての場合で重要な問題は、ルーティング判断を行うコンポーネントが、ノードに割り当てられたパーティションの変更をどのように知るかである。&lt;br&gt;
+多くのコーディネーションサービスが存在する: &lt;a href=&#34;https://stackshare.io/service-discovery&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://stackshare.io/service-discovery&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/06-8.png&#34; alt=&#34;図6-8&#34;&gt;&lt;br&gt;
+&lt;em&gt;図6-8. ZooKeeperを使ってパーティション割り当て情報を追跡する&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;データベース別のパーティション割り当て情報へのアプローチ&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;方法1. 個別ノードがパーティション割り当て情報を持つ。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cassandra、Riak&lt;/li&gt;
+&lt;li&gt;データベースノードに複雑性を加えるが、外部コーディネーションサービスに依存しない点は利点である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;方法2. ルーティング層がパーティション割り当て情報を持つ。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HBase、SolrCloud、Kafka、MongoDB&lt;/li&gt;
+&lt;li&gt;コーディネーションライブラリ、または独自の設定サーバーを使用する（MongoDB）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;方法3. クライアントがパーティション割り当て情報を持つ。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;情報提供をお願いします。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;並列クエリ実行&#34;&gt;並列クエリ実行&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;データの大規模化により、大規模データ分析とクエリが重要になる。これによりクラスタ型データベースが使われる。&lt;/li&gt;
+&lt;li&gt;大規模並列処理（massively parallel processing, MPP）をサポートする。&lt;/li&gt;
+&lt;li&gt;RDBは結合、フィルタリング、グループ化、集計演算など、複雑な種類のクエリをサポートする。&lt;/li&gt;
+&lt;li&gt;MPPクエリはクラスタ内の異なるノードで並列に実行される。&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
       
     </item>
     
@@ -3682,6 +4959,332 @@ Result&amp;gt; (nil)   5秒が経過してデータが削除された
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第07章 トランザクション</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/7/</link>
+      <pubDate>Fri, 01 Apr 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/7/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: パク・ヒョンド、イ・スンイク&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;曖昧なトランザクションの概念&#34;&gt;曖昧なトランザクションの概念&lt;/h2&gt;
+&lt;h3 id=&#34;acid&#34;&gt;ACID&lt;/h3&gt;
+&lt;p&gt;ACIDは、データベーストランザクションが安全に実行されることを保証する性質を指す略語である。&lt;/p&gt;
+&lt;h4 id=&#34;原子性atomicity&#34;&gt;原子性（Atomicity）&lt;/h4&gt;
+&lt;p&gt;データベースは、すべて反映されるか、何も反映されないことを保証する。原子性により、部分更新がより大きな問題を引き起こすことを防げる。&lt;/p&gt;
+&lt;p&gt;例: 航空券&lt;br&gt;
+チケットは、支払いと予約が必ず同時に行われるか、どちらも行われない必要がある。支払いは成功したが座席予約はされていない、という状態は許されない。&lt;br&gt;
+一つのトランザクションは航空券予約だけでなく、ホテル、移動手段、現在の為替レートで正確に換金される処理にも適用される。&lt;br&gt;
+&lt;em&gt;出典: &lt;a href=&#34;https://ko.wikipedia.org/wiki/%EC%9B%90%EC%9E%90%EC%84%B1_%28%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4_%EC%8B%9C%EC%8A%A4%ED%85%9C%29&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;wikipedia&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;h4 id=&#34;一貫性consistency&#34;&gt;一貫性（Consistency）&lt;/h4&gt;
+&lt;p&gt;トランザクションが正常に完了すると、常に一貫性のあるデータベース状態を維持することをいう。&lt;br&gt;
+&lt;em&gt;出典: &lt;a href=&#34;https://ko.wikipedia.org/wiki/ACID&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;wikipedia&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;例: 会計システムでは、すべての口座にわたる貸方と借方が常に一致しなければならない。&lt;/p&gt;
+&lt;p&gt;一貫性（C）は、実際にはACIDに属するものではなく、アプリケーションの性質と見なされる。&lt;br&gt;
+&lt;strong&gt;データベース自体だけでは、不変条件に違反する誤ったデータの書き込みを防げないためである。&lt;/strong&gt;&lt;br&gt;
+これはアプリケーションの責任と考えられ、一貫性を達成するためにデータベースの原子性と分離性に依存できる。&lt;/p&gt;
+&lt;h4 id=&#34;分離性isolation&#34;&gt;分離性（Isolation）&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;同時に実行されるトランザクションは互いに分離され、干渉できない。&lt;/strong&gt;&lt;br&gt;
+あるトランザクションが複数回書き込む場合、別のトランザクションはその内容をすべて見るか、何も見ないかのどちらかでなければならず、一部だけを見ることはできない。&lt;/p&gt;
+&lt;h4 id=&#34;永続性durability&#34;&gt;永続性（Durability）&lt;/h4&gt;
+&lt;p&gt;データベースシステムの目的は、データを失う心配のない安全な保存場所を提供することである。&lt;br&gt;
+&lt;strong&gt;永続性は、トランザクションが正常にコミットされたなら、ハードウェア障害が発生したりデータベースが停止したりしても、そのトランザクションで記録したすべてのデータは失われないという保証である。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;単一オブジェクト操作と複数オブジェクト操作&#34;&gt;単一オブジェクト操作と複数オブジェクト操作&lt;/h3&gt;
+&lt;h4 id=&#34;単一オブジェクト書き込み&#34;&gt;単一オブジェクト書き込み&lt;/h4&gt;
+&lt;p&gt;原子性と分離性は、単一オブジェクトを変更する場合にも適用される。&lt;/p&gt;
+&lt;p&gt;そのため、ストレージエンジンはほぼ普遍的に、一つのノードに存在する単一オブジェクトレベルで原子性と分離性を提供することを目標にする。&lt;/p&gt;
+&lt;p&gt;例: 20KBのJSON文書をデータベースに書き込む場合。&lt;/p&gt;
+&lt;p&gt;最初の10KBを送信した後にネットワーク接続が切れる場合、データベースがディスク上の既存値を上書きしている途中で電源が落ちる場合、または文書を書き込んでいる最中に別のクライアントがその文書を読み、部分的に更新された値を読む場合を考える。&lt;/p&gt;
+&lt;h4 id=&#34;複数オブジェクトトランザクションの必要性&#34;&gt;複数オブジェクトトランザクションの必要性&lt;/h4&gt;
+&lt;p&gt;複数オブジェクトトランザクションは、データの複数部分を同期された状態に保つ必要があるときに必要である。&lt;/p&gt;
+&lt;p&gt;トランザクションがなくても、複雑なデータの書き込みと読み取りを行うアプリケーションは実装できる。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;しかし、原子性がなければエラー処理ははるかに複雑になり、分離性がなければ並行性の問題が発生する可能性がある。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;複数オブジェクトトランザクションは、外部キーなどの参照が有効な状態で保たれることを保証する。&lt;/li&gt;
+&lt;li&gt;複数文書を一度に更新するとき、非正規化されたデータの同期が崩れることを防ぐ。&lt;/li&gt;
+&lt;li&gt;トランザクション分離性がなければ、あるインデックスではレコードが見えるが、別のインデックスはまだ更新されていないためレコードが見えない場合がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;緩い分離レベル&#34;&gt;緩い分離レベル&lt;/h2&gt;
+&lt;h3 id=&#34;コミット後読み取りread-committed&#34;&gt;コミット後読み取り（READ COMMITTED）&lt;/h3&gt;
+&lt;p&gt;最も基本的なトランザクション分離レベルであり、このレベルでは二つのことを保証する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データベースから読むとき、コミット済みデータだけを見る。ダーティリードがない。&lt;/li&gt;
+&lt;li&gt;データベースに書くとき、コミット済みデータだけを上書きする。ダーティライトがない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;ダーティリード防止&#34;&gt;ダーティリード防止&lt;/h4&gt;
+&lt;p&gt;ダーティリードとは、あるトランザクションで処理した作業が完了していないにもかかわらず、別のトランザクションから見える現象である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-2.jpg&#34; alt=&#34;図7-2&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-2. 分離性違反: トランザクションが別トランザクションで書かれたがコミットされていないデータを読む（ダーティリード）&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;ダーティリードを防ぐことが有用な理由:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ダーティリードが起きると、別のトランザクションが一部は更新された値、一部は更新されていない値を見ることがある。&lt;/li&gt;
+&lt;li&gt;トランザクションがアボートされるとすべてロールバックされるべきだが、ダーティリードを許可すると、後でロールバックされるデータを別トランザクションが見る可能性がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;ダーティライト防止&#34;&gt;ダーティライト防止&lt;/h4&gt;
+&lt;p&gt;ダーティライトとは、二つのトランザクションが同じオブジェクトを同時に更新しようとするとき、先に書かれた内容がまだコミットされていないトランザクションによるものであり、後から実行された書き込みがその未コミット値を上書きする場合である。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-5.jpg&#34; alt=&#34;図7-5&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-5. 別トランザクションで競合する書き込みを実行するとき、ダーティライトがあると内容が混ざる可能性がある。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;別トランザクションで競合する書き込みを実行するとき、ダーティライトがあると内容が混ざる可能性があり、ダーティライトを防ぐことでいくつかの並行性問題を回避できる。&lt;/p&gt;
+&lt;h4 id=&#34;コミット後読み取りの実装&#34;&gt;コミット後読み取りの実装&lt;/h4&gt;
+&lt;p&gt;コミット後読み取りは、Oracle 11g、PostgreSQL、SQL Server 2012、MemSQLなどでデフォルト設定として使われている分離レベルである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ダーティライト防止: トランザクションがコミットまたはアボートされるまでロックを保持する。このロックはコミット後読み取りモードでデータベースにより自動的に実行される。&lt;/li&gt;
+&lt;li&gt;ダーティリード防止: 過去のコミット済み値と現在書き込み中の新しい値の両方を記憶し、そのトランザクションが実行中の間は過去の値を読ませることでダーティリードを防げる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-4.jpg&#34; alt=&#34;図7-4&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-4. ダーティリード防止: ユーザー2はユーザー1のトランザクションがコミットされた後にだけxの新しい値を見る。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ダーティリード防止: ユーザー2はユーザー1のトランザクションがコミットされた後にだけxの新しい値を見る。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;スナップショット分離と反復読み取りsnapshot-isolation&#34;&gt;スナップショット分離と反復読み取り（Snapshot Isolation）&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-6.jpg&#34; alt=&#34;図7-6&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-6. 読み取りスキュー: Aliceは一貫性が崩れた状態のデータベースを見る。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;コミット後読み取り分離レベルでも並行性バグが発生する可能性があり、この現象を非反復読み取り（nonrepeatable read）または読み取りスキュー（read skew）という。&lt;/p&gt;
+&lt;p&gt;上のような場合、数秒後に更新すれば一貫性のある口座を見られるが、状況によってはこのような不整合を許容できない場合もある。&lt;/p&gt;
+&lt;p&gt;例: バックアップでは元本とコピーのデータに差が出る。分析クエリや整合性確認では、大きな範囲をスキャンするクエリが異なる時点のデータベースの一部を見て、誤った結果を返す可能性がある。&lt;/p&gt;
+&lt;p&gt;スナップショット分離は、各トランザクションがデータベースの一貫したスナップショットから読む実装である。&lt;/p&gt;
+&lt;p&gt;つまり、トランザクションは開始時にデータベースへコミットされていたすべてのデータを見る。後で別トランザクションによりデータが変わっても、各トランザクションは特定時点の過去データを見るだけである。&lt;/p&gt;
+&lt;h4 id=&#34;スナップショット分離の実装&#34;&gt;スナップショット分離の実装&lt;/h4&gt;
+&lt;p&gt;**多版型並行性制御（multi-version concurrency control, MVCC）**は、データベースがオブジェクトの複数バージョンを一緒に保持する技法である。&lt;/p&gt;
+&lt;p&gt;Q. コミット後読み取りもダーティリードを防ぐためにバージョンを使うが、何が違うのか。&lt;/p&gt;
+&lt;p&gt;A. コミット後読み取りはクエリごとに独立したスナップショットを使い、スナップショット分離はトランザクション全体に同じスナップショットを使う。つまり、バックアップされたレコードの複数バージョンのうち、どの以前のバージョンまで探すかが異なる。&lt;/p&gt;
+&lt;h4 id=&#34;一貫したスナップショットを見る可視性ルール&#34;&gt;一貫したスナップショットを見る可視性ルール&lt;/h4&gt;
+&lt;p&gt;トランザクションはデータベースでオブジェクトを読むとき、トランザクションIDを使って何を見られ、何を見られないかを決定する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07_real-mysql-1.jpg&#34; alt=&#34;Real MySQL 8.0&#34;&gt;&lt;br&gt;
+&lt;em&gt;出典: Real MySQL 8.0&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;動作方式:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;トランザクションIDがより大きい、つまり現在のトランザクション開始後に開始したトランザクションが書いたデータは、そのトランザクションのコミット有無に関係なくすべて無視される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;インデックスとスナップショット分離&#34;&gt;インデックスとスナップショット分離&lt;/h4&gt;
+&lt;p&gt;多版データベースでのインデックスの動作:&lt;br&gt;
+一つの選択肢は、インデックスがオブジェクトのすべてのバージョンを指し、インデックスクエリが現在のトランザクションから見えないバージョンを除外し、ガベージコレクションがどのトランザクションからも見えなくなった古いオブジェクトバージョンを削除するときに対応するインデックス項目も削除する方法である。&lt;/p&gt;
+&lt;p&gt;PostgreSQL:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同じオブジェクトの別バージョンが同じページに保存できる場合、インデックス更新を回避する最適化を実行する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;CouchDB、Datomic、LMDB:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;書き込み時コピー（append-only/copy-on-write）の変種を使用する。&lt;br&gt;
+ツリーのページが更新されるとき、上書きする代わりに変更された各ページの新しいコピーを作成する。ツリーのルートに至るまで存在する親ページはコピーされ、それらの子ページの新バージョンを指すように更新される。書き込みの影響を受けないページはコピーする必要がなく、不変のまま残る。&lt;/li&gt;
+&lt;li&gt;追記専用Bツリーを使用する。&lt;br&gt;
+書き込みを実行するすべてのトランザクションは新しいBツリールートを作成し、特定のルートはそれが作成された時点に該当するデータベースの一貫したスナップショットになる。後で実行される書き込みは新しいツリールートだけを作成でき、既存のBツリーを変更できないため、トランザクションIDに基づいてオブジェクトを除外する必要がない。&lt;br&gt;
+ただし、この方法でもコンパクションとガベージコレクションを実行するバックグラウンドプロセスが必要である。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;反復読み取りと紛らわしい名前&#34;&gt;反復読み取りと紛らわしい名前&lt;/h4&gt;
+&lt;p&gt;スナップショット分離は読み取り専用トランザクションで有用であり、SQL標準にスナップショット分離の概念がないため、複数のデータベースで異なる名前で呼ばれる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Oracle: Serializable&lt;/li&gt;
+&lt;li&gt;PostgreSQL、MySQL: Repeatable Read&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;更新損失の防止&#34;&gt;更新損失の防止&lt;/h3&gt;
+&lt;p&gt;二つのトランザクションが同時に作業すると、二番目の書き込み作業が最初の変更を含まないため、変更の一つが失われる可能性がある。&lt;/p&gt;
+&lt;p&gt;解決策:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;原子的書き込み操作&lt;/li&gt;
+&lt;li&gt;明示的なロック&lt;/li&gt;
+&lt;li&gt;更新損失の自動検出&lt;/li&gt;
+&lt;li&gt;Compare-and-set&lt;/li&gt;
+&lt;li&gt;競合解消とレプリケーション&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;原子的書き込み操作&#34;&gt;原子的書き込み操作&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;書き込み操作に原子性（Atomicity）を与えることで並行性安全性を得る。&lt;/li&gt;
+&lt;li&gt;exclusive lockを獲得して実装する。更新が適用されるまで、別トランザクションはそのオブジェクトを読めない。&lt;/li&gt;
+&lt;li&gt;または、すべての原子的操作を単一スレッドで実行するよう強制する方法もある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;明示的なロック&#34;&gt;明示的なロック&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;アプリケーションで更新するオブジェクトを明示的にロックすること。&lt;/li&gt;
+&lt;li&gt;別トランザクションが同時に同じオブジェクトを読もうとすると、最初のread-modify-write周期が完了するまで待つよう強制される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;リスティング開発チーム &amp;gt; 07. トランザクション &amp;gt; スクリーンショット 2022-04-01 午後 1.30.42.png&lt;/p&gt;
+&lt;p&gt;例7-1. 行を明示的にロックして更新損失を防ぐ&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;BEGIN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;TRANSACTION&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SELECT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;figures&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;robot&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;AND&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;game_id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;222&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;FOR&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;UPDATE&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;-- 移動が有効か確認した後
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;-- 前のSELECTで返された位置を更新する。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;UPDATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;figures&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SET&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;position&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;4&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1234&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;COMMIT&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;更新損失の自動検出&#34;&gt;更新損失の自動検出&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;複数トランザクションの並列実行を許可し、トランザクション管理者が更新損失を発見するとトランザクションをabortし、再試行を強制する方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;compare-and-set&#34;&gt;Compare-and-set&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;値を最後に読んだ後で変更されていない場合だけ更新を許可することで、更新損失を回避する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;-- データベース実装によって安全な場合も安全でない場合もある
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;UPDATE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;wiki_pages&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SET&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;content&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;new content&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;1234&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;AND&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;content&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;old content&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;競合解消とレプリケーション&#34;&gt;競合解消とレプリケーション&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;ロックとcompare-and-set操作は、データの最新コピーが一つだけあると仮定する。&lt;/li&gt;
+&lt;li&gt;マルチリーダーまたはリーダーレスレプリケーションを使うデータベースは、一般的に複数の書き込みが同時に実行され、非同期で複製されることを許可する。&lt;/li&gt;
+&lt;li&gt;したがって、データの最新コピーが一つだけであるとは保証できない。&lt;/li&gt;
+&lt;li&gt;レプリケーションが適用されたデータベースでよく使われる方法は、書き込みが同時に実行されるとき、一つの値に対して複数の競合バージョンが作成されることを許可し、後で競合を解消してそれらのバージョンをマージすることである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;書き込みスキューとファントム&#34;&gt;書き込みスキューとファントム&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ほぼ同時に二つのトランザクションが開始されたと仮定する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-8.png&#34; alt=&#34;図7-8&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-8. アプリケーションバグを引き起こす書き込みスキューの例&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データベースでスナップショット分離を使うため、どちらも2を返し、二つのトランザクションは次の段階へ進む。&lt;/li&gt;
+&lt;li&gt;最低一人の医師が呼び出し待機しなければならないという要件に違反する。&lt;/li&gt;
+&lt;li&gt;この現象を書き込みスキュー（write skew）という。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;書き込みスキューを特徴づける&#34;&gt;書き込みスキューを特徴づける&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;書き込みスキューは、二つのトランザクションが同じオブジェクト群を読み、その一部を更新するときに現れることがある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;書き込みスキューを引き起こすファントム&#34;&gt;書き込みスキューを引き起こすファントム&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07_transaction.png&#34; alt=&#34;書き込みスキューを引き起こすファントム&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;あるトランザクションで実行した書き込みが、別トランザクションの検索クエリ結果を変えることをファントム（Phantom）という。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;競合の具体化&#34;&gt;競合の具体化&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;競合の具体化とは何か。最初のselect時にロックできるオブジェクトがなかったため、データベースに人工的なロックオブジェクトを追加するということ。&lt;/li&gt;
+&lt;li&gt;対象rowを事前に作成し、lockをかける。トランザクション対象になる特定範囲のすべての組み合わせについて、事前にrowを作成しておく。たとえば会議室予約なら次の6か月分などである。&lt;/li&gt;
+&lt;li&gt;予約するトランザクションは、テーブルから目的の対象rowをロックできる。事前に生成されているためである。&lt;/li&gt;
+&lt;li&gt;ここで生成されたrowは、単に同時変更を防ぐためのロック集合であり、実際に使われるデータではない。&lt;/li&gt;
+&lt;li&gt;欠点: 並行性制御メカニズムがアプリケーションデータモデルへ漏れ出すのは好ましくない。ほかの代替案が不可能なときの最後の手段として考慮する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;直列性&#34;&gt;直列性&lt;/h3&gt;
+&lt;p&gt;DBの並行性を管理する方式の問題点:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;分離レベルは理解しにくく、データベースごとに実装の一貫性がない。&lt;/li&gt;
+&lt;li&gt;アプリケーションコードを見て、特定の分離レベルでそのコードを実行するのが安全か判断しにくい。特に、同時に起きるすべてのことを把握できない大きなアプリケーションではなおさらである。&lt;/li&gt;
+&lt;li&gt;並行性問題は通常、非決定的、つまり間欠的なのでテストしにくい。タイミングが悪いときだけ問題が発生する。&lt;/li&gt;
+&lt;li&gt;代案は直列性分離を使うことである。&lt;/li&gt;
+&lt;li&gt;直列性分離は通常、最も強力な分離レベルと考えられる。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;複数トランザクションが並列で実行されても、最終結果は並行性なしに一つずつ直列実行された場合と同じになることを保証する。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;直列性を提供する三つの技法&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文字どおりトランザクションを順番に実行する。&lt;/li&gt;
+&lt;li&gt;2段階ロック。&lt;/li&gt;
+&lt;li&gt;直列性スナップショット分離のような楽観的並行性制御技法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;実際の直列実行&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;並行性問題を避ける最も簡単な方法は、並行性を完全に取り除くことである。&lt;/li&gt;
+&lt;li&gt;一度に一つのトランザクションだけを、単一スレッドで直列に実行すればよい。&lt;/li&gt;
+&lt;li&gt;欠点は性能である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;トランザクションをストアドプロシージャ内にカプセル化する&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データベース初期には、トランザクションがユーザー活動全体の流れを含められるようにする意図があった。&lt;/li&gt;
+&lt;li&gt;航空券予約の複数過程、つまり経路選択、料金、利用可能座席の探索、旅行日程の決定などを一つのトランザクションとして表現し、原子的にコミットすることである。&lt;/li&gt;
+&lt;li&gt;この方法を実装するためにデータベーストランザクションがユーザー入力を待たなければならないなら、非常に遅くなると予想される。&lt;/li&gt;
+&lt;li&gt;代わりに、トランザクションコード全体をストアドプロシージャとしてデータベースに事前提出する。&lt;/li&gt;
+&lt;li&gt;トランザクションに必要なデータはすべてメモリにあり、ストアドプロシージャはネットワークやディスクI/Oなしに非常に速く実行されると仮定する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-9.png&#34; alt=&#34;図7-9&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-9. 対話型トランザクションとストアドプロシージャの違い（図7-8の例トランザクションを使用）&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;パーティショニング&lt;/strong&gt;&lt;br&gt;
+各トランザクションが単一パーティション内でのみデータを読み書きするようにパーティショニングできるなら、各パーティションは別パーティションと独立して実行される独自のトランザクション処理スレッドを持てる。&lt;br&gt;
+この場合、各CPUコアに各自のパーティションを割り当てることで、トランザクション処理量をCPUコア数に合わせて線形に拡張できる。&lt;br&gt;
+しかし、複数パーティションにアクセスする必要があるトランザクションがあるなら、コーディネーションオーバーヘッドがあるため、単一パーティショントランザクションより非常に遅い。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;直列実行まとめ&lt;/strong&gt;&lt;br&gt;
+トランザクションの直列実行は、いくつかの制約の中で直列性分離を得る実用的な方法になった。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;すべてのトランザクションは小さく速くなければならない。遅いトランザクション一つが全体処理を遅延させる可能性があるため。&lt;/li&gt;
+&lt;li&gt;アクティブなデータセットがメモリに載る場合に利用が制限される。単一スレッドトランザクションでディスクにアクセスすると、システムは非常に遅くなる。&lt;/li&gt;
+&lt;li&gt;書き込み処理量は、単一CPUコアで処理できる程度に十分低くなければならない。&lt;/li&gt;
+&lt;li&gt;複数パーティションにまたがるトランザクションも使えるが、使用できる程度には厳しい制限がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2段階ロック2pl&#34;&gt;2段階ロック（2PL）&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;トランザクションAがオブジェクトを読み、トランザクションBがそのオブジェクトに書き込みたいなら、BはAがコミットまたはアボートされるまで待たなければならない。これにより、BがAに気づかれず突然オブジェクトを変更できないことが保証される。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;トランザクションAがオブジェクトに書き込み、トランザクションBがそのオブジェクトを読みたいなら、BはAがコミットまたはアボートされるまで待たなければならない。図7-4で見たように、2PLを使う場合はオブジェクトの過去バージョンを読むことは許可されない。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;スナップショット分離と比較すると、スナップショット分離では読む側は決して書く側を妨げず、書く側も決して読む側を妨げない。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2段階ロックの実装&#34;&gt;2段階ロックの実装&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;MySQL、SQL Serverで直列性分離レベルを実装するために使われる。&lt;/li&gt;
+&lt;li&gt;ロックは共有モード（shared mode）または排他モード（exclusive mode）で使われる。&lt;/li&gt;
+&lt;li&gt;ロックが非常に多く使われるため、デッドロック、つまり二つのトランザクションが互いに待つ状態が非常に起こりやすい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2段階ロックの性能&#34;&gt;2段階ロックの性能&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;最大の弱点は性能である。&lt;/li&gt;
+&lt;li&gt;ロックを獲得し解放するオーバーヘッドのため遅い。&lt;/li&gt;
+&lt;li&gt;より重要な原因は並行性が低下すること。並行性と性能は反比例する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;述語ロック&#34;&gt;述語ロック&lt;/h3&gt;
+&lt;p&gt;条件に合うすべてのオブジェクトにロックを獲得することである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-SQL&#34; data-lang=&#34;SQL&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SELECT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;bookings&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;   &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;room_id&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;123&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;AND&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;end_time&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;2018-01-01 12:00&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;AND&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;start_time&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;2018-01-01 13:00&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;述語ロックは時間がかかる。条件に合うロックを確認するのに時間がかかるためである。&lt;/li&gt;
+&lt;li&gt;このため、2PLをサポートするほとんどのデータベースは、実際にはインデックス範囲ロックやnext-key lockを実装して使用する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;インデックス範囲ロック&#34;&gt;インデックス範囲ロック&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;たとえば、正午から午後1時まで123番の部屋を予約することに対する述語ロックを、すべての時間範囲で123番の部屋を予約するものとして近似してロックする。&lt;/li&gt;
+&lt;li&gt;上の例では、&lt;code&gt;room_id&lt;/code&gt;または時間値にインデックスがあるはずなので、そのインデックス範囲にlockをかける。&lt;/li&gt;
+&lt;li&gt;インデックス範囲ロックは述語ロックより精密ではないが、直列性を維持するために必須な範囲より広い範囲をロックする場合がある。しかしオーバーヘッドが低いため、よい妥協案になる。&lt;/li&gt;
+&lt;li&gt;範囲ロックを取得できる適切なインデックスがなければ、テーブル全体に共有ロックを取得する形に代替することもある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;直列性スナップショット分離serializable-snapshot-isolation-ssi&#34;&gt;直列性スナップショット分離（Serializable Snapshot Isolation, SSI）&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;直列性分離と良い性能は共存できるのか。&lt;/li&gt;
+&lt;li&gt;現在最も有望なのが直列性スナップショット分離である。&lt;/li&gt;
+&lt;li&gt;スナップショット分離に比べ、わずかな性能損失があるだけである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;悲観的並行性制御 vs 楽観的並行性制御&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;2段階ロックは悲観的並行性制御メカニズムである。
+&lt;ul&gt;
+&lt;li&gt;何かがうまくいかない可能性があるなら、何かをする前に状況が再び安全になるまで待つほうがよいという原則である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;直列性スナップショット分離は楽観的並行性制御メカニズムである。
+&lt;ul&gt;
+&lt;li&gt;危険な状況が発生する可能性があるとき、トランザクションを止める代わりに、すべてがうまくいくという希望を持って進行するという意味である。&lt;/li&gt;
+&lt;li&gt;トランザクションがコミットしようとするとき、データベースは悪い状況が発生したか確認する。&lt;/li&gt;
+&lt;li&gt;発生していればabortされ、再試行される。&lt;/li&gt;
+&lt;li&gt;競合が激しいとabort率が上がるため性能が落ちる。&lt;/li&gt;
+&lt;li&gt;予備容量が十分で、トランザクション間の競合が激しすぎなければ、楽観的並行性制御技法は性能がよい傾向がある。&lt;/li&gt;
+&lt;li&gt;SSI = スナップショット分離 + 直列性競合検出およびabortさせるトランザクションを決定するアルゴリズム。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;古い読み取りを検出する&lt;/strong&gt;&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-11.png&#34; alt=&#34;図7-10&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-10. トランザクションがMVCCスナップショットから古い値を読んだか検出する&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;過去の読み取りに影響する書き込みを検出する&lt;/strong&gt;&lt;br&gt;
+&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/07-11.png&#34; alt=&#34;図7-11&#34;&gt;&lt;br&gt;
+&lt;em&gt;図7-11. 直列性スナップショット分離で、トランザクションが別トランザクションの読んだデータを変更する場合を検出する&lt;/em&gt;&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB で重複データを抽出、削除する方法</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/delete-duplicate-data/</link>
       <pubDate>Wed, 12 Jan 2022 09:29:00 +0900</pubDate>
@@ -4085,6 +5688,311 @@ Remove dupulicate data.
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第08章 分散システムの問題</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/8/</link>
+      <pubDate>Fri, 08 Apr 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/8/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: ファン・ユンホ、キム・ウンテク&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;分散システムを扱うことは、1台のコンピュータで動くソフトウェアを書くこととは根本的に異なる。&lt;br&gt;
+エンジニアは、あらゆることがうまくいかなくても役割を果たし続けるシステムを構築しなければならない。&lt;/p&gt;
+&lt;h2 id=&#34;障害と部分障害&#34;&gt;障害と部分障害&lt;/h2&gt;
+&lt;p&gt;単一コンピュータ環境では、2つの状態を予測できる。&lt;br&gt;
+分散コンピューティング環境では、予測できない方法で故障する。これを部分障害という。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;単一コンピュータ環境&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;正常に動作する。&lt;/li&gt;
+&lt;li&gt;動かない。
+-&amp;gt; 「たまたま運が悪い日」のように見えることもあるが、多くは誤って書かれたソフトウェアの結果である。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;分散コンピュータ環境&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;ネットワークで接続された複数のコンピュータでソフトウェアが実行される。&lt;/li&gt;
+&lt;li&gt;分散システムでは、システムのある部分は正常に動作する一方で、別の部分が予測できない形で故障することも珍しくない。これを部分障害という。&lt;/li&gt;
+&lt;li&gt;部分障害は非決定的なので扱いにくい。&lt;/li&gt;
+&lt;li&gt;何かが成功したかどうか分からない場合もある。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;クラウドコンピューティングとスーパーコンピューティング&#34;&gt;クラウドコンピューティングとスーパーコンピューティング&lt;/h3&gt;
+&lt;p&gt;高性能コンピューティング:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数千個のCPUを持つスーパーコンピュータ。&lt;/li&gt;
+&lt;li&gt;通常、天気予報や分子動力学のように計算コストが非常に高い科学計算作業に使われる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;クラウドコンピューティング:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;マルチテナントのデータセンター。&lt;/li&gt;
+&lt;li&gt;IPネットワーク（Ethernet）で接続された汎用コンピュータなど。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;従来の企業向けデータセンターは、この2つの極端な形の中間にある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;スーパーコンピュータで実行されるジョブは、通常、計算状態を耐久性のあるストレージにチェックポイントとして定期的に保存する。&lt;/li&gt;
+&lt;li&gt;障害が発生すると、最後のチェックポイントから計算を再開する。単一ノードのコンピュータに近い。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;分散システムを動作させるには、部分障害の可能性を受け入れ、ソフトウェアに耐障害性メカニズムを組み込まなければならない。&lt;br&gt;
+信頼できない構成要素を使って信頼できるシステムを構築する必要がある。完全な信頼性は存在しない。&lt;br&gt;
+障害処理はソフトウェア設計の一部でなければならず、障害が発生したときにソフトウェアがどう動作するかを理解していなければならない。&lt;/p&gt;
+&lt;h2 id=&#34;信頼できないネットワーク&#34;&gt;信頼できないネットワーク&lt;/h2&gt;
+&lt;p&gt;本で主に扱う分散システムはシェアードナッシングシステム、つまりネットワークで接続された多数のマシンである。&lt;br&gt;
+シェアードナッシングがシステム構築の唯一の方法ではないが、いくつかの理由からインターネットサービスを構築する主な方法になっている。&lt;/p&gt;
+&lt;p&gt;特別なハードウェアが不要で比較的安価であり、汎用的なクラウドサービスを活用でき、地理的に分散した複数のデータセンターに冗長配置することで高い信頼性を確保できる。&lt;br&gt;
+各ノードは他のマシンのメモリやディスクにアクセスできない。ネットワークが唯一の通信手段である。&lt;br&gt;
+この種のネットワークでは、ノードは別のノードへメッセージ（パケット）を送れるが、ネットワークはメッセージが到着することを保証しない。&lt;/p&gt;
+&lt;p&gt;保証されない原因はさまざまである。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;リクエストが失われる。&lt;/li&gt;
+&lt;li&gt;リクエストがキューで待機し、後で送信される。&lt;/li&gt;
+&lt;li&gt;リモートノードに障害が発生する。&lt;/li&gt;
+&lt;li&gt;リモートノードが一時的に応答を止めるが、後で再び応答を始める。&lt;/li&gt;
+&lt;li&gt;レスポンスがネットワーク上で失われる。&lt;/li&gt;
+&lt;li&gt;レスポンスが遅延し、後で送信される。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;送信側は、パケットが送信されたかどうかさえ区別できない。&lt;br&gt;
+そのため受信側が応答メッセージを送るが、その応答メッセージも失われたり遅延したりする。&lt;br&gt;
+この問題を扱う一般的な方法が&lt;strong&gt;タイムアウト&lt;/strong&gt;である。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;現実のネットワーク障害&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;信頼できるネットワークを作る完全な方法はまだない。&lt;br&gt;
+ある会社の管理された環境でも、ネットワーク問題は驚くほど頻繁に発生する。&lt;br&gt;
+公開クラウドサービスでもネットワーク障害はよく発生する。&lt;br&gt;
+ネットワーク障害がまれであっても、障害が起こり得ることを認識し、ソフトウェアがそれを処理できるよう設計しなければならない。&lt;/p&gt;
+&lt;p&gt;エラー処理が定義されテストされていなければ、悪いことが勝手に起こり得る。&lt;br&gt;
+必ずしもネットワーク障害に耐えられるよう処理する必要はない。&lt;br&gt;
+ネットワークが十分に信頼できるなら、問題が起きたときに単にユーザーへエラーメッセージを表示するのも妥当な方法である。&lt;/p&gt;
+&lt;p&gt;しかし、ソフトウェアがネットワーク問題にどう反応するかを理解し、システムがそこから復旧できることを保証しなければならない。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;障害検出&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;多くのシステムでは、障害のあるノードを自動で検出できなければならない。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ロードバランサは死んだノードへリクエストを送るのをやめなければならない。&lt;/li&gt;
+&lt;li&gt;単一リーダーレプリケーションを使う分散データベースでは、リーダーに障害が発生するとフォロワーの1つがリーダーへ昇格しなければならない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;タイムアウトと上限のない遅延&#34;&gt;タイムアウトと上限のない遅延&lt;/h3&gt;
+&lt;p&gt;タイムアウトだけが障害検出の確実な手段だとすると、タイムアウトはどのくらい長くすべきだろうか。残念ながら簡単な答えはない。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;タイムアウトが長いと、ノードが死んだと宣言されるまで待つ時間が長くなる。&lt;/li&gt;
+&lt;li&gt;タイムアウトが短いと、障害を早く発見できるが、応答が一時的に遅いだけでも死んだと宣言する危険が高まる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ノードが死んだと宣言されると、そのノードの責務は別のノードへ渡されるため、他のノードとネットワークに追加負荷がかかる。&lt;br&gt;
+特に、そのノードは実際には死んでおらず、過負荷のため応答が遅いだけかもしれない。その負荷を他のノードへ移すと、連鎖障害を引き起こす可能性がある。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ネットワーク輻輳とキュー待ち&lt;/strong&gt;&lt;br&gt;
+ネットワークでのパケット遅延の変動は、キュー待ちが原因である場合が多い。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;複数のノードが同じ宛先へ同時にパケットを送ろうとすると、ネットワークスイッチはパケットをキューに入れ、ネットワークリンクへ1つずつ渡す。&lt;/li&gt;
+&lt;li&gt;ネットワークリンクが混雑していると、パケットはスロットを得るまでしばらく待つことがある。これをネットワーク輻輳という。&lt;/li&gt;
+&lt;li&gt;TCPはフロー制御を行い、輻輳回避やバックプレッシャーによって送信を制限し、過負荷にならないようにする。&lt;/li&gt;
+&lt;li&gt;TCPはタイムアウト内に確認応答を受け取らないと、パケットが失われたとみなして再送する。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;遅延時間に敏感なアプリケーションはTCPの代わりにUDPを使う。&lt;/p&gt;
+&lt;p&gt;UDPはフロー制御を行わず、失われたパケットを再送しないため、ネットワーク遅延を大きく変動させる原因の一部を取り除く。&lt;/p&gt;
+&lt;p&gt;UDPは、遅延したデータに価値がない状況で選ぶとよい。&lt;/p&gt;
+&lt;p&gt;このように、信頼性と遅延変動性の間にはトレードオフがある。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;同期ネットワークと非同期ネットワーク&lt;/strong&gt;&lt;br&gt;
+電話ネットワークは極端に高い信頼性を持つ。エンドツーエンドの遅延時間は低くなければならず、声の音声サンプルを送るのに十分な帯域幅が必要である。通話時には回線が作られる。&lt;br&gt;
+2人の間の経路全体に沿って、その通話に対して固定され保証された量の帯域幅が割り当てられる。ISDNネットワークは秒間4,000フレームの固定比率で実行される。&lt;br&gt;
+この種のネットワークは同期式である。データが複数のルーターを経由しても、キュー待ち問題に悩まされない。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;単にネットワーク遅延を予測可能にできないのか。&lt;/strong&gt;&lt;br&gt;
+データセンターネットワークとインターネットが回線交換ネットワークなら、往復時間の最大値を保証できる。EthernetとIPはキュー待ちの影響を受けるパケット交換プロトコルであり、したがってネットワークには上限のない遅延がある。これらのプロトコルには回線という概念がない。&lt;/p&gt;
+&lt;p&gt;なぜデータセンターネットワークとインターネットはパケット交換を使うのか。瞬間的に集中するトラフィックに最適化されているからである。瞬間的に集中するデータ転送に回線を使うと、ネットワーク容量を浪費し、転送が不必要に遅くなる。TCPは利用可能なネットワーク容量に合わせてデータ転送率を動的に調整する。&lt;/p&gt;
+&lt;p&gt;タイムアウトに正しい値はない。実験を通じて決める必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;信頼できない時計&#34;&gt;信頼できない時計&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;このリクエストはタイムアウトしたか。&lt;/li&gt;
+&lt;li&gt;このサービスの99パーセンタイル応答時間はどのくらいか。&lt;/li&gt;
+&lt;li&gt;このサービスは過去5分間で平均して毎秒何件のクエリを処理したか。&lt;/li&gt;
+&lt;li&gt;ユーザーはサイトでどのくらいの時間を過ごしたか。&lt;/li&gt;
+&lt;li&gt;この記事はいつ公開されたか。&lt;/li&gt;
+&lt;li&gt;何日何時にリマインドメールを送るべきか。&lt;/li&gt;
+&lt;li&gt;このキャッシュ項目はいつ期限切れになるか。&lt;/li&gt;
+&lt;li&gt;ログファイルに残ったこのエラーメッセージのタイムスタンプは何か。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;単調時計と時刻時計&#34;&gt;単調時計と時刻時計&lt;/h3&gt;
+&lt;p&gt;時刻時計:
+日付と時刻を返す。&lt;/p&gt;
+&lt;p&gt;NTP（Network Time Protocol）で同期するが、信頼性は高くない。&lt;/p&gt;
+&lt;p&gt;ファイアウォール。
+ネットワーク遅延時間、最大1秒程度。
+うるう秒が発生し、1分の長さが59秒または61秒になる。NTPサーバーでは1日にわたって徐々に処理することがある。
+モバイル/組み込みデバイスは信頼性が低い。&lt;/p&gt;
+&lt;p&gt;単調時計:
+継続時間の測定に適している。&lt;/p&gt;
+&lt;p&gt;別の単調時計との比較には意味がない。&lt;/p&gt;
+&lt;p&gt;同期された時計に依存する問題:
+問題の原因は、時計が間違っていることに気づけない点である。&lt;/p&gt;
+&lt;p&gt;明白なエラーよりも、微妙なデータ損失が起こる。
+時計がずれているノードは死んだものとして宣言され、取り除かれる必要がある。
+最後の書き込み勝ち（Last write wins, LWW）。&lt;/p&gt;
+&lt;p&gt;リーダーなしデータベース: マルチリーダーレプリケーション、Cassandra、Riak。&lt;/p&gt;
+&lt;p&gt;データベースの書き込みが不可解に消える。この事実を知っておくことが重要である。
+グローバルスナップショット用の同期時計: Googleの事例。
+SpannerとGoogle TrueTime API。&lt;/p&gt;
+&lt;p&gt;信頼区間を明示的に報告する。
+最も早いタイムスタンプと最も遅いタイムスタンプを含む区間が重ならなければ、Bは明らかにAより後に実行された。
+Spannerは因果性を反映するため、Bを信頼区間の分だけ遅延実行する。
+Googleは各データセンターにGPS/原子時計を配置し、約7ミリ秒以内で同期する。&lt;/p&gt;
+&lt;p&gt;プロセス停止:
+パーティションごとにリーダーが1つあるデータベースを仮定する。書き込みを受け付けるのはリーダーだけである。&lt;/p&gt;
+&lt;p&gt;質問: リーダーノードは、自分がまだリーダーであることをどう知るのか。&lt;/p&gt;
+&lt;p&gt;1つの方法は、リーダーが他のノードからリースを得ることである。特定時点でリーダーは1つだけ存在する。&lt;/p&gt;
+&lt;p&gt;シナリオ:
+リーダーであり続けるには、定期的にリースを更新しなければならない。
+障害が発生した場合、リース更新を止めるため、期限切れ時に別のノードがリーダー役を引き継ぐ。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;while&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;true&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;	&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;request&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;getIncomingRequest&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;	&lt;/span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;// 常にリースが少なくとも10秒は残るよう保証する。&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lease&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;expiryTimeMillis&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;currentTimeMillis&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;()&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;10_000&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lease&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lease&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;renew&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;();&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lease&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;isValid&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;())&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;process&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;request&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;);&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;問題は何か。&lt;/p&gt;
+&lt;p&gt;同期された時計に依存している。
+時刻を確認する時点とリクエストを処理する時点の間に、非常に短い時間しか流れないと仮定している。
+もし途中でプログラムが停止したらどうなるか。
+別のノードがリーダーを引き継ぐ。
+このスレッドが停止していたことを誰も知らせないため、処理を続けてしまう。これは安全ではない。&lt;/p&gt;
+&lt;p&gt;システムが停止する場合:
+stop-the-world: GC停止。
+仮想環境でのsuspend: メモリ内容を保存し、その後再開する。ノートPCでは休止中にも発生する。
+スレッドのコンテキストスイッチ。
+遅いディスクI/O操作。
+UnixではSIGSTOP（^Z）コマンド。&lt;/p&gt;
+&lt;p&gt;単一マシンで有用な道具:&lt;/p&gt;
+&lt;p&gt;ミューテックス（mutex）。
+セマフォ（semaphore）。
+アトミックカウンタ（atomic counter）。
+ロックフリー（lock-free）データ構造。
+ブロッキングキュー（blocking queue）。&lt;/p&gt;
+&lt;p&gt;応答時間保証:
+リアルタイムOS（RTOS）: 航空機、ロケット、ロボット、自動車産業など。&lt;/p&gt;
+&lt;p&gt;最悪実行時間を明示する。
+動的メモリ割り当てが禁止されることがある。
+膨大な量のテストが必要である。
+そのため、プログラミング言語、ライブラリ、ツールの範囲が厳しく制限される。&lt;/p&gt;
+&lt;h2 id=&#34;知識真実そして嘘&#34;&gt;知識、真実、そして嘘&lt;/h2&gt;
+&lt;p&gt;ネットワークは信頼できない区間である。結局、部分障害、信頼できない時計、プロセス停止に悩まされる可能性がある。&lt;br&gt;
+信頼できるソフトウェアを作る方法に役立つ概念を紹介する。&lt;/p&gt;
+&lt;h3 id=&#34;真実は多数決で決まる&#34;&gt;真実は多数決で決まる&lt;/h3&gt;
+&lt;p&gt;1つのノードだけを見て正常稼働中か判断するのは難しい。&lt;/p&gt;
+&lt;p&gt;例: full GCで停止したサービスを死んだと判断したが、再び生き返って、それまでの作業を続ける。&lt;/p&gt;
+&lt;p&gt;代わりに、クォーラム、つまりノード間の投票に依存する。特定ノード1つへの依存を減らすため、決定には複数ノードから最小数の投票を受け取る必要がある。&lt;/p&gt;
+&lt;p&gt;ノードの過半数をクォーラムとするのが最も一般的である。3台中1台の障害、5台中2台の障害でも正常に動作できる。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;リーダーとロック&lt;/strong&gt;
+システムが単独で動かなければならないとき:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;スプリットブレインを避けるため、データベースパーティションのリーダーになれるノードは1つだけである。&lt;/li&gt;
+&lt;li&gt;特定のリソースやオブジェクトへ同時に書き込んだり汚染したりすることを防ぐため、そのリソースやオブジェクトのロックを取得できるトランザクションまたはクライアントは1つだけである。&lt;/li&gt;
+&lt;li&gt;ユーザー名でユーザーを一意に識別できなければならないため、特定のユーザー名で登録できるユーザーは1人だけである。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;hellip; 画像 &amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;フェンシングトークン&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&amp;hellip; 画像 &amp;hellip;&lt;/p&gt;
+&lt;p&gt;ロックサービスとしてZooKeeperを使う場合、トランザクションIDのzxidやノードバージョンのcversionをフェンシングトークンとして使える。これらは単調増加が保証されるため、必要な性質を持つ。&lt;/p&gt;
+&lt;h3 id=&#34;ビザンチン障害&#34;&gt;ビザンチン障害&lt;/h3&gt;
+&lt;p&gt;分散システムの問題は、ノードが「嘘をつく」（任意の障害を持つ、または汚染された応答を送る）危険があると、はるかに難しくなる。
+このような動作をビザンチン障害（Byzantine fault）と呼び、このように信頼できない環境で合意に達する問題をビザンチン将軍問題（Byzantine Generals Problem）という。
+一部のノードが誤動作してプロトコルに従わなかったり、悪意ある攻撃者がネットワークを妨害したりしても、システムが正しく動作し続けるなら、そのシステムはビザンチン耐障害性を持つという。
+これは概して現実的ではないため、認証、アクセス制御、暗号化、ファイアウォールなどの従来の仕組みが、今も攻撃者から保護する主な手段として使われている。&lt;/p&gt;
+&lt;h3 id=&#34;弱い形の嘘&#34;&gt;弱い形の嘘&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;ハードウェア問題、OS、ドライバ、ルーターバグによるネットワークパケットの汚染。&lt;/li&gt;
+&lt;li&gt;通常はTCP/UDPチェックサムで検出される。&lt;/li&gt;
+&lt;li&gt;アプリケーションでチェックサムを使って問題を解決する。&lt;/li&gt;
+&lt;li&gt;公開アプリケーションはユーザー入力を慎重にサニタイズしなければならない。&lt;/li&gt;
+&lt;li&gt;値の範囲確認、適切なメモリ割り当てのための入力サイズ制限、基本的な正常性チェックを行う。&lt;/li&gt;
+&lt;li&gt;NTPクライアントでは複数のサーバーアドレスを設定すると役立つ。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;システムモデルと現実&#34;&gt;システムモデルと現実&lt;/h3&gt;
+&lt;p&gt;システムモデル: システムで発生すると予想される障害の種類を何らかの形で定式化したもの。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;タイミング仮定&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同期モデル: ネットワーク遅延、プロセス停止、時計誤差のすべてに上限があると仮定する。&lt;/li&gt;
+&lt;li&gt;部分同期モデル: システムはほとんどの時間は同期システムのように動作するが、ときどきネットワーク遅延、プロセス停止、時計ドリフトの上限を超えるという意味である。&lt;/li&gt;
+&lt;li&gt;非同期モデル: このモデルでは、アルゴリズムはタイミングについていかなる仮定もできない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;ノード障害&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;crash-stop障害: ノードがある瞬間に突然応答を停止すると、その後そのノードは永久に使えず、決して戻ってこないという意味である。&lt;/li&gt;
+&lt;li&gt;crash-recovery障害: ノードはある瞬間に死ぬことがあるが、未知の時間が経った後にはおそらく再び応答し始めると仮定する。&lt;/li&gt;
+&lt;li&gt;crash-recoveryモデルでは、ノードはメモリ上の状態を失うが、死んでもデータが残る安定したストレージ、つまり不揮発性ディスクストレージがあると仮定する。&lt;/li&gt;
+&lt;li&gt;ビザンチン（任意）障害: ノードは前節で説明したように、他のノードをだましたり欺いたりすることを含め、まったく何でもできる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;アルゴリズムの正しさ&lt;/strong&gt;&lt;br&gt;
+性質を記述し、常に満たされるか確認する。&lt;/p&gt;
+&lt;p&gt;例: フェンシングトークン&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一意性: フェンシングトークン要求が同じ値を返さない。&lt;/li&gt;
+&lt;li&gt;単調なシーケンス番号: 要求xがトークンtxを、要求yがトークンtyを返し、yが開始する前にxが完了していたなら、tx &amp;lt; tyを満たす。&lt;/li&gt;
+&lt;li&gt;可用性: フェンシングトークンを要求し、死ななかったノードは最終的に応答を受け取る。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;安全性（safety）と活性（liveness）&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;安全性
+&lt;ul&gt;
+&lt;li&gt;安全性性質が破られると、その性質が壊れた特定の時点を指し示せる。たとえば一意性が破られれば、重複したフェンシングトークンを返した特定の操作を識別できる。&lt;/li&gt;
+&lt;li&gt;安全性性質が破られた後は、その違反を取り消せない。すでに壊れた状態である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;活性
+&lt;ul&gt;
+&lt;li&gt;活性性質は逆に働く。ある時点を特定できないこともある。たとえばノードが要求を送ったがまだ応答を受け取っていないかもしれない。しかし、将来その性質を満たせるという希望は常にある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;安全性: 常に満たされることを要求する。すべてのノードやネットワーク全体が故障しても、誤った結果を返してはならない。&lt;/p&gt;
+&lt;p&gt;活性: 警告は許容される。ネットワーク分断があるなら、分断期間に上限を置く。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;現実への対応&lt;/strong&gt;&lt;br&gt;
+分散システムの正しさを考えるうえで非常に有用だが、限界は明確である。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;crash-recoveryモデル: ノードが死んでもデータは残ると仮定する。
+&lt;ul&gt;
+&lt;li&gt;ディスク汚染。&lt;/li&gt;
+&lt;li&gt;ハードウェア障害。&lt;/li&gt;
+&lt;li&gt;誤った設定によるデータ消失。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;コンピュータサイエンスとコンピュータ工学の違い:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;実際の実装では、不可能だと仮定していたことが起こる場合を処理しなければならないことがある。
+&lt;ul&gt;
+&lt;li&gt;printf(&amp;ldquo;너라서 짜증나&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;exit(666)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;それでも抽象システムモデルは重要である。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;現実システムの複雑さ -&amp;gt; 推論できる管理可能な障害集合を抽出する -&amp;gt; 問題を理解し体系的に解決する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;ネットワークパケットはいつでも破損したり遅延したりする可能性がある。&lt;/li&gt;
+&lt;li&gt;ノードの時計は時刻を信頼できない。&lt;/li&gt;
+&lt;li&gt;プロセスは実行中にstop-the-worldに遭遇する可能性がある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;部分障害は分散システムの明確な特徴である。&lt;/p&gt;
+&lt;p&gt;検出からして難しさが始まる。タイムアウトは使うが、これはネットワーク障害とノード障害を区別できない。&lt;br&gt;
+厳密なリアルタイム応答保証とネットワーク遅延制限を置くことは可能だが、コストが非常に高く、リソース使用率は低くなる。&lt;/p&gt;
+&lt;p&gt;次章は、すべての分散システムの問題に対処する解決策である。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>MongoDB で自動増分シーケンスを作成する方法</title>
       <link>https://www.devkuma.com/jp/docs/mongodb/collection-restriction/</link>
       <pubDate>Thu, 13 Jan 2022 07:57:00 +0900</pubDate>
@@ -4228,6 +6136,114 @@ Remove dupulicate data.
       <category>NoSQL</category>
       
       <category>MongoDB</category>
+      
+    </item>
+    
+    <item>
+      <title>データ指向アプリケーションデザイン | 第09章 一貫性と合意</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/9/</link>
+      <pubDate>Fri, 15 Apr 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/9/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: イ・ホジュン、チョ・ソンジク&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;この章では、耐障害性を備えた分散システムを構築するために使われるアルゴリズムとプロトコルを紹介する。&lt;/p&gt;
+&lt;h2 id=&#34;一貫性保証&#34;&gt;一貫性保証&lt;/h2&gt;
+&lt;p&gt;複製データベースでは、結果整合性のような弱い保証が一般的である。システムはいずれ収束するかもしれないが、それがいつかは分からない。より強い保証は理解しやすいが、性能や耐障害性を下げることがある。&lt;/p&gt;
+&lt;h2 id=&#34;線形化可能性&#34;&gt;線形化可能性&lt;/h2&gt;
+&lt;p&gt;線形化可能性は、広く使われる最も強い一貫性モデルの1つである。複製されたシステムを、データのコピーが1つしかないかのように振る舞わせる。また、書き込みが完了した後の読み取りは、その値またはそれ以降の値を返すという最新性保証を提供する。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/09-1.png&#34; alt=&#34;図9-1&#34;&gt;&lt;br&gt;
+&lt;em&gt;図9-1. 線形化可能でないシステムはユーザーを混乱させる。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;読み取りが書き込みと重なっている場合、古い値を返すことも新しい値を返すこともある。しかし、いったんどこかの読み取りが新しい値を返したなら、その後のすべての読み取りは、同じクライアントか別のクライアントかに関係なく、新しい値を返さなければならない。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/09-3.png&#34; alt=&#34;図9-3&#34;&gt;&lt;br&gt;
+&lt;em&gt;図9-3. 読み取りが新しい値を返した後は、後続の読み取りも新しい値を返さなければならない。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;線形化可能性は、各操作が効果を持ったように見える一点を時間軸上に選ぶことで可視化できる。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/09-4.png&#34; alt=&#34;図9-4&#34;&gt;&lt;br&gt;
+&lt;em&gt;図9-4. 各読み書きが効果を持つように見える時点を可視化する。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;線形化可能性はロックやリーダー選出に役立つ。システムに誤って2つのリーダーが存在してはならない。ZooKeeperやetcdのようなコーディネーションサービスは、この目的のために線形化可能な操作を提供することが多い。&lt;/p&gt;
+&lt;p&gt;通信チャネル間のタイミング依存性を避ける場合にも役立つ。たとえば、Webサーバーがファイルストアに画像を書き込み、画像リサイズワーカーへメッセージを送る場合、ワーカーが古いファイルを見てはいけない。&lt;/p&gt;
+&lt;h2 id=&#34;線形化可能なシステムの実装&#34;&gt;線形化可能なシステムの実装&lt;/h2&gt;
+&lt;p&gt;線形化可能性とは、データのコピーが1つだけあり、そのデータに対するすべての操作が原子的であるかのように振る舞うことである。本当にコピーが1つだけでは障害に耐えられないため、実際にはレプリケーションが必要になる。&lt;/p&gt;
+&lt;p&gt;レプリケーション方式によって性質は異なる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;単一リーダーレプリケーションは、読み取りがリーダーを通るか、最新であることが別の方法で保証されれば、線形化可能になり得る。&lt;/li&gt;
+&lt;li&gt;合意アルゴリズムは線形化可能性を提供できる。&lt;/li&gt;
+&lt;li&gt;複数リーダーレプリケーションは一般に線形化可能ではない。&lt;/li&gt;
+&lt;li&gt;リーダーレスレプリケーションは、追加の調整を入れない限り通常は線形化可能ではない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;線形化可能性とクォーラム&#34;&gt;線形化可能性とクォーラム&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;w + r &amp;gt; n&lt;/code&gt;を満たすクォーラム読み書きは線形化可能に見えることがあるが、それでも競合は起こり得る。Dynamo風のリーダーレスシステムは、性能コストとより強い調整が必要になるため、一般に線形化可能性を提供しない。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/09-5.png&#34; alt=&#34;図9-5&#34;&gt;&lt;br&gt;
+&lt;em&gt;図9-5. クォーラム読み書きでも競合条件が発生することがある。&lt;/em&gt;&lt;/p&gt;
+&lt;h2 id=&#34;線形化可能性のコスト&#34;&gt;線形化可能性のコスト&lt;/h2&gt;
+&lt;p&gt;ネットワークが分断されると、システムは線形化可能性と可用性のどちらを取るか選ばなければならないことがある。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/09-7.png&#34; alt=&#34;図9-7&#34;&gt;&lt;br&gt;
+&lt;em&gt;図9-7. ネットワーク分断では線形化可能性と可用性の選択が必要になる。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;CAP定理は、ネットワーク分断が発生した場合、線形化可能性を要求するシステムは完全な可用性を保てないことを述べている。これはネットワークが常に分断されるという意味ではないが、通信が失敗したときにどう振る舞うかを設計で決める必要がある。&lt;/p&gt;
+&lt;h2 id=&#34;順序保証&#34;&gt;順序保証&lt;/h2&gt;
+&lt;p&gt;順序、因果関係、一貫性は密接に関連する。あるイベントが別のイベントの原因であるなら、すべてのノードはその因果順序で観測すべきである。因果順序は全順序より弱いが、多くの混乱する履歴を排除できる。&lt;/p&gt;
+&lt;p&gt;シーケンス番号とタイムスタンプはイベントの順序付けに役立つ。分散システムでは物理時計が不完全なので、Lamportタイムスタンプのような論理時計が因果関係を表すためによく使われる。&lt;/p&gt;
+&lt;p&gt;全順序ブロードキャストは、すべてのメッセージをすべてのノードへ同じ順序で届ける。これは合意と同等の力を持ち、複製状態機械の基本的な構成要素である。&lt;/p&gt;
+&lt;h2 id=&#34;分散トランザクションと原子的コミット&#34;&gt;分散トランザクションと原子的コミット&lt;/h2&gt;
+&lt;p&gt;原子的コミットは、トランザクションのすべての参加者がコミットするか、すべてがアボートするかを保証する。複数ノードまたは複数システムにまたがるトランザクションでは特に重要である。&lt;/p&gt;
+&lt;p&gt;2フェーズコミット（2PC）はコーディネータと参加者を使う。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;コーディネータがprepare要求を送る。各参加者はコミット可能か確認し、その判断を復旧可能にするための十分な情報を永続ストレージへ書く。&lt;/li&gt;
+&lt;li&gt;すべての応答を受け取った後、コーディネータはコミットまたはアボートを決定し、その決定を記録する。&lt;/li&gt;
+&lt;li&gt;コーディネータは最終決定をすべての参加者へ送り、参加者はそれに従ってコミットまたはアボートする。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;prepareフェーズが完了する前に問題が起これば、コーディネータはアボートできる。参加者がprepare済みになった後に問題が起こると、参加者はコーディネータの最終決定を待たなければならない。この間、リソースがブロックされる。&lt;/p&gt;
+&lt;p&gt;3フェーズコミットはブロックを避けるために提案されたが、ネットワーク遅延とノード応答時間に上限があることを仮定する。この仮定は多くの分散システムでは現実的ではない。&lt;/p&gt;
+&lt;h2 id=&#34;実際の分散トランザクション&#34;&gt;実際の分散トランザクション&lt;/h2&gt;
+&lt;p&gt;分散トランザクションの評価は分かれる。原子的コミットによって安全性を提供する一方で、運用上の問題や性能問題を引き起こすことがある。&lt;/p&gt;
+&lt;p&gt;大きく2種類がある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;データベース内部の分散トランザクション&lt;/strong&gt;は、同じ分散データベースのノード間で行われる。データベースは自分に合ったプロトコルを選び、最適化できる。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;異種分散トランザクション&lt;/strong&gt;は、異なるベンダーの2つのデータベースや、データベースとメッセージブローカーなど、異なるシステムにまたがる。共通プロトコルが必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;XAは、2フェーズコミットで異種分散トランザクションを実装するための標準である。トランザクションコーディネータとリソースマネージャの間のインターフェースを定義し、多くのリレーショナルデータベースとメッセージブローカーが対応している。&lt;/p&gt;
+&lt;p&gt;XAではコーディネータが失敗すると、トランザクションが疑わしい状態に残ることがある。参加者は最終決定が分かるまでロックを保持しなければならない。コーディネータのトランザクションログが失われたり、ソフトウェアバグがあったりすると、管理者が経験的決定を手動で下す必要がある。&lt;/p&gt;
+&lt;p&gt;分散トランザクションでは、コーディネータを高可用化しない限り単一障害点になる。コーディネータがアプリケーションサーバーに組み込まれると、トランザクションログをローカルに持つため、そのサーバーは状態を持つ。XAは参加システムの共通部分の機能しか提供できないという制約もある。&lt;/p&gt;
+&lt;h2 id=&#34;耐障害性を持つ合意&#34;&gt;耐障害性を持つ合意&lt;/h2&gt;
+&lt;p&gt;合意とは、複数のノードが1つの値に同意することである。合意アルゴリズムは次の性質を満たすべきである。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;一様合意&lt;/strong&gt;: 2つのノードが異なる値を決定しない。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;完全性&lt;/strong&gt;: どのノードも2回決定しない。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;妥当性&lt;/strong&gt;: ノードが値&lt;code&gt;v&lt;/code&gt;を決定したなら、&lt;code&gt;v&lt;/code&gt;はどこかのノードによって提案された値である。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;終了性&lt;/strong&gt;: 故障していないノードは最終的に何らかの値を決定する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;最初の3つは安全性の性質である。終了性は活性の性質であり、障害とタイミングに関する仮定を必要とする。合意アルゴリズムは一般に、過半数のノードが利用可能であり、ビザンチン障害は扱わないと仮定する。&lt;/p&gt;
+&lt;h2 id=&#34;合意と全順序ブロードキャスト&#34;&gt;合意と全順序ブロードキャスト&lt;/h2&gt;
+&lt;p&gt;全順序ブロードキャストは合意と同じ核心的性質を持つ。すべてのノードが同じメッセージを同じ順序で配信し、メッセージは重複せず、破損せず、最終的に配信される。&lt;/p&gt;
+&lt;p&gt;単一リーダーレプリケーションは、リーダーが書き込み順序を決めるため全順序ブロードキャストに似ている。しかしリーダーが失敗した場合、新しいリーダーについて合意しなければならない。それを安全に解くには、合意またはすでに合意を提供しているサービスが必要になる。&lt;/p&gt;
+&lt;h2 id=&#34;エポック番号とクォーラム&#34;&gt;エポック番号とクォーラム&lt;/h2&gt;
+&lt;p&gt;合意システムでは、リーダーの権限を区別するためにエポック番号、term、ballotなどを使う。リーダーは通常、クォーラムと通信することで、自分がまだ有効なリーダーであることを示さなければならない。これにより、古いリーダーが新しいリーダー選出後も書き込みを受け付け続けることを防ぐ。&lt;/p&gt;
+&lt;p&gt;2フェーズコミットとの違いは、耐障害性を持つ合意では過半数が利用可能であれば進行できるのに対し、2PCはコーディネータが悪いタイミングで失敗するとブロックする点である。&lt;/p&gt;
+&lt;h2 id=&#34;合意の制約&#34;&gt;合意の制約&lt;/h2&gt;
+&lt;p&gt;合意はクォーラムへの同期レプリケーションを必要とするため、レイテンシが増える。過半数が利用可能でなければならないので、多くのノードを失うとシステムは利用できなくなる。ノード集合の変更は慎重に行う必要があり、レイテンシが不安定なネットワークでは再選出や性能低下が繰り返されることがある。&lt;/p&gt;
+&lt;h2 id=&#34;メンバーシップとコーディネーションサービス&#34;&gt;メンバーシップとコーディネーションサービス&lt;/h2&gt;
+&lt;p&gt;ZooKeeperやetcdのようなシステムは、合意の上に少数のコーディネーションプリミティブを提供する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;線形化可能な原子的操作。&lt;/li&gt;
+&lt;li&gt;操作の全順序化。&lt;/li&gt;
+&lt;li&gt;リースとセッションによる障害検出。&lt;/li&gt;
+&lt;li&gt;データ変更時の変更通知。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;これらのプリミティブは、作業のノード割り当て、サービス探索、リーダー選出、メンバーシップ追跡、クラスタ設定に役立つ。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;線形化可能性は単純なメンタルモデルを提供するが、ネットワーク分断時には可用性を犠牲にする。原子的コミットは参加者間のall-or-nothingな決定を調整するが、ブロックすることがある。合意は障害があっても分散システムが安全に同意できるようにし、コーディネーションサービスはロック、リース、メンバーシップ、通知といった実用的なプリミティブとしてそれを公開する。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
       
     </item>
     
@@ -4523,6 +6539,239 @@ Remove dupulicate data.
     </item>
     
     <item>
+      <title>データ指向アプリケーションデザイン | 第10章 バッチ処理</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/10/</link>
+      <pubDate>Fri, 22 Apr 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/10/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: キム・ジョンス、パク・スミン&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.devkuma.com/docs/data-intensive-application/10_ppt.pdf&#34;&gt;発表資料&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;バッチ処理の代替&#34;&gt;バッチ処理の代替&lt;/h2&gt;
+&lt;p&gt;MapReduce&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;長所: 分散ファイルシステム上で、かなり単純で明快に抽象化されたモデルである。&lt;/li&gt;
+&lt;li&gt;短所: 複雑な演算は非常に難しい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;mapreduceの中間状態の具現化&#34;&gt;MapReduceの中間状態の具現化&lt;/h3&gt;
+&lt;p&gt;バッチ処理ワークフローで、&lt;strong&gt;各タスク&lt;/strong&gt;の&lt;strong&gt;output&lt;/strong&gt;（&lt;strong&gt;中間状態&lt;/strong&gt;）を&lt;strong&gt;分散ファイルシステム&lt;/strong&gt;に&lt;strong&gt;ファイル&lt;/strong&gt;として保存（具現化）しておく方法である。&lt;/p&gt;
+&lt;p&gt;（複雑な演算を複数のMapReduceに分割して処理する。）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;分散ファイルシステム: タスクのoutputをファイルとして保存する仕組み。
+&lt;ul&gt;
+&lt;li&gt;このファイルは他のタスクのinputとして使われる。主にタスク間でデータを渡す用途である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;中間状態: このようなファイルとして保存されている状態。
+&lt;ul&gt;
+&lt;li&gt;複雑なワークフローでは非常に多くの中間状態が存在する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;具現化: 中間状態をファイルとして保存する過程。
+&lt;ul&gt;
+&lt;li&gt;要求が来たときに結果を生成するのではなく、&lt;strong&gt;あらかじめ特定の演算結果を生成&lt;/strong&gt;しておくこと。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Unixパイプと比べた短所:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;先行作業が完了しなければ後続作業を開始できない。
+&lt;ul&gt;
+&lt;li&gt;Unixパイプでは同時に作業が進む。
+&lt;ul&gt;
+&lt;li&gt;データの生成と同時に消費が行われる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ワークフロー全体の実行時間が遅くなる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;マッパーの重複
+&lt;ul&gt;
+&lt;li&gt;マッパーはリデューサーが生成したファイルを読み、パーティショニングとソートを行う。
+&lt;ul&gt;
+&lt;li&gt;不要なI/Oが発生する。&lt;/li&gt;
+&lt;li&gt;リデューサーにマッパーの機能も持たせることで解決できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;分散ファイルシステムのすべてのマシンに中間状態ファイルの複製が発生する。
+&lt;ul&gt;
+&lt;li&gt;中間状態ファイルは一時データであるにもかかわらず、分散ファイルシステムを使うことで複製という過度なコストが発生する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;データフローエンジンdataflow-engine&#34;&gt;データフローエンジン（Dataflow Engine）&lt;/h3&gt;
+&lt;p&gt;MapReduceの問題を解決するために、分散バッチ処理演算を実行するエンジンが登場した。&lt;/p&gt;
+&lt;p&gt;データの流れを明示的にモデル化する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Spark: フレームワーク&lt;/li&gt;
+&lt;li&gt;Tez: 軽量ライブラリ&lt;/li&gt;
+&lt;li&gt;Flink: フレームワーク&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;フレームワーク: 独自のネットワーク通信層、スケジューラ、APIなどを備える。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://trends.google.com/trends/explore?cat=32&amp;amp;q=Spark,Tez,Flink&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://trends.google.com/trends/explore?cat=32&amp;q=Spark,Tez,Flink&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/10_treands.png&#34; alt=&#34;ストリームテーブル結合&#34;&gt;&lt;/p&gt;
+&lt;p&gt;特徴:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ワークフローを独立した下位作業に分けず、1つの作業として扱う。&lt;/li&gt;
+&lt;li&gt;MapReduceのように、単一スレッドでユーザー定義関数を呼び出し、レコードを1つずつ処理する。&lt;/li&gt;
+&lt;li&gt;入力データをパーティショニングして並列処理する。&lt;/li&gt;
+&lt;li&gt;ネットワークコピーによって、ある関数のoutputが別の関数のinputとして渡される。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;演算子:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データ処理に使われる各種関数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;MapReduceモデルと比べた長所:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ソートなどの高コストな作業は、必要な場合にだけ実行できる。
+&lt;ul&gt;
+&lt;li&gt;MapReduceでは、基本的にmapとreduceの間で常にソートが発生する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;局所性の最適化が可能である。
+&lt;ul&gt;
+&lt;li&gt;ワークフローが明示的なので、どのデータがどの時点で必要かを把握できる。&lt;/li&gt;
+&lt;li&gt;関数間のデータ受け渡しをネットワークコピーではなくメモリ共有で行える。これによりネットワークI/Oを減らせる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;中間状態はローカルディスクに保存する。I/O消費を減らせる。
+&lt;ul&gt;
+&lt;li&gt;HDFS（Hadoop Distributed File System）に保存する場合、複数サーバーへの複製が必要になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;演算子はinputが発生するとすぐに実行される。
+&lt;ul&gt;
+&lt;li&gt;先行関数全体の終了を待つ必要がない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;演算子を実行するたびにJVMを起動しなくてもよい。
+&lt;ul&gt;
+&lt;li&gt;MapReduceでは各タスクごとに新しいJVMを起動する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データフローエンジンはMapReduceのワークフローと同じ演算を実装でき、複数の最適化によって一般に実行速度が&lt;strong&gt;はるかに速い&lt;/strong&gt;。&lt;br&gt;
+演算子はmapとreduceを一般化したものなので、MapReduceのワークフローは大きな変更なしにデータフローへ簡単に移行できる。移行前に互換性を確認すること。&lt;/p&gt;
+&lt;h4 id=&#34;耐障害性&#34;&gt;耐障害性&lt;/h4&gt;
+&lt;p&gt;MapReduceはすべての中間状態を具現化するため、耐障害性（耐久性）を容易に確保できる。&lt;br&gt;
+データフローエンジンはHDFSに中間状態を具現化しないため、別の方法を使う。HDFSを使わないという意味ではない。元データはHDFSにある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ローカルにinputデータが残っていれば再計算する。なければHDFSから元データを取得して計算する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;再計算のために演算を追跡する。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;どの入力パーティションを使ったか、どの演算子を使ったかを追跡しなければならない。&lt;/li&gt;
+&lt;li&gt;SparkはRDD（Resilient Distributed Dataset）抽象化を使う。
+&lt;ul&gt;
+&lt;li&gt;RDD: 複数のデータ要素を集めたimmutableな分散コレクション。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Flinkは演算子の状態をチェックポイントとして残す。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;再計算時には&lt;strong&gt;冪等性&lt;/strong&gt;が保証されなければならない。&lt;/p&gt;
+&lt;p&gt;冪等性を保証するために注意すべき事項:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;データ検索などでハッシュテーブルを使う場合、ハッシュテーブルは特定の順序を保証しない。&lt;/li&gt;
+&lt;li&gt;演算ロジックが乱数に依存する場合、乱数が必要なら固定シードを使うなどして乱数を制御する。&lt;/li&gt;
+&lt;li&gt;システム時刻や外部データを使う場合、冪等性を保証できなくする原因を取り除く。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ただし、中間データのサイズが小さい場合や演算がCPUリソースを多く使う場合は、再計算よりも中間データを生成するほうが効果的なことがある。&lt;/p&gt;
+&lt;h4 id=&#34;具現化に関する議論&#34;&gt;具現化に関する議論&lt;/h4&gt;
+&lt;p&gt;内容の要約:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;先行作業の完了を待つ必要がない。パイプライン方式で実行できる。&lt;/li&gt;
+&lt;li&gt;すべての中間状態をHDFSに保存しなくてもよい。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;グラフと反復処理&#34;&gt;グラフと反復処理&lt;/h4&gt;
+&lt;p&gt;グラフデータモデルに対するバッチ処理の必要性が高まっている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PageRank: Webページの人気度を測定するアルゴリズム。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データフローエンジンでは、データ自体は典型的な&lt;strong&gt;リレーショナルタプル&lt;/strong&gt;で構成される。ある演算子から別の演算子へ向かうデータフローはグラフとして構成される。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一般には演算子を有向非巡回グラフとして配置する。&lt;/li&gt;
+&lt;li&gt;「データフロー」という名前のため、グラフではないかのような誤解を招くことがある。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;データはリレーショナルタプル（辺と頂点）として構成できるため、アルゴリズムを反復的な形で実装できる。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MapReduceでも実装できるが非効率である。&lt;/li&gt;
+&lt;li&gt;MapReduceはアルゴリズムの反復的な性質を考慮しない。
+&lt;ul&gt;
+&lt;li&gt;データを一回限りで処理する。&lt;/li&gt;
+&lt;li&gt;例: 「ある条件を満たすまでそのタスクを繰り返す」といった形式を自然に実装できない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;pregel処理モデル&#34;&gt;Pregel処理モデル&lt;/h4&gt;
+&lt;p&gt;バッチグラフ処理を最適化する方法として、BSP（Bulk Synchronous Parallel）演算モデルが広く使われる。&lt;/p&gt;
+&lt;p&gt;BSPの実装:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Apache Giraph&lt;/li&gt;
+&lt;li&gt;Spark GraphX&lt;/li&gt;
+&lt;li&gt;Flink Gelly API&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;BSPはPregelモデルとも呼ばれる。GoogleのPregel論文でグラフ処理方法論として紹介され、広く普及した。&lt;/p&gt;
+&lt;p&gt;Pregel = グラフ並列/分散処理フレームワーク。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;大規模なグラフを扱うことは非常に難しい。最適なアルゴリズムを選んでも、processing costが指数的に増加するのが一般的である。&lt;/li&gt;
+&lt;li&gt;グラフの分散処理のために使われる。&lt;/li&gt;
+&lt;li&gt;Pregel自体だけでも内容が非常に広範なため、Pregelの詳細説明と本の該当内容は省略する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;高水準apiと言語&#34;&gt;高水準APIと言語&lt;/h4&gt;
+&lt;p&gt;分散バッチ処理エンジンの発展:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数万台のマシンで構成されたクラスタで、PB（ペタバイト、1PB = 1,000TB）のデータを保存し処理するのに十分で堅牢になった。&lt;/li&gt;
+&lt;li&gt;技術が成熟し、技術で解決できる問題の範囲を広げることに注力するようになった。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;SparkとFlinkも独自の高水準データフローAPIを持っている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;高水準APIにより、実装する演算のコード量を減らせる。&lt;/li&gt;
+&lt;li&gt;対話的な利用もサポートし、コードの動作をすぐ確認できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;結論: 高水準APIを使うことでシステムの生産性を高め、作業をより効率的に実行できる。&lt;/p&gt;
+&lt;h4 id=&#34;宣言型クエリ言語への移行&#34;&gt;宣言型クエリ言語への移行&lt;/h4&gt;
+&lt;p&gt;結合が必要な演算では、結合を実行するコードを書くよりも、リレーショナル演算子として結合を表現するほうが、フレームワークが結合に使う適切なアルゴリズムを自動的に決定できるという利点がある。RDBのjoinに似ている。&lt;/p&gt;
+&lt;p&gt;Hive、Spark、Flinkはこのようなクエリオプティマイザを内蔵している。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ユーザーはさまざまな結合アルゴリズムをすべて知る必要も、どのアルゴリズムを使うか悩む必要もない。&lt;/li&gt;
+&lt;li&gt;宣言的な方法により、optimizerが最適な実行方法を決定する。&lt;/li&gt;
+&lt;li&gt;MapReduceの場合、ユーザーが直接コードを書けるという利点がある。ただし、CPUリソースのオーバーヘッドなどの短所もある。MapReduceとデータフローエンジンそれぞれの特徴として理解しよう。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;多様な分野を支援するための特殊化&#34;&gt;多様な分野を支援するための特殊化&lt;/h3&gt;
+&lt;p&gt;標準化された処理パターンが繰り返し現れる共通ケースは多い。そのため、再利用可能な共通ビルディングブロックを実装することは重要である。&lt;/p&gt;
+&lt;p&gt;統計学や数値アルゴリズムの分野でも、バッチ処理の重要性が高まっている。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;統計学や数値アルゴリズムの分野は、分類や推薦システムのような機械学習アプリケーションを構築するために必要である。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;上記の分野で再利用可能な実装を提供する技術:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Mahout: MapReduce、Spark、Flinkで実行されるさまざまな機械学習用アルゴリズム実装を持つ。&lt;/li&gt;
+&lt;li&gt;MADlib: リレーショナルMPP（Massively Parallel Processing）データベースに機械学習機能を追加できるオープンソースライブラリ。&lt;/li&gt;
+&lt;li&gt;k近傍法（k-nearest neighbor）アルゴリズム: 多次元空間で、与えられたアイテムに近いアイテムを探す一種の類似度検索アルゴリズム。
+&lt;ul&gt;
+&lt;li&gt;遺伝子解析アルゴリズムで重要に使われる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;バッチ処理システムは、組み込み機能と高水準の宣言的演算子の両方を持つため、広範な領域で必要とされるアルゴリズムを分散実行するために使われる。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
+      
+    </item>
+    
+    <item>
       <title>Apache HBase アーキテクチャ</title>
       <link>https://www.devkuma.com/jp/docs/hbase/architecture/</link>
       <pubDate>Fri, 08 Jul 2022 09:40:00 +0900</pubDate>
@@ -4644,6 +6893,106 @@ MemStore flush は &lt;code&gt;hbase.hregion.memstore.flush.size&lt;/code&gt; �
       <category>NoSQL</category>
       
       <category>HBase</category>
+      
+    </item>
+    
+    <item>
+      <title>データ指向アプリケーションデザイン | 第11章 ストリーム処理</title>
+      <link>https://www.devkuma.com/jp/docs/data-intensive-application/11/</link>
+      <pubDate>Fri, 29 Apr 2022 00:00:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/data-intensive-application/11/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;em&gt;発表者: キム・ギョンチョル、キム・ミンギュ&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;ストリームとは、時間の経過とともに少しずつ生成されるデータである。ストリーム処理は、データを集めて後で処理するバッチ処理とは異なり、イベントが発生するたびに処理する。イベントストリームは、増分処理できる時系列のビジネスイベントである。&lt;/p&gt;
+&lt;h2 id=&#34;イベントストリームの転送&#34;&gt;イベントストリームの転送&lt;/h2&gt;
+&lt;p&gt;イベントには、特定の時点で起きた事柄の詳細が含まれ、通常は時計に基づくイベント発生タイムスタンプを持つ。イベントの例には、ページ閲覧や商品購入などのユーザー行動、センサー値、CPUメトリクス、Webサーバーログの各行がある。&lt;/p&gt;
+&lt;p&gt;イベントはテキスト、JSON、バイナリデータとして符号化できる。ファイル、リレーショナルテーブル、ドキュメントデータベースへ書き込むことも、別ノードで処理するためネットワーク経由で送ることもできる。&lt;/p&gt;
+&lt;p&gt;プロデューサ、パブリッシャ、送信者はイベントを作る。コンシューマ、サブスクライバ、受信者はイベントを処理する。ストリームシステムでは、関連するイベントをトピックまたはストリームにまとめる。&lt;/p&gt;
+&lt;p&gt;バッチ処理では、1日分のデータを1日の終わりに処理することがある。ストリーム処理では、新しいイベントを継続的に確認して処理し、最後に処理した位置からの進捗も追跡する。&lt;/p&gt;
+&lt;h3 id=&#34;メッセージングシステム&#34;&gt;メッセージングシステム&lt;/h3&gt;
+&lt;p&gt;メッセージングシステムは、新しいイベントをコンシューマへ通知する。プロデューサはイベントを含むメッセージを送り、コンシューマはそれを受け取って処理する。&lt;/p&gt;
+&lt;p&gt;最も単純な方法は、UnixパイプやTCP接続のような直接通信チャネルである。メッセージングシステムはこれを一般化し、多数のプロデューサが同じトピックへメッセージを送り、多数のコンシューマがそこからメッセージを受け取れるようにする。&lt;/p&gt;
+&lt;p&gt;publish/subscribeシステムは、プロデューサがコンシューマの処理速度より速く送る場合の扱いを決めなければならない。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;メッセージを捨てる。&lt;/li&gt;
+&lt;li&gt;キューにバッファする。&lt;/li&gt;
+&lt;li&gt;バックプレッシャ、つまりフロー制御を適用してプロデューサを遅くする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ノードが故障したり一時的にオフラインになったりした場合の扱いも決める必要がある。耐久性には、メッセージをディスクへ書く、複製する、またはその両方が必要である。耐久性を避ければスループットとレイテンシは改善できるが、アプリケーションによってはメッセージ損失が許容できない。&lt;/p&gt;
+&lt;h4 id=&#34;直接メッセージング&#34;&gt;直接メッセージング&lt;/h4&gt;
+&lt;p&gt;一部のシステムは、中間ブローカーなしでプロデューサからコンシューマへ直接メッセージを送る。UDPマルチキャストはレイテンシに敏感な金融システムで使われ、アプリケーションレベルのプロトコルで失われたパケットを回復できる。ZeroMQやnanomsgは、TCPまたはIPマルチキャスト上でpublish/subscribeメッセージングを提供する。StatsDのようなメトリクスシステムはUDPメッセージングを使う。プロデューサがコンシューマのHTTPまたはRPCエンドポイントを直接呼ぶこともできる。&lt;/p&gt;
+&lt;p&gt;直接メッセージングの制約は、メッセージ損失やオフラインのコンシューマをアプリケーション側で扱わなければならない点である。コンシューマが利用できない間に送られたメッセージは失われる可能性がある。&lt;/p&gt;
+&lt;h4 id=&#34;メッセージブローカー&#34;&gt;メッセージブローカー&lt;/h4&gt;
+&lt;p&gt;メッセージブローカーは、プロデューサからメッセージを受け取り、コンシューマへ配送する代替手段である。メッセージストリームに最適化された一種のデータベースと見なせる。プロデューサとコンシューマは、ブローカーへクライアントとして接続する。&lt;/p&gt;
+&lt;p&gt;ブローカーはクライアント状態の変化を吸収する。メッセージをディスクへ書けば、ブローカー障害後も失われにくい。コンシューマが遅い場合、ブローカーはメッセージをバッファできるが、キューが増えるとメモリ、ディスク使用量、性能の問題が出る。&lt;/p&gt;
+&lt;p&gt;データベースと比べると、ブローカーは通常、配送または確認応答後にメッセージを削除する。保存データに対する任意のクエリではなく、逐次的なメッセージ配送に最適化されている。&lt;/p&gt;
+&lt;p&gt;メッセージブローカーにはRabbitMQ、ActiveMQ、Qpid、HornetQ、TIBCO Enterprise Message Service、IBM MQ、Azure Service Bus、Google Cloud Pub/Subなどがある。JMSはメッセージの送信、受信、読み取りのためのJava APIである。AMQPはメッセージ指向ミドルウェア向けのオープン標準アプリケーション層プロトコルである。&lt;/p&gt;
+&lt;h4 id=&#34;複数コンシューマ&#34;&gt;複数コンシューマ&lt;/h4&gt;
+&lt;p&gt;一般的なパターンは2つある。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ロードバランシング&lt;/strong&gt;: 各メッセージを1つのコンシューマへ配送し、作業を複数ノードに分散する。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ファンアウト&lt;/strong&gt;: 各メッセージをすべてのコンシューマへ配送し、独立した処理パイプラインを可能にする。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;コンシューマグループは両方の考え方を組み合わせる。各グループはすべてのメッセージを受け取るが、グループ内では各メッセージを1つのノードだけが処理する。&lt;/p&gt;
+&lt;h4 id=&#34;確認応答と再配送&#34;&gt;確認応答と再配送&lt;/h4&gt;
+&lt;p&gt;ブローカーがメッセージをコンシューマへ配送した後、コンシューマが処理前に失敗することがある。損失を防ぐため、コンシューマは処理成功を明示的に確認応答する。タイムアウトや切断までに確認応答を受け取れなければ、ブローカーはメッセージを再配送する。&lt;/p&gt;
+&lt;p&gt;再配送は順序を変える可能性がある。あるコンシューマが&lt;code&gt;m3&lt;/code&gt;の処理中に失敗し、別のコンシューマがすでに&lt;code&gt;m4&lt;/code&gt;を処理している場合、&lt;code&gt;m3&lt;/code&gt;は後で再配送され、&lt;code&gt;m4&lt;/code&gt;の後に処理されることがある。&lt;/p&gt;
+&lt;h3 id=&#34;パーティション化されたログ&#34;&gt;パーティション化されたログ&lt;/h3&gt;
+&lt;p&gt;従来のメッセージブローカーは、メッセージを一時的なものとして扱う。配送と確認応答の後、メッセージは削除され復旧できない。これに対し、データベースやファイルは誰かが削除するまでデータを保持する。&lt;/p&gt;
+&lt;p&gt;ログベースのブローカーは、メッセージをディスク上の追記専用列として保存する。プロデューサはログ末尾へメッセージを追記する。コンシューマはログを順に読み、末尾に到達したら新しいメッセージの通知を待つ。&lt;/p&gt;
+&lt;p&gt;スループットを上げるため、ログはパーティション化できる。各パーティションは別のマシンで提供できる。パーティション内では、ブローカーが各メッセージへ増加するオフセットを割り当てる。順序はパーティション内で保証され、パーティション間では保証されない。&lt;/p&gt;
+&lt;p&gt;Apache Kafka、Amazon Kinesis、Twitterの分散ログはこの方式を使う。非常に多くのメッセージを処理でき、メッセージを複製することで障害に耐えられる。&lt;/p&gt;
+&lt;h4 id=&#34;ログ方式と従来型メッセージングの比較&#34;&gt;ログ方式と従来型メッセージングの比較&lt;/h4&gt;
+&lt;p&gt;ログベースメッセージングは、コンシューマが独立してログを読み、読んでもメッセージが削除されないため、ファンアウトを支援する。ロードバランシングは通常、グループ内のコンシューマへパーティションを割り当てることで行う。&lt;/p&gt;
+&lt;p&gt;利点は高スループットと再生可能性である。欠点は、1つのグループ内のコンシューマ数がパーティション数に制限されること、遅いコンシューマが遅れ続ける可能性があることである。&lt;/p&gt;
+&lt;h4 id=&#34;コンシューマオフセット&#34;&gt;コンシューマオフセット&lt;/h4&gt;
+&lt;p&gt;コンシューマが1つのパーティションを順に処理するなら、進捗はオフセットで表せる。各メッセージの確認応答を追跡する必要はない。これによりオーバーヘッドが減り、バッチ処理とパイプライン化が可能になる。&lt;/p&gt;
+&lt;p&gt;オフセットはデータベースレプリケーションのログシーケンス番号に似ている。コンシューマが失敗した場合、グループ内の別のコンシューマが最後にコミットされたオフセットから再開できる。失敗したコンシューマがメッセージを処理したがオフセットをコミットしていなければ、そのメッセージは再処理される可能性がある。&lt;/p&gt;
+&lt;h4 id=&#34;ディスク領域と遅いコンシューマ&#34;&gt;ディスク領域と遅いコンシューマ&lt;/h4&gt;
+&lt;p&gt;ログベースのブローカーは通常、一定期間またはサイズ上限までメッセージを保持する。コンシューマが大きく遅れて必要なメッセージが削除されると、別のデータ源なしには追いつけない。そのため運用ではコンシューマラグの監視が必要である。&lt;/p&gt;
+&lt;h3 id=&#34;古いメッセージの再生&#34;&gt;古いメッセージの再生&lt;/h3&gt;
+&lt;p&gt;AMQPやJMS型のブローカーでは、メッセージを確認応答すると通常は削除される。ログベースのブローカーでは、メッセージを消費してもログは変わらない。コンシューマはオフセットを戻して古いメッセージを再生できる。これはデバッグ、派生データの再構築、新しいストリームプロセッサの導入に役立つ。&lt;/p&gt;
+&lt;h2 id=&#34;データベースとストリーム&#34;&gt;データベースとストリーム&lt;/h2&gt;
+&lt;p&gt;データベースとストリームは、データベース変更ログがイベントのストリームであるという点でつながっている。レプリケーションログ、write-ahead log、change data captureはいずれも変更を順序付きレコードとして公開する。&lt;/p&gt;
+&lt;h3 id=&#34;システムを同期させる&#34;&gt;システムを同期させる&lt;/h3&gt;
+&lt;p&gt;多くのアプリケーションは、データベース、キャッシュ、検索インデックス、分析システム、データウェアハウスなど複数のシステムにデータを持つ。アプリケーションが2つのシステムへ別々に書き込むdual writeは、途中で失敗して不整合を残すことがある。&lt;/p&gt;
+&lt;p&gt;Change data capture（CDC）は、データベースから変更ストリームを派生させ、それを他システムへ適用することでこの問題を解決する。データベースが真実の源となり、コンシューマが変更ストリームから派生システムを更新する。&lt;/p&gt;
+&lt;h3 id=&#34;イベントソーシング&#34;&gt;イベントソーシング&lt;/h3&gt;
+&lt;p&gt;イベントソーシングは、すべての変更を不変イベントとして保存する。現在状態だけを保存するのではなく、その状態に至ったイベント列を記録する。現在状態はイベントを再生することで再構築できる。&lt;/p&gt;
+&lt;p&gt;イベントソーシングは監査可能性や派生ビューと相性がよいが、古いイベントを理解できる状態に保つ必要があるため、スキーマ進化とイベント設計には注意が必要である。&lt;/p&gt;
+&lt;h3 id=&#34;状態ストリーム不変性&#34;&gt;状態、ストリーム、不変性&lt;/h3&gt;
+&lt;p&gt;可変状態は、不変イベントのストリームを適用した結果と見なせる。イベントログを保持すれば、状態の再構築、新しい派生ビューの作成、バグからの復旧が可能になる。完全な履歴が不要になった場合は、コンパクションで各キーの最新値だけを残せる。&lt;/p&gt;
+&lt;h2 id=&#34;ストリーム処理&#34;&gt;ストリーム処理&lt;/h2&gt;
+&lt;p&gt;ストリーム処理は、アラート送信、ダッシュボード更新、検索インデックス構築、キャッシュ更新、不正検知、イベント拡張、分析計算など多くの用途に使える。&lt;/p&gt;
+&lt;p&gt;ストリームプロセッサは入力ストリームを消費し、出力ストリームを生成するかデータベースを更新する。時間、結合、障害、exactly-onceな効果をどう扱うかを決めなければならない。&lt;/p&gt;
+&lt;h3 id=&#34;ストリーム処理の用途&#34;&gt;ストリーム処理の用途&lt;/h3&gt;
+&lt;p&gt;複合イベント処理はイベントストリーム内のパターンを探す。ストリーム分析はレート、パーセンタイル、移動集計などのメトリクスを計算する。マテリアライズドビューの維持は、ソースデータの変化に合わせて派生データを最新に保つ。&lt;/p&gt;
+&lt;h3 id=&#34;時間の扱い&#34;&gt;時間の扱い&lt;/h3&gt;
+&lt;p&gt;イベントは遅れて到着したり順不同で到着したりする。イベント時刻は実際にイベントが起きた時刻であり、処理時刻はプロセッサがそのイベントを見る時刻である。ウィンドウ処理はイベントを時間でまとめるが、遅延イベントによってウィンドウを閉じる判断が難しくなる。システムはウォーターマークや許容遅延を使い、正確性とレイテンシのバランスを取る。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/11_window.png&#34; alt=&#34;Window&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;ストリーム結合&#34;&gt;ストリーム結合&lt;/h3&gt;
+&lt;p&gt;ストリーム処理では、ストリームとテーブル、2つのストリーム、またはストリームと変化するテーブルを結合することがある。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/11_stream-table-join.jpeg&#34; alt=&#34;Stream-table join&#34;&gt;&lt;/p&gt;
+&lt;p&gt;ストリーム同士の結合では、後から到着する対応イベントを結合できるように、両側の最近のイベントを保持する必要がある。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/data-intensive-application/11_stream-stream-join.jpg&#34; alt=&#34;Stream-stream join&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;耐障害性&#34;&gt;耐障害性&lt;/h3&gt;
+&lt;p&gt;バッチ処理は入力ファイルが不変なので、失敗したタスクを再試行しやすい。ストリーム処理は継続的に動作し、副作用を持つことがあるため難しい。&lt;/p&gt;
+&lt;p&gt;at-least-once処理ではイベントが複数回処理されることがある。at-most-once処理ではイベントが失われることがある。exactly-once処理は通常、再生可能なログ、チェックポイント、決定的処理、冪等な書き込み、入力オフセットと出力書き込みの間のトランザクションによって実装される。&lt;/p&gt;
+&lt;h2 id=&#34;まとめ&#34;&gt;まとめ&lt;/h2&gt;
+&lt;p&gt;ストリーム処理は、継続的に発生するデータを第一級の入力として扱う。メッセージングシステムはイベントを配送し、ログベースのブローカーはそれを保持して再生可能にし、データベース変更ストリームは派生システムを同期させる。主な設計課題は、配送保証、順序、保持、時間の扱い、結合、状態管理、耐障害性である。&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>NoSQL</category>
+      
+      <category>Data</category>
+      
+      <category>RDB</category>
       
     </item>
     
