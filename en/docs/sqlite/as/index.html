@@ -1,0 +1,1712 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>SQLite | Query Data | Assign Column Aliases (AS Clause) | devkuma</title>
+<meta name="description" content="When querying a table with SELECT, the AS clause lets you display a column under a name different from its original name. This article explains how to assign column aliases.
+Assigning a Different Name with AS Use AS to assign a different name to a column in a SELECT result. The syntax is as follows.
+SELECT column_name AS alias ... FROM table_name; Place AS after the column name and specify its alias.">
+<meta property="og:url" content="https://www.devkuma.com/en/docs/sqlite/as/">
+	<meta property="og:site_name" content="devkuma">
+	<meta property="og:title" content="SQLite | Query Data | Assign Column Aliases (AS Clause)">
+	<meta property="og:description" content="When querying a table with SELECT, the AS clause lets you display a column under a name different from its original name. This article explains how to assign column aliases.
+Assigning a Different Name with AS Use AS to assign a different name to a column in a SELECT result. The syntax is as follows.
+SELECT column_name AS alias ... FROM table_name; Place AS after the column name and specify its alias.">
+	<meta property="og:locale" content="en">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="420_data-science_rdbms">
+		<meta property="article:published_time" content="2019-10-14T23:19:51+09:00">
+		<meta property="article:modified_time" content="2019-11-13T22:42:06+09:00">
+		<meta property="article:tag" content="SQLite">
+		<meta property="article:tag" content="Database">
+
+	<meta itemprop="name" content="SQLite | Query Data | Assign Column Aliases (AS Clause)">
+	<meta itemprop="description" content="When querying a table with SELECT, the AS clause lets you display a column under a name different from its original name. This article explains how to assign column aliases.
+Assigning a Different Name with AS Use AS to assign a different name to a column in a SELECT result. The syntax is as follows.
+SELECT column_name AS alias ... FROM table_name; Place AS after the column name and specify its alias.">
+	<meta itemprop="datePublished" content="2019-10-14T23:19:51+09:00">
+	<meta itemprop="dateModified" content="2019-11-13T22:42:06+09:00">
+	<meta itemprop="wordCount" content="444">
+	<meta itemprop="keywords" content="SQLite,Database">
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="SQLite | Query Data | Assign Column Aliases (AS Clause)">
+	<meta name="twitter:description" content="When querying a table with SELECT, the AS clause lets you display a column under a name different from its original name. This article explains how to assign column aliases.
+Assigning a Different Name with AS Use AS to assign a different name to a column in a SELECT result. The syntax is as follows.
+SELECT column_name AS alias ... FROM table_name; Place AS after the column name and specify its alias.">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/en/docs/sqlite/as/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/en/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/en/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/computer/basic/">Basic computer knowledge</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/spring/">Spring framework</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/web/">Web Programming</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/tools/">Programming Tools</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-database'></i>
+          <span>Data Science</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/big-data/">Big Data</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/rdb/">Relational Database</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/nosql/">NoSQL Database</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/graph-db/">Graph Databse</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/data-science/" role="button">
+          <span>Data Science</span>
+				</a>
+      </li>
+      
+			
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/en/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+      </li>
+      
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+      </li>
+      
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">English</span>
+    <span class="td-lang-menu__title-code">EN</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/sqlite/as/">한국어</a></li>
+      <li><span class="dropdown-item active">English</span></li>
+      <li><a class="dropdown-item" href="/jp/docs/sqlite/as/">日本語</a></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-endocssqliteas").addClass("active");
+    $("#td-section-nav #m-endocssqliteas-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-endocssqliteas").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-endocssqliteas-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-endocssqliteas-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocscategorydata-sciencerdb-li">
+    <a href="/en/docs/category/data-science/rdb/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-endocscategorydata-sciencerdb"><span class="">Relational Database</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsrdbms-li">
+    <input type="checkbox" id="m-endocsrdbms-check"/>
+    <label for="m-endocsrdbms-check"><a href="/en/docs/rdbms/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsrdbms"><span class="">Relational Database</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsrdbmsindex-li">
+    <input type="checkbox" id="m-endocsrdbmsindex-check"/>
+    <label for="m-endocsrdbmsindex-check"><a href="/en/docs/rdbms/index/" title="Database Index" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsrdbmsindex"><span class="">Index</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsrdbmstransaction-li">
+    <input type="checkbox" id="m-endocsrdbmstransaction-check"/>
+    <label for="m-endocsrdbmstransaction-check"><a href="/en/docs/rdbms/transaction/" title="Database Transaction" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsrdbmstransaction"><span class="">Transaction</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsrdbmsnormalization-li">
+    <input type="checkbox" id="m-endocsrdbmsnormalization-check"/>
+    <label for="m-endocsrdbmsnormalization-check"><a href="/en/docs/rdbms/normalization/" title="Database Normalization" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsrdbmsnormalization"><span class="">Normalization</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsrdbmstuning-li">
+    <input type="checkbox" id="m-endocsrdbmstuning-check"/>
+    <label for="m-endocsrdbmstuning-check"><a href="/en/docs/rdbms/tuning/" title="Database Tuning" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsrdbmstuning"><span class="">Tuning</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsrdbmslock-li">
+    <input type="checkbox" id="m-endocsrdbmslock-check"/>
+    <label for="m-endocsrdbmslock-check"><a href="/en/docs/rdbms/lock/" title="Database Lock" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsrdbmslock"><span class="">Lock</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssql-li">
+    <input type="checkbox" id="m-endocssql-check"/>
+    <label for="m-endocssql-check"><a href="/en/docs/sql/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssql"><span class="">SQL Basics</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlsql-li">
+    <input type="checkbox" id="m-endocssqlsql-check"/>
+    <label for="m-endocssqlsql-check"><a href="/en/docs/sql/sql/" title="SQL Basics | SQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlsql"><span class="">SQL</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlcomments-li">
+    <input type="checkbox" id="m-endocssqlcomments-check"/>
+    <label for="m-endocssqlcomments-check"><a href="/en/docs/sql/comments/" title="SQL Basics | SQL | Comments" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlcomments"><span class="">Comments</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlddl--eb8db0ec9db4ed84b0-eca095ec9d98-ec96b8ec96b4-li">
+    <input type="checkbox" id="m-endocssqlddl--eb8db0ec9db4ed84b0-eca095ec9d98-ec96b8ec96b4-check"/>
+    <label for="m-endocssqlddl--eb8db0ec9db4ed84b0-eca095ec9d98-ec96b8ec96b4-check"><a href="/en/docs/sql/ddl-:-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%95%EC%9D%98-%EC%96%B8%EC%96%B4/" title="SQL Basics | DDL: Data Definition Language" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlddl--eb8db0ec9db4ed84b0-eca095ec9d98-ec96b8ec96b4"><span class="">DDL: Data Definition Language</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqldatabase-li">
+    <input type="checkbox" id="m-endocssqldatabase-check"/>
+    <label for="m-endocssqldatabase-check"><a href="/en/docs/sql/database/" title="SQL Basics | DDL: Data Definition Language | DATABASE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqldatabase"><span class="">DATABASE</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqltable-li">
+    <input type="checkbox" id="m-endocssqltable-check"/>
+    <label for="m-endocssqltable-check"><a href="/en/docs/sql/table/" title="SQL Basics | DDL: Data Definition Language | TABLE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqltable"><span class="">TABLE</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlview-li">
+    <input type="checkbox" id="m-endocssqlview-check"/>
+    <label for="m-endocssqlview-check"><a href="/en/docs/sql/view/" title="SQL Basics | DDL: Data Definition Language | VIEW" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlview"><span class="">VIEW</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlindex-li">
+    <input type="checkbox" id="m-endocssqlindex-check"/>
+    <label for="m-endocssqlindex-check"><a href="/en/docs/sql/index/" title="SQL Basics | DDL: Data Definition Language | INDEX" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlindex"><span class="">INDEX</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlprimary-key-li">
+    <input type="checkbox" id="m-endocssqlprimary-key-check"/>
+    <label for="m-endocssqlprimary-key-check"><a href="/en/docs/sql/primary-key/" title="SQL Basics | DDL: Data Definition Language | Primary Key" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlprimary-key"><span class="">Primary Key</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlforeign-key-li">
+    <input type="checkbox" id="m-endocssqlforeign-key-check"/>
+    <label for="m-endocssqlforeign-key-check"><a href="/en/docs/sql/foreign-key/" title="SQL Basics | DDL: Data Definition Language | Foreign Key" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlforeign-key"><span class="">Foreign Key</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqldcl-li">
+    <input type="checkbox" id="m-endocssqldcl-check"/>
+    <label for="m-endocssqldcl-check"><a href="/en/docs/sql/dcl/" title="SQL Basics | DCL: Data Control Language" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqldcl"><span class="">DCL: Data Control Language</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqldml-li">
+    <input type="checkbox" id="m-endocssqldml-check"/>
+    <label for="m-endocssqldml-check"><a href="/en/docs/sql/dml/" title="SQL Basics | DML: Data Manipulation Language" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqldml"><span class="">DML: Data Manipulation Language</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlselect-li">
+    <input type="checkbox" id="m-endocssqlselect-check"/>
+    <label for="m-endocssqlselect-check"><a href="/en/docs/sql/select/" title="SQL Basics | DML: Data Manipulation Language | SELECT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlselect"><span class="">SELECT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqldistinct-li">
+    <input type="checkbox" id="m-endocssqldistinct-check"/>
+    <label for="m-endocssqldistinct-check"><a href="/en/docs/sql/distinct/" title="SQL Basics | DML: Data Manipulation Language | DISTINCT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqldistinct"><span class="">DISTINCT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlwhere-li">
+    <input type="checkbox" id="m-endocssqlwhere-check"/>
+    <label for="m-endocssqlwhere-check"><a href="/en/docs/sql/where/" title="SQL Basics | DML: Data Manipulation Language | WHERE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlwhere"><span class="">WHERE</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqland-or-li">
+    <input type="checkbox" id="m-endocssqland-or-check"/>
+    <label for="m-endocssqland-or-check"><a href="/en/docs/sql/and-or/" title="SQL Basics | DML: Data Manipulation Language | AND, OR" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqland-or"><span class="">AND, OR</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlin-not-in-li">
+    <input type="checkbox" id="m-endocssqlin-not-in-check"/>
+    <label for="m-endocssqlin-not-in-check"><a href="/en/docs/sql/in-not-in/" title="SQL Basics | DML: Data Manipulation Language | IN, NOT IN" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlin-not-in"><span class="">IN, NOT IN</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlbetween-li">
+    <input type="checkbox" id="m-endocssqlbetween-check"/>
+    <label for="m-endocssqlbetween-check"><a href="/en/docs/sql/between/" title="SQL Basics | DML: Data Manipulation Language | BETWEEN" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlbetween"><span class="">BETWEEN</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqllike-li">
+    <input type="checkbox" id="m-endocssqllike-check"/>
+    <label for="m-endocssqllike-check"><a href="/en/docs/sql/like/" title="SQL Basics | DML: Data Manipulation Language | LIKE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqllike"><span class="">LIKE</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlis-null-is-not-null-li">
+    <input type="checkbox" id="m-endocssqlis-null-is-not-null-check"/>
+    <label for="m-endocssqlis-null-is-not-null-check"><a href="/en/docs/sql/is-null-is-not-null/" title="SQL Basics | DML: Data Manipulation Language | IS NULL, IS NOT NULL" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlis-null-is-not-null"><span class="">IS NULL, IS NOT NULL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlexists-li">
+    <input type="checkbox" id="m-endocssqlexists-check"/>
+    <label for="m-endocssqlexists-check"><a href="/en/docs/sql/exists/" title="SQL Basics | DML: Data Manipulation Language | EXISTS" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlexists"><span class="">EXISTS</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlorder-by-li">
+    <input type="checkbox" id="m-endocssqlorder-by-check"/>
+    <label for="m-endocssqlorder-by-check"><a href="/en/docs/sql/order-by/" title="SQL Basics | DML: Data Manipulation Language | ORDER BY" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlorder-by"><span class="">ORDER BY</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlgroup-by-li">
+    <input type="checkbox" id="m-endocssqlgroup-by-check"/>
+    <label for="m-endocssqlgroup-by-check"><a href="/en/docs/sql/group-by/" title="SQL Basics | DML: Data Manipulation Language | GROUP BY" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlgroup-by"><span class="">GROUP BY</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlhaving-li">
+    <input type="checkbox" id="m-endocssqlhaving-check"/>
+    <label for="m-endocssqlhaving-check"><a href="/en/docs/sql/having/" title="SQL Basics | DML: Data Manipulation Language | HAVING" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlhaving"><span class="">HAVING</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlas--aliases-li">
+    <input type="checkbox" id="m-endocssqlas--aliases-check"/>
+    <label for="m-endocssqlas--aliases-check"><a href="/en/docs/sql/as--aliases/" title="SQL Basics | DML: Data Manipulation Language | AS - Aliases" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlas--aliases"><span class="">AS - Aliases</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqljoin-li">
+    <input type="checkbox" id="m-endocssqljoin-check"/>
+    <label for="m-endocssqljoin-check"><a href="/en/docs/sql/join/" title="SQL Basics | DML: Data Manipulation Language | JOIN" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqljoin"><span class="">JOIN</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlsubquery-li">
+    <input type="checkbox" id="m-endocssqlsubquery-check"/>
+    <label for="m-endocssqlsubquery-check"><a href="/en/docs/sql/subquery/" title="SQL Basics | DML: Data Manipulation Language | Subquery" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlsubquery"><span class="">Subquery</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlunion-union-all-li">
+    <input type="checkbox" id="m-endocssqlunion-union-all-check"/>
+    <label for="m-endocssqlunion-union-all-check"><a href="/en/docs/sql/union-union-all/" title="SQL Basics | DML: Data Manipulation Language | UNION, UNION ALL" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlunion-union-all"><span class="">UNION, UNION ALL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlintersect-li">
+    <input type="checkbox" id="m-endocssqlintersect-check"/>
+    <label for="m-endocssqlintersect-check"><a href="/en/docs/sql/intersect/" title="SQL Basics | DML: Data Manipulation Language | INTERSECT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlintersect"><span class="">INTERSECT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlminus-li">
+    <input type="checkbox" id="m-endocssqlminus-check"/>
+    <label for="m-endocssqlminus-check"><a href="/en/docs/sql/minus/" title="SQL Basics | DML: Data Manipulation Language | MINUS" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlminus"><span class="">MINUS</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlinsert-li">
+    <input type="checkbox" id="m-endocssqlinsert-check"/>
+    <label for="m-endocssqlinsert-check"><a href="/en/docs/sql/insert/" title="SQL Basics | DML: Data Manipulation Language | INSERT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlinsert"><span class="">INSERT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlupdate-li">
+    <input type="checkbox" id="m-endocssqlupdate-check"/>
+    <label for="m-endocssqlupdate-check"><a href="/en/docs/sql/update/" title="SQL Basics | DML: Data Manipulation Language | UPDATE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlupdate"><span class="">UPDATE</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqldelete-li">
+    <input type="checkbox" id="m-endocssqldelete-check"/>
+    <label for="m-endocssqldelete-check"><a href="/en/docs/sql/delete/" title="SQL Basics | DML: Data Manipulation Language | DELETE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqldelete"><span class="">DELETE</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqled95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqled95a8ec8898-check"/>
+    <label for="m-endocssqled95a8ec8898-check"><a href="/en/docs/sql/%ED%95%A8%EC%88%98/" title="SQL Basics | Functions" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqled95a8ec8898"><span class="">Functions</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlavg-ed8f89eab7a0-li">
+    <input type="checkbox" id="m-endocssqlavg-ed8f89eab7a0-check"/>
+    <label for="m-endocssqlavg-ed8f89eab7a0-check"><a href="/en/docs/sql/avg-%ED%8F%89%EA%B7%A0/" title="SQL Basics | Functions | AVG" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlavg-ed8f89eab7a0"><span class="">AVG</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlcount-ecb9b4ec9ab4ed8ab8-li">
+    <input type="checkbox" id="m-endocssqlcount-ecb9b4ec9ab4ed8ab8-check"/>
+    <label for="m-endocssqlcount-ecb9b4ec9ab4ed8ab8-check"><a href="/en/docs/sql/count-%EC%B9%B4%EC%9A%B4%ED%8A%B8/" title="SQL Basics | Functions | COUNT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlcount-ecb9b4ec9ab4ed8ab8"><span class="">COUNT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlmax-ecb59ceb8c80eab092-min-ecb59cec868ceab092-li">
+    <input type="checkbox" id="m-endocssqlmax-ecb59ceb8c80eab092-min-ecb59cec868ceab092-check"/>
+    <label for="m-endocssqlmax-ecb59ceb8c80eab092-min-ecb59cec868ceab092-check"><a href="/en/docs/sql/max-%EC%B5%9C%EB%8C%80%EA%B0%92-min-%EC%B5%9C%EC%86%8C%EA%B0%92/" title="SQL Basics | Functions | MAX, MIN" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlmax-ecb59ceb8c80eab092-min-ecb59cec868ceab092"><span class="">MAX, MIN</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlsum-li">
+    <input type="checkbox" id="m-endocssqlsum-check"/>
+    <label for="m-endocssqlsum-check"><a href="/en/docs/sql/sum/" title="SQL Basics | Functions | SUM" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlsum"><span class="">SUM</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlsubstring-li">
+    <input type="checkbox" id="m-endocssqlsubstring-check"/>
+    <label for="m-endocssqlsubstring-check"><a href="/en/docs/sql/substring/" title="SQL Basics | Functions | Substring" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlsubstring"><span class="">Substring</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlconcatenate-li">
+    <input type="checkbox" id="m-endocssqlconcatenate-check"/>
+    <label for="m-endocssqlconcatenate-check"><a href="/en/docs/sql/concatenate/" title="SQL Basics | Functions | Concatenate" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlconcatenate"><span class="">Concatenate</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqltrim-li">
+    <input type="checkbox" id="m-endocssqltrim-check"/>
+    <label for="m-endocssqltrim-check"><a href="/en/docs/sql/trim/" title="SQL Basics | Functions | Trim" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqltrim"><span class="">Trim</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlreplace-li">
+    <input type="checkbox" id="m-endocssqlreplace-check"/>
+    <label for="m-endocssqlreplace-check"><a href="/en/docs/sql/replace/" title="SQL Basics | Functions | Replace" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlreplace"><span class="">Replace</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsmysql-li">
+    <input type="checkbox" id="m-endocsmysql-check"/>
+    <label for="m-endocsmysql-check"><a href="/en/docs/mysql/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsmysql"><span class="">MySQL</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlinstall-li">
+    <input type="checkbox" id="m-endocsmysqlinstall-check"/>
+    <label for="m-endocsmysqlinstall-check"><a href="/en/docs/mysql/install/" title="MySQL | Installing MySQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlinstall"><span class="">Installing MySQL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlconnecting-to-a-database-from-the-console-li">
+    <input type="checkbox" id="m-endocsmysqlconnecting-to-a-database-from-the-console-check"/>
+    <label for="m-endocsmysqlconnecting-to-a-database-from-the-console-check"><a href="/en/docs/mysql/connecting-to-a-database-from-the-console/" title="MySQL | Connecting to a Database from the Console" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlconnecting-to-a-database-from-the-console"><span class="">Connecting to a Database from the Console</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlversion-li">
+    <input type="checkbox" id="m-endocsmysqlversion-check"/>
+    <label for="m-endocsmysqlversion-check"><a href="/en/docs/mysql/version/" title="MySQL | Checking the Version" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlversion"><span class="">Checking the Version</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlcreate-tables-and-add-delete-modify-columns-li">
+    <input type="checkbox" id="m-endocsmysqlcreate-tables-and-add-delete-modify-columns-check"/>
+    <label for="m-endocsmysqlcreate-tables-and-add-delete-modify-columns-check"><a href="/en/docs/mysql/create-tables-and-add-delete-modify-columns/" title="MySQL | Create Tables and Add, Delete, or Modify Columns" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlcreate-tables-and-add-delete-modify-columns"><span class="">Create Tables and Add, Delete, or Modify Columns</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqltable-creation-default-timestamp-error-li">
+    <input type="checkbox" id="m-endocsmysqltable-creation-default-timestamp-error-check"/>
+    <label for="m-endocsmysqltable-creation-default-timestamp-error-check"><a href="/en/docs/mysql/table-creation-default-timestamp-error/" title="MySQL | Table Creation Error Related to DEFAULT timestamp" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqltable-creation-default-timestamp-error"><span class="">Table Creation Error Related to DEFAULT timestamp</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlstrings-li">
+    <input type="checkbox" id="m-endocsmysqlstrings-check"/>
+    <label for="m-endocsmysqlstrings-check"><a href="/en/docs/mysql/strings/" title="MySQL | Strings" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlstrings"><span class="">Strings</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlwith-rollup-totals-li">
+    <input type="checkbox" id="m-endocsmysqlwith-rollup-totals-check"/>
+    <label for="m-endocsmysqlwith-rollup-totals-check"><a href="/en/docs/mysql/with-rollup-totals/" title="MySQL | Totals with WITH ROLLUP" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlwith-rollup-totals"><span class="">Totals with WITH ROLLUP</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsmysqlchange-null-value-sort-order-li">
+    <input type="checkbox" id="m-endocsmysqlchange-null-value-sort-order-check"/>
+    <label for="m-endocsmysqlchange-null-value-sort-order-check"><a href="/en/docs/mysql/change-null-value-sort-order/" title="MySQL | Change the Sort Order of NULL Values" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsmysqlchange-null-value-sort-order"><span class="">Change the Sort Order of NULL Values</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresql-li">
+    <input type="checkbox" id="m-endocspostgresql-check"/>
+    <label for="m-endocspostgresql-check"><a href="/en/docs/postgresql/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresql"><span class="">PostgreSQL</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlpostgresql-installation-li">
+    <input type="checkbox" id="m-endocspostgresqlpostgresql-installation-check"/>
+    <label for="m-endocspostgresqlpostgresql-installation-check"><a href="/en/docs/postgresql/postgresql-installation/" title="PostgreSQL | Installing PostgreSQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlpostgresql-installation"><span class="">Installing PostgreSQL</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlpostgresql-download-install-li">
+    <input type="checkbox" id="m-endocspostgresqlpostgresql-download-install-check"/>
+    <label for="m-endocspostgresqlpostgresql-download-install-check"><a href="/en/docs/postgresql/postgresql-download-install/" title="PostgreSQL | Installing PostgreSQL | Download and Install PostgreSQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlpostgresql-download-install"><span class="">Download and Install PostgreSQL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlpath-settings-li">
+    <input type="checkbox" id="m-endocspostgresqlpath-settings-check"/>
+    <label for="m-endocspostgresqlpath-settings-check"><a href="/en/docs/postgresql/path-settings/" title="PostgreSQL | Installing PostgreSQL | PATH Settings" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlpath-settings"><span class="">PATH Settings</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlstart-and-stop-windows-service-li">
+    <input type="checkbox" id="m-endocspostgresqlstart-and-stop-windows-service-check"/>
+    <label for="m-endocspostgresqlstart-and-stop-windows-service-check"><a href="/en/docs/postgresql/start-and-stop-windows-service/" title="PostgreSQL | Installing PostgreSQL | Start and Stop the Windows Service" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlstart-and-stop-windows-service"><span class="">Start and Stop the Windows Service</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlreferencing-postgresql-documentation-li">
+    <input type="checkbox" id="m-endocspostgresqlreferencing-postgresql-documentation-check"/>
+    <label for="m-endocspostgresqlreferencing-postgresql-documentation-check"><a href="/en/docs/postgresql/referencing-postgresql-documentation/" title="PostgreSQL | Installing PostgreSQL | Referencing PostgreSQL Documentation" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlreferencing-postgresql-documentation"><span class="">Referencing PostgreSQL Documentation</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlconnecting-to-postgresql-with-psql-li">
+    <input type="checkbox" id="m-endocspostgresqlconnecting-to-postgresql-with-psql-check"/>
+    <label for="m-endocspostgresqlconnecting-to-postgresql-with-psql-check"><a href="/en/docs/postgresql/connecting-to-postgresql-with-psql/" title="PostgreSQL | Connecting to PostgreSQL with psql" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlconnecting-to-postgresql-with-psql"><span class="">Connecting to PostgreSQL with psql</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlconnecting-and-disconnecting-from-postgresql-li">
+    <input type="checkbox" id="m-endocspostgresqlconnecting-and-disconnecting-from-postgresql-check"/>
+    <label for="m-endocspostgresqlconnecting-and-disconnecting-from-postgresql-check"><a href="/en/docs/postgresql/connecting-and-disconnecting-from-postgresql/" title="PostgreSQL | Connecting to PostgreSQL with psql | Connecting and Disconnecting from PostgreSQL" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlconnecting-and-disconnecting-from-postgresql"><span class="">Connecting and Disconnecting from PostgreSQL</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlhow-to-use-psql-options-and-option-list-li">
+    <input type="checkbox" id="m-endocspostgresqlhow-to-use-psql-options-and-option-list-check"/>
+    <label for="m-endocspostgresqlhow-to-use-psql-options-and-option-list-check"><a href="/en/docs/postgresql/how-to-use-psql-options-and-option-list/" title="PostgreSQL | Connecting to PostgreSQL with psql | How to Use psql Options and Option List" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlhow-to-use-psql-options-and-option-list"><span class="">How to Use psql Options and Option List</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqllist-of-psql-meta-commands-and-how-to-execute-them-li">
+    <input type="checkbox" id="m-endocspostgresqllist-of-psql-meta-commands-and-how-to-execute-them-check"/>
+    <label for="m-endocspostgresqllist-of-psql-meta-commands-and-how-to-execute-them-check"><a href="/en/docs/postgresql/list-of-psql-meta-commands-and-how-to-execute-them/" title="PostgreSQL | Connecting to PostgreSQL with psql | List of psql Meta-Commands and How to Execute Them" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqllist-of-psql-meta-commands-and-how-to-execute-them"><span class="">List of psql Meta-Commands and How to Execute Them</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlexecuting-sql-commands-in-psql-li">
+    <input type="checkbox" id="m-endocspostgresqlexecuting-sql-commands-in-psql-check"/>
+    <label for="m-endocspostgresqlexecuting-sql-commands-in-psql-check"><a href="/en/docs/postgresql/executing-sql-commands-in-psql/" title="PostgreSQL | Connecting to PostgreSQL with psql | Executing SQL Commands in psql" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlexecuting-sql-commands-in-psql"><span class="">Executing SQL Commands in psql</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlpostgresql-configuration-files-li">
+    <input type="checkbox" id="m-endocspostgresqlpostgresql-configuration-files-check"/>
+    <label for="m-endocspostgresqlpostgresql-configuration-files-check"><a href="/en/docs/postgresql/postgresql-configuration-files/" title="PostgreSQL | PostgreSQL Configuration Files" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlpostgresql-configuration-files"><span class="">PostgreSQL Configuration Files</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlhow-to-configure-the-postgresql-conf-file-li">
+    <input type="checkbox" id="m-endocspostgresqlhow-to-configure-the-postgresql-conf-file-check"/>
+    <label for="m-endocspostgresqlhow-to-configure-the-postgresql-conf-file-check"><a href="/en/docs/postgresql/how-to-configure-the-postgresql-conf-file/" title="PostgreSQL | PostgreSQL Configuration Files | How to Configure the postgresql.conf File" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlhow-to-configure-the-postgresql-conf-file"><span class="">How to Configure the postgresql.conf File</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlhow-to-configure-the-pg-hba-conf-file-li">
+    <input type="checkbox" id="m-endocspostgresqlhow-to-configure-the-pg-hba-conf-file-check"/>
+    <label for="m-endocspostgresqlhow-to-configure-the-pg-hba-conf-file-check"><a href="/en/docs/postgresql/how-to-configure-the-pg-hba-conf-file/" title="PostgreSQL | PostgreSQL Configuration Files | How to Configure the pg_hba.conf File" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlhow-to-configure-the-pg-hba-conf-file"><span class="">How to Configure the pg_hba.conf File</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlhow-to-configure-the-pg-ident-conf-file-li">
+    <input type="checkbox" id="m-endocspostgresqlhow-to-configure-the-pg-ident-conf-file-check"/>
+    <label for="m-endocspostgresqlhow-to-configure-the-pg-ident-conf-file-check"><a href="/en/docs/postgresql/how-to-configure-the-pg-ident-conf-file/" title="PostgreSQL | PostgreSQL Configuration Files | How to Configure the pg_ident.conf File" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlhow-to-configure-the-pg-ident-conf-file"><span class="">How to Configure the pg_ident.conf File</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlpostgresql-basic-syntax-li">
+    <input type="checkbox" id="m-endocspostgresqlpostgresql-basic-syntax-check"/>
+    <label for="m-endocspostgresqlpostgresql-basic-syntax-check"><a href="/en/docs/postgresql/postgresql-basic-syntax/" title="PostgreSQL | PostgreSQL Basic Syntax" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlpostgresql-basic-syntax"><span class="">PostgreSQL Basic Syntax</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlhow-to-enter-string-and-numeric-values-li">
+    <input type="checkbox" id="m-endocspostgresqlhow-to-enter-string-and-numeric-values-check"/>
+    <label for="m-endocspostgresqlhow-to-enter-string-and-numeric-values-check"><a href="/en/docs/postgresql/how-to-enter-string-and-numeric-values/" title="PostgreSQL | PostgreSQL Basic Syntax | How to Enter String and Numeric Values" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlhow-to-enter-string-and-numeric-values"><span class="">How to Enter String and Numeric Values</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlidentifiers-and-keywords-li">
+    <input type="checkbox" id="m-endocspostgresqlidentifiers-and-keywords-check"/>
+    <label for="m-endocspostgresqlidentifiers-and-keywords-check"><a href="/en/docs/postgresql/identifiers-and-keywords/" title="PostgreSQL | PostgreSQL Basic Syntax | Identifiers and Keywords" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlidentifiers-and-keywords"><span class="">Identifiers and Keywords</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlwriting-comments-li">
+    <input type="checkbox" id="m-endocspostgresqlwriting-comments-check"/>
+    <label for="m-endocspostgresqlwriting-comments-check"><a href="/en/docs/postgresql/writing-comments/" title="PostgreSQL | PostgreSQL Basic Syntax | Writing Comments" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlwriting-comments"><span class="">Writing Comments</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlusing-logical-operators-and-or-not-li">
+    <input type="checkbox" id="m-endocspostgresqlusing-logical-operators-and-or-not-check"/>
+    <label for="m-endocspostgresqlusing-logical-operators-and-or-not-check"><a href="/en/docs/postgresql/using-logical-operators-and-or-not/" title="PostgreSQL | PostgreSQL Basic Syntax | Using Logical Operators (AND, OR, NOT)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlusing-logical-operators-and-or-not"><span class="">Using Logical Operators (AND, OR, NOT)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlusing-comparison-operators-li">
+    <input type="checkbox" id="m-endocspostgresqlusing-comparison-operators-check"/>
+    <label for="m-endocspostgresqlusing-comparison-operators-check"><a href="/en/docs/postgresql/using-comparison-operators/" title="PostgreSQL | PostgreSQL Basic Syntax | Using Comparison Operators (&lt;, &gt;, =, BETWEEN, IS NULL)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlusing-comparison-operators"><span class="">Using Comparison Operators (&lt;, &gt;, =, BETWEEN, IS NULL)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlusing-arithmetic-operators-li">
+    <input type="checkbox" id="m-endocspostgresqlusing-arithmetic-operators-check"/>
+    <label for="m-endocspostgresqlusing-arithmetic-operators-check"><a href="/en/docs/postgresql/using-arithmetic-operators/" title="PostgreSQL | PostgreSQL Basic Syntax | Using Arithmetic Operators" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlusing-arithmetic-operators"><span class="">Using Arithmetic Operators</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqldata-types-li">
+    <input type="checkbox" id="m-endocspostgresqldata-types-check"/>
+    <label for="m-endocspostgresqldata-types-check"><a href="/en/docs/postgresql/data-types/" title="PostgreSQL | Data Types" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqldata-types"><span class="">Data Types</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlnumeric-types-integer-decimal-double-precision-etc-li">
+    <input type="checkbox" id="m-endocspostgresqlnumeric-types-integer-decimal-double-precision-etc-check"/>
+    <label for="m-endocspostgresqlnumeric-types-integer-decimal-double-precision-etc-check"><a href="/en/docs/postgresql/numeric-types-integer-decimal-double-precision-etc/" title="PostgreSQL | Data Types | Numeric Types (integer, decimal, double precision, etc.)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlnumeric-types-integer-decimal-double-precision-etc"><span class="">Numeric Types (integer, decimal, double precision, etc.)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlauto-incrementing-types-serial-etc-li">
+    <input type="checkbox" id="m-endocspostgresqlauto-incrementing-types-serial-etc-check"/>
+    <label for="m-endocspostgresqlauto-incrementing-types-serial-etc-check"><a href="/en/docs/postgresql/auto-incrementing-types-serial-etc/" title="PostgreSQL | Data Types | Auto-Incrementing Types (serial, etc.)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlauto-incrementing-types-serial-etc"><span class="">Auto-Incrementing Types (serial, etc.)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlstring-types-varchar-char-text-li">
+    <input type="checkbox" id="m-endocspostgresqlstring-types-varchar-char-text-check"/>
+    <label for="m-endocspostgresqlstring-types-varchar-char-text-check"><a href="/en/docs/postgresql/string-types-varchar-char-text/" title="PostgreSQL | Data Types | String Types (varchar, char, text)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlstring-types-varchar-char-text"><span class="">String Types (varchar, char, text)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlboolean-data-type-li">
+    <input type="checkbox" id="m-endocspostgresqlboolean-data-type-check"/>
+    <label for="m-endocspostgresqlboolean-data-type-check"><a href="/en/docs/postgresql/boolean-data-type/" title="PostgreSQL | Data Types | Boolean Data Type" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlboolean-data-type"><span class="">Boolean Data Type</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlnetwork-address-types-cidr-inet-macaddr-li">
+    <input type="checkbox" id="m-endocspostgresqlnetwork-address-types-cidr-inet-macaddr-check"/>
+    <label for="m-endocspostgresqlnetwork-address-types-cidr-inet-macaddr-check"><a href="/en/docs/postgresql/network-address-types-cidr-inet-macaddr/" title="PostgreSQL | Data Types | Network Address Types (cidr, inet, macaddr)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlnetwork-address-types-cidr-inet-macaddr"><span class="">Network Address Types (cidr, inet, macaddr)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqldatabase-li">
+    <input type="checkbox" id="m-endocspostgresqldatabase-check"/>
+    <label for="m-endocspostgresqldatabase-check"><a href="/en/docs/postgresql/database/" title="PostgreSQL | Database" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqldatabase"><span class="">Database</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlcreate-database-li">
+    <input type="checkbox" id="m-endocspostgresqlcreate-database-check"/>
+    <label for="m-endocspostgresqlcreate-database-check"><a href="/en/docs/postgresql/create-database/" title="PostgreSQL | Database | Create a Database (CREATE DATABASE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlcreate-database"><span class="">Create a Database (CREATE DATABASE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqllist-created-databases-li">
+    <input type="checkbox" id="m-endocspostgresqllist-created-databases-check"/>
+    <label for="m-endocspostgresqllist-created-databases-check"><a href="/en/docs/postgresql/list-created-databases/" title="PostgreSQL | Database | List Created Databases" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqllist-created-databases"><span class="">List Created Databases</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlconnect-to-specified-database-li">
+    <input type="checkbox" id="m-endocspostgresqlconnect-to-specified-database-check"/>
+    <label for="m-endocspostgresqlconnect-to-specified-database-check"><a href="/en/docs/postgresql/connect-to-specified-database/" title="PostgreSQL | Database | Connect to a Specified Database" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlconnect-to-specified-database"><span class="">Connect to a Specified Database</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlalter-database-li">
+    <input type="checkbox" id="m-endocspostgresqlalter-database-check"/>
+    <label for="m-endocspostgresqlalter-database-check"><a href="/en/docs/postgresql/alter-database/" title="PostgreSQL | Database | Modify a Database (ALTER DATABASE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlalter-database"><span class="">Modify a Database (ALTER DATABASE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqldrop-database-li">
+    <input type="checkbox" id="m-endocspostgresqldrop-database-check"/>
+    <label for="m-endocspostgresqldrop-database-check"><a href="/en/docs/postgresql/drop-database/" title="PostgreSQL | Database | Drop a Database (DROP DATABASE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqldrop-database"><span class="">Drop a Database (DROP DATABASE)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlschema-li">
+    <input type="checkbox" id="m-endocspostgresqlschema-check"/>
+    <label for="m-endocspostgresqlschema-check"><a href="/en/docs/postgresql/schema/" title="PostgreSQL | Schema" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlschema"><span class="">Schema</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqldatabase-schema-table-relationship-li">
+    <input type="checkbox" id="m-endocspostgresqldatabase-schema-table-relationship-check"/>
+    <label for="m-endocspostgresqldatabase-schema-table-relationship-check"><a href="/en/docs/postgresql/database-schema-table-relationship/" title="PostgreSQL | Schema | Relationship Between Databases, Schemas, and Tables" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqldatabase-schema-table-relationship"><span class="">Relationship Between Databases, Schemas, and Tables</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlcreate-schema-li">
+    <input type="checkbox" id="m-endocspostgresqlcreate-schema-check"/>
+    <label for="m-endocspostgresqlcreate-schema-check"><a href="/en/docs/postgresql/create-schema/" title="PostgreSQL | Schema | Create a Schema (CREATE SCHEMA)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlcreate-schema"><span class="">Create a Schema (CREATE SCHEMA)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqllist-created-schemas-li">
+    <input type="checkbox" id="m-endocspostgresqllist-created-schemas-check"/>
+    <label for="m-endocspostgresqllist-created-schemas-check"><a href="/en/docs/postgresql/list-created-schemas/" title="PostgreSQL | Schema | List Created Schemas" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqllist-created-schemas"><span class="">List Created Schemas</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlconfigure-schema-search-path-li">
+    <input type="checkbox" id="m-endocspostgresqlconfigure-schema-search-path-check"/>
+    <label for="m-endocspostgresqlconfigure-schema-search-path-check"><a href="/en/docs/postgresql/configure-schema-search-path/" title="PostgreSQL | Schema | Configure the Schema Search Path" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlconfigure-schema-search-path"><span class="">Configure the Schema Search Path</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlalter-schema-li">
+    <input type="checkbox" id="m-endocspostgresqlalter-schema-check"/>
+    <label for="m-endocspostgresqlalter-schema-check"><a href="/en/docs/postgresql/alter-schema/" title="PostgreSQL | Schema | Modify a Schema (ALTER SCHEMA)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlalter-schema"><span class="">Modify a Schema (ALTER SCHEMA)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqldrop-schema-li">
+    <input type="checkbox" id="m-endocspostgresqldrop-schema-check"/>
+    <label for="m-endocspostgresqldrop-schema-check"><a href="/en/docs/postgresql/drop-schema/" title="PostgreSQL | Schema | Drop a Schema (DROP SCHEMA)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqldrop-schema"><span class="">Drop a Schema (DROP SCHEMA)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlcreating-roles-users-li">
+    <input type="checkbox" id="m-endocspostgresqlcreating-roles-users-check"/>
+    <label for="m-endocspostgresqlcreating-roles-users-check"><a href="/en/docs/postgresql/creating-roles-users/" title="PostgreSQL | Creating Roles (Users)" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlcreating-roles-users"><span class="">Creating Roles (Users)</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlcreate-role-li">
+    <input type="checkbox" id="m-endocspostgresqlcreate-role-check"/>
+    <label for="m-endocspostgresqlcreate-role-check"><a href="/en/docs/postgresql/create-role/" title="PostgreSQL | Role (User) ROLE Creation | Create a Role (CREATE ROLE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlcreate-role"><span class="">Create a Role (CREATE ROLE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqllist-created-roles-li">
+    <input type="checkbox" id="m-endocspostgresqllist-created-roles-check"/>
+    <label for="m-endocspostgresqllist-created-roles-check"><a href="/en/docs/postgresql/list-created-roles/" title="PostgreSQL | Role (User) ROLE Creation | List Created Roles" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqllist-created-roles"><span class="">List Created Roles</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlchange-role-attributes-and-name-alter-role-li">
+    <input type="checkbox" id="m-endocspostgresqlchange-role-attributes-and-name-alter-role-check"/>
+    <label for="m-endocspostgresqlchange-role-attributes-and-name-alter-role-check"><a href="/en/docs/postgresql/change-role-attributes-and-name-alter-role/" title="PostgreSQL | Role (User) ROLE Creation | Change Role Attributes and Name (ALTER ROLE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlchange-role-attributes-and-name-alter-role"><span class="">Change Role Attributes and Name (ALTER ROLE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlrename-role-alter-role-li">
+    <input type="checkbox" id="m-endocspostgresqlrename-role-alter-role-check"/>
+    <label for="m-endocspostgresqlrename-role-alter-role-check"><a href="/en/docs/postgresql/rename-role-alter-role/" title="PostgreSQL | Role (User) ROLE Creation | Rename a Role (ALTER ROLE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlrename-role-alter-role"><span class="">Rename a Role (ALTER ROLE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlset-role-password-expiration-alter-role-li">
+    <input type="checkbox" id="m-endocspostgresqlset-role-password-expiration-alter-role-check"/>
+    <label for="m-endocspostgresqlset-role-password-expiration-alter-role-check"><a href="/en/docs/postgresql/set-role-password-expiration-alter-role/" title="PostgreSQL | Role (User) ROLE Creation | Set Role Password Expiration (ALTER ROLE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlset-role-password-expiration-alter-role"><span class="">Set Role Password Expiration (ALTER ROLE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlgrant-privileges-on-tables-views-etc-li">
+    <input type="checkbox" id="m-endocspostgresqlgrant-privileges-on-tables-views-etc-check"/>
+    <label for="m-endocspostgresqlgrant-privileges-on-tables-views-etc-check"><a href="/en/docs/postgresql/grant-privileges-on-tables-views-etc/" title="PostgreSQL | Role (User) ROLE Creation | Grant Privileges on Tables, Views, and Other Objects (GRANT)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlgrant-privileges-on-tables-views-etc"><span class="">Grant Privileges on Tables, Views, and Other Objects (GRANT)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlrevoke-role-privileges-li">
+    <input type="checkbox" id="m-endocspostgresqlrevoke-role-privileges-check"/>
+    <label for="m-endocspostgresqlrevoke-role-privileges-check"><a href="/en/docs/postgresql/revoke-role-privileges/" title="PostgreSQL | Role (User) ROLE Creation | Remove Role Privileges (REVOKE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlrevoke-role-privileges"><span class="">Remove Role Privileges (REVOKE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlreassign-owned-objects-to-another-role-li">
+    <input type="checkbox" id="m-endocspostgresqlreassign-owned-objects-to-another-role-check"/>
+    <label for="m-endocspostgresqlreassign-owned-objects-to-another-role-check"><a href="/en/docs/postgresql/reassign-owned-objects-to-another-role/" title="PostgreSQL | Role (User) ROLE Creation | Change Ownership of Objects Owned by a Specified Role to Another Role (REASSIGN OWNED)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlreassign-owned-objects-to-another-role"><span class="">Change Ownership of Objects Owned by a Specified Role to Another Role (REASSIGN OWNED)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocspostgresqlterminal-command-collection-li">
+    <input type="checkbox" id="m-endocspostgresqlterminal-command-collection-check"/>
+    <label for="m-endocspostgresqlterminal-command-collection-check"><a href="/en/docs/postgresql/terminal-command-collection/" title="PostgreSQL | Terminal Command Collection" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlterminal-command-collection"><span class="">Terminal Command Collection</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlinitdb-li">
+    <input type="checkbox" id="m-endocspostgresqlinitdb-check"/>
+    <label for="m-endocspostgresqlinitdb-check"><a href="/en/docs/postgresql/initdb/" title="PostgreSQL | Terminal Command Collection | Initialize (initdb)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlinitdb"><span class="">Initialize (initdb)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlbackup-pgdump-li">
+    <input type="checkbox" id="m-endocspostgresqlbackup-pgdump-check"/>
+    <label for="m-endocspostgresqlbackup-pgdump-check"><a href="/en/docs/postgresql/backup-pgdump/" title="PostgreSQL | Terminal Command Collection | Backup (pg_dump)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocspostgresqlbackup-pgdump"><span class="">Backup (pg_dump)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlalter-constraints-and-table-names-li">
+    <input type="checkbox" id="m-endocspostgresqlalter-constraints-and-table-names-check"/>
+    <label for="m-endocspostgresqlalter-constraints-and-table-names-check"><a href="/en/docs/postgresql/alter-constraints-and-table-names/" title="PostgreSQL | ALTER Constraints and Table Names" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlalter-constraints-and-table-names"><span class="">ALTER Constraints and Table Names</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlusing-sequences-li">
+    <input type="checkbox" id="m-endocspostgresqlusing-sequences-check"/>
+    <label for="m-endocspostgresqlusing-sequences-check"><a href="/en/docs/postgresql/using-sequences/" title="PostgreSQL | Using Sequences" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlusing-sequences"><span class="">Using Sequences</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlusing-rownum-with-row-number-li">
+    <input type="checkbox" id="m-endocspostgresqlusing-rownum-with-row-number-check"/>
+    <label for="m-endocspostgresqlusing-rownum-with-row-number-check"><a href="/en/docs/postgresql/using-rownum-with-row-number/" title="PostgreSQL | Using ROWNUM with row_number()" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlusing-rownum-with-row-number"><span class="">Using ROWNUM with row_number()</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqltrigger-usage-example-li">
+    <input type="checkbox" id="m-endocspostgresqltrigger-usage-example-check"/>
+    <label for="m-endocspostgresqltrigger-usage-example-check"><a href="/en/docs/postgresql/trigger-usage-example/" title="PostgreSQL | Trigger Usage Example" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqltrigger-usage-example"><span class="">Trigger Usage Example</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlfunctions-li">
+    <input type="checkbox" id="m-endocspostgresqlfunctions-check"/>
+    <label for="m-endocspostgresqlfunctions-check"><a href="/en/docs/postgresql/functions/" title="PostgreSQL | Functions" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlfunctions"><span class="">Functions</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocspostgresqlquery-foreign-key-table-and-column-lists-li">
+    <input type="checkbox" id="m-endocspostgresqlquery-foreign-key-table-and-column-lists-check"/>
+    <label for="m-endocspostgresqlquery-foreign-key-table-and-column-lists-check"><a href="/en/docs/postgresql/query-foreign-key-table-and-column-lists/" title="PostgreSQL | Query Foreign Key Table and Column Lists" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocspostgresqlquery-foreign-key-table-and-column-lists"><span class="">Query Foreign Key Table and Column Lists</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlite-li">
+    <input type="checkbox" id="m-endocssqlite-check"/>
+    <label for="m-endocssqlite-check"><a href="/en/docs/sqlite/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlite"><span class="">SQLite</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitesqlite-install-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-install-check"/>
+    <label for="m-endocssqlitesqlite-install-check"><a href="/en/docs/sqlite/sqlite-install/" title="SQLite | Installing SQLite" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitesqlite-install"><span class="">Installing SQLite</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesqlite-ecbba4eba7a8eb939c-eb9dbcec9db8-eb8f84eab5ac-eb8ba4ec9ab4eba19ceb939c-ebb08f-ec84a4ecb998-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-ecbba4eba7a8eb939c-eb9dbcec9db8-eb8f84eab5ac-eb8ba4ec9ab4eba19ceb939c-ebb08f-ec84a4ecb998-check"/>
+    <label for="m-endocssqlitesqlite-ecbba4eba7a8eb939c-eb9dbcec9db8-eb8f84eab5ac-eb8ba4ec9ab4eba19ceb939c-ebb08f-ec84a4ecb998-check"><a href="/en/docs/sqlite/sqlite-%EC%BB%A4%EB%A7%A8%EB%93%9C-%EB%9D%BC%EC%9D%B8-%EB%8F%84%EA%B5%AC-%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-%EB%B0%8F-%EC%84%A4%EC%B9%98/" title="SQLite | Installing SQLite | Downloading and Installing the SQLite Command-Line Tool" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesqlite-ecbba4eba7a8eb939c-eb9dbcec9db8-eb8f84eab5ac-eb8ba4ec9ab4eba19ceb939c-ebb08f-ec84a4ecb998"><span class="">Downloading and Installing the SQLite Command-Line Tool</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesqlite-cli-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-cli-check"/>
+    <label for="m-endocssqlitesqlite-cli-check"><a href="/en/docs/sqlite/sqlite-cli/" title="SQLite | Installing SQLite | Testing the SQLite Command-Line Tool" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesqlite-cli"><span class="">Testing the SQLite Command-Line Tool</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesqlite3-dll-download-li">
+    <input type="checkbox" id="m-endocssqlitesqlite3-dll-download-check"/>
+    <label for="m-endocssqlitesqlite3-dll-download-check"><a href="/en/docs/sqlite/sqlite3-dll-download/" title="SQLite | Installing SQLite | Downloading sqlite3.dll" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesqlite3-dll-download"><span class="">Downloading sqlite3.dll</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesqlite-docs-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-docs-check"/>
+    <label for="m-endocssqlitesqlite-docs-check"><a href="/en/docs/sqlite/sqlite-docs/" title="SQLite | Installing SQLite | Referencing the SQLite Documentation" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesqlite-docs"><span class="">Referencing the SQLite Documentation</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitebasic-li">
+    <input type="checkbox" id="m-endocssqlitebasic-check"/>
+    <label for="m-endocssqlitebasic-check"><a href="/en/docs/sqlite/basic/" title="SQLite | SQLite Basic Knowledge" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitebasic"><span class="">SQLite Basic Knowledge</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecli-sql-command-li">
+    <input type="checkbox" id="m-endocssqlitecli-sql-command-check"/>
+    <label for="m-endocssqlitecli-sql-command-check"><a href="/en/docs/sqlite/cli-sql-command/" title="SQLite | SQLite Basic Knowledge | How to Enter SQL Statements and Commands in the Command-Line Tool" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecli-sql-command"><span class="">How to Enter SQL Statements and Commands in the Command-Line Tool</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesqlite-keywords-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-keywords-check"/>
+    <label for="m-endocssqlitesqlite-keywords-check"><a href="/en/docs/sqlite/sqlite-keywords/" title="SQLite | SQLite Basic Knowledge | Notes on Keywords Defined in SQLite" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesqlite-keywords"><span class="">Notes on Keywords Defined in SQLite</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesql-comment-li">
+    <input type="checkbox" id="m-endocssqlitesql-comment-check"/>
+    <label for="m-endocssqlitesql-comment-check"><a href="/en/docs/sqlite/sql-comment/" title="SQLite | SQLite Basic Knowledge | Writing Comments in SQL Statements" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesql-comment"><span class="">Writing Comments in SQL Statements</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitedatabase-li">
+    <input type="checkbox" id="m-endocssqlitedatabase-check"/>
+    <label for="m-endocssqlitedatabase-check"><a href="/en/docs/sqlite/database/" title="SQLite | Database" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitedatabase"><span class="">Database</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecreate-connect-database-li">
+    <input type="checkbox" id="m-endocssqlitecreate-connect-database-check"/>
+    <label for="m-endocssqlitecreate-connect-database-check"><a href="/en/docs/sqlite/create-connect-database/" title="SQLite | Database | Creating and Connecting to a Database" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecreate-connect-database"><span class="">Creating and Connecting to a Database</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecheck-connected-databases-li">
+    <input type="checkbox" id="m-endocssqlitecheck-connected-databases-check"/>
+    <label for="m-endocssqlitecheck-connected-databases-check"><a href="/en/docs/sqlite/check-connected-databases/" title="SQLite | Database | Checking Connected Databases" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecheck-connected-databases"><span class="">Checking Connected Databases</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedatabase-backup-delete-li">
+    <input type="checkbox" id="m-endocssqlitedatabase-backup-delete-check"/>
+    <label for="m-endocssqlitedatabase-backup-delete-check"><a href="/en/docs/sqlite/database-backup-delete/" title="SQLite | Database | Backing Up and Deleting a Database" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedatabase-backup-delete"><span class="">Backing Up and Deleting a Database</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedatabase-vacuum-li">
+    <input type="checkbox" id="m-endocssqlitedatabase-vacuum-check"/>
+    <label for="m-endocssqlitedatabase-vacuum-check"><a href="/en/docs/sqlite/database-vacuum/" title="SQLite | Database | Reclaiming Free Space (VACUUM)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedatabase-vacuum"><span class="">Reclaiming Free Space (VACUUM)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitedata-type-li">
+    <input type="checkbox" id="m-endocssqlitedata-type-check"/>
+    <label for="m-endocssqlitedata-type-check"><a href="/en/docs/sqlite/data-type/" title="SQLite | Data Types" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitedata-type"><span class="">Data Types</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedate-typeintro-li">
+    <input type="checkbox" id="m-endocssqlitedate-typeintro-check"/>
+    <label for="m-endocssqlitedate-typeintro-check"><a href="/en/docs/sqlite/date-type/intro/" title="SQLite | Data Type | Data Types Available in SQLite" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedate-typeintro"><span class="">Data Types Available in SQLite</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitestored-value-types-li">
+    <input type="checkbox" id="m-endocssqlitestored-value-types-check"/>
+    <label for="m-endocssqlitestored-value-types-check"><a href="/en/docs/sqlite/stored-value-types/" title="SQLite | Data Types | Inspect the Data Type of Stored Values" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitestored-value-types"><span class="">Inspect the Data Type of Stored Values</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitestring-escape-li">
+    <input type="checkbox" id="m-endocssqlitestring-escape-check"/>
+    <label for="m-endocssqlitestring-escape-check"><a href="/en/docs/sqlite/string-escape/" title="SQLite | Data Type | Escaping Strings" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitestring-escape"><span class="">Escaping Strings</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitetable-li">
+    <input type="checkbox" id="m-endocssqlitetable-check"/>
+    <label for="m-endocssqlitetable-check"><a href="/en/docs/sqlite/table/" title="SQLite | Table" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitetable"><span class="">Table</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteed858cec9db4ebb894-ec839dec84b1-li">
+    <input type="checkbox" id="m-endocssqliteed858cec9db4ebb894-ec839dec84b1-check"/>
+    <label for="m-endocssqliteed858cec9db4ebb894-ec839dec84b1-check"><a href="/en/docs/sqlite/%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%83%9D%EC%84%B1/" title="SQLite | Tables | Creating a Table" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteed858cec9db4ebb894-ec839dec84b1"><span class="">Creating a Table</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteed858cec9db4ebb894-ec8aa4ed82a4eba788-eab5aceca1b0-ed9995ec9db8-li">
+    <input type="checkbox" id="m-endocssqliteed858cec9db4ebb894-ec8aa4ed82a4eba788-eab5aceca1b0-ed9995ec9db8-check"/>
+    <label for="m-endocssqliteed858cec9db4ebb894-ec8aa4ed82a4eba788-eab5aceca1b0-ed9995ec9db8-check"><a href="/en/docs/sqlite/%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%8A%A4%ED%82%A4%EB%A7%88-%EA%B5%AC%EC%A1%B0-%ED%99%95%EC%9D%B8/" title="SQLite | Table | Inspecting a Table Schema" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteed858cec9db4ebb894-ec8aa4ed82a4eba788-eab5aceca1b0-ed9995ec9db8"><span class="">Inspecting a Table Schema</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitealter-table-li">
+    <input type="checkbox" id="m-endocssqlitealter-table-check"/>
+    <label for="m-endocssqlitealter-table-check"><a href="/en/docs/sqlite/alter-table/" title="SQLite | Tables | Rename a Table and Add or Remove Columns" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitealter-table"><span class="">Rename a Table and Add or Remove Columns</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteed858cec9db4ebb894-ec82adeca09c-li">
+    <input type="checkbox" id="m-endocssqliteed858cec9db4ebb894-ec82adeca09c-check"/>
+    <label for="m-endocssqliteed858cec9db4ebb894-ec82adeca09c-check"><a href="/en/docs/sqlite/%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%82%AD%EC%A0%9C/" title="SQLite | Table | Dropping a Table" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteed858cec9db4ebb894-ec82adeca09c"><span class="">Dropping a Table</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitenot-null-eca09cec95bd-eca1b0eab1b4-li">
+    <input type="checkbox" id="m-endocssqlitenot-null-eca09cec95bd-eca1b0eab1b4-check"/>
+    <label for="m-endocssqlitenot-null-eca09cec95bd-eca1b0eab1b4-check"><a href="/en/docs/sqlite/not-null-%EC%A0%9C%EC%95%BD-%EC%A1%B0%EA%B1%B4/" title="SQLite | Table | NOT NULL Constraint" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitenot-null-eca09cec95bd-eca1b0eab1b4"><span class="">NOT NULL Constraint</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteunique-constraint-li">
+    <input type="checkbox" id="m-endocssqliteunique-constraint-check"/>
+    <label for="m-endocssqliteunique-constraint-check"><a href="/en/docs/sqlite/unique-constraint/" title="SQLite | Tables | UNIQUE Constraint" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteunique-constraint"><span class="">UNIQUE Constraint</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedefault-constraint-li">
+    <input type="checkbox" id="m-endocssqlitedefault-constraint-check"/>
+    <label for="m-endocssqlitedefault-constraint-check"><a href="/en/docs/sqlite/default-constraint/" title="SQLite | Tables | DEFAULT Constraint" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedefault-constraint"><span class="">DEFAULT Constraint</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecheck-constraint-li">
+    <input type="checkbox" id="m-endocssqlitecheck-constraint-check"/>
+    <label for="m-endocssqlitecheck-constraint-check"><a href="/en/docs/sqlite/check-constraint/" title="SQLite | Tables | CHECK Constraint" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecheck-constraint"><span class="">CHECK Constraint</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqliteview-li">
+    <input type="checkbox" id="m-endocssqliteview-check"/>
+    <label for="m-endocssqliteview-check"><a href="/en/docs/sqlite/view/" title="SQLite | View" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqliteview"><span class="">View</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecreate-view-li">
+    <input type="checkbox" id="m-endocssqlitecreate-view-check"/>
+    <label for="m-endocssqlitecreate-view-check"><a href="/en/docs/sqlite/create-view/" title="SQLite | Views | Create a View" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecreate-view"><span class="">Create a View</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedrop-view-li">
+    <input type="checkbox" id="m-endocssqlitedrop-view-check"/>
+    <label for="m-endocssqlitedrop-view-check"><a href="/en/docs/sqlite/drop-view/" title="SQLite | View | Dropping a View" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedrop-view"><span class="">Dropping a View</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqliteindex-li">
+    <input type="checkbox" id="m-endocssqliteindex-check"/>
+    <label for="m-endocssqliteindex-check"><a href="/en/docs/sqlite/index/" title="SQLite | Index" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqliteindex"><span class="">Index</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteindex-intro-li">
+    <input type="checkbox" id="m-endocssqliteindex-intro-check"/>
+    <label for="m-endocssqliteindex-intro-check"><a href="/en/docs/sqlite/index-intro/" title="SQLite | Index | What Indexes Are and Their Pros and Cons" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteindex-intro"><span class="">What Indexes Are and Their Pros and Cons</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecreate-index-li">
+    <input type="checkbox" id="m-endocssqlitecreate-index-check"/>
+    <label for="m-endocssqlitecreate-index-check"><a href="/en/docs/sqlite/create-index/" title="SQLite | Indexes | Creating an Index" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecreate-index"><span class="">Creating an Index</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecreate-unique-index-li">
+    <input type="checkbox" id="m-endocssqlitecreate-unique-index-check"/>
+    <label for="m-endocssqlitecreate-unique-index-check"><a href="/en/docs/sqlite/create-unique-index/" title="SQLite | Indexes | Creating a UNIQUE Index" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecreate-unique-index"><span class="">Creating a UNIQUE Index</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteindex-schema-li">
+    <input type="checkbox" id="m-endocssqliteindex-schema-check"/>
+    <label for="m-endocssqliteindex-schema-check"><a href="/en/docs/sqlite/index-schema/" title="SQLite | Indexes | Viewing an Index Schema" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteindex-schema"><span class="">Viewing an Index Schema</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedrop-index-li">
+    <input type="checkbox" id="m-endocssqlitedrop-index-check"/>
+    <label for="m-endocssqlitedrop-index-check"><a href="/en/docs/sqlite/drop-index/" title="SQLite | Index | Dropping an Index" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedrop-index"><span class="">Dropping an Index</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitetrigger-li">
+    <input type="checkbox" id="m-endocssqlitetrigger-check"/>
+    <label for="m-endocssqlitetrigger-check"><a href="/en/docs/sqlite/trigger/" title="SQLite | Trigger" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitetrigger"><span class="">Trigger</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitetrigger-schema-li">
+    <input type="checkbox" id="m-endocssqlitetrigger-schema-check"/>
+    <label for="m-endocssqlitetrigger-schema-check"><a href="/en/docs/sqlite/trigger-schema/" title="SQLite | Trigger | Inspect a Trigger Schema" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitetrigger-schema"><span class="">Inspect a Trigger Schema</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedrop-trigger-li">
+    <input type="checkbox" id="m-endocssqlitedrop-trigger-check"/>
+    <label for="m-endocssqlitedrop-trigger-check"><a href="/en/docs/sqlite/drop-trigger/" title="SQLite | Triggers | Dropping a Trigger" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedrop-trigger"><span class="">Dropping a Trigger</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqliteinsert-update-delete-li">
+    <input type="checkbox" id="m-endocssqliteinsert-update-delete-check"/>
+    <label for="m-endocssqliteinsert-update-delete-check"><a href="/en/docs/sqlite/insert-update-delete/" title="SQLite | Adding, Updating, and Deleting Data" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqliteinsert-update-delete"><span class="">Adding, Updating, and Deleting Data</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteinsert-select-li">
+    <input type="checkbox" id="m-endocssqliteinsert-select-check"/>
+    <label for="m-endocssqliteinsert-select-check"><a href="/en/docs/sqlite/insert-select/" title="SQLite | Inserting, Updating, and Deleting Data | Inserting Data Selected from Another Table" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteinsert-select"><span class="">Inserting Data Selected from Another Table</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteupdate-li">
+    <input type="checkbox" id="m-endocssqliteupdate-check"/>
+    <label for="m-endocssqliteupdate-check"><a href="/en/docs/sqlite/update/" title="SQLite | Insert, Update, and Delete Data | Update Data (UPDATE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteupdate"><span class="">Update Data (UPDATE)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedelete-li">
+    <input type="checkbox" id="m-endocssqlitedelete-check"/>
+    <label for="m-endocssqlitedelete-check"><a href="/en/docs/sqlite/delete/" title="SQLite | Adding, Updating, and Deleting Data | Deleting Data (DELETE)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedelete"><span class="">Deleting Data (DELETE Statement)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitequerying-data-li">
+    <input type="checkbox" id="m-endocssqlitequerying-data-check"/>
+    <label for="m-endocssqlitequerying-data-check"><a href="/en/docs/sqlite/querying-data/" title="SQLite | Querying Data" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitequerying-data"><span class="">Querying Data</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteselect-li">
+    <input type="checkbox" id="m-endocssqliteselect-check"/>
+    <label for="m-endocssqliteselect-check"><a href="/en/docs/sqlite/select/" title="SQLite | Query Data | Retrieve Data with SELECT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteselect"><span class="">Retrieve Data with SELECT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteorder-by-li">
+    <input type="checkbox" id="m-endocssqliteorder-by-check"/>
+    <label for="m-endocssqliteorder-by-check"><a href="/en/docs/sqlite/order-by/" title="SQLite | Query Data | Sort Rows by Column Values (ORDER BY)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteorder-by"><span class="">Sort Rows by Column Values (ORDER BY)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitebetween-li">
+    <input type="checkbox" id="m-endocssqlitebetween-check"/>
+    <label for="m-endocssqlitebetween-check"><a href="/en/docs/sqlite/between/" title="SQLite | Query Data | Compare Against a Range of Values (BETWEEN Clause)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitebetween"><span class="">Compare Against a Range of Values (BETWEEN Clause)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitein-li">
+    <input type="checkbox" id="m-endocssqlitein-check"/>
+    <label for="m-endocssqlitein-check"><a href="/en/docs/sqlite/in/" title="SQLite | Query Data | Compare Against a List of Values (IN Clause)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitein"><span class="">Compare Against a List of Values (IN Clause)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteis-null-li">
+    <input type="checkbox" id="m-endocssqliteis-null-check"/>
+    <label for="m-endocssqliteis-null-check"><a href="/en/docs/sqlite/is-null/" title="SQLite | Query Data | Find Rows with NULL Values (IS NULL)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteis-null"><span class="">Find Rows with NULL Values (IS NULL)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteas-li">
+    <input type="checkbox" id="m-endocssqliteas-check"/>
+    <label for="m-endocssqliteas-check"><a href="/en/docs/sqlite/as/" title="SQLite | Query Data | Assign Column Aliases (AS Clause)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteas"><span class="">Assign Column Aliases (AS Clause)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedistinct-li">
+    <input type="checkbox" id="m-endocssqlitedistinct-check"/>
+    <label for="m-endocssqlitedistinct-check"><a href="/en/docs/sqlite/distinct/" title="SQLite | Query Data | Remove Duplicate Rows with DISTINCT" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedistinct"><span class="">Remove Duplicate Rows with DISTINCT</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteecbbaceb9fbc-eab092ec9790-ec82acecb999-ec97b0ec82b0ec9d98-eab2b0eab3bc-eca1b0ed9a8c-li">
+    <input type="checkbox" id="m-endocssqliteecbbaceb9fbc-eab092ec9790-ec82acecb999-ec97b0ec82b0ec9d98-eab2b0eab3bc-eca1b0ed9a8c-check"/>
+    <label for="m-endocssqliteecbbaceb9fbc-eab092ec9790-ec82acecb999-ec97b0ec82b0ec9d98-eab2b0eab3bc-eca1b0ed9a8c-check"><a href="/en/docs/sqlite/%EC%BB%AC%EB%9F%BC-%EA%B0%92%EC%97%90-%EC%82%AC%EC%B9%99-%EC%97%B0%EC%82%B0%EC%9D%98-%EA%B2%B0%EA%B3%BC-%EC%A1%B0%ED%9A%8C/" title="SQLite | Query Data | Calculate Arithmetic Expressions from Column Values" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteecbbaceb9fbc-eab092ec9790-ec82acecb999-ec97b0ec82b0ec9d98-eab2b0eab3bc-eca1b0ed9a8c"><span class="">Calculate Arithmetic Expressions from Column Values</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecase-li">
+    <input type="checkbox" id="m-endocssqlitecase-check"/>
+    <label for="m-endocssqlitecase-check"><a href="/en/docs/sqlite/case/" title="SQLite | Query Data | Return Conditional Results with CASE" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecase"><span class="">Return Conditional Results with CASE</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitedata-joins-li">
+    <input type="checkbox" id="m-endocssqlitedata-joins-check"/>
+    <label for="m-endocssqlitedata-joins-check"><a href="/en/docs/sqlite/data-joins/" title="SQLite | Data Joins" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitedata-joins"><span class="">Data Joins</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteouter-join-li">
+    <input type="checkbox" id="m-endocssqliteouter-join-check"/>
+    <label for="m-endocssqliteouter-join-check"><a href="/en/docs/sqlite/outer-join/" title="SQLite | Joining Data | Outer Joins (OUTER JOIN)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteouter-join"><span class="">Outer Joins (OUTER JOIN)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecross-join-li">
+    <input type="checkbox" id="m-endocssqlitecross-join-check"/>
+    <label for="m-endocssqlitecross-join-check"><a href="/en/docs/sqlite/cross-join/" title="SQLite | Joining Data | Cross Join (CROSS JOIN)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecross-join"><span class="">Cross Join (CROSS JOIN)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitenatural-li">
+    <input type="checkbox" id="m-endocssqlitenatural-check"/>
+    <label for="m-endocssqlitenatural-check"><a href="/en/docs/sqlite/natural/" title="SQLite | Joining Data | Natural Joins (NATURAL Keyword)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitenatural"><span class="">Natural Joins (NATURAL Keyword)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteself-join-li">
+    <input type="checkbox" id="m-endocssqliteself-join-check"/>
+    <label for="m-endocssqliteself-join-check"><a href="/en/docs/sqlite/self-join/" title="SQLite | Joins | Joining a Table to Itself (SELF JOIN)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteself-join"><span class="">Joining a Table to Itself (SELF JOIN)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitesqlite-commands-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-commands-check"/>
+    <label for="m-endocssqlitesqlite-commands-check"><a href="/en/docs/sqlite/sqlite-commands/" title="SQLite | SQLite Commands" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitesqlite-commands"><span class="">SQLite Commands</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeab081-ed95adebaaa9ec9d98-ed9884ec9eac-ec84a4eca095-eb82b4ec9aa9ec9d84-ed9995ec9db8--show-ebaa85eba0b9-li">
+    <input type="checkbox" id="m-endocssqliteeab081-ed95adebaaa9ec9d98-ed9884ec9eac-ec84a4eca095-eb82b4ec9aa9ec9d84-ed9995ec9db8--show-ebaa85eba0b9-check"/>
+    <label for="m-endocssqliteeab081-ed95adebaaa9ec9d98-ed9884ec9eac-ec84a4eca095-eb82b4ec9aa9ec9d84-ed9995ec9db8--show-ebaa85eba0b9-check"><a href="/en/docs/sqlite/%EA%B0%81-%ED%95%AD%EB%AA%A9%EC%9D%98-%ED%98%84%EC%9E%AC-%EC%84%A4%EC%A0%95-%EB%82%B4%EC%9A%A9%EC%9D%84-%ED%99%95%EC%9D%B8--show-%EB%AA%85%EB%A0%B9/" title="SQLite | SQLite Commands | Viewing Current Settings (.show Command)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeab081-ed95adebaaa9ec9d98-ed9884ec9eac-ec84a4eca095-eb82b4ec9aa9ec9d84-ed9995ec9db8--show-ebaa85eba0b9"><span class="">Viewing Current Settings (.show Command)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteheaders-command-li">
+    <input type="checkbox" id="m-endocssqliteheaders-command-check"/>
+    <label for="m-endocssqliteheaders-command-check"><a href="/en/docs/sqlite/headers-command/" title="SQLite | SQLite Commands | Show Column Names in SELECT Results (.headers)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteheaders-command"><span class="">Show Column Names in SELECT Results (.headers)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteselect-ebacb8ec9cbceba19c-eab2b0eab3bceba5bc-ed919cec8b9ced95a0-eb958c-eab5acebb684-eab8b0ed98b8-ebb380eab2bd--separator-ebaa85eba0b9-li">
+    <input type="checkbox" id="m-endocssqliteselect-ebacb8ec9cbceba19c-eab2b0eab3bceba5bc-ed919cec8b9ced95a0-eb958c-eab5acebb684-eab8b0ed98b8-ebb380eab2bd--separator-ebaa85eba0b9-check"/>
+    <label for="m-endocssqliteselect-ebacb8ec9cbceba19c-eab2b0eab3bceba5bc-ed919cec8b9ced95a0-eb958c-eab5acebb684-eab8b0ed98b8-ebb380eab2bd--separator-ebaa85eba0b9-check"><a href="/en/docs/sqlite/select-%EB%AC%B8%EC%9C%BC%EB%A1%9C-%EA%B2%B0%EA%B3%BC%EB%A5%BC-%ED%91%9C%EC%8B%9C%ED%95%A0-%EB%95%8C-%EA%B5%AC%EB%B6%84-%EA%B8%B0%ED%98%B8-%EB%B3%80%EA%B2%BD--separator-%EB%AA%85%EB%A0%B9/" title="SQLite | SQLite Commands | Change the SELECT Result Separator (.separator)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteselect-ebacb8ec9cbceba19c-eab2b0eab3bceba5bc-ed919cec8b9ced95a0-eb958c-eab5acebb684-eab8b0ed98b8-ebb380eab2bd--separator-ebaa85eba0b9"><span class="">Change the SELECT Result Separator (.separator)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitewidth-command-li">
+    <input type="checkbox" id="m-endocssqlitewidth-command-check"/>
+    <label for="m-endocssqlitewidth-command-check"><a href="/en/docs/sqlite/width-command/" title="SQLite | SQLite Commands | Set Column Widths in Column Mode (.width)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitewidth-command"><span class="">Set Column Widths in Column Mode (.width)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteimport-csv-li">
+    <input type="checkbox" id="m-endocssqliteimport-csv-check"/>
+    <label for="m-endocssqliteimport-csv-check"><a href="/en/docs/sqlite/import-csv/" title="SQLite | SQLite Commands | Import CSV Data from a File (.import)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteimport-csv"><span class="">Import CSV Data from a File (.import)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitedump-command-li">
+    <input type="checkbox" id="m-endocssqlitedump-command-check"/>
+    <label for="m-endocssqlitedump-command-check"><a href="/en/docs/sqlite/dump-command/" title="SQLite | SQLite Commands | Database Dump (.dump)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitedump-command"><span class="">Database Dump (.dump)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeb8da4ed9484eba5bc-eab080eca0b8ec9980ec849c-eb8db0ec9db4ed84b0ebb2a0ec9db4ec8aa4-ec9eaceab5acecb695--read-ebaa85eba0b9-li">
+    <input type="checkbox" id="m-endocssqliteeb8da4ed9484eba5bc-eab080eca0b8ec9980ec849c-eb8db0ec9db4ed84b0ebb2a0ec9db4ec8aa4-ec9eaceab5acecb695--read-ebaa85eba0b9-check"/>
+    <label for="m-endocssqliteeb8da4ed9484eba5bc-eab080eca0b8ec9980ec849c-eb8db0ec9db4ed84b0ebb2a0ec9db4ec8aa4-ec9eaceab5acecb695--read-ebaa85eba0b9-check"><a href="/en/docs/sqlite/%EB%8D%A4%ED%94%84%EB%A5%BC-%EA%B0%80%EC%A0%B8%EC%99%80%EC%84%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EC%9E%AC%EA%B5%AC%EC%B6%95--read-%EB%AA%85%EB%A0%B9/" title="SQLite | SQLite Commands | Rebuilding a Database from a Dump (.read Command)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeb8da4ed9484eba5bc-eab080eca0b8ec9980ec849c-eb8db0ec9db4ed84b0ebb2a0ec9db4ec8aa4-ec9eaceab5acecb695--read-ebaa85eba0b9"><span class="">Rebuilding a Database from a Dump (.read Command)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitebackup-restore-li">
+    <input type="checkbox" id="m-endocssqlitebackup-restore-check"/>
+    <label for="m-endocssqlitebackup-restore-check"><a href="/en/docs/sqlite/backup-restore/" title="SQLite | SQLite Commands | Back Up and Restore a Database (.backup/.restore)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitebackup-restore"><span class="">Back Up and Restore a Database (.backup/.restore)</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocssqlitesqlite-functions-li">
+    <input type="checkbox" id="m-endocssqlitesqlite-functions-check"/>
+    <label for="m-endocssqlitesqlite-functions-check"><a href="/en/docs/sqlite/sqlite-functions/" title="SQLite | SQLite Functions" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocssqlitesqlite-functions"><span class="">SQLite Functions</span></a></label>
+    
+    <ul class="ul-3 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteecbbaceb9fbc-eb9890eb8a94-eca084ecb2b4-ed858cec9db4ebb894ec9d98-ed9689ec8898-eab5aced9598eab8b0-count-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteecbbaceb9fbc-eb9890eb8a94-eca084ecb2b4-ed858cec9db4ebb894ec9d98-ed9689ec8898-eab5aced9598eab8b0-count-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteecbbaceb9fbc-eb9890eb8a94-eca084ecb2b4-ed858cec9db4ebb894ec9d98-ed9689ec8898-eab5aced9598eab8b0-count-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%BB%AC%EB%9F%BC-%EB%98%90%EB%8A%94-%EC%A0%84%EC%B2%B4-%ED%85%8C%EC%9D%B4%EB%B8%94%EC%9D%98-%ED%96%89%EC%88%98-%EA%B5%AC%ED%95%98%EA%B8%B0-count-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Counting Rows in a Column or Table (count Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteecbbaceb9fbc-eb9890eb8a94-eca084ecb2b4-ed858cec9db4ebb894ec9d98-ed9689ec8898-eab5aced9598eab8b0-count-ed95a8ec8898"><span class="">Counting Rows in a Column or Table (count Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitesum-total-functions-li">
+    <input type="checkbox" id="m-endocssqlitesum-total-functions-check"/>
+    <label for="m-endocssqlitesum-total-functions-check"><a href="/en/docs/sqlite/sum-total-functions/" title="SQLite | SQLite Functions | Calculate Column Totals with sum and total" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitesum-total-functions"><span class="">Calculate Column Totals with sum and total</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteavg-function-li">
+    <input type="checkbox" id="m-endocssqliteavg-function-check"/>
+    <label for="m-endocssqliteavg-function-check"><a href="/en/docs/sqlite/avg-function/" title="SQLite | SQLite Functions | Calculate an Average with avg" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteavg-function"><span class="">Calculate an Average with avg</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteecbbaceb9fbc-eab092ec9d98-ecb59ceb8c80eab092eab3bc-ecb59cec868ceab092-eab5aced9598eab8b0-max-ed95a8ec8898-min-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteecbbaceb9fbc-eab092ec9d98-ecb59ceb8c80eab092eab3bc-ecb59cec868ceab092-eab5aced9598eab8b0-max-ed95a8ec8898-min-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteecbbaceb9fbc-eab092ec9d98-ecb59ceb8c80eab092eab3bc-ecb59cec868ceab092-eab5aced9598eab8b0-max-ed95a8ec8898-min-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%BB%AC%EB%9F%BC-%EA%B0%92%EC%9D%98-%EC%B5%9C%EB%8C%80%EA%B0%92%EA%B3%BC-%EC%B5%9C%EC%86%8C%EA%B0%92-%EA%B5%AC%ED%95%98%EA%B8%B0-max-%ED%95%A8%EC%88%98-min-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Finding Maximum and Minimum Column Values (max and min Functions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteecbbaceb9fbc-eab092ec9d98-ecb59ceb8c80eab092eab3bc-ecb59cec868ceab092-eab5aced9598eab8b0-max-ed95a8ec8898-min-ed95a8ec8898"><span class="">Finding Maximum and Minimum Column Values (max and min Functions)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteecbbaceb9fbc-eab092ec9d84-ec97b0eab2b0ed9598ec97ac-ed919cec8b9c-groupconcat-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteecbbaceb9fbc-eab092ec9d84-ec97b0eab2b0ed9598ec97ac-ed919cec8b9c-groupconcat-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteecbbaceb9fbc-eab092ec9d84-ec97b0eab2b0ed9598ec97ac-ed919cec8b9c-groupconcat-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%BB%AC%EB%9F%BC-%EA%B0%92%EC%9D%84-%EC%97%B0%EA%B2%B0%ED%95%98%EC%97%AC-%ED%91%9C%EC%8B%9C-groupconcat-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Concatenating Column Values (group_concat Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteecbbaceb9fbc-eab092ec9d84-ec97b0eab2b0ed9598ec97ac-ed919cec8b9c-groupconcat-ed95a8ec8898"><span class="">Concatenating Column Values (group_concat Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ebacb8ec9e90ec8898-ebb098ed9998-length-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ebacb8ec9e90ec8898-ebb098ed9998-length-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ebacb8ec9e90ec8898-ebb098ed9998-length-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%98-%EB%AC%B8%EC%9E%90%EC%88%98-%EB%B0%98%ED%99%98-length-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Returning the Number of Characters in a String (length Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ebacb8ec9e90ec8898-ebb098ed9998-length-ed95a8ec8898"><span class="">Returning the Number of Characters in a String (length Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8c80ebacb8ec9e90-eb9890eb8a94-ec868cebacb8ec9e90eba19c-ebb380ed9998-lower-ed95a8ec8898-upper-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8c80ebacb8ec9e90-eb9890eb8a94-ec868cebacb8ec9e90eba19c-ebb380ed9998-lower-ed95a8ec8898-upper-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8c80ebacb8ec9e90-eb9890eb8a94-ec868cebacb8ec9e90eba19c-ebb380ed9998-lower-ed95a8ec8898-upper-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%84-%EB%8C%80%EB%AC%B8%EC%9E%90-%EB%98%90%EB%8A%94-%EC%86%8C%EB%AC%B8%EC%9E%90%EB%A1%9C-%EB%B3%80%ED%99%98-lower-%ED%95%A8%EC%88%98-upper-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Converting Strings to Uppercase or Lowercase (lower and upper Functions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8c80ebacb8ec9e90-eb9890eb8a94-ec868cebacb8ec9e90eba19c-ebb380ed9998-lower-ed95a8ec8898-upper-ed95a8ec8898"><span class="">Converting Strings to Uppercase or Lowercase (lower and upper Functions)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8ba4eba5b8-ebacb8ec9e90ec97b4eba19c-ecb998ed9998-replace-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8ba4eba5b8-ebacb8ec9e90ec97b4eba19c-ecb998ed9998-replace-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8ba4eba5b8-ebacb8ec9e90ec97b4eba19c-ecb998ed9998-replace-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%84-%EB%8B%A4%EB%A5%B8-%EB%AC%B8%EC%9E%90%EC%97%B4%EB%A1%9C-%EC%B9%98%ED%99%98-replace-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Replacing Part of a String (replace Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-eb8ba4eba5b8-ebacb8ec9e90ec97b4eba19c-ecb998ed9998-replace-ed95a8ec8898"><span class="">Replacing Part of a String (replace Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9790ec849c-ec9dbcebb680ebb684-ecb694ecb69c-substr-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9790ec849c-ec9dbcebb680ebb684-ecb694ecb69c-substr-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9790ec849c-ec9dbcebb680ebb684-ecb694ecb69c-substr-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%97%90%EC%84%9C-%EC%9D%BC%EB%B6%80%EB%B6%84-%EC%B6%94%EC%B6%9C-substr-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Extracting Part of a String (substr Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9790ec849c-ec9dbcebb680ebb684-ecb694ecb69c-substr-ed95a8ec8898"><span class="">Extracting Part of a String (substr Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ec8b9cec9e91eab3bc-eb819dec9790ec849c-eab3b5ebb0b1-eca09ceab1b0-trim-ed95a8ec8898-rtrim-ed95a8ec8898-ltrim-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ec8b9cec9e91eab3bc-eb819dec9790ec849c-eab3b5ebb0b1-eca09ceab1b0-trim-ed95a8ec8898-rtrim-ed95a8ec8898-ltrim-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ec8b9cec9e91eab3bc-eb819dec9790ec849c-eab3b5ebb0b1-eca09ceab1b0-trim-ed95a8ec8898-rtrim-ed95a8ec8898-ltrim-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%98-%EC%8B%9C%EC%9E%91%EA%B3%BC-%EB%81%9D%EC%97%90%EC%84%9C-%EA%B3%B5%EB%B0%B1-%EC%A0%9C%EA%B1%B0-trim-%ED%95%A8%EC%88%98-rtrim-%ED%95%A8%EC%88%98-ltrim-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Removing Characters from the Start and End of a String (trim, rtrim, and ltrim Functions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9d98-ec8b9cec9e91eab3bc-eb819dec9790ec849c-eab3b5ebb0b1-eca09ceab1b0-trim-ed95a8ec8898-rtrim-ed95a8ec8898-ltrim-ed95a8ec8898"><span class="">Removing Characters from the Start and End of a String (trim, rtrim, and ltrim Functions)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-ec9e91ec9d80-eb94b0ec98b4ed919ceba19c-eb9198eb9facec8bb8eab8b0-quote-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-ec9e91ec9d80-eb94b0ec98b4ed919ceba19c-eb9198eb9facec8bb8eab8b0-quote-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteebacb8ec9e90ec97b4ec9d84-ec9e91ec9d80-eb94b0ec98b4ed919ceba19c-eb9198eb9facec8bb8eab8b0-quote-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%AC%B8%EC%9E%90%EC%97%B4%EC%9D%84-%EC%9E%91%EC%9D%80-%EB%94%B0%EC%98%B4%ED%91%9C%EB%A1%9C-%EB%91%98%EB%9F%AC%EC%8B%B8%EA%B8%B0-quote-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Enclosing a String in Single Quotes (quote Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteebacb8ec9e90ec97b4ec9d84-ec9e91ec9d80-eb94b0ec98b4ed919ceba19c-eb9198eb9facec8bb8eab8b0-quote-ed95a8ec8898"><span class="">Enclosing a String in Single Quotes (quote Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteec88abec9e90-ebb098ec98aceba6bc-eab5aced9598eab8b0-round-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteec88abec9e90-ebb098ec98aceba6bc-eab5aced9598eab8b0-round-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteec88abec9e90-ebb098ec98aceba6bc-eab5aced9598eab8b0-round-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%88%AB%EC%9E%90-%EB%B0%98%EC%98%AC%EB%A6%BC-%EA%B5%AC%ED%95%98%EA%B8%B0-round-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Rounding Numbers (round Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteec88abec9e90-ebb098ec98aceba6bc-eab5aced9598eab8b0-round-ed95a8ec8898"><span class="">Rounding Numbers (round Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteec88abec9e90-eca088eb8c80-eab092-eab5aced9598eab8b0-abs-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteec88abec9e90-eca088eb8c80-eab092-eab5aced9598eab8b0-abs-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteec88abec9e90-eca088eb8c80-eab092-eab5aced9598eab8b0-abs-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%88%AB%EC%9E%90-%EC%A0%88%EB%8C%80-%EA%B0%92-%EA%B5%AC%ED%95%98%EA%B8%B0-abs-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Calculating an Absolute Value (abs Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteec88abec9e90-eca088eb8c80-eab092-eab5aced9598eab8b0-abs-ed95a8ec8898"><span class="">Calculating an Absolute Value (abs Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeb829cec8898-ec839dec84b1-random-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteeb829cec8898-ec839dec84b1-random-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteeb829cec8898-ec839dec84b1-random-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%82%9C%EC%88%98-%EC%83%9D%EC%84%B1-random-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Generating Random Numbers (random Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeb829cec8898-ec839dec84b1-random-ed95a8ec8898"><span class="">Generating Random Numbers (random Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteblob-ed8380ec9e85ec9d98-eab092ec9d84-16eca784ec8898eba19c-ebb380ed9998-hex-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteblob-ed8380ec9e85ec9d98-eab092ec9d84-16eca784ec8898eba19c-ebb380ed9998-hex-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteblob-ed8380ec9e85ec9d98-eab092ec9d84-16eca784ec8898eba19c-ebb380ed9998-hex-ed95a8ec8898-check"><a href="/en/docs/sqlite/blob-%ED%83%80%EC%9E%85%EC%9D%98-%EA%B0%92%EC%9D%84-16%EC%A7%84%EC%88%98%EB%A1%9C-%EB%B3%80%ED%99%98-hex-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Converting a BLOB Value to Hexadecimal (hex Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteblob-ed8380ec9e85ec9d98-eab092ec9d84-16eca784ec8898eba19c-ebb380ed9998-hex-ed95a8ec8898"><span class="">Converting a BLOB Value to Hexadecimal (hex Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitegenerate-random-numbers-for-blob-values-randomblob-function-li">
+    <input type="checkbox" id="m-endocssqlitegenerate-random-numbers-for-blob-values-randomblob-function-check"/>
+    <label for="m-endocssqlitegenerate-random-numbers-for-blob-values-randomblob-function-check"><a href="/en/docs/sqlite/generate-random-numbers-for-blob-values-randomblob-function/" title="SQLite | SQLite Functions | Generate Random Numbers for BLOB Values (randomblob Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitegenerate-random-numbers-for-blob-values-randomblob-function"><span class="">Generate Random Numbers for BLOB Values (randomblob Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitecreate-blob-0x00-value-of-specified-bytes-zeroblob-function-li">
+    <input type="checkbox" id="m-endocssqlitecreate-blob-0x00-value-of-specified-bytes-zeroblob-function-check"/>
+    <label for="m-endocssqlitecreate-blob-0x00-value-of-specified-bytes-zeroblob-function-check"><a href="/en/docs/sqlite/create-blob-0x00-value-of-specified-bytes-zeroblob-function/" title="SQLite | SQLite Functions | Create a BLOB 0x00 Value of a Specified Number of Bytes (zeroblob Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitecreate-blob-0x00-value-of-specified-bytes-zeroblob-function"><span class="">Create a BLOB 0x00 Value of a Specified Number of Bytes (zeroblob Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitechanges-function-li">
+    <input type="checkbox" id="m-endocssqlitechanges-function-check"/>
+    <label for="m-endocssqlitechanges-function-check"><a href="/en/docs/sqlite/changes-function/" title="SQLite | SQLite Functions | Count Rows Changed by the Most Recent SQL Statement (changes)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitechanges-function"><span class="">Count Rows Changed by the Most Recent SQL Statement (changes)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitetotal-changes-function-li">
+    <input type="checkbox" id="m-endocssqlitetotal-changes-function-check"/>
+    <label for="m-endocssqlitetotal-changes-function-check"><a href="/en/docs/sqlite/total-changes-function/" title="SQLite | SQLite Functions | Count All Rows Changed Since Connecting (total_changes)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitetotal-changes-function"><span class="">Count All Rows Changed Since Connecting (total_changes)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeab092ec9db4-nullec9db8-eab2bdec9ab0ec9790-eca780eca095eb909c-eb8ba4eba5b8-eab092ec9d84-ebb098ed9998-ifnull-ed95a8ec8898-coalesce-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteeab092ec9db4-nullec9db8-eab2bdec9ab0ec9790-eca780eca095eb909c-eb8ba4eba5b8-eab092ec9d84-ebb098ed9998-ifnull-ed95a8ec8898-coalesce-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteeab092ec9db4-nullec9db8-eab2bdec9ab0ec9790-eca780eca095eb909c-eb8ba4eba5b8-eab092ec9d84-ebb098ed9998-ifnull-ed95a8ec8898-coalesce-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EA%B0%92%EC%9D%B4-null%EC%9D%B8-%EA%B2%BD%EC%9A%B0%EC%97%90-%EC%A7%80%EC%A0%95%EB%90%9C-%EB%8B%A4%EB%A5%B8-%EA%B0%92%EC%9D%84-%EB%B0%98%ED%99%98-ifnull-%ED%95%A8%EC%88%98-coalesce-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Returning Another Value for NULL (ifnull and coalesce Functions)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeab092ec9db4-nullec9db8-eab2bdec9ab0ec9790-eca780eca095eb909c-eb8ba4eba5b8-eab092ec9d84-ebb098ed9998-ifnull-ed95a8ec8898-coalesce-ed95a8ec8898"><span class="">Returning Another Value for NULL (ifnull and coalesce Functions)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeca780eca095ed959c-eab092eab3bc-eab099ec9cbceba9b4-nullec9d84-ebb098ed9998-nullif-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteeca780eca095ed959c-eab092eab3bc-eab099ec9cbceba9b4-nullec9d84-ebb098ed9998-nullif-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteeca780eca095ed959c-eab092eab3bc-eab099ec9cbceba9b4-nullec9d84-ebb098ed9998-nullif-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EC%A7%80%EC%A0%95%ED%95%9C-%EA%B0%92%EA%B3%BC-%EA%B0%99%EC%9C%BC%EB%A9%B4-null%EC%9D%84-%EB%B0%98%ED%99%98-nullif-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Returning NULL When Values Match (nullif Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeca780eca095ed959c-eab092eab3bc-eab099ec9cbceba9b4-nullec9d84-ebb098ed9998-nullif-ed95a8ec8898"><span class="">Returning NULL When Values Match (nullif Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteeba788eca780eba789ec9790-ecb694eab080eb909c-eb8db0ec9db4ed84b0ec9d98-rowid-eba5bc-ebb098ed9998-lastinsertrowid-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteeba788eca780eba789ec9790-ecb694eab080eb909c-eb8db0ec9db4ed84b0ec9d98-rowid-eba5bc-ebb098ed9998-lastinsertrowid-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteeba788eca780eba789ec9790-ecb694eab080eb909c-eb8db0ec9db4ed84b0ec9d98-rowid-eba5bc-ebb098ed9998-lastinsertrowid-ed95a8ec8898-check"><a href="/en/docs/sqlite/%EB%A7%88%EC%A7%80%EB%A7%89%EC%97%90-%EC%B6%94%EA%B0%80%EB%90%9C-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%9D%98-rowid-%EB%A5%BC-%EB%B0%98%ED%99%98-lastinsertrowid-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Returning the ROWID of the Last Inserted Row (last_insert_rowid Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteeba788eca780eba789ec9790-ecb694eab080eb909c-eb8db0ec9db4ed84b0ec9d98-rowid-eba5bc-ebb098ed9998-lastinsertrowid-ed95a8ec8898"><span class="">Returning the ROWID of the Last Inserted Row (last_insert_rowid Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqliteed858cec9db4ebb894ec9790-eca080ec9ea5eb909c-eab092ec9d98-eb8db0ec9db4ed84b0-ed8380ec9e85-ebb098ed9998-typeof-ed95a8ec8898-li">
+    <input type="checkbox" id="m-endocssqliteed858cec9db4ebb894ec9790-eca080ec9ea5eb909c-eab092ec9d98-eb8db0ec9db4ed84b0-ed8380ec9e85-ebb098ed9998-typeof-ed95a8ec8898-check"/>
+    <label for="m-endocssqliteed858cec9db4ebb894ec9790-eca080ec9ea5eb909c-eab092ec9d98-eb8db0ec9db4ed84b0-ed8380ec9e85-ebb098ed9998-typeof-ed95a8ec8898-check"><a href="/en/docs/sqlite/%ED%85%8C%EC%9D%B4%EB%B8%94%EC%97%90-%EC%A0%80%EC%9E%A5%EB%90%9C-%EA%B0%92%EC%9D%98-%EB%8D%B0%EC%9D%B4%ED%84%B0-%ED%83%80%EC%9E%85-%EB%B0%98%ED%99%98-typeof-%ED%95%A8%EC%88%98/" title="SQLite | SQLite Functions | Returning the Data Type of a Stored Value (typeof Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqliteed858cec9db4ebb894ec9790-eca080ec9ea5eb909c-eab092ec9d98-eb8db0ec9db4ed84b0-ed8380ec9e85-ebb098ed9998-typeof-ed95a8ec8898"><span class="">Returning the Data Type of a Stored Value (typeof Function)</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocssqlitequery-sqlite-version-information-sqliteversion-function-li">
+    <input type="checkbox" id="m-endocssqlitequery-sqlite-version-information-sqliteversion-function-check"/>
+    <label for="m-endocssqlitequery-sqlite-version-information-sqliteversion-function-check"><a href="/en/docs/sqlite/query-sqlite-version-information-sqliteversion-function/" title="SQLite | SQLite Functions | Query SQLite Version Information (sqlite_version Function)" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocssqlitequery-sqlite-version-information-sqliteversion-function"><span class="">Query SQLite Version Information (sqlite_version Function)</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsdbeaver-li">
+    <input type="checkbox" id="m-endocsdbeaver-check"/>
+    <label for="m-endocsdbeaver-check"><a href="/en/docs/dbeaver/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsdbeaver"><span class="">DBeaver</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#assigning-a-different-name-with-as">Assigning a Different Name with AS</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">39</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">Android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/calibre/" data-taxonomy-term="calibre"><span class="taxonomy-label">Calibre</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/claude/" data-taxonomy-term="claude"><span class="taxonomy-label">Claude</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/claude-code/" data-taxonomy-term="claude-code"><span class="taxonomy-label">Claude Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">279</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">27</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/docusaurus/" data-taxonomy-term="docusaurus"><span class="taxonomy-label">Docusaurus</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/epub/" data-taxonomy-term="epub"><span class="taxonomy-label">EPub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage Collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/github/" data-taxonomy-term="github"><span class="taxonomy-label">GitHub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/groovy/" data-taxonomy-term="groovy"><span class="taxonomy-label">Groovy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/grpc/" data-taxonomy-term="grpc"><span class="taxonomy-label">GRPC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">Gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/it-terms/" data-taxonomy-term="it-terms"><span class="taxonomy-label">IT Terms</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">440</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">Javascript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">JQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">78</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">160</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lua/" data-taxonomy-term="lua"><span class="taxonomy-label">Lua</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/makefile/" data-taxonomy-term="makefile"><span class="taxonomy-label">Makefile</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">Markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">MockK</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">48</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">Php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">59</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sigil/" data-taxonomy-term="sigil"><span class="taxonomy-label">Sigil</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">120</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">93</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sre/" data-taxonomy-term="sre"><span class="taxonomy-label">SRE</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/subversion/" data-taxonomy-term="subversion"><span class="taxonomy-label">Subversion</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/typescript/" data-taxonomy-term="typescript"><span class="taxonomy-label">TypeScript</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vectordb/" data-taxonomy-term="vectordb"><span class="taxonomy-label">VectorDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/version-control/" data-taxonomy-term="version-control"><span class="taxonomy-label">Version Control</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">Web</span><span class="taxonomy-count">390</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/en/docs/category/data-science/rdb/">Relational Database</a></li>
+  <li class="breadcrumb-item">
+    <a href="/en/docs/sqlite/">SQLite</a></li>
+  <li class="breadcrumb-item">
+    <a href="/en/docs/sqlite/querying-data/">Querying Data</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Assign Column Aliases (AS Clause)</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>SQLite | Query Data | Assign Column Aliases (AS Clause)</h1>
+	
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<p>When querying a table with <code>SELECT</code>, the <code>AS</code> clause lets you display a column under a name different from its original name. This article explains how to assign column aliases.</p>
+<p> </p>
+<h2 id="assigning-a-different-name-with-as">Assigning a Different Name with AS</h2>
+<p>Use <code>AS</code> to assign a different name to a column in a <code>SELECT</code> result. The syntax is as follows.</p>
+<pre tabindex="0"><code>SELECT column_name AS alias ... FROM table_name;
+</code></pre><p>Place <code>AS</code> after the column name and specify its alias.</p>
+<p>&ndash;</p>
+<p>Try it with an example. Create the following table.</p>
+<pre tabindex="0"><code>create table product (name text, num integer, price integer);
+</code></pre><pre tabindex="0"><code>sqlite&gt; create table product (name text, num integer, price integer);
+sqlite&gt; 
+</code></pre><p>Insert data into the table with <code>INSERT</code> statements.</p>
+<pre tabindex="0"><code>insert into product values (&#39;Mouse&#39;, 10, 2500);
+insert into product values (&#39;Printer&#39;, 4, 8200);
+insert into product values (&#39;NotePC&#39;, 6, 54000);
+insert into product values (&#39;Display&#39;, 5, 18000);
+insert into product values (&#39;Desk&#39;, 8, 27000);
+</code></pre><pre tabindex="0"><code>sqlite&gt; insert into product values (&#39;Mouse&#39;, 10, 2500);
+sqlite&gt; insert into product values (&#39;Printer&#39;, 4, 8200);
+sqlite&gt; insert into product values (&#39;NotePC&#39;, 6, 54000);
+sqlite&gt; insert into product values (&#39;Display&#39;, 5, 18000);
+sqlite&gt; insert into product values (&#39;Desk&#39;, 8, 27000);
+sqlite&gt; 
+</code></pre><p>A normal query against this table returns the following result.</p>
+<pre tabindex="0"><code>select name, num, price from product;
+</code></pre><pre tabindex="0"><code>sqlite&gt; select name, num, price from product;
+name        num         price     
+----------  ----------  ----------
+Mouse       10          2500      
+Printer     4           8200      
+NotePC      6           54000     
+Display     5           18000     
+Desk        8           27000     
+sqlite&gt; 
+</code></pre><p>Now use <code>AS</code> to display the <code>price</code> column under the alias <code>value</code>.</p>
+<pre tabindex="0"><code>select name, num, price as value from product;
+</code></pre><pre tabindex="0"><code>sqlite&gt; select name, num, price as value from product;
+name        num         value     
+----------  ----------  ----------
+Mouse       10          2500      
+Printer     4           8200      
+NotePC      6           54000     
+Display     5           18000     
+Desk        8           27000     
+sqlite&gt; 
+</code></pre><p>The result shows <code>value</code> as the column name.</p>
+<p>&ndash;</p>
+<p>A <code>SELECT</code> statement can also return the result of an expression applied to column values.</p>
+<pre tabindex="0"><code>select name, num, price, num * price from product;
+</code></pre><pre tabindex="0"><code>sqlite&gt; select name, num, price, num * price from product;
+name        num         price       num * price
+----------  ----------  ----------  -----------
+Mouse       10          2500        25000      
+Printer     4           8200        32800      
+NotePC      6           54000       324000     
+Display     5           18000       90000      
+Desk        8           27000       216000     
+sqlite&gt; 
+</code></pre><p>By default, the expression <code>num * price</code> becomes the result column name. Use <code>AS</code> to assign the alias <code>value</code> to that expression.</p>
+<pre tabindex="0"><code>select name, num, price, num * price as value from product;
+</code></pre><pre tabindex="0"><code>sqlite&gt; select name, num, price, num * price as value from product;
+name        num         price       value     
+----------  ----------  ----------  ----------
+Mouse       10          2500        25000     
+Printer     4           8200        32800     
+NotePC      6           54000       324000    
+Display     5           18000       90000     
+Desk        8           27000       216000    
+sqlite&gt; 
+</code></pre><p>In this way, you can assign a meaningful column name to a calculated result.</p>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>
