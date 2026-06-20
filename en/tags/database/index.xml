@@ -731,6 +731,88 @@ RAID is not a safe storage location. There are also methods such as storing data
     </item>
     
     <item>
+      <title>Graph Database Quick Start Guide</title>
+      <link>https://www.devkuma.com/en/docs/graph-database/quick-start/</link>
+      <pubDate>Wed, 27 Jul 2022 07:48:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/graph-database/quick-start/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-a-graph-database&#34;&gt;What is a graph database?&lt;/h2&gt;
+&lt;p&gt;A graph database stores and processes graph structures. Relational databases model data as tables and can represent relationships, but doing so often requires careful schemas, complex queries, and expensive joins. Graph databases model connected data much like a whiteboard diagram. They are intuitive for connected data but less suitable for unrelated records.&lt;/p&gt;
+&lt;h3 id=&#34;property-graph-model&#34;&gt;Property graph model&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/graph-database/graph-data-model.png&#34; alt=&#34;Graph data model&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A graph contains nodes (vertices) and edges.&lt;/li&gt;
+&lt;li&gt;Nodes have labels and key-value properties.&lt;/li&gt;
+&lt;li&gt;Edges have labels, directions, start nodes, and end nodes.&lt;/li&gt;
+&lt;li&gt;Edges can also have properties.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;try-a-graph-database&#34;&gt;Try a graph database&lt;/h2&gt;
+&lt;p&gt;Clone the air-route sample from &lt;em&gt;Practical Gremlin&lt;/em&gt; and run TinkerGraph through Docker:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git clone https://github.com/krlawrence/graph.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cd graph/sample-data
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run -it --rm -v `pwd`:/mydata tinkerpop/gremlin-console
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; :load /mydata/load-air-routes-graph-34.groovy
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;explore-the-graph-with-gremlin&#34;&gt;Explore the graph with Gremlin&lt;/h2&gt;
+&lt;p&gt;Gremlin traversals conventionally begin with &lt;code&gt;g&lt;/code&gt;, the graph traversal source.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3619
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3374
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;v[122]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).valueMap()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[country:[KR],code:[ICN],city:[Seoul],icao:[RKSI],runways:[3]]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;V()&lt;/code&gt; selects vertices, &lt;code&gt;hasLabel&lt;/code&gt; filters labels, &lt;code&gt;has&lt;/code&gt; filters properties, and &lt;code&gt;valueMap&lt;/code&gt; returns properties.&lt;/p&gt;
+&lt;h3 id=&#34;follow-relationships&#34;&gt;Follow relationships&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;144
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).values(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;BKK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;SVO
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;HND
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;With one connection, duplicate destinations produce 11,386 paths. &lt;code&gt;dedup()&lt;/code&gt; reduces these to 1,817 unique airports:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1817
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Exclude destinations already reachable nonstop:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).aggregate(&amp;#39;nonstop&amp;#39;).out(&amp;#39;route&amp;#39;).where(without(&amp;#39;nonstop&amp;#39;)).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1673
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Find two-leg routes from Incheon to Gimpo:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;GMP&amp;#39;).path().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,HND,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,KIX,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,NGO,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,CJU,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,PEK,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Count routes from Korean airports to Japan by origin:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).as(&amp;#39;kr&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).select(&amp;#39;kr&amp;#39;).groupCount().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN:27,TAE:5,GMP:3,CJU:4,PUS:6]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Find the longest route by traversing edges and ordering their &lt;code&gt;dist&lt;/code&gt; property:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).outE(&amp;#39;route&amp;#39;).order().by(&amp;#39;dist&amp;#39;,desc).inV().has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).path().by(&amp;#39;code&amp;#39;).by(&amp;#39;dist&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,882,CTS]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;strengths-and-challenges&#34;&gt;Strengths and challenges&lt;/h2&gt;
+&lt;p&gt;Graph databases make connected data easy to traverse, but performance still declines when a traversal touches huge numbers of nodes or edges—for example, millions of followers of a celebrity. Design the graph around common queries, write efficient traversals, and keep data in other database systems when it does not benefit from graph storage.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Practical Gremlin&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.oreilly.com/library/view/graph-databases/9781449356255/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;O&amp;rsquo;Reilly Graph Databases&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tinkerpop.apache.org/docs/current/reference/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TinkerPop documentation&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>Graph Database</category>
+      
+      <category>Gremlin</category>
+      
+    </item>
+    
+    <item>
       <title>Graph Database</title>
       <link>https://www.devkuma.com/en/docs/graph-db/</link>
       <pubDate>Wed, 27 Jul 2022 07:48:00 +0900</pubDate>
@@ -5025,264 +5107,6 @@ TiFlash MPP mode is enabled by default. When an SQL statement is executed, TiDB 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
 &lt;p&gt;&lt;a href=&#34;https://github.com/pingcap/docs/blob/release-6.1/explore-htap.md&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Explore HTAP&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; last modified 2022-07-08 11:48:44: &lt;a href=&#34;https://github.com/pingcap/docs/commit/4ac6357b8f2ad7e9c5c632ef4edd0627b0f7c20a&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;tiflash refactor: split use-tiflash into multiple docs (#9452) (#9521)&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
-
-      </description>
-      
-      <category>Database</category>
-      
-      <category>TiDB</category>
-      
-    </item>
-    
-    <item>
-      <title>Simulating Production TiDB Cluster Deployment on a Single Computer</title>
-      <link>https://www.devkuma.com/en/docs/tidb/quick-start-with-tidb/</link>
-      <pubDate>Fri, 02 Sep 2022 15:38:00 +0900</pubDate>
-      <author>kc@example.com (kc kim)</author>
-      <guid>https://www.devkuma.com/en/docs/tidb/quick-start-with-tidb/</guid>
-      <description>
-        
-        
-        &lt;h2 id=&#34;deploying-a-production-cluster-on-a-single-computer&#34;&gt;Deploying a Production Cluster on a Single Computer&lt;/h2&gt;
-&lt;p&gt;Scenario: experience a minimal TiDB cluster with a complete topology and simulate the procedure for deploying a production cluster on a single Linux server.
-This section explains how to deploy a TiDB cluster with a minimal topology YAML file in TiUP.&lt;/p&gt;
-&lt;h3 id=&#34;preparing-for-cluster-deployment&#34;&gt;Preparing for Cluster Deployment&lt;/h3&gt;
-&lt;p&gt;Prepare a target machine that meets the following requirements.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;CentOS 7.3 or later is installed.&lt;/li&gt;
-&lt;li&gt;The Linux OS can access the internet. This is required to download TiDB and related software installation packages.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The minimal TiDB cluster topology is as follows.
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Note:&lt;/div&gt;
-
-
-The IP addresses of the following instances are only examples. In an actual deployment, replace them with the real IP addresses.
-&lt;/div&gt;
-&lt;/p&gt;
-&lt;table&gt;
-	&lt;thead&gt;
-			&lt;tr&gt;
-					&lt;th&gt;Instance&lt;/th&gt;
-					&lt;th&gt;Count&lt;/th&gt;
-					&lt;th&gt;Address&lt;/th&gt;
-					&lt;th&gt;Configuration&lt;/th&gt;
-			&lt;/tr&gt;
-	&lt;/thead&gt;
-	&lt;tbody&gt;
-			&lt;tr&gt;
-					&lt;td&gt;TiKV&lt;/td&gt;
-					&lt;td&gt;3&lt;/td&gt;
-					&lt;td&gt;10.0.1.1&lt;br&gt;10.0.1.1&lt;br&gt;10.0.1.1&lt;/td&gt;
-					&lt;td&gt;Avoid port and directory conflicts&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;TiDB&lt;/td&gt;
-					&lt;td&gt;1&lt;/td&gt;
-					&lt;td&gt;10.0.1.1&lt;/td&gt;
-					&lt;td&gt;Default port&lt;br&gt;Global directory configuration&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;PD&lt;/td&gt;
-					&lt;td&gt;1&lt;/td&gt;
-					&lt;td&gt;10.0.1.1&lt;/td&gt;
-					&lt;td&gt;Default port&lt;br&gt;Global directory configuration&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;TiFlash&lt;/td&gt;
-					&lt;td&gt;1&lt;/td&gt;
-					&lt;td&gt;10.0.1.1&lt;/td&gt;
-					&lt;td&gt;Default port&lt;br&gt;Global directory configuration&lt;/td&gt;
-			&lt;/tr&gt;
-			&lt;tr&gt;
-					&lt;td&gt;Monitor&lt;/td&gt;
-					&lt;td&gt;1&lt;/td&gt;
-					&lt;td&gt;10.0.1.1&lt;/td&gt;
-					&lt;td&gt;Default port&lt;br&gt;Global directory configuration&lt;/td&gt;
-			&lt;/tr&gt;
-	&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;Other requirements for the target machine:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;A root user and password are required.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Stop the firewall service on the target system or open the ports required by TiDB cluster nodes.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;TiUP Cluster currently supports TiDB deployment on x86_64 (AMD64) and ARM architectures.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;On AMD64, CentOS 7.3 or later is recommended.&lt;/li&gt;
-&lt;li&gt;On ARM, CentOS 7.6 1810 is recommended.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;running-cluster-deployment&#34;&gt;Running Cluster Deployment&lt;/h3&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Note:&lt;/div&gt;
-
-
-You can log in to the target machine as a normal user or as root. The following procedure uses the root user as an example.
-&lt;/div&gt;
-
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Download and install TiUP.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;curl --proto &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;=https&amp;#39;&lt;/span&gt; --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;|&lt;/span&gt; sh
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Declare global environment variables.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Note:&lt;/div&gt;
-
-
-After installation, TiUP displays the absolute path of the corresponding shell profile file. Depending on the path, replace `${your_shell_profile}` in the following `source` command.
-    &lt;/div&gt;
-
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87&#34;&gt;source&lt;/span&gt; &lt;span style=&#34;color:#4e9a06&#34;&gt;${&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;your_shell_profile&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Install the TiUP cluster component.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup cluster
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If TiUP Cluster is already installed on the machine, update the software version.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup update --self &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; tiup update cluster
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Use root privileges to increase the connection limit of the &lt;code&gt;sshd&lt;/code&gt; service. This is because TiUP needs to simulate deployment across multiple machines.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Change &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; and set &lt;code&gt;MaxSessions&lt;/code&gt; to &lt;code&gt;20&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;Restart the &lt;code&gt;sshd&lt;/code&gt; service.
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;service sshd restart
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Create and start the cluster.&lt;/p&gt;
-&lt;p&gt;Edit the configuration file according to the following template and name it &lt;code&gt;topo.yaml&lt;/code&gt;.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# # Global variables are applied to all deployments and used as the default value of&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# # the deployments if a specific deployment value is missing.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;global:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;user: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;tidb&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ssh_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;22&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;deploy_dir: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/tidb-deploy&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;data_dir: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;/tidb-data&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#8f5902;font-style:italic&#34;&gt;# # Monitored variables are applied to all the machines.&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;monitored:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;node_exporter_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;9100&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;blackbox_exporter_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;9115&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;server_configs:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tidb:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;log.slow-threshold: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;300&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tikv:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;readpool.storage.use-unified-pool: &lt;span style=&#34;color:#204a87&#34;&gt;false&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;readpool.coprocessor.use-unified-pool: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pd:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;replication.enable-placement-rules: &lt;span style=&#34;color:#204a87&#34;&gt;true&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;replication.location-labels: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;host&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiflash:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;logger.level: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;info&amp;#34;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pd_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tidb_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tikv_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20160&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;status_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20180&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;config:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    server.labels: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; host: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;logic-host-1&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20161&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;status_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20181&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;config:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    server.labels: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; host: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;logic-host-2&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20162&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;status_port: &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;20182&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;config:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    server.labels: &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt; host: &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;logic-host-3&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiflash_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;monitoring_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;grafana_servers:
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;- host: 10.0.1.1
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;user: &amp;quot;tidb&amp;quot;&lt;/code&gt;: uses the &lt;code&gt;tidb&lt;/code&gt; system user, which is automatically created during deployment, to perform internal cluster management. By default, it logs in to the target machine through SSH on port 22.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;replication.enable-placement-rules&lt;/code&gt;: this PD parameter is configured so TiFlash works properly.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;host&lt;/code&gt;: the IP address of the target machine.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Run the cluster deployment command.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup cluster deploy &amp;lt;cluster-name&amp;gt; &amp;lt;tidb-version&amp;gt; ./topo.yaml --user root -p
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;&amp;lt;cluster-name&amp;gt;&lt;/code&gt;: sets the cluster name.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;&amp;lt;tidb-version&amp;gt;&lt;/code&gt;: sets the TiDB cluster version. You can run &lt;code&gt;tiup list tidb&lt;/code&gt; to see all supported TiDB versions.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;code&gt;-p&lt;/code&gt;: specifies the password used to connect to the target machine.&lt;/p&gt;
-&lt;div class=&#34;alert alert-primary&#34; role=&#34;alert&#34;&gt;&lt;div class=&#34;h4 alert-heading&#34; role=&#34;heading&#34;&gt;Note:&lt;/div&gt;
-
-
-If you use a private key, specify the key path with `-i`. Do not use `-i` and `-p` at the same time.
-        &lt;/div&gt;
-
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Enter &amp;ldquo;y&amp;rdquo; and the root user&amp;rsquo;s password to complete deployment.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Do you want to &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;continue&lt;/span&gt;? &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;[&lt;/span&gt;y/N&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;]&lt;/span&gt;:  y
-&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Input SSH password:
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Start the cluster.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup cluster start &amp;lt;cluster-name&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Access the cluster.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Install the MySQL client. If it is already installed, skip this step.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;yum -y install mysql
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Access TiDB. The password is empty.&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mysql -h 10.0.1.1 -P &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;4000&lt;/span&gt; -u root
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Access the Grafana monitoring dashboard at http://{grafana-ip}:3000. The default username and password are both &lt;code&gt;admin&lt;/code&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Access the TiDB dashboard at http://{pd-ip}:2379/dashboard. The default username is root, and the password is empty.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;To view the currently deployed cluster list:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup cluster list
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;To view the cluster topology and status:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;tiup cluster display &amp;lt;cluster-name&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://docs.pingcap.com/tidb/stable/quick-start-with-tidb&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Quick Start Guide for the TiDB Database Platform&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
 
       </description>
       

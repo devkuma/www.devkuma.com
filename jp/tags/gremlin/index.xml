@@ -1,0 +1,102 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>devkuma – Gremlin</title>
+    <link>https://www.devkuma.com/jp/tags/gremlin/</link>
+    <image>
+      <url>https://www.devkuma.com/jp/tags/gremlin/logo/180x180.jpg</url>
+      <title>Gremlin</title>
+      <link>https://www.devkuma.com/jp/tags/gremlin/</link>
+    </image>
+    <description>Recent content in Gremlin on devkuma</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <managingEditor>kc@example.com (kc kim)</managingEditor>
+    <webMaster>kc@example.com (kc kim)</webMaster>
+    <copyright>The devkuma</copyright>
+    
+	  <atom:link href="https://www.devkuma.com/jp/tags/gremlin/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>グラフデータベース・クイックスタート</title>
+      <link>https://www.devkuma.com/jp/docs/graph-database/quick-start/</link>
+      <pubDate>Wed, 27 Jul 2022 07:48:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/jp/docs/graph-database/quick-start/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;グラフデータベースとは&#34;&gt;グラフデータベースとは&lt;/h2&gt;
+&lt;p&gt;グラフデータベースはグラフ構造を保存・処理する。リレーショナルデータベースでも関係を表現できるが、適切なスキーマ、複雑なクエリ、高コストなJOINが必要になりやすい。グラフデータベースはホワイトボードの図のように接続データを直感的に扱える一方、関係のないデータには適さない。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/graph-database/graph-data-model.png&#34; alt=&#34;グラフデータモデル&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;グラフはノードとエッジを持つ。&lt;/li&gt;
+&lt;li&gt;ノードはラベルとKey-Valueプロパティを持つ。&lt;/li&gt;
+&lt;li&gt;エッジはラベル、方向、開始ノード、終了ノードを持つ。&lt;/li&gt;
+&lt;li&gt;エッジもプロパティを持てる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;dockerで試す&#34;&gt;Dockerで試す&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git clone https://github.com/krlawrence/graph.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cd graph/sample-data
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run -it --rm -v `pwd`:/mydata tinkerpop/gremlin-console
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; :load /mydata/load-air-routes-graph-34.groovy
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;gremlinで探索する&#34;&gt;Gremlinで探索する&lt;/h2&gt;
+&lt;p&gt;Gremlinのトラバーサルは通常、グラフトラバーサルソース&lt;code&gt;g&lt;/code&gt;から始まる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3619
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3374
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;v[122]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).valueMap()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[country:[KR],code:[ICN],city:[Seoul],icao:[RKSI]]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;V()&lt;/code&gt;は頂点、&lt;code&gt;hasLabel&lt;/code&gt;はラベル、&lt;code&gt;has&lt;/code&gt;はプロパティを絞り込み、&lt;code&gt;valueMap&lt;/code&gt;はプロパティを返す。&lt;/p&gt;
+&lt;h3 id=&#34;リレーションシップをたどる&#34;&gt;リレーションシップをたどる&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;144
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).values(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;BKK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;SVO
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;HND
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;乗り継ぎ1回の重複を&lt;code&gt;dedup()&lt;/code&gt;で除くと1817空港になる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1817
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;直行便で到達できる空港を除くと1673、仁川から金浦へ戻る2区間ルートは次のように取得できる。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).aggregate(&amp;#39;nonstop&amp;#39;).out(&amp;#39;route&amp;#39;).where(without(&amp;#39;nonstop&amp;#39;)).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1673
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;GMP&amp;#39;).path().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,HND,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,KIX,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,NGO,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;韓国から日本への便を出発空港別に集計する。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).as(&amp;#39;kr&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).select(&amp;#39;kr&amp;#39;).groupCount().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN:27,TAE:5,GMP:3,CJU:4,PUS:6]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;最長路線はエッジの&lt;code&gt;dist&lt;/code&gt;を並べ替えて取得でき、仁川―新千歳の882マイルである。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).outE(&amp;#39;route&amp;#39;).order().by(&amp;#39;dist&amp;#39;,desc).inV().has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).path().by(&amp;#39;code&amp;#39;).by(&amp;#39;dist&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,882,CTS]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;特徴と難しさ&#34;&gt;特徴と難しさ&lt;/h2&gt;
+&lt;p&gt;接続データを容易にたどれるが、参照するノードやエッジが数百万規模になると応答は遅くなる。一般的なクエリを効率よく処理できるようグラフを設計し、グラフ保存の利点がないデータは他のデータベースと組み合わせることが重要である。&lt;/p&gt;
+&lt;h2 id=&#34;参考文献&#34;&gt;参考文献&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Practical Gremlin&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.oreilly.com/library/view/graph-databases/9781449356255/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;O&amp;rsquo;Reilly Graph Databases&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tinkerpop.apache.org/docs/current/reference/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TinkerPopドキュメント&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>データベース</category>
+      
+      <category>グラフデータベース</category>
+      
+      <category>Gremlin</category>
+      
+    </item>
+    
+  </channel>
+</rss>

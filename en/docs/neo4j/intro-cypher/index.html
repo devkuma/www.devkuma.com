@@ -1,0 +1,878 @@
+<!doctype html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="en" class="no-js" data-theme-init>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#000000">
+
+<style>
+  html { background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0b0d12; color: #e6e6e6; }
+  }
+  html[data-theme-init] * { transition: none !important; }
+</style>
+
+<script>
+  (function() {
+    const themeKey = 'td-color-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    let theme = storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    if (theme === 'auto') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>
+<meta name="robots" content="index, follow">
+
+
+<link rel="shortcut icon" href="/favicons/favicon.ico" >
+<link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png" sizes="180x180">
+<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicons/android-36x36.png" sizes="36x36">
+<link rel="icon" type="image/png" href="/favicons/android-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicons/android-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="/favicons/android-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/favicons/android-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="/favicons/android-192x192.png" sizes="192x192">
+
+<title>Introduction to Neo4j Cypher | devkuma</title>
+<meta name="description" content="What is Cypher? Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.
+As Neo4j’s primary interface, Cypher provides a visual way to match patterns and relationships.
+Cypher uses patterns such as (nodes)-[:ARE_CONNECTED_TO]-&gt;(otherNodes). Parentheses () represent nodes, brackets [] represent relationships, and - and -&gt; show the direction of a relationship between nodes.
+Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.">
+<meta property="og:url" content="https://www.devkuma.com/en/docs/neo4j/intro-cypher/">
+	<meta property="og:site_name" content="devkuma">
+	<meta property="og:title" content="Introduction to Neo4j Cypher">
+	<meta property="og:description" content="What is Cypher? Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.
+As Neo4j’s primary interface, Cypher provides a visual way to match patterns and relationships.
+Cypher uses patterns such as (nodes)-[:ARE_CONNECTED_TO]-&gt;(otherNodes). Parentheses () represent nodes, brackets [] represent relationships, and - and -&gt; show the direction of a relationship between nodes.
+Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.">
+	<meta property="og:locale" content="en">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="440_data-science_graphdb">
+		<meta property="article:published_time" content="2023-05-14T02:30:00+09:00">
+		<meta property="article:modified_time" content="2023-05-14T02:30:00+09:00">
+		<meta property="article:tag" content="Neo4j">
+		<meta property="article:tag" content="Graph Database">
+
+	<meta itemprop="name" content="Introduction to Neo4j Cypher">
+	<meta itemprop="description" content="What is Cypher? Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.
+As Neo4j’s primary interface, Cypher provides a visual way to match patterns and relationships.
+Cypher uses patterns such as (nodes)-[:ARE_CONNECTED_TO]-&gt;(otherNodes). Parentheses () represent nodes, brackets [] represent relationships, and - and -&gt; show the direction of a relationship between nodes.
+Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.">
+	<meta itemprop="datePublished" content="2023-05-14T02:30:00+09:00">
+	<meta itemprop="dateModified" content="2023-05-14T02:30:00+09:00">
+	<meta itemprop="wordCount" content="995">
+	<meta itemprop="keywords" content="Neo4j,Graph Database">
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:title" content="Introduction to Neo4j Cypher">
+	<meta name="twitter:description" content="What is Cypher? Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.
+As Neo4j’s primary interface, Cypher provides a visual way to match patterns and relationships.
+Cypher uses patterns such as (nodes)-[:ARE_CONNECTED_TO]-&gt;(otherNodes). Parentheses () represent nodes, brackets [] represent relationships, and - and -&gt; show the direction of a relationship between nodes.
+Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.">
+<link rel="preload" href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" as="style" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<link href="/scss/main.min.791c04117eee064961dc7878c2d152be5e037e49d363d7944c9018210ff9b3ba.css" rel="stylesheet" integrity="sha256-eRwEEX7uBklh3Hh4wtFSvl4DfknTY9eUTJAYIQ/5s7o=" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-3.7.1.min.js"
+  integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+  crossorigin="anonymous"></script>
+
+<link rel="canonical" href="https://www.devkuma.com/en/docs/neo4j/intro-cypher/">
+<link rel="apple-touch-icon" href="/logo/180x180.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/logo/76x76.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/logo/120x120.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/logo/152x152.jpg">
+<link rel="alternate" type="application/rss+xml" title="프로그램 개발 지식 공유, devkuma" href="https://www.devkuma.com/docs/index.xml" />
+
+<meta name="google-site-verification" content="H-H39pWMNsr140LTp2QECNnXtOVbixbDubFbZV668hg" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-FW3TZ3QLYR"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-FW3TZ3QLYR');
+        }
+      </script>
+  </head>
+  <body class="td-page">
+    <header>
+      <nav class="td-navbar js-navbar-scroll">
+<div class="td-navbar-container container-fluid flex-column flex-md-row">
+  <a class="navbar-brand" href="/en/"><span class="navbar-brand__logo navbar-logo"><svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000" stroke="none"><path d="M974 4420c-263-37-494-206-609-445-59-123-70-176-69-330 0-155 16-220 82-350 38-75 63-107 152-196l107-106-29-58c-46-90-106-280-129-411-31-171-31-477 0-648 36-202 117-418 222-591 139-231 386-480 634-641 83-54 349-194 369-194 4 0-19 29-52 65-207 221-303 511-272 818 24 241 110 428 280 610 189 202 437 333 707 371 414 59 784-58 1067-338 142-141 225-276 283-465 26-81 27-97 27-286 0-190-1-204-27-289-38-122-113-264-192-364l-67-84 74 38c242 127 425 261 593 435 324 336 487 715 502 1167 11 310-33 536-154 805l-35 78 89 92c101 107 143 172 187 294 29 84 31 95 31 243-1 144-3 161-28 235-87 250-304 451-556 516-239 62-509 20-697-108-69-47-172-150-222-222-37-54-46-57-102-41-58 17-220 48-303 60-103 13-487 13-602-1-49-6-148-24-220-41-71-16-139-32-150-34-15-4-27 6-49 41-108 173-289 306-484 356-87 22-268 32-358 19zm3128-429c280-97 375-437 182-651l-35-39-112 116c-169 175-350 317-528 416l-32 18 44 45c48 49 123 90 202 110 70 18 206 11 279-15zm-28e2-44c40-19 91-55 113-77 37-39 39-43 21-54-219-132-429-309-584-491l-51-60-36 35c-20 19-51 64-68 1e2-30 61-32 70-32 180 0 107 2 119 28 170 59 113 139 183 255 221 45 15 80 18 169 16 105-3 116-5 185-40z"/><path d="M2388 2235c-80-20-152-59-209-112-194-181-11-436 329-459 149-10 309 38 401 122 158 142 91 340-145 430-58 23-88 27-194 30-87 3-143-1-182-11z"/></g></svg></span><span class="navbar-brand__name">devkuma</span></a>
+  <div class="td-navbar__main td-navbar-nav-scroll td-navbar-nav-scroll--indicator" id="main_navbar">
+    <div class="scroll-indicator scroll-left"></div>
+    <ul class="navbar-nav">
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/en/docs/category/ai/"><i class='fa fa-microchip'></i><span>AI</span></a>
+      </li>
+      
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-desktop'></i>
+          <span>Computer</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/computer/basic/">Basic computer knowledge</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/operating-system/">Operating System</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/network/">Network</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/computer/" role="button">
+          <span>Computer</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-keyboard'></i>
+          <span>Programming</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/design/">Design and Development</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/testing/">Software Testing</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/jvm/">JVM Based Programming</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/spring/">Spring framework</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/web/">Web Programming</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/programming/tools/">Programming Tools</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/programming/" role="button">
+          <span>Programming</span>
+				</a>
+      </li>
+      
+			
+
+      
+			<li class="dropdown sub-menu d-none d-lg-block">
+				<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class='fas fa-database'></i>
+          <span>Data Science</span>
+				</a>
+        <ul class="dropdown-menu">
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/big-data/">Big Data</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/rdb/">Relational Database</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/nosql/">NoSQL Database</a>
+					
+					<a class="dropdown-item" href="/en/docs/category/data-science/graph-db/">Graph Databse</a>
+					
+				</ul>
+			</li>
+      <li class="d-lg-none">
+        <a class="nav-link" href="/en/docs/category/data-science/" role="button">
+          <span>Data Science</span>
+				</a>
+      </li>
+      
+			
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="/en/docs/category/dev-ops/"><i class='fas fa-cogs'></i><span>DevOps</span></a>
+      </li>
+      
+
+      
+
+
+      <li class="nav-item">
+        <a class="nav-link" href="https://toolkit.devkuma.com" target="_blank" rel="noopener"><i class='fas fa-tools'></i><span>Toolkit</span><sup><i class='ps-1 fa-solid fa-up-right-from-square fa-xs' aria-hidden='true'></i></sup></a>
+      </li>
+      
+
+      <li class="nav-item td-navbar__lang-menu">
+        <div class="td-lang-menu dropdown">
+  <a class="nav-link dropdown-toggle td-lang-menu__title" href="#" role="button"
+    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="td-lang-menu__title-text">English</span>
+    <span class="td-lang-menu__title-code">EN</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/docs/neo4j/intro-cypher/">한국어</a></li>
+      <li><span class="dropdown-item active">English</span></li>
+      <li><a class="dropdown-item" href="/jp/docs/neo4j/intro-cypher/">日本語</a></li>
+      </ul>
+</div></li>
+      <li class="nav-item td-navbar__light-dark-menu">
+        <div class="td-light-dark-menu dropdown"><svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+<button class="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active"><use href="#circle-half"></use></svg>
+</button>
+<ul class="dropdown-menu" aria-labelledby="bd-theme">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+</div>
+
+      </li>
+      </ul>
+    <div class="scroll-indicator scroll-right"></div>
+  </div>
+  <div class="td-navbar__search d-none d-lg-block">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+  </div>
+</div>
+</nav>
+    </header>
+    <div class="container-fluid td-outer">
+      <div class="td-main" data-bs-spy="scroll" data-bs-target=".td-toc" data-bs-root-margin="0px 0px -10%">
+        <div class="row flex-xl-nowrap">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+            
+  <script>
+    $(function() {
+    $("#td-section-nav a").removeClass("active");
+    $("#td-section-nav #m-endocsneo4jintro-cypher").addClass("active");
+    $("#td-section-nav #m-endocsneo4jintro-cypher-li span").addClass("td-sidebar-nav-active-item");
+    $("#td-section-nav #m-endocsneo4jintro-cypher").parents("li").addClass("active-path");
+    $("#td-section-nav li.active-path").addClass("show");
+    $("#td-section-nav li.active-path").children("input").prop('checked', true);
+    $("#td-section-nav #m-endocsneo4jintro-cypher-li").siblings("li").addClass("show");
+    $("#td-section-nav #m-endocsneo4jintro-cypher-li").children("ul").children("li").addClass("show");
+    $("#td-sidebar-menu").toggleClass("d-none");
+    });
+  </script>
+  <div id="td-sidebar-menu" class="td-sidebar__inner d-none">
+  <form class="td-sidebar__search d-flex align-items-center">
+    <div class="td-search">
+  <div class="td-search__icon"></div>
+  <input type="search" name="q" class="td-search__input form-control td-search-input" placeholder='Search this site…' aria-label='Search this site…' autocomplete="off">
+</div>
+    <button class="btn btn-link td-sidebar__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#td-section-nav" aria-controls="td-section-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    </button>
+  </form>
+  <nav class="td-sidebar-nav collapse foldable-nav" id="td-section-nav">
+    <ul class="td-sidebar-nav__section pe-md-3 ul-0">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocscategorydata-sciencegraph-db-li">
+    <a href="/en/docs/category/data-science/graph-db/" class="align-left ps-0 td-sidebar-link td-sidebar-link__section tree-root" id="m-endocscategorydata-sciencegraph-db"><span class="">Graph Database</span></a>
+    <ul class="ul-1">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsgraph-db-li">
+    <input type="checkbox" id="m-endocsgraph-db-check"/>
+    <label for="m-endocsgraph-db-check"><a href="/en/docs/graph-db/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsgraph-db"><span class="">Graph Database</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsgraph-databaseoverview-li">
+    <input type="checkbox" id="m-endocsgraph-databaseoverview-check"/>
+    <label for="m-endocsgraph-databaseoverview-check"><a href="/en/docs/graph-database/overview/" title="Graph Database Overview" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsgraph-databaseoverview"><span class="">Overview</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsgraph-databasequick-start-li">
+    <input type="checkbox" id="m-endocsgraph-databasequick-start-check"/>
+    <label for="m-endocsgraph-databasequick-start-check"><a href="/en/docs/graph-database/quick-start/" title="Graph Database Quick Start Guide" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsgraph-databasequick-start"><span class="">Getting Started</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsgraph-databaseapache-tinkerpop-li">
+    <input type="checkbox" id="m-endocsgraph-databaseapache-tinkerpop-check"/>
+    <label for="m-endocsgraph-databaseapache-tinkerpop-check"><a href="/en/docs/graph-database/apache-tinkerpop/" title="What Is Apache TinkerPop?" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsgraph-databaseapache-tinkerpop"><span class="">Apache TinkerPop</span></a></label>
+    
+  </li>
+    </ul>
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section with-child" id="m-endocsneo4j-li">
+    <input type="checkbox" id="m-endocsneo4j-check"/>
+    <label for="m-endocsneo4j-check"><a href="/en/docs/neo4j/" class="align-left ps-0  td-sidebar-link td-sidebar-link__section" id="m-endocsneo4j"><span class="">Neo4j</span></a></label>
+    
+    <ul class="ul-2 foldable">
+      <li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4joverview-li">
+    <input type="checkbox" id="m-endocsneo4joverview-check"/>
+    <label for="m-endocsneo4joverview-check"><a href="/en/docs/neo4j/overview/" title="Neo4j Overview - Features and Operating Environments" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4joverview"><span class="">Neo4j Overview</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jterms-li">
+    <input type="checkbox" id="m-endocsneo4jterms-check"/>
+    <label for="m-endocsneo4jterms-check"><a href="/en/docs/neo4j/terms/" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jterms"><span class="">Neo4j Terminology</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jinstallation-macos-li">
+    <input type="checkbox" id="m-endocsneo4jinstallation-macos-check"/>
+    <label for="m-endocsneo4jinstallation-macos-check"><a href="/en/docs/neo4j/installation-macos/" title="Downloading and Installing Neo4j on macOS" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jinstallation-macos"><span class="">Download and Install</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jinstallation-homebrew-li">
+    <input type="checkbox" id="m-endocsneo4jinstallation-homebrew-check"/>
+    <label for="m-endocsneo4jinstallation-homebrew-check"><a href="/en/docs/neo4j/installation-homebrew/" title="Installing Neo4j with Homebrew on macOS" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jinstallation-homebrew"><span class="">Install with Homebrew</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jinstallation-docker-li">
+    <input type="checkbox" id="m-endocsneo4jinstallation-docker-check"/>
+    <label for="m-endocsneo4jinstallation-docker-check"><a href="/en/docs/neo4j/installation-docker/" title="Installing Neo4j with Docker" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jinstallation-docker"><span class="">Docker Installation</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jintro-cypher-li">
+    <input type="checkbox" id="m-endocsneo4jintro-cypher-check"/>
+    <label for="m-endocsneo4jintro-cypher-check"><a href="/en/docs/neo4j/intro-cypher/" title="Introduction to Neo4j Cypher" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jintro-cypher"><span class="">Introduction to Cypher</span></a></label>
+    
+  </li><li class="td-sidebar-nav__section-title td-sidebar-nav__section without-child" id="m-endocsneo4jcypher-querying-li">
+    <input type="checkbox" id="m-endocsneo4jcypher-querying-check"/>
+    <label for="m-endocsneo4jcypher-querying-check"><a href="/en/docs/neo4j/cypher-querying/" title="Neo4j Cypher Queries" class="align-left ps-0  td-sidebar-link td-sidebar-link__page" id="m-endocsneo4jcypher-querying"><span class="">Cypher Queries</span></a></label>
+    
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </li>
+    </ul>
+  </nav>
+</div>
+
+          </aside>
+          <aside class="td-sidebar-toc">
+            <div class="td-page-meta ms-2 pb-1 pt-2 mb-0">
+
+</div>
+
+            <div class="td-toc" data-proofer-ignore>
+<div class="td-toc-title">
+      <span class="td-toc-title__text">On this page</span>
+      <a class="td-toc-title__link" title="Top of page" href="#"></a>
+    </div>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-cypher">What is Cypher?</a></li>
+    <li><a href="#cypher-syntax">Cypher syntax</a>
+      <ul>
+        <li><a href="#cypher-comments">Cypher comments</a></li>
+      </ul>
+    </li>
+    <li><a href="#representing-nodes-in-cypher">Representing nodes in Cypher</a>
+      <ul>
+        <li><a href="#node-variables">Node variables</a></li>
+        <li><a href="#node-labels">Node labels</a></li>
+        <li><a href="#example-nodes-in-cypher">Example: nodes in Cypher</a></li>
+      </ul>
+    </li>
+    <li><a href="#representing-relationships-in-cypher">Representing relationships in Cypher</a></li>
+    <li><a href="#relationship-types">Relationship types</a>
+      <ul>
+        <li><a href="#relationship-variables">Relationship variables</a></li>
+      </ul>
+    </li>
+    <li><a href="#node-and-relationship-properties">Node and relationship properties</a></li>
+    <li><a href="#patterns-in-cypher">Patterns in Cypher</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ul>
+</nav>
+  </div>
+
+            <div class="taxonomy taxonomy-terms-cloud taxo-tags">
+      <h5 class="taxonomy-title">Tags</h5>
+      <ul class="taxonomy-terms">
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ai/" data-taxonomy-term="ai"><span class="taxonomy-label">AI</span><span class="taxonomy-count">39</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/algorithm/" data-taxonomy-term="algorithm"><span class="taxonomy-label">Algorithm</span><span class="taxonomy-count">61</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/android/" data-taxonomy-term="android"><span class="taxonomy-label">Android</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angular/" data-taxonomy-term="angular"><span class="taxonomy-label">Angular</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angular2/" data-taxonomy-term="angular2"><span class="taxonomy-label">Angular2</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/angularjs/" data-taxonomy-term="angularjs"><span class="taxonomy-label">AngularJS</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache/" data-taxonomy-term="apache"><span class="taxonomy-label">Apache</span><span class="taxonomy-count">51</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-hadoop/" data-taxonomy-term="apache-hadoop"><span class="taxonomy-label">Apache Hadoop</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-kafka/" data-taxonomy-term="apache-kafka"><span class="taxonomy-label">Apache Kafka</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-spark/" data-taxonomy-term="apache-spark"><span class="taxonomy-label">Apache Spark</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-thrift/" data-taxonomy-term="apache-thrift"><span class="taxonomy-label">Apache Thrift</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/apache-zookeeper/" data-taxonomy-term="apache-zookeeper"><span class="taxonomy-label">Apache ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/architecture/" data-taxonomy-term="architecture"><span class="taxonomy-label">Architecture</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/aws/" data-taxonomy-term="aws"><span class="taxonomy-label">AWS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bdd/" data-taxonomy-term="bdd"><span class="taxonomy-label">BDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bigdata/" data-taxonomy-term="bigdata"><span class="taxonomy-label">BigData</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/blog/" data-taxonomy-term="blog"><span class="taxonomy-label">Blog</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bootstrap/" data-taxonomy-term="bootstrap"><span class="taxonomy-label">Bootstrap</span><span class="taxonomy-count">10</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/bug/" data-taxonomy-term="bug"><span class="taxonomy-label">Bug</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/build/" data-taxonomy-term="build"><span class="taxonomy-label">Build</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/c/" data-taxonomy-term="c"><span class="taxonomy-label">C</span><span class="taxonomy-count">86</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cache/" data-taxonomy-term="cache"><span class="taxonomy-label">Cache</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/caffeine/" data-taxonomy-term="caffeine"><span class="taxonomy-label">Caffeine</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/calibre/" data-taxonomy-term="calibre"><span class="taxonomy-label">Calibre</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cassandra/" data-taxonomy-term="cassandra"><span class="taxonomy-label">Cassandra</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cdn/" data-taxonomy-term="cdn"><span class="taxonomy-label">CDN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/centos/" data-taxonomy-term="centos"><span class="taxonomy-label">CentOS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cerebro/" data-taxonomy-term="cerebro"><span class="taxonomy-label">Cerebro</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/chatgpt/" data-taxonomy-term="chatgpt"><span class="taxonomy-label">ChatGPT</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ci/cd/" data-taxonomy-term="ci/cd"><span class="taxonomy-label">CI/CD</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/claude/" data-taxonomy-term="claude"><span class="taxonomy-label">Claude</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/claude-code/" data-taxonomy-term="claude-code"><span class="taxonomy-label">Claude Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cloud/" data-taxonomy-term="cloud"><span class="taxonomy-label">Cloud</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cloud-native/" data-taxonomy-term="cloud-native"><span class="taxonomy-label">Cloud Native</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/code/" data-taxonomy-term="code"><span class="taxonomy-label">Code</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/codex/" data-taxonomy-term="codex"><span class="taxonomy-label">Codex</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/computer/" data-taxonomy-term="computer"><span class="taxonomy-label">Computer</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/cors/" data-taxonomy-term="cors"><span class="taxonomy-label">CORS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/css/" data-taxonomy-term="css"><span class="taxonomy-label">CSS</span><span class="taxonomy-count">69</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/d3/" data-taxonomy-term="d3"><span class="taxonomy-label">D3</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/d3.js/" data-taxonomy-term="d3.js"><span class="taxonomy-label">D3.js</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/data/" data-taxonomy-term="data"><span class="taxonomy-label">Data</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/data-structure/" data-taxonomy-term="data-structure"><span class="taxonomy-label">Data Structure</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/database/" data-taxonomy-term="database"><span class="taxonomy-label">Database</span><span class="taxonomy-count">298</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ddd/" data-taxonomy-term="ddd"><span class="taxonomy-label">DDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/design-pattern/" data-taxonomy-term="design-pattern"><span class="taxonomy-label">Design Pattern</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/devops/" data-taxonomy-term="devops"><span class="taxonomy-label">DevOps</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dns/" data-taxonomy-term="dns"><span class="taxonomy-label">DNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/docker/" data-taxonomy-term="docker"><span class="taxonomy-label">Docker</span><span class="taxonomy-count">28</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/docusaurus/" data-taxonomy-term="docusaurus"><span class="taxonomy-label">Docusaurus</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/dto/" data-taxonomy-term="dto"><span class="taxonomy-label">Dto</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-book/" data-taxonomy-term="e-book"><span class="taxonomy-label">E-Book</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/e-mail/" data-taxonomy-term="e-mail"><span class="taxonomy-label">E-Mail</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/eclipse/" data-taxonomy-term="eclipse"><span class="taxonomy-label">Eclipse</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/effective-java/" data-taxonomy-term="effective-java"><span class="taxonomy-label">Effective Java</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/elasticsearch/" data-taxonomy-term="elasticsearch"><span class="taxonomy-label">Elasticsearch</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/elastisearch/" data-taxonomy-term="elastisearch"><span class="taxonomy-label">Elastisearch</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/entity/" data-taxonomy-term="entity"><span class="taxonomy-label">Entity</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/epub/" data-taxonomy-term="epub"><span class="taxonomy-label">EPub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/etym/" data-taxonomy-term="etym"><span class="taxonomy-label">ETYM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/excel/" data-taxonomy-term="excel"><span class="taxonomy-label">Excel</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/flutter/" data-taxonomy-term="flutter"><span class="taxonomy-label">Flutter</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ftp/" data-taxonomy-term="ftp"><span class="taxonomy-label">FTP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/game/" data-taxonomy-term="game"><span class="taxonomy-label">Game</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/garbage-collection/" data-taxonomy-term="garbage-collection"><span class="taxonomy-label">Garbage Collection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gcp/" data-taxonomy-term="gcp"><span class="taxonomy-label">GCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gemini/" data-taxonomy-term="gemini"><span class="taxonomy-label">Gemini</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/git/" data-taxonomy-term="git"><span class="taxonomy-label">Git</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/github/" data-taxonomy-term="github"><span class="taxonomy-label">GitHub</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gitops/" data-taxonomy-term="gitops"><span class="taxonomy-label">GitOps</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/go/" data-taxonomy-term="go"><span class="taxonomy-label">Go</span><span class="taxonomy-count">20</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gradle/" data-taxonomy-term="gradle"><span class="taxonomy-label">Gradle</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/grafana/" data-taxonomy-term="grafana"><span class="taxonomy-label">Grafana</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/graphql/" data-taxonomy-term="graphql"><span class="taxonomy-label">GraphQL</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gremlin/" data-taxonomy-term="gremlin"><span class="taxonomy-label">Gremlin</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/groovy/" data-taxonomy-term="groovy"><span class="taxonomy-label">Groovy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/grpc/" data-taxonomy-term="grpc"><span class="taxonomy-label">GRPC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/guava/" data-taxonomy-term="guava"><span class="taxonomy-label">Guava</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/gulp/" data-taxonomy-term="gulp"><span class="taxonomy-label">Gulp</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/handlebars/" data-taxonomy-term="handlebars"><span class="taxonomy-label">Handlebars</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/harbor/" data-taxonomy-term="harbor"><span class="taxonomy-label">Harbor</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hbase/" data-taxonomy-term="hbase"><span class="taxonomy-label">HBase</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/helm/" data-taxonomy-term="helm"><span class="taxonomy-label">Helm</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/html/" data-taxonomy-term="html"><span class="taxonomy-label">HTML</span><span class="taxonomy-count">65</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/http/" data-taxonomy-term="http"><span class="taxonomy-label">HTTP</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hugo/" data-taxonomy-term="hugo"><span class="taxonomy-label">Hugo</span><span class="taxonomy-count">22</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/hyper-v/" data-taxonomy-term="hyper-v"><span class="taxonomy-label">Hyper-V</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ide/" data-taxonomy-term="ide"><span class="taxonomy-label">IDE</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/influxdb/" data-taxonomy-term="influxdb"><span class="taxonomy-label">InfluxDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/intellij/" data-taxonomy-term="intellij"><span class="taxonomy-label">IntelliJ</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/internet/" data-taxonomy-term="internet"><span class="taxonomy-label">Internet</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ip/" data-taxonomy-term="ip"><span class="taxonomy-label">IP</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/it-terms/" data-taxonomy-term="it-terms"><span class="taxonomy-label">IT Terms</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/java/" data-taxonomy-term="java"><span class="taxonomy-label">Java</span><span class="taxonomy-count">440</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javadoc/" data-taxonomy-term="javadoc"><span class="taxonomy-label">Javadoc</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javafx/" data-taxonomy-term="javafx"><span class="taxonomy-label">JavaFX</span><span class="taxonomy-count">12</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/javascript/" data-taxonomy-term="javascript"><span class="taxonomy-label">JavaScript</span><span class="taxonomy-count">205</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jenkins/" data-taxonomy-term="jenkins"><span class="taxonomy-label">Jenkins</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jpa/" data-taxonomy-term="jpa"><span class="taxonomy-label">JPA</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jquery/" data-taxonomy-term="jquery"><span class="taxonomy-label">JQuery</span><span class="taxonomy-count">53</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/json/" data-taxonomy-term="json"><span class="taxonomy-label">JSON</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jsp/" data-taxonomy-term="jsp"><span class="taxonomy-label">JSP</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/junit/" data-taxonomy-term="junit"><span class="taxonomy-label">JUnit</span><span class="taxonomy-count">18</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/jvm/" data-taxonomy-term="jvm"><span class="taxonomy-label">JVM</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kafka/" data-taxonomy-term="kafka"><span class="taxonomy-label">Kafka</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kibana/" data-taxonomy-term="kibana"><span class="taxonomy-label">Kibana</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotest/" data-taxonomy-term="kotest"><span class="taxonomy-label">Kotest</span><span class="taxonomy-count">78</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kotlin/" data-taxonomy-term="kotlin"><span class="taxonomy-label">Kotlin</span><span class="taxonomy-count">160</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ktor/" data-taxonomy-term="ktor"><span class="taxonomy-label">Ktor</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/kubernetes/" data-taxonomy-term="kubernetes"><span class="taxonomy-label">Kubernetes</span><span class="taxonomy-count">21</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lan/" data-taxonomy-term="lan"><span class="taxonomy-label">LAN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/laravel/" data-taxonomy-term="laravel"><span class="taxonomy-label">Laravel</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/license/" data-taxonomy-term="license"><span class="taxonomy-label">License</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/linux/" data-taxonomy-term="linux"><span class="taxonomy-label">Linux</span><span class="taxonomy-count">77</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/llm/" data-taxonomy-term="llm"><span class="taxonomy-label">LLM</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/logback/" data-taxonomy-term="logback"><span class="taxonomy-label">Logback</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lombok/" data-taxonomy-term="lombok"><span class="taxonomy-label">Lombok</span><span class="taxonomy-count">16</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/lua/" data-taxonomy-term="lua"><span class="taxonomy-label">Lua</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/macos/" data-taxonomy-term="macos"><span class="taxonomy-label">MacOS</span><span class="taxonomy-count">19</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/makefile/" data-taxonomy-term="makefile"><span class="taxonomy-label">Makefile</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/markdown/" data-taxonomy-term="markdown"><span class="taxonomy-label">Markdown</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/maven/" data-taxonomy-term="maven"><span class="taxonomy-label">Maven</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mcp/" data-taxonomy-term="mcp"><span class="taxonomy-label">MCP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/message-queue/" data-taxonomy-term="message-queue"><span class="taxonomy-label">Message Queue</span><span class="taxonomy-count">6</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockk/" data-taxonomy-term="mockk"><span class="taxonomy-label">Mockk</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mockserver/" data-taxonomy-term="mockserver"><span class="taxonomy-label">MockServer</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mongodb/" data-taxonomy-term="mongodb"><span class="taxonomy-label">MongoDB</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mqtt/" data-taxonomy-term="mqtt"><span class="taxonomy-label">MQTT</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/msa/" data-taxonomy-term="msa"><span class="taxonomy-label">MSA</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mvc/" data-taxonomy-term="mvc"><span class="taxonomy-label">MVC</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mybatis/" data-taxonomy-term="mybatis"><span class="taxonomy-label">MyBatis</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/mysql/" data-taxonomy-term="mysql"><span class="taxonomy-label">MySQL</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/network/" data-taxonomy-term="network"><span class="taxonomy-label">Network</span><span class="taxonomy-count">24</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/nginx/" data-taxonomy-term="nginx"><span class="taxonomy-label">Nginx</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/node.js/" data-taxonomy-term="node.js"><span class="taxonomy-label">Node.js</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/nosql/" data-taxonomy-term="nosql"><span class="taxonomy-label">NoSQL</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/os/" data-taxonomy-term="os"><span class="taxonomy-label">OS</span><span class="taxonomy-count">100</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/osi/" data-taxonomy-term="osi"><span class="taxonomy-label">OSI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/php/" data-taxonomy-term="php"><span class="taxonomy-label">Php</span><span class="taxonomy-count">67</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/pinpoint/" data-taxonomy-term="pinpoint"><span class="taxonomy-label">Pinpoint</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/port/" data-taxonomy-term="port"><span class="taxonomy-label">Port</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/postgresql/" data-taxonomy-term="postgresql"><span class="taxonomy-label">PostgreSQL</span><span class="taxonomy-count">60</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/programming/" data-taxonomy-term="programming"><span class="taxonomy-label">Programming</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/prometheus/" data-taxonomy-term="prometheus"><span class="taxonomy-label">Prometheus</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/proxy/" data-taxonomy-term="proxy"><span class="taxonomy-label">Proxy</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/pyspark/" data-taxonomy-term="pyspark"><span class="taxonomy-label">PySpark</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/python/" data-taxonomy-term="python"><span class="taxonomy-label">Python</span><span class="taxonomy-count">34</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rag/" data-taxonomy-term="rag"><span class="taxonomy-label">RAG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rdb/" data-taxonomy-term="rdb"><span class="taxonomy-label">RDB</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rdbms/" data-taxonomy-term="rdbms"><span class="taxonomy-label">RDBMS</span><span class="taxonomy-count">7</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/react/" data-taxonomy-term="react"><span class="taxonomy-label">React</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/redis/" data-taxonomy-term="redis"><span class="taxonomy-label">Redis</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/reflection/" data-taxonomy-term="reflection"><span class="taxonomy-label">Reflection</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rest-api/" data-taxonomy-term="rest-api"><span class="taxonomy-label">REST API</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rmi/" data-taxonomy-term="rmi"><span class="taxonomy-label">RMI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/robots/" data-taxonomy-term="robots"><span class="taxonomy-label">Robots</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/rpc/" data-taxonomy-term="rpc"><span class="taxonomy-label">RPC</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sass/" data-taxonomy-term="sass"><span class="taxonomy-label">SASS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/scm/" data-taxonomy-term="scm"><span class="taxonomy-label">SCM</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/scsss/" data-taxonomy-term="scsss"><span class="taxonomy-label">SCSSS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/security/" data-taxonomy-term="security"><span class="taxonomy-label">Security</span><span class="taxonomy-count">23</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/seo/" data-taxonomy-term="seo"><span class="taxonomy-label">SEO</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/servlet/" data-taxonomy-term="servlet"><span class="taxonomy-label">Servlet</span><span class="taxonomy-count">44</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sigil/" data-taxonomy-term="sigil"><span class="taxonomy-label">Sigil</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/site/" data-taxonomy-term="site"><span class="taxonomy-label">Site</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sitemap/" data-taxonomy-term="sitemap"><span class="taxonomy-label">Sitemap</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sns/" data-taxonomy-term="sns"><span class="taxonomy-label">SNS</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/software/" data-taxonomy-term="software"><span class="taxonomy-label">Software</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/solid/" data-taxonomy-term="solid"><span class="taxonomy-label">SOLID</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spinnaker/" data-taxonomy-term="spinnaker"><span class="taxonomy-label">Spinnaker</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring/" data-taxonomy-term="spring"><span class="taxonomy-label">Spring</span><span class="taxonomy-count">120</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-batch/" data-taxonomy-term="spring-batch"><span class="taxonomy-label">Spring Batch</span><span class="taxonomy-count">5</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-boot/" data-taxonomy-term="spring-boot"><span class="taxonomy-label">Spring Boot</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-data/" data-taxonomy-term="spring-data"><span class="taxonomy-label">Spring Data</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-data-r2dbc/" data-taxonomy-term="spring-data-r2dbc"><span class="taxonomy-label">Spring Data R2DBC</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-security/" data-taxonomy-term="spring-security"><span class="taxonomy-label">Spring Security</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/spring-web-reactive/" data-taxonomy-term="spring-web-reactive"><span class="taxonomy-label">Spring Web Reactive</span><span class="taxonomy-count">35</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sql/" data-taxonomy-term="sql"><span class="taxonomy-label">SQL</span><span class="taxonomy-count">42</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sqlite/" data-taxonomy-term="sqlite"><span class="taxonomy-label">SQLite</span><span class="taxonomy-count">108</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/sre/" data-taxonomy-term="sre"><span class="taxonomy-label">SRE</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/stack/" data-taxonomy-term="stack"><span class="taxonomy-label">Stack</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/subversion/" data-taxonomy-term="subversion"><span class="taxonomy-label">Subversion</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/svg/" data-taxonomy-term="svg"><span class="taxonomy-label">SVG</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/svn/" data-taxonomy-term="svn"><span class="taxonomy-label">SVN</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/swift/" data-taxonomy-term="swift"><span class="taxonomy-label">Swift</span><span class="taxonomy-count">49</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/syntaxhighlighter/" data-taxonomy-term="syntaxhighlighter"><span class="taxonomy-label">SyntaxHighlighter</span><span class="taxonomy-count">11</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tcp/" data-taxonomy-term="tcp"><span class="taxonomy-label">TCP</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tdd/" data-taxonomy-term="tdd"><span class="taxonomy-label">TDD</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/telnet/" data-taxonomy-term="telnet"><span class="taxonomy-label">Telnet</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testcontainers/" data-taxonomy-term="testcontainers"><span class="taxonomy-label">Testcontainers</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/testing/" data-taxonomy-term="testing"><span class="taxonomy-label">Testing</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/thymeleaf/" data-taxonomy-term="thymeleaf"><span class="taxonomy-label">Thymeleaf</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tidb/" data-taxonomy-term="tidb"><span class="taxonomy-label">TiDB</span><span class="taxonomy-count">25</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/tomcat/" data-taxonomy-term="tomcat"><span class="taxonomy-label">Tomcat</span><span class="taxonomy-count">8</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/transaction/" data-taxonomy-term="transaction"><span class="taxonomy-label">Transaction</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/typescript/" data-taxonomy-term="typescript"><span class="taxonomy-label">TypeScript</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/udp/" data-taxonomy-term="udp"><span class="taxonomy-label">UDP</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ui/" data-taxonomy-term="ui"><span class="taxonomy-label">UI</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/ux/" data-taxonomy-term="ux"><span class="taxonomy-label">UX</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vcs/" data-taxonomy-term="vcs"><span class="taxonomy-label">VCS</span><span class="taxonomy-count">46</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vectordb/" data-taxonomy-term="vectordb"><span class="taxonomy-label">VectorDB</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/version-control/" data-taxonomy-term="version-control"><span class="taxonomy-label">Version Control</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/virtualbox/" data-taxonomy-term="virtualbox"><span class="taxonomy-label">VirtualBox</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/virtualization/" data-taxonomy-term="virtualization"><span class="taxonomy-label">Virtualization</span><span class="taxonomy-count">2</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vo/" data-taxonomy-term="vo"><span class="taxonomy-label">Vo</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vpn/" data-taxonomy-term="vpn"><span class="taxonomy-label">VPN</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vscode/" data-taxonomy-term="vscode"><span class="taxonomy-label">VSCode</span><span class="taxonomy-count">4</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/vue.js/" data-taxonomy-term="vue.js"><span class="taxonomy-label">Vue.js</span><span class="taxonomy-count">9</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/web/" data-taxonomy-term="web"><span class="taxonomy-label">Web</span><span class="taxonomy-count">390</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/windows/" data-taxonomy-term="windows"><span class="taxonomy-label">Windows</span><span class="taxonomy-count">3</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/xml/" data-taxonomy-term="xml"><span class="taxonomy-label">XML</span><span class="taxonomy-count">13</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/yaml/" data-taxonomy-term="yaml"><span class="taxonomy-label">YAML</span><span class="taxonomy-count">1</span></a></li>
+        <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/zookeeper/" data-taxonomy-term="zookeeper"><span class="taxonomy-label">ZooKeeper</span><span class="taxonomy-count">2</span></a></li>
+        </ul>
+    </div>
+  
+
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 ps-md-5" role="main">
+            
+            <nav aria-label="breadcrumb" class="td-breadcrumbs">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item">
+    <a href="/en/docs/category/data-science/graph-db/">Graph Database</a></li>
+  <li class="breadcrumb-item">
+    <a href="/en/docs/neo4j/">Neo4j</a></li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Introduction to Cypher</li>
+  </ol>
+</nav>
+<div class="td-content">
+	<h1>Introduction to Neo4j Cypher</h1>
+	
+	<header class="article-meta">
+		<div class="taxonomy taxonomy-terms-article taxo-tags">
+  <h5 class="taxonomy-title">Tags:</h5>
+  <ul class="taxonomy-terms">
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/neo4j/" data-taxonomy-term="neo4j"><span class="taxonomy-label">Neo4j</span></a></li>
+    <li><a class="taxonomy-term" href="https://www.devkuma.com/en/tags/graph-database/" data-taxonomy-term="graph-database"><span class="taxonomy-label">Graph Database</span></a></li>
+    </ul>
+</div>
+
+</header>
+	
+	<h2 id="what-is-cypher">What is Cypher?</h2>
+<p>Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.</p>
+<p><img src="/docs/neo4j/sample-cypher.png" alt="Sample Cypher"></p>
+<p>As Neo4j&rsquo;s primary interface, Cypher provides a visual way to match patterns and relationships.</p>
+<p>Cypher uses patterns such as <code>(nodes)-[:ARE_CONNECTED_TO]-&gt;(otherNodes)</code>. Parentheses <code>()</code> represent <strong>nodes</strong>, brackets <code>[]</code> represent <strong>relationships</strong>, and <code>-</code> and <code>-&gt;</code> show the <strong>direction of a relationship</strong> between nodes.</p>
+<p>Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.</p>
+<h2 id="cypher-syntax">Cypher syntax</h2>
+<p>Cypher is designed for humans to read. Its syntax uses English words and visual shapes representing entities.</p>
+<p><img src="/docs/neo4j/cypher_graph_v1.jpg" alt="Cypher graph v1"></p>
+<ul>
+<li>Jennifer likes graphs as a technology.</li>
+<li>Jennifer has been friends with Michael since 2018.</li>
+<li>Jennifer works for Neo4j.</li>
+</ul>
+<h3 id="cypher-comments">Cypher comments</h3>
+<p>Comments start with <code>//</code>, followed by any desired text. As in many programming languages, beginning a line with two slashes makes the rest of that line a comment.</p>
+<h2 id="representing-nodes-in-cypher">Representing nodes in Cypher</h2>
+<p>Cypher uses ASCII art<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> for patterns, so each component needs a visual representation. Nodes and relationships are the main components of the property graph model. Nodes are data entities in a graph and usually correspond to nouns or objects in a data model. In this example, Jennifer, Michael, and Graphs are Neo4j nodes.</p>
+<p><img src="/docs/neo4j/cypher_graph_nodes.jpg" alt="Cypher graph nodes"></p>
+<p>A node is enclosed in parentheses, as in <code>(node)</code>. The parentheses resemble the circles commonly used for nodes in visual data models.</p>
+<h3 id="node-variables">Node variables</h3>
+<p>Assign a variable such as <code>p</code> or <code>t</code> to refer to a node later: <code>(p:Person)</code> or <code>(t:Thing)</code>. Longer, descriptive names such as <code>(person)</code> and <code>(thing)</code> are also valid. As with variables in programming languages, choose a name and use the same name for later references.</p>
+<p>Empty parentheses specify an anonymous node. Use <code>()</code> when the node itself is irrelevant to the returned result. An anonymous node cannot be returned by name later in the query.</p>
+<h3 id="node-labels">Node labels</h3>
+<p>Node labels group similar nodes in a property graph. A label works like a tag, specifying the type of entity to find or create. In this example, <code>Person</code>, <code>Technology</code>, and <code>Company</code> are labels.</p>
+<p>Labels resemble selecting a table in SQL. Just as SQL can target a <code>Person</code>, <code>Employee</code>, or <code>Customer</code> table, Cypher can inspect only nodes with the relevant label. This distinguishes entities and helps optimize query execution. Use node labels whenever possible.</p>
+<blockquote>
+<p>Without a label, Cypher must inspect every node in the database to filter out unrelated categories. Queries over very large graphs may therefore take much longer.</p>
+</blockquote>
+<h3 id="example-nodes-in-cypher">Example: nodes in Cypher</h3>
+<p>The following examples use the graph described above.</p>
+<pre tabindex="0"><code class="language-cypher" data-lang="cypher">()                  // Anonymous node with no label or variable; can refer to any node
+(p:Person)          // Variable p and label Person
+(:Technology)       // No variable; label Technology
+(work:Company)      // Variable work and label Company
+</code></pre><h2 id="representing-relationships-in-cypher">Representing relationships in Cypher</h2>
+<p>To use a graph database effectively, represent relationships between nodes. Cypher displays a relationship between two nodes with an arrow, <code>--&gt;</code> or <code>&lt;--</code>. The syntax looks like the lines and arrows connecting nodes in a diagram. Additional information—such as relationship type and properties—goes inside brackets <code>[]</code> within the arrow.</p>
+<p>In this example, <code>LIKES</code>, <code>WORKS_FOR</code>, and <code>IS_FRIENDS_WITH</code> are relationships between nodes.</p>
+<p><img src="/docs/neo4j/cypher_graph_rels.jpg" alt="Cypher graph relationships"></p>
+<p>An undirected relationship uses two dashes, <code>--</code>, without an arrow. The relationship can then point in either direction. Although the database stores a direction, an undirected query tells Cypher to ignore it when finding relationships and connected nodes. This makes queries flexible when the stored direction is unknown.</p>
+<blockquote>
+<p>If data is stored in one direction and a query specifies the opposite direction, Cypher returns no result. When the direction is uncertain, use an undirected relationship.</p>
+<pre tabindex="0"><code class="language-cypher" data-lang="cypher">// Data is stored in this direction.
+CREATE (p:Person)-[:LIKES]-&gt;(t:Technology)
+
+// Querying in the opposite direction returns no result.
+MATCH (p:Person)&lt;-[:LIKES]-(t:Technology)
+
+// Use an undirected relationship when the direction is uncertain.
+MATCH (p:Person)-[:LIKES]-(t:Technology)
+</code></pre></blockquote>
+<h2 id="relationship-types">Relationship types</h2>
+<p>Relationship types classify relationships and add meaning, much as labels group nodes. Relationships show how nodes connect and relate to each other. Actions and verbs in a data model often identify suitable relationships.</p>
+<p>You can define any needed relationship type, but clear verb- or action-based names are recommended. Poor names make Cypher harder to read and write; good Cypher reads much like English.</p>
+<ul>
+<li><code>[:LIKES]</code> — meaningful when nodes are placed on each side: Jennifer LIKES Graphs.</li>
+<li><code>[:IS_FRIENDS_WITH]</code> — meaningful with nodes: Jennifer IS_FRIENDS_WITH Michael.</li>
+<li><code>[:WORKS_FOR]</code> — fits the nodes: Jennifer WORKS_FOR Neo4j.</li>
+</ul>
+<h3 id="relationship-variables">Relationship variables</h3>
+<p>Assign a variable such as <code>[r]</code> or <code>[rel]</code> to refer to a relationship later. Longer names such as <code>[likes]</code> and <code>[knows]</code> are also valid. If no later reference is needed, use <code>--</code>, <code>--&gt;</code>, or <code>&lt;--</code> for an anonymous relationship.</p>
+<p>For example, <code>-[rel]-&gt;</code> or <code>-[rel:LIKES]-&gt;</code> assigns the variable <code>rel</code>, which can later refer to the relationship and its details.</p>
+<blockquote>
+<p>Omitting the colon before a supposed relationship type, as in <code>-[LIKES]-&gt;</code>, makes <code>LIKES</code> a variable instead. With no relationship type declared, Cypher searches every relationship type.</p>
+</blockquote>
+<h2 id="node-and-relationship-properties">Node and relationship properties</h2>
+<p>Properties are name-value pairs that add details to nodes and relationships. In Cypher, put them inside braces within a node&rsquo;s parentheses or a relationship&rsquo;s brackets. The example graph contains both a node property (<code>name</code>) and a relationship property (<code>since</code>).</p>
+<ul>
+<li>Node property: <code>(p:Person {name: 'Jennifer'})</code></li>
+<li>Relationship property: <code>-[rel:IS_FRIENDS_WITH {since: 2018}]-&gt;</code></li>
+</ul>
+<p><img src="/docs/neo4j/cypher_graph_props.jpg" alt="Cypher graph properties"></p>
+<p>Properties can contain values of various data types. See the Cypher manual&rsquo;s values and types section for the complete list.</p>
+<h2 id="patterns-in-cypher">Patterns in Cypher</h2>
+<p>Nodes and relationships form graph patterns. Combined, they can express simple or complex structures. Patterns are one of the graph model&rsquo;s most powerful features. Cypher can write them as continuous paths or separate smaller patterns with commas.</p>
+<p>To represent a pattern, combine the node and relationship syntax described above. For example, <code>Jennifer likes Graphs</code> becomes:</p>
+<pre tabindex="0"><code class="language-cypher" data-lang="cypher">(p:Person {name: &#34;Jennifer&#34;})-[rel:LIKES]-&gt;(g:Technology {type: &#34;Graphs&#34;})
+</code></pre><p>This fragment describes the desired pattern but does not say whether to find an existing pattern or insert a new one. Add a Cypher keyword to specify the operation.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://neo4j.com/developer/cypher/" target="_blank" rel="noopener">Cypher Query Language - Developer Guides<i class="fas fa-external-link-alt"></i></a></li>
+<li><a href="https://neo4j.com/developer/cypher/intro-cypher/" target="_blank" rel="noopener">Getting Started with Cypher - Developer Guides<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>A technique that represents pictures or diagrams using only text and special characters.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+	<br>
+
+<br>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8543127460401091"
+     crossorigin="anonymous"></script>
+
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8543127460401091"
+     data-ad-slot="3689386360"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+<br>
+<script src="https://utteranc.es/client.js"
+        repo="devkuma/blog-comments"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>	
+	
+</div>
+
+
+          </main>
+        </div>
+      </div>
+      <footer class="td-footer row d-print-none">
+  <div class="container-fluid">
+    <div class="row mx-md-2">
+      <div class="td-footer__left col-6 col-sm-4 order-sm-1">
+        
+      </div><div class="td-footer__right col-6 col-sm-4 order-sm-3">
+        <ul class="td-footer__links-list">
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Toolkit" aria-label="Toolkit">
+    <a href="https://toolkit.devkuma.com" aria-label="Toolkit" target="_blank" rel="noopener">
+      <i class="fas fa-tools"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Favorites" aria-label="Favorites">
+    <a href="/favorites/" aria-label="Favorites">
+      <i class="fa fa-star"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="GitHub" aria-label="GitHub">
+    <a href="https://github.com/devkuma" aria-label="GitHub" target="_blank" rel="noopener">
+      <i class="fab fa-github"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Blog" aria-label="Blog">
+    <a href="https://blog.devkuma.com" aria-label="Blog" target="_blank" rel="noopener">
+      <i class="fab fa-blogger"></i>
+    </a>
+  </li>
+  
+  <li class="td-footer__links-item" data-bs-toggle="tooltip" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/redfreek2c" aria-label="Facebook" target="_blank" rel="noopener">
+      <i class="fab fa-facebook"></i>
+    </a>
+  </li>
+  
+</ul>
+
+      </div><div class="td-footer__center col-12 col-sm-4 py-2 order-sm-2">
+        <span class="td-footer__copyright">&copy;
+    2026
+    <span class="td-footer__authors">The devkuma</span></span><span class="td-footer__all_rights_reserved">All Rights Reserved</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <style>
+.markmap > svg {
+  width: 100%;
+  height: 300px;
+}
+</style>
+<script>
+window.markmap = {
+  autoLoader: {
+      manual: true,
+      onReady() {
+        const { autoLoader, builtInPlugins } = window.markmap;
+        autoLoader.transformPlugins = builtInPlugins.filter(plugin => plugin.name !== 'prism');
+      },
+  },
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+<script src='/js/deflate.js'></script>
+<script src="/js/main.min.9605e532e44c7386eb38f34e262ce329caf8ad9db10f3b43c8db681b4351b292.js" integrity="sha256-lgXlMuRMc4brOPNOJizjKcr4rZ2xDztDyNtoG0NRspI=" crossorigin="anonymous"></script>
+<script defer src="/js/click-to-copy.min.24576ff9fe9f85bb1948ecae52ce227cafce53757a3ad52301f2a79260f6b97d.js" integrity="sha256-JFdv&#43;f6fhbsZSOyuUs4ifK/OU3V6OtUjAfKnkmD2uX0=" crossorigin="anonymous"></script>
+<script src='/js/tabpane-persist.js'></script>
+
+  </body>
+</html>

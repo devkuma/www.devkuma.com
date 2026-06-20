@@ -189,6 +189,88 @@ An ontology is a model that represents, in a conceptual and computer-processable
     </item>
     
     <item>
+      <title>Graph Database Quick Start Guide</title>
+      <link>https://www.devkuma.com/en/docs/graph-database/quick-start/</link>
+      <pubDate>Wed, 27 Jul 2022 07:48:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/graph-database/quick-start/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-a-graph-database&#34;&gt;What is a graph database?&lt;/h2&gt;
+&lt;p&gt;A graph database stores and processes graph structures. Relational databases model data as tables and can represent relationships, but doing so often requires careful schemas, complex queries, and expensive joins. Graph databases model connected data much like a whiteboard diagram. They are intuitive for connected data but less suitable for unrelated records.&lt;/p&gt;
+&lt;h3 id=&#34;property-graph-model&#34;&gt;Property graph model&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/graph-database/graph-data-model.png&#34; alt=&#34;Graph data model&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A graph contains nodes (vertices) and edges.&lt;/li&gt;
+&lt;li&gt;Nodes have labels and key-value properties.&lt;/li&gt;
+&lt;li&gt;Edges have labels, directions, start nodes, and end nodes.&lt;/li&gt;
+&lt;li&gt;Edges can also have properties.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;try-a-graph-database&#34;&gt;Try a graph database&lt;/h2&gt;
+&lt;p&gt;Clone the air-route sample from &lt;em&gt;Practical Gremlin&lt;/em&gt; and run TinkerGraph through Docker:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% git clone https://github.com/krlawrence/graph.git
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% cd graph/sample-data
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker run -it --rm -v `pwd`:/mydata tinkerpop/gremlin-console
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; :load /mydata/load-air-routes-graph-34.groovy
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;explore-the-graph-with-gremlin&#34;&gt;Explore the graph with Gremlin&lt;/h2&gt;
+&lt;p&gt;Gremlin traversals conventionally begin with &lt;code&gt;g&lt;/code&gt;, the graph traversal source.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3619
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;3374
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;v[122]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).valueMap()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[country:[KR],code:[ICN],city:[Seoul],icao:[RKSI],runways:[3]]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;V()&lt;/code&gt; selects vertices, &lt;code&gt;hasLabel&lt;/code&gt; filters labels, &lt;code&gt;has&lt;/code&gt; filters properties, and &lt;code&gt;valueMap&lt;/code&gt; returns properties.&lt;/p&gt;
+&lt;h3 id=&#34;follow-relationships&#34;&gt;Follow relationships&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;144
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).values(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;BKK
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;SVO
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;HND
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;With one connection, duplicate destinations produce 11,386 paths. &lt;code&gt;dedup()&lt;/code&gt; reduces these to 1,817 unique airports:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1817
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Exclude destinations already reachable nonstop:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).aggregate(&amp;#39;nonstop&amp;#39;).out(&amp;#39;route&amp;#39;).where(without(&amp;#39;nonstop&amp;#39;)).dedup().count()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;1673
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Find two-leg routes from Incheon to Gimpo:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;ICN&amp;#39;).out(&amp;#39;route&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;code&amp;#39;,&amp;#39;GMP&amp;#39;).path().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,HND,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,KIX,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,NGO,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,CJU,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,PEK,GMP]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Count routes from Korean airports to Japan by origin:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).as(&amp;#39;kr&amp;#39;).out(&amp;#39;route&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).select(&amp;#39;kr&amp;#39;).groupCount().by(&amp;#39;code&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN:27,TAE:5,GMP:3,CJU:4,PUS:6]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Find the longest route by traversing edges and ordering their &lt;code&gt;dist&lt;/code&gt; property:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gremlin&amp;gt; g.V().hasLabel(&amp;#39;airport&amp;#39;).has(&amp;#39;country&amp;#39;,&amp;#39;KR&amp;#39;).outE(&amp;#39;route&amp;#39;).order().by(&amp;#39;dist&amp;#39;,desc).inV().has(&amp;#39;country&amp;#39;,&amp;#39;JP&amp;#39;).path().by(&amp;#39;code&amp;#39;).by(&amp;#39;dist&amp;#39;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;==&amp;gt;[ICN,882,CTS]
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;strengths-and-challenges&#34;&gt;Strengths and challenges&lt;/h2&gt;
+&lt;p&gt;Graph databases make connected data easy to traverse, but performance still declines when a traversal touches huge numbers of nodes or edges—for example, millions of followers of a celebrity. Design the graph around common queries, write efficient traversals, and keep data in other database systems when it does not benefit from graph storage.&lt;/p&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://kelvinlawrence.net/book/Gremlin-Graph-Guide.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Practical Gremlin&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.oreilly.com/library/view/graph-databases/9781449356255/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;O&amp;rsquo;Reilly Graph Databases&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://tinkerpop.apache.org/docs/current/reference/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;TinkerPop documentation&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>Graph Database</category>
+      
+      <category>Gremlin</category>
+      
+    </item>
+    
+    <item>
       <title>Graph Database</title>
       <link>https://www.devkuma.com/en/docs/graph-db/</link>
       <pubDate>Wed, 27 Jul 2022 07:48:00 +0900</pubDate>
@@ -218,6 +300,954 @@ An ontology is a model that represents, in a conceptual and computer-processable
         
         
         
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>What Is Apache TinkerPop?</title>
+      <link>https://www.devkuma.com/en/docs/graph-database/apache-tinkerpop/</link>
+      <pubDate>Thu, 28 Jul 2022 18:47:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/graph-database/apache-tinkerpop/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-apache-tinkerpop&#34;&gt;What is Apache TinkerPop?&lt;/h2&gt;
+&lt;p&gt;Apache TinkerPop is a framework for graph computing.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://tinkerpop.apache.org&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Apache TinkerPop&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;It is designed as an abstraction layer over individual graph databases. Its goal is to provide a common way to operate a wide range of graph databases.&lt;/p&gt;
+&lt;p&gt;It already supports various cloud-based and open-source databases, including Neo4j, JanusGraph, Amazon Neptune, and Azure Cosmos DB.&lt;/p&gt;
+&lt;p&gt;The framework broadly consists of the following components:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A Java-based Core API&lt;/li&gt;
+&lt;li&gt;Gremlin, a graph traversal language&lt;/li&gt;
+&lt;li&gt;Gremlin Server, which exchanges queries and data with clients&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;graph-traversal-language-gremlin&#34;&gt;Graph traversal language: Gremlin&lt;/h2&gt;
+&lt;p&gt;Gremlin is a language specialized for manipulating graph data structures. It serves a role similar to SQL in relational databases.&lt;/p&gt;
+&lt;p&gt;Gremlin makes it possible to write concise queries. Graphs can also be represented in an RDBMS, but expressing them in SQL often requires many JOINs and produces complex queries. Gremlin instead connects operations through method chains without JOINs, which improves readability.&lt;/p&gt;
+&lt;p&gt;The following compares a simple SQL query containing a JOIN with its Gremlin equivalent. Note that this is not a perfectly equivalent comparison because the data models differ.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-SQL&#34; data-lang=&#34;SQL&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SELECT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Products&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;ProductName&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;FROM&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Products&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;INNER&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;JOIN&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Categories&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;        &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ON&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Categories&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CategoryID&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Products&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CategoryID&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;     &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;Categories&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;CategoryName&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;Beverages&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;g.V().has(&amp;#34;name&amp;#34;,&amp;#34;Beverages&amp;#34;).in(&amp;#34;inCategory&amp;#34;).values(&amp;#34;name&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;gremlin-libraries-by-language&#34;&gt;Gremlin libraries by language&lt;/h2&gt;
+&lt;p&gt;Official libraries let applications written in Python, JavaScript, and other languages define Gremlin traversals.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://tinkerpop.apache.org/docs/current/reference/#gremlin-python&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://tinkerpop.apache.org/docs/current/reference/#gremlin-python&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://tinkerpop.apache.org/docs/current/reference/#gremlin-javascript&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://tinkerpop.apache.org/docs/current/reference/#gremlin-javascript&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://tinkerpop.apache.org/docs/current/reference/#gremlin-dotnet&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;http://tinkerpop.apache.org/docs/current/reference/#gremlin-dotnet&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Libraries for each programming language, such as Gremlin-Python and Gremlin-JavaScript, generally generate bytecode from traversals written in that language and send it to the JVM.&lt;/p&gt;
+&lt;h2 id=&#34;relationship-with-amazon-neptune&#34;&gt;Relationship with Amazon Neptune&lt;/h2&gt;
+&lt;p&gt;Amazon Neptune supports both Gremlin and SPARQL for queries. Gremlin will often be the natural choice. SPARQL resembles SQL in both its name and syntax.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;SELECT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;DISTINCT&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;WHERE&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;label&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;person&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;age&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;age&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;person&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;e&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;created&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;project&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;project&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;project&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;v&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lang&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lang&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;FILTER&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;age&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;30&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;?&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;lang&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;==&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;java&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a40000&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Gremlin is based on the property graph model of nodes, edges, and properties, whereas SPARQL is based on the triple-store model of subject, predicate, and object. Conceptually, Gremlin can therefore feel closer to graph theory.&lt;/p&gt;
+
+      </description>
+      
+      <category>Database</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Neo4j Overview - Features and Operating Environments</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/overview/</link>
+      <pubDate>Fri, 28 Oct 2022 01:02:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/overview/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;neo4j-overview&#34;&gt;Neo4j overview&lt;/h2&gt;
+&lt;p&gt;Neo4j is a database management system (DBMS) for graph-structured data models&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; and is classified as a graph database&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;Neo4j is one of the most widely used graph databases. Development began in 2000 to address RDBMS performance limitations. The first version appeared in 2002, the project became open source in 2007, and version 1.0 was released in 2010. Neo4j is implemented in Java.&lt;/p&gt;
+&lt;p&gt;Its schema-free data structure, ease of development, and ACID transactions have drawn worldwide attention as an architecture well suited to graph data. Neo4j has also received industry recognition, including selection for InfoWorld&amp;rsquo;s 2014 Technology of the Year Award.&lt;/p&gt;
+&lt;h2 id=&#34;key-neo4j-features&#34;&gt;Key Neo4j features&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Strong transactions
+&lt;ul&gt;
+&lt;li&gt;Neo4j supports ACID-compliant transactions—atomicity, consistency, isolation, and durability—to protect data integrity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Flexible schema
+&lt;ul&gt;
+&lt;li&gt;Neo4j uses the property graph model, allowing data to be modeled in a natural form.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;High-performance traversal
+&lt;ul&gt;
+&lt;li&gt;Index-free adjacency enables fast traversal while maintaining predictable performance regardless of graph volume or complexity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Query language
+&lt;ul&gt;
+&lt;li&gt;Neo4j uses Cypher, a declarative graph query language that is intuitive and often requires less code than SQL.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Support for major languages and frameworks
+&lt;ul&gt;
+&lt;li&gt;Official drivers support Java, C#, Python, and JavaScript. The community also supports frameworks such as Spring Data, Django ORM, Laravel, and JDBC.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Cloud support
+&lt;ul&gt;
+&lt;li&gt;Neo4j runs on AWS, Microsoft Azure, and Google Cloud Platform. An official Docker image simplifies deployment.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Multiple databases
+&lt;ul&gt;
+&lt;li&gt;Neo4j 4.0 and later support multiple databases per cluster.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Reactive architecture
+&lt;ul&gt;
+&lt;li&gt;Neo4j 4.0 introduced a reactive architecture to improve responsiveness, elasticity, and resilience.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;comparison-with-relational-databases&#34;&gt;Comparison with relational databases&lt;/h3&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;&lt;/th&gt;
+					&lt;th&gt;Relational database&lt;/th&gt;
+					&lt;th&gt;Neo4j&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Data storage&lt;/td&gt;
+					&lt;td&gt;Data is divided into tables with predefined rows and columns, which can reduce query efficiency for connected data.&lt;/td&gt;
+					&lt;td&gt;A graph storage structure with index-free adjacency accelerates transaction and relationship processing.&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Data model&lt;/td&gt;
+					&lt;td&gt;The logical model must be converted into a physical model. Types and sources must be known in advance, making changes expensive.&lt;/td&gt;
+					&lt;td&gt;The logical and physical models align and remain flexible. Types and sources can be added or changed at any time.&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Query performance&lt;/td&gt;
+					&lt;td&gt;Performance is affected by the number and depth of joins or relationships.&lt;/td&gt;
+					&lt;td&gt;Graph traversal offers low latency regardless of relationship count and depth.&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Query language&lt;/td&gt;
+					&lt;td&gt;SQL becomes more complex as joins increase.&lt;/td&gt;
+					&lt;td&gt;Cypher provides an expressive way to describe relationship queries.&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Transaction support&lt;/td&gt;
+					&lt;td&gt;Supports ACID transactions.&lt;/td&gt;
+					&lt;td&gt;Supports ACID transactions.&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Data center efficiency&lt;/td&gt;
+					&lt;td&gt;Server consolidation is possible, but scale-up and scale-out can be expensive.&lt;/td&gt;
+					&lt;td&gt;Data and relationships are stored together, enabling efficient server consolidation and hardware use as complexity grows.&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;neo4j-use-cases&#34;&gt;Neo4j use cases&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Stronger security
+&lt;ul&gt;
+&lt;li&gt;Traditional unauthorized-access detection examines individual data points such as accounts, IP addresses, and devices. Neo4j can analyze relationships among these points and detect patterns missed by conventional methods.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Enhanced search
+&lt;ul&gt;
+&lt;li&gt;Graph-based search can show related information without requiring users to enter additional keywords.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;neo4j-operating-environment&#34;&gt;Neo4j operating environment&lt;/h2&gt;
+&lt;p&gt;The following requirements apply to Neo4j 4.x.&lt;/p&gt;
+&lt;h3 id=&#34;supported-platforms&#34;&gt;Supported platforms&lt;/h3&gt;
+&lt;p&gt;Neo4j supports x86_64 systems on physical, virtual, and container platforms.&lt;/p&gt;
+&lt;h3 id=&#34;hardware&#34;&gt;Hardware&lt;/h3&gt;
+&lt;p&gt;For personal use and software development:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Category&lt;/th&gt;
+					&lt;th&gt;Specification&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CPU&lt;/td&gt;
+					&lt;td&gt;Intel Core i3 minimum; Core i7 recommended&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Memory&lt;/td&gt;
+					&lt;td&gt;2 GB minimum; 16 GB or more recommended&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Storage&lt;/td&gt;
+					&lt;td&gt;10 GB SATA minimum; an SSD with SATA Express or NVMe recommended&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;For cloud environments:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Category&lt;/th&gt;
+					&lt;th&gt;Specification&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CPU&lt;/td&gt;
+					&lt;td&gt;2 vCPUs minimum; 16 or more recommended, preferably Xeon&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Memory&lt;/td&gt;
+					&lt;td&gt;2 GB minimum; actual requirements depend on workload and graph size&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Storage&lt;/td&gt;
+					&lt;td&gt;10 GB block storage minimum; NVMe SSD recommended; size depends on database size&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;For on-premises servers:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Category&lt;/th&gt;
+					&lt;th&gt;Specification&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CPU&lt;/td&gt;
+					&lt;td&gt;Intel Xeon processor&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Memory&lt;/td&gt;
+					&lt;td&gt;8 GB minimum; actual requirements depend on workload and graph size&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Storage&lt;/td&gt;
+					&lt;td&gt;SATA 7.2K RPM 6 Gbps minimum; NVMe SSD recommended; size depends on database size&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;software&#34;&gt;Software&lt;/h3&gt;
+&lt;p&gt;A compatible Java Virtual Machine (JVM) is required. Neo4j 3.x requires Java 8, while Neo4j 4.x requires Java 11.&lt;/p&gt;
+&lt;p&gt;For personal use and software development:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Operating system&lt;/th&gt;
+					&lt;th&gt;Version&lt;/th&gt;
+					&lt;th&gt;Supported JDK&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;macOS&lt;/td&gt;
+					&lt;td&gt;10.14 or later&lt;/td&gt;
+					&lt;td&gt;ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Ubuntu Desktop&lt;/td&gt;
+					&lt;td&gt;16.04 or later&lt;/td&gt;
+					&lt;td&gt;OpenJDK 11, OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Debian&lt;/td&gt;
+					&lt;td&gt;9 or later&lt;/td&gt;
+					&lt;td&gt;OpenJDK 11, OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;SUSE&lt;/td&gt;
+					&lt;td&gt;15 or later&lt;/td&gt;
+					&lt;td&gt;OracleJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Windows&lt;/td&gt;
+					&lt;td&gt;10&lt;/td&gt;
+					&lt;td&gt;OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;For cloud environments:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Operating system&lt;/th&gt;
+					&lt;th&gt;Supported JDK&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Ubuntu Server 16.04 or later&lt;/td&gt;
+					&lt;td&gt;OpenJDK 11, OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Red Hat Enterprise Linux Server 7.5 or later&lt;/td&gt;
+					&lt;td&gt;Red Hat OpenJDK 11, OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CentOS Server 7.7&lt;/td&gt;
+					&lt;td&gt;OpenJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Amazon Linux 2 AMI&lt;/td&gt;
+					&lt;td&gt;Amazon Corretto 11, OpenJDK 11, OracleJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Windows Server 2016 or later&lt;/td&gt;
+					&lt;td&gt;OracleJDK 11, ZuluJDK 11&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;neo4j-license&#34;&gt;Neo4j license&lt;/h2&gt;
+&lt;p&gt;Neo4j Community Edition is licensed under the GNU General Public License (GPLv3.0), which permits copying, distribution, source disclosure, and modification under its terms.&lt;/p&gt;
+&lt;h2 id=&#34;neo4j-resources&#34;&gt;Neo4j resources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Neo4j product page&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/download/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Download Neo4j&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/neo4j/neo4j&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Neo4j source code on GitHub&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;A graph-structured data model consists of the smallest units, called nodes, and the relationships between them.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;A graph database is a type of NoSQL database based on graph theory. Unlike relational databases, which store data in tables, it processes data through complex relationships. It typically does not require a fixed schema, can manage node properties in complex hierarchies, and supports expressive queries and graphical tools.&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Neo4j Terminology</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/terms/</link>
+      <pubDate>Fri, 12 May 2023 14:40:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/terms/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;related-information&#34;&gt;Related information&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.devkuma.com/en/docs/graph-database/overview/#graph-theory-terminology&#34;&gt;Graph theory terminology&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;software&#34;&gt;Software&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Term&lt;/th&gt;
+					&lt;th&gt;Description&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Neo4j&lt;/td&gt;
+					&lt;td&gt;A graph database&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Bolt&lt;/td&gt;
+					&lt;td&gt;Neo4j&amp;rsquo;s official language-driver protocol&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;web-tools&#34;&gt;Web tools&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Term&lt;/th&gt;
+					&lt;th&gt;Description&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Neo4j Browser&lt;/td&gt;
+					&lt;td&gt;A web tool for operating Neo4j, with an interface for querying and visualizing data&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Sandbox&lt;/td&gt;
+					&lt;td&gt;A temporary, free test database used through Neo4j Browser that expires after several days&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;language&#34;&gt;Language&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Term&lt;/th&gt;
+					&lt;th&gt;Description&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Cypher query&lt;/td&gt;
+					&lt;td&gt;Neo4j&amp;rsquo;s query language&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Clause&lt;/td&gt;
+					&lt;td&gt;A component of a Cypher query, such as &lt;code&gt;MATCH&lt;/code&gt;, &lt;code&gt;CREATE&lt;/code&gt;, or &lt;code&gt;WHERE&lt;/code&gt;&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;resources&#34;&gt;Resources&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Term&lt;/th&gt;
+					&lt;th&gt;Description&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Node&lt;/td&gt;
+					&lt;td&gt;A graph data record; an entity or object in the graph&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Relationship&lt;/td&gt;
+					&lt;td&gt;Information connecting nodes; also called an edge&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Property&lt;/td&gt;
+					&lt;td&gt;A key-value pair containing data associated with a node or relationship&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Label&lt;/td&gt;
+					&lt;td&gt;A label that identifies a node&amp;rsquo;s role, comparable to a role in an ontology&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Type&lt;/td&gt;
+					&lt;td&gt;Identifies the kind of relationship&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;graph-data-modeling&#34;&gt;Graph data modeling&lt;/h2&gt;
+&lt;h3 id=&#34;graph-data-modeling-1&#34;&gt;Graph data modeling&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;The process of describing data as a connected graph using nodes and relationships.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;node&#34;&gt;Node&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;The most basic unit of a graph.&lt;/li&gt;
+&lt;li&gt;Represents a conceptually unique entity.&lt;/li&gt;
+&lt;li&gt;Connects to other nodes through relationships and can have one or more labels and properties.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;relationship&#34;&gt;Relationship&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Represents an interaction or connection between nodes.&lt;/li&gt;
+&lt;li&gt;A relationship always has one direction. It can connect different nodes or form a recursive relationship with the same node.&lt;/li&gt;
+&lt;li&gt;A relationship can have one or more properties.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;label&#34;&gt;Label&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Groups and categorizes similar nodes.&lt;/li&gt;
+&lt;li&gt;Helps optimize queries. Without labels, a query may scan every node. Labels do not have properties.&lt;/li&gt;
+&lt;li&gt;A named graph construct used to group multiple nodes into a set.&lt;/li&gt;
+&lt;li&gt;Nodes with the same label belong to the same set.&lt;/li&gt;
+&lt;li&gt;A label can be identified from the role of a domain object.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;property&#34;&gt;Property&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Stores data on a node or relationship as key-value pairs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;comparison-with-general-terminology&#34;&gt;Comparison with general terminology&lt;/h2&gt;
+&lt;p&gt;The following table compares terms with nearly equivalent meanings in Neo4j, graph theory, and ontology.&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Neo4j&lt;/th&gt;
+					&lt;th&gt;Graph theory&lt;/th&gt;
+					&lt;th&gt;Ontology&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Node&lt;/td&gt;
+					&lt;td&gt;Node&lt;/td&gt;
+					&lt;td&gt;Entity&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Relationship&lt;/td&gt;
+					&lt;td&gt;Edge&lt;/td&gt;
+					&lt;td&gt;Relation&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Label&lt;/td&gt;
+					&lt;td&gt;Label&lt;/td&gt;
+					&lt;td&gt;Role&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Downloading and Installing Neo4j on macOS</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/installation-macos/</link>
+      <pubDate>Fri, 12 May 2023 16:03:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/installation-macos/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;installing-on-macos&#34;&gt;Installing on macOS&lt;/h2&gt;
+&lt;p&gt;Before installing Neo4j on macOS, review the system requirements to ensure that your environment is suitable.&lt;/p&gt;
+&lt;h2 id=&#34;unix-console-application&#34;&gt;Unix console application&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Install OpenJDK 17 or Oracle Java 17 if it is not already installed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Download the latest release from the &lt;a href=&#34;https://neo4j.com/download-center&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Neo4j Download Center&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Select the tar.gz distribution for your platform.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Always verify that the downloaded file has the correct SHA hash.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;In the Neo4j Download Center, click the item below the downloaded file to obtain the correct &lt;code&gt;SHA-256&lt;/code&gt; hash.&lt;/li&gt;
+&lt;li&gt;Use the appropriate command for your platform to display the downloaded file&amp;rsquo;s &lt;code&gt;SHA-256&lt;/code&gt; hash.&lt;/li&gt;
+&lt;li&gt;Confirm that the two hashes match.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;Extract the archive with &lt;code&gt;tar -xf&lt;/code&gt;, substituting the archive name for &lt;code&gt;&amp;lt;filename&amp;gt;&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;For example: &lt;code&gt;tar -xf neo4j-community-5.7.0-unix.tar.gz&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Place the extracted files in a suitable location on the server. This guide refers to the top-level directory as &lt;code&gt;NEO4J_HOME&lt;/code&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Starting with Neo4j v5.4, you must accept the license agreement before running Neo4j Enterprise Edition. Skip this step for Community Edition.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;To accept the commercial license, use one of the following options. See &lt;a href=&#34;https://neo4j.com/terms/licensing/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Neo4j licensing&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; for details.
+&lt;ul&gt;
+&lt;li&gt;Set &lt;code&gt;NEO4J_ACCEPT_LICENSE_AGREEMENT=yes&lt;/code&gt; in the environment.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;&amp;lt;NEO4J_HOME&amp;gt;/bin/neo4j-admin server license --accept-commercial&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;To accept the evaluation license, use one of the following options. See the &lt;a href=&#34;https://neo4j.com/terms/enterprise_us/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;evaluation agreement&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt; for details.
+&lt;ul&gt;
+&lt;li&gt;Set &lt;code&gt;NEO4J_ACCEPT_LICENSE_AGREEMENT=eval&lt;/code&gt; in the environment.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;&amp;lt;NEO4J_HOME&amp;gt;/bin/neo4j-admin server license --accept-evaluation&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;Start Neo4j.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;To run it as a console application, run &lt;code&gt;&amp;lt;NEO4J_HOME&amp;gt;/bin/neo4j console&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;To run it as a background process, run &lt;code&gt;&amp;lt;NEO4J_HOME&amp;gt;/bin/neo4j start&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;8&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Open &lt;code&gt;http://localhost:7474&lt;/code&gt; in a web browser.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Sign in with the username &lt;code&gt;neo4j&lt;/code&gt; and default password &lt;code&gt;neo4j&lt;/code&gt;. You will then be prompted to change the password.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When running in console mode, press &lt;code&gt;Ctrl-C&lt;/code&gt; to stop the server.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When Neo4j runs in console mode, logs are printed to the terminal.&lt;/p&gt;
+&lt;h2 id=&#34;macos-service&#34;&gt;macOS service&lt;/h2&gt;
+&lt;p&gt;Use standard macOS system tools to create a service based on the &lt;code&gt;neo4j&lt;/code&gt; command.&lt;/p&gt;
+&lt;h2 id=&#34;macos-file-descriptor-limit&#34;&gt;macOS file descriptor limit&lt;/h2&gt;
+&lt;p&gt;If the database has many indexes or connections, you may need to increase the &lt;strong&gt;open file descriptor limit&lt;/strong&gt;. Check the current limit on macOS with &lt;code&gt;launchctl limit maxfiles&lt;/code&gt;. The method for changing it varies by macOS version, so consult the operating-system documentation for the appropriate command.&lt;/p&gt;
+&lt;p&gt;If you raise the limit to 10240 or higher, also add the following setting to &lt;a href=&#34;https://neo4j.com/docs/operations-manual/current/configuration/file-locations/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;neo4j.conf&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-properties&#34; data-lang=&#34;properties&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;server.jvm.additional&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;-XX:-MaxFDLimit&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Without this setting, the JVM file descriptor limit will not increase beyond 10240. This applies only to macOS. On all other operating systems, leave the &lt;code&gt;MaxFDLimit&lt;/code&gt; JVM setting enabled.&lt;/p&gt;
+&lt;h2 id=&#34;source&#34;&gt;Source&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/docs/operations-manual/current/installation/osx/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;macOS installation - Operations Manual&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Installing Neo4j with Homebrew on macOS</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/installation-homebrew/</link>
+      <pubDate>Fri, 12 May 2023 14:40:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/installation-homebrew/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;install-neo4j&#34;&gt;Install Neo4j&lt;/h2&gt;
+&lt;p&gt;Install Neo4j with Homebrew:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% brew install neo4j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Check the version after installation:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% neo4j --version
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;5.7.0
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If the version is displayed correctly, installation is complete.&lt;/p&gt;
+&lt;h3 id=&#34;ports&#34;&gt;Ports&lt;/h3&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;Port&lt;/th&gt;
+					&lt;th&gt;Description&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;7687&lt;/td&gt;
+					&lt;td&gt;Neo4j database service&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;7474&lt;/td&gt;
+					&lt;td&gt;Hosts the Neo4j Browser administration console&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;initial-password&#34;&gt;Initial password&lt;/h3&gt;
+&lt;p&gt;The default Neo4j credentials are:&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;ID&lt;/th&gt;
+					&lt;th&gt;Password&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;neo4j&lt;/td&gt;
+					&lt;td&gt;neo4j&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;You must change this initial password. Change it through the web interface or with the following command:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ neo4j-admin dbms set-initial-password &lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;{&lt;/span&gt;password&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;start-neo4j&#34;&gt;Start Neo4j&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ neo4j start
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;startup-error&#34;&gt;Startup error&lt;/h3&gt;
+&lt;p&gt;Neo4j may fail to start after installation with an error like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ neo4j start
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Failed to &lt;span style=&#34;color:#204a87&#34;&gt;read&lt;/span&gt; config /opt/homebrew/Cellar/neo4j/5.7.0/libexec/conf/neo4j.conf: Unrecognized setting. No declared setting with name: wrapper.java.additional.4. Cleanup the config or disable &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;server.config.strict_validation.enabled&amp;#39;&lt;/span&gt; to &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;continue&lt;/span&gt;.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Run with &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;--verbose&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;for&lt;/span&gt; a more detailed error message.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As indicated by the message, add the following setting to &lt;code&gt;/opt/homebrew/Cellar/neo4j/5.7.0/libexec/conf/neo4j.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-properties&#34; data-lang=&#34;properties&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#c4a000&#34;&gt;server.config.strict_validation.enabled&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;false&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;stop-neo4j&#34;&gt;Stop Neo4j&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ neo4j stop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;check-neo4j-status&#34;&gt;Check Neo4j status&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ neo4j status
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;open-the-neo4j-browser-console&#34;&gt;Open the Neo4j Browser console&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ open http://localhost:7474
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The first startup after installation prompts you to change the password. Unless a new password was already configured, you must change it.&lt;/p&gt;
+&lt;h2 id=&#34;connection-information&#34;&gt;Connection information&lt;/h2&gt;
+&lt;p&gt;Applications can connect through HTTP/HTTPS or the Bolt protocol.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;HTTP base URL&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;http://localhost:7474/db/data
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Bolt base URL&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bolt://localhost:7687
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;directory-and-file-paths&#34;&gt;Directory and file paths&lt;/h2&gt;
+&lt;h3 id=&#34;base-directory&#34;&gt;Base directory&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/opt/homebrew/Cellar/neo4j/5.7.0/libexec/import/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;configuration-file&#34;&gt;Configuration file&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/opt/homebrew/Cellar/neo4j/5.7.0/libexec/conf/neo4j.conf
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;plugin-directory&#34;&gt;Plugin directory&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/opt/homebrew/Cellar/neo4j/5.7.0/libexec/plugins/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;data-directory&#34;&gt;Data directory&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/opt/homebrew/var/neo4j/data/databases/neo4j/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;log-file&#34;&gt;Log file&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;/opt/homebrew/var/log/neo4j/neo4j.log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Installing Neo4j with Docker</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/installation-docker/</link>
+      <pubDate>Sat, 13 May 2023 22:33:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/installation-docker/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;docker-image&#34;&gt;Docker image&lt;/h2&gt;
+&lt;p&gt;This guide installs Neo4j in Docker using the official image.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Neo4j official image
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://hub.docker.com/_/neo4j&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://hub.docker.com/_/neo4j&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;run-with-the-neo4j-docker-image&#34;&gt;Run with the Neo4j Docker image&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker run &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --publish&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;7474:7474 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --publish&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;7687:7687 &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --volume&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;$HOME&lt;/span&gt;/neo4j/data:/data &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  --env &lt;span style=&#34;color:#000&#34;&gt;NEO4J_AUTH&lt;/span&gt;&lt;span style=&#34;color:#ce5c00;font-weight:bold&#34;&gt;=&lt;/span&gt;neo4j/password &lt;span style=&#34;color:#4e9a06&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  neo4j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;After Neo4j starts, open the following URL:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;http://localhost:7474/
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The web interface appears. Sign in with the &lt;code&gt;neo4j/password&lt;/code&gt; credentials configured in the command.&lt;/p&gt;
+&lt;h2 id=&#34;run-with-docker-compose&#34;&gt;Run with Docker Compose&lt;/h2&gt;
+&lt;h3 id=&#34;create-a-working-directory&#34;&gt;Create a working directory&lt;/h3&gt;
+&lt;p&gt;Create a working directory in a suitable location.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ mkdir neo4j
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ &lt;span style=&#34;color:#204a87&#34;&gt;cd&lt;/span&gt; neo4j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;create-the-docker-compose-file&#34;&gt;Create the Docker Compose file&lt;/h3&gt;
+&lt;p&gt;Create &lt;code&gt;docker-compose.yml&lt;/code&gt; with the following content:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-yml&#34; data-lang=&#34;yml&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;version&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#39;3.1&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;services&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;neo4j&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;container_name&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;neo4j-server&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;image&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;neo4j&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;ports&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7474&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7474&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7687&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;7687&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;- &lt;span style=&#34;color:#000&#34;&gt;data:/data&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;environment&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;      &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;NEO4J_AUTH&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;neo4j/password&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;volumes&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;  &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;data&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;    &lt;/span&gt;&lt;span style=&#34;color:#204a87;font-weight:bold&#34;&gt;driver&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#000&#34;&gt;local&lt;/span&gt;&lt;span style=&#34;color:#f8f8f8&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;start-docker-compose&#34;&gt;Start Docker Compose&lt;/h3&gt;
+&lt;p&gt;Create and start the container:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker-compose up -d
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The &lt;code&gt;-d&lt;/code&gt; (&lt;code&gt;--detach&lt;/code&gt;) option runs it in detached mode, meaning in the background.&lt;/p&gt;
+&lt;h3 id=&#34;verify-the-docker-container&#34;&gt;Verify the Docker container&lt;/h3&gt;
+&lt;p&gt;Run the following command to confirm that the Neo4j container is running:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;docker ps -a
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-zsh&#34; data-lang=&#34;zsh&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;% docker ps -a
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                                      NAMES
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bf181e1623d3   neo4j     &lt;span style=&#34;color:#4e9a06&#34;&gt;&amp;#34;tini -g -- /startup…&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;19&lt;/span&gt; seconds ago   Up &lt;span style=&#34;color:#0000cf;font-weight:bold&#34;&gt;18&lt;/span&gt; seconds   0.0.0.0:7474-&amp;gt;7474/tcp, 7473/tcp, 0.0.0.0:7687-&amp;gt;7687/tcp   neo4j-server
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+      <category>Docker</category>
+      
+    </item>
+    
+    <item>
+      <title>Introduction to Neo4j Cypher</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/intro-cypher/</link>
+      <pubDate>Sun, 14 May 2023 02:30:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/intro-cypher/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-cypher&#34;&gt;What is Cypher?&lt;/h2&gt;
+&lt;p&gt;Cypher is a graph query language developed by Neo4j for database queries. Its SQL-like form supports powerful and varied data expressions.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/neo4j/sample-cypher.png&#34; alt=&#34;Sample Cypher&#34;&gt;&lt;/p&gt;
+&lt;p&gt;As Neo4j&amp;rsquo;s primary interface, Cypher provides a visual way to match patterns and relationships.&lt;/p&gt;
+&lt;p&gt;Cypher uses patterns such as &lt;code&gt;(nodes)-[:ARE_CONNECTED_TO]-&amp;gt;(otherNodes)&lt;/code&gt;. Parentheses &lt;code&gt;()&lt;/code&gt; represent &lt;strong&gt;nodes&lt;/strong&gt;, brackets &lt;code&gt;[]&lt;/code&gt; represent &lt;strong&gt;relationships&lt;/strong&gt;, and &lt;code&gt;-&lt;/code&gt; and &lt;code&gt;-&amp;gt;&lt;/code&gt; show the &lt;strong&gt;direction of a relationship&lt;/strong&gt; between nodes.&lt;/p&gt;
+&lt;p&gt;Cypher can construct expressive, efficient queries to create, read, update, and delete (CRUD) every kind of graph data.&lt;/p&gt;
+&lt;h2 id=&#34;cypher-syntax&#34;&gt;Cypher syntax&lt;/h2&gt;
+&lt;p&gt;Cypher is designed for humans to read. Its syntax uses English words and visual shapes representing entities.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/neo4j/cypher_graph_v1.jpg&#34; alt=&#34;Cypher graph v1&#34;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Jennifer likes graphs as a technology.&lt;/li&gt;
+&lt;li&gt;Jennifer has been friends with Michael since 2018.&lt;/li&gt;
+&lt;li&gt;Jennifer works for Neo4j.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;cypher-comments&#34;&gt;Cypher comments&lt;/h3&gt;
+&lt;p&gt;Comments start with &lt;code&gt;//&lt;/code&gt;, followed by any desired text. As in many programming languages, beginning a line with two slashes makes the rest of that line a comment.&lt;/p&gt;
+&lt;h2 id=&#34;representing-nodes-in-cypher&#34;&gt;Representing nodes in Cypher&lt;/h2&gt;
+&lt;p&gt;Cypher uses ASCII art&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; for patterns, so each component needs a visual representation. Nodes and relationships are the main components of the property graph model. Nodes are data entities in a graph and usually correspond to nouns or objects in a data model. In this example, Jennifer, Michael, and Graphs are Neo4j nodes.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/neo4j/cypher_graph_nodes.jpg&#34; alt=&#34;Cypher graph nodes&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A node is enclosed in parentheses, as in &lt;code&gt;(node)&lt;/code&gt;. The parentheses resemble the circles commonly used for nodes in visual data models.&lt;/p&gt;
+&lt;h3 id=&#34;node-variables&#34;&gt;Node variables&lt;/h3&gt;
+&lt;p&gt;Assign a variable such as &lt;code&gt;p&lt;/code&gt; or &lt;code&gt;t&lt;/code&gt; to refer to a node later: &lt;code&gt;(p:Person)&lt;/code&gt; or &lt;code&gt;(t:Thing)&lt;/code&gt;. Longer, descriptive names such as &lt;code&gt;(person)&lt;/code&gt; and &lt;code&gt;(thing)&lt;/code&gt; are also valid. As with variables in programming languages, choose a name and use the same name for later references.&lt;/p&gt;
+&lt;p&gt;Empty parentheses specify an anonymous node. Use &lt;code&gt;()&lt;/code&gt; when the node itself is irrelevant to the returned result. An anonymous node cannot be returned by name later in the query.&lt;/p&gt;
+&lt;h3 id=&#34;node-labels&#34;&gt;Node labels&lt;/h3&gt;
+&lt;p&gt;Node labels group similar nodes in a property graph. A label works like a tag, specifying the type of entity to find or create. In this example, &lt;code&gt;Person&lt;/code&gt;, &lt;code&gt;Technology&lt;/code&gt;, and &lt;code&gt;Company&lt;/code&gt; are labels.&lt;/p&gt;
+&lt;p&gt;Labels resemble selecting a table in SQL. Just as SQL can target a &lt;code&gt;Person&lt;/code&gt;, &lt;code&gt;Employee&lt;/code&gt;, or &lt;code&gt;Customer&lt;/code&gt; table, Cypher can inspect only nodes with the relevant label. This distinguishes entities and helps optimize query execution. Use node labels whenever possible.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Without a label, Cypher must inspect every node in the database to filter out unrelated categories. Queries over very large graphs may therefore take much longer.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;example-nodes-in-cypher&#34;&gt;Example: nodes in Cypher&lt;/h3&gt;
+&lt;p&gt;The following examples use the graph described above.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;()                  // Anonymous node with no label or variable; can refer to any node
+(p:Person)          // Variable p and label Person
+(:Technology)       // No variable; label Technology
+(work:Company)      // Variable work and label Company
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;representing-relationships-in-cypher&#34;&gt;Representing relationships in Cypher&lt;/h2&gt;
+&lt;p&gt;To use a graph database effectively, represent relationships between nodes. Cypher displays a relationship between two nodes with an arrow, &lt;code&gt;--&amp;gt;&lt;/code&gt; or &lt;code&gt;&amp;lt;--&lt;/code&gt;. The syntax looks like the lines and arrows connecting nodes in a diagram. Additional information—such as relationship type and properties—goes inside brackets &lt;code&gt;[]&lt;/code&gt; within the arrow.&lt;/p&gt;
+&lt;p&gt;In this example, &lt;code&gt;LIKES&lt;/code&gt;, &lt;code&gt;WORKS_FOR&lt;/code&gt;, and &lt;code&gt;IS_FRIENDS_WITH&lt;/code&gt; are relationships between nodes.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/neo4j/cypher_graph_rels.jpg&#34; alt=&#34;Cypher graph relationships&#34;&gt;&lt;/p&gt;
+&lt;p&gt;An undirected relationship uses two dashes, &lt;code&gt;--&lt;/code&gt;, without an arrow. The relationship can then point in either direction. Although the database stores a direction, an undirected query tells Cypher to ignore it when finding relationships and connected nodes. This makes queries flexible when the stored direction is unknown.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If data is stored in one direction and a query specifies the opposite direction, Cypher returns no result. When the direction is uncertain, use an undirected relationship.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;// Data is stored in this direction.
+CREATE (p:Person)-[:LIKES]-&amp;gt;(t:Technology)
+
+// Querying in the opposite direction returns no result.
+MATCH (p:Person)&amp;lt;-[:LIKES]-(t:Technology)
+
+// Use an undirected relationship when the direction is uncertain.
+MATCH (p:Person)-[:LIKES]-(t:Technology)
+&lt;/code&gt;&lt;/pre&gt;&lt;/blockquote&gt;
+&lt;h2 id=&#34;relationship-types&#34;&gt;Relationship types&lt;/h2&gt;
+&lt;p&gt;Relationship types classify relationships and add meaning, much as labels group nodes. Relationships show how nodes connect and relate to each other. Actions and verbs in a data model often identify suitable relationships.&lt;/p&gt;
+&lt;p&gt;You can define any needed relationship type, but clear verb- or action-based names are recommended. Poor names make Cypher harder to read and write; good Cypher reads much like English.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[:LIKES]&lt;/code&gt; — meaningful when nodes are placed on each side: Jennifer LIKES Graphs.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[:IS_FRIENDS_WITH]&lt;/code&gt; — meaningful with nodes: Jennifer IS_FRIENDS_WITH Michael.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[:WORKS_FOR]&lt;/code&gt; — fits the nodes: Jennifer WORKS_FOR Neo4j.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;relationship-variables&#34;&gt;Relationship variables&lt;/h3&gt;
+&lt;p&gt;Assign a variable such as &lt;code&gt;[r]&lt;/code&gt; or &lt;code&gt;[rel]&lt;/code&gt; to refer to a relationship later. Longer names such as &lt;code&gt;[likes]&lt;/code&gt; and &lt;code&gt;[knows]&lt;/code&gt; are also valid. If no later reference is needed, use &lt;code&gt;--&lt;/code&gt;, &lt;code&gt;--&amp;gt;&lt;/code&gt;, or &lt;code&gt;&amp;lt;--&lt;/code&gt; for an anonymous relationship.&lt;/p&gt;
+&lt;p&gt;For example, &lt;code&gt;-[rel]-&amp;gt;&lt;/code&gt; or &lt;code&gt;-[rel:LIKES]-&amp;gt;&lt;/code&gt; assigns the variable &lt;code&gt;rel&lt;/code&gt;, which can later refer to the relationship and its details.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Omitting the colon before a supposed relationship type, as in &lt;code&gt;-[LIKES]-&amp;gt;&lt;/code&gt;, makes &lt;code&gt;LIKES&lt;/code&gt; a variable instead. With no relationship type declared, Cypher searches every relationship type.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;node-and-relationship-properties&#34;&gt;Node and relationship properties&lt;/h2&gt;
+&lt;p&gt;Properties are name-value pairs that add details to nodes and relationships. In Cypher, put them inside braces within a node&amp;rsquo;s parentheses or a relationship&amp;rsquo;s brackets. The example graph contains both a node property (&lt;code&gt;name&lt;/code&gt;) and a relationship property (&lt;code&gt;since&lt;/code&gt;).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Node property: &lt;code&gt;(p:Person {name: &#39;Jennifer&#39;})&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Relationship property: &lt;code&gt;-[rel:IS_FRIENDS_WITH {since: 2018}]-&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.devkuma.com/docs/neo4j/cypher_graph_props.jpg&#34; alt=&#34;Cypher graph properties&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Properties can contain values of various data types. See the Cypher manual&amp;rsquo;s values and types section for the complete list.&lt;/p&gt;
+&lt;h2 id=&#34;patterns-in-cypher&#34;&gt;Patterns in Cypher&lt;/h2&gt;
+&lt;p&gt;Nodes and relationships form graph patterns. Combined, they can express simple or complex structures. Patterns are one of the graph model&amp;rsquo;s most powerful features. Cypher can write them as continuous paths or separate smaller patterns with commas.&lt;/p&gt;
+&lt;p&gt;To represent a pattern, combine the node and relationship syntax described above. For example, &lt;code&gt;Jennifer likes Graphs&lt;/code&gt; becomes:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;(p:Person {name: &amp;#34;Jennifer&amp;#34;})-[rel:LIKES]-&amp;gt;(g:Technology {type: &amp;#34;Graphs&amp;#34;})
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This fragment describes the desired pattern but does not say whether to find an existing pattern or insert a new one. Add a Cypher keyword to specify the operation.&lt;/p&gt;
+&lt;h2 id=&#34;sources&#34;&gt;Sources&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/developer/cypher/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Cypher Query Language - Developer Guides&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/developer/cypher/intro-cypher/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Getting Started with Cypher - Developer Guides&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;A technique that represents pictures or diagrams using only text and special characters.&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+
+      </description>
+      
+      <category>Neo4j</category>
+      
+      <category>Graph Database</category>
+      
+    </item>
+    
+    <item>
+      <title>Neo4j Cypher Queries</title>
+      <link>https://www.devkuma.com/en/docs/neo4j/cypher-querying/</link>
+      <pubDate>Sun, 14 May 2023 03:20:00 +0900</pubDate>
+      <author>kc@example.com (kc kim)</author>
+      <guid>https://www.devkuma.com/en/docs/neo4j/cypher-querying/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;cypher-keywords&#34;&gt;Cypher keywords&lt;/h2&gt;
+&lt;p&gt;Like most programming languages, Cypher reserves several words for specific operations within a query. You need to create, read, update, and delete data in Neo4j, and these keywords help perform those operations. This section examines two common keywords in detail; later guides cover more.&lt;/p&gt;
+&lt;h3 id=&#34;match&#34;&gt;MATCH&lt;/h3&gt;
+&lt;p&gt;Cypher&amp;rsquo;s &lt;code&gt;MATCH&lt;/code&gt; keyword searches the database for existing nodes, relationships, labels, properties, or patterns. If you are familiar with SQL, &lt;code&gt;MATCH&lt;/code&gt; behaves much like SQL&amp;rsquo;s &lt;code&gt;SELECT&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;You can use &lt;code&gt;MATCH&lt;/code&gt; to find all node labels, retrieve a particular node, find every node with a specific relationship, or locate patterns of nodes and relationships.&lt;/p&gt;
+&lt;h3 id=&#34;return&#34;&gt;RETURN&lt;/h3&gt;
+&lt;p&gt;Cypher&amp;rsquo;s &lt;code&gt;RETURN&lt;/code&gt; keyword specifies the values or results returned by a query. It can return nodes, relationships, their properties, or patterns. It is unnecessary for write-only operations but required when reading data.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;RETURN&lt;/code&gt; becomes important when using node and relationship variables. To retrieve a node, relationship, property, or pattern, assign a variable to the desired data in the &lt;code&gt;MATCH&lt;/code&gt; clause.&lt;/p&gt;
+&lt;h2 id=&#34;cypher-examples&#34;&gt;Cypher examples&lt;/h2&gt;
+&lt;p&gt;The following examples use &lt;code&gt;MATCH&lt;/code&gt; and &lt;code&gt;RETURN&lt;/code&gt;. Each starts with the intended result and shows a query that can be run in Neo4j Browser.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Example 1&lt;/strong&gt;: Find a labeled node in the &lt;code&gt;Person&lt;/code&gt; graph. To return a &lt;code&gt;Person&lt;/code&gt; node, assign it a variable such as &lt;code&gt;p&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;MATCH (p:Person)
+RETURN p
+LIMIT 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Example 2&lt;/strong&gt;: Find the node named &lt;code&gt;Tom Hanks&lt;/code&gt; in the &lt;code&gt;Person&lt;/code&gt; graph. You may choose any variable name as long as later references use the same name.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;MATCH (tom:Person {name: &amp;#39;Tom Hanks&amp;#39;})
+RETURN tom
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Example 3&lt;/strong&gt;: Find a &lt;code&gt;Movie&lt;/code&gt; directed by Tom Hanks.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;MATCH (:Person {name: &amp;#39;Tom Hanks&amp;#39;})-[:DIRECTED]-&amp;gt;(movie:Movie)
+RETURN movie
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Example 4&lt;/strong&gt;: Find a movie directed by Tom Hanks, but return only its title.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;MATCH (:Person {name: &amp;#39;Tom Hanks&amp;#39;})-[:DIRECTED]-&amp;gt;(movie:Movie)
+RETURN movie.title
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;aliasing-returned-values&#34;&gt;Aliasing returned values&lt;/h2&gt;
+&lt;p&gt;Not every property name is as simple as &lt;code&gt;movie.title&lt;/code&gt;. Some are difficult to read because they are long, contain several words, use developer terminology, or rely on abbreviations. Such names become especially awkward in reports and other user-facing interfaces.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;// Poorly named properties
+MATCH (tom:Person {name:&amp;#39;Tom Hanks&amp;#39;})-[rel:DIRECTED]-(movie:Movie)
+RETURN tom.name, tom.born, movie.title, movie.released
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;As in SQL, use the &lt;code&gt;AS&lt;/code&gt; keyword to assign simpler aliases and rename fields in the returned results. The following mock example lists a person&amp;rsquo;s movies with clearer result names.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-cypher&#34; data-lang=&#34;cypher&#34;&gt;// Cleaner printed results with aliasing
+MATCH (tom:Person {name:&amp;#39;Tom Hanks&amp;#39;})-[rel:DIRECTED]-(movie:Movie)
+RETURN tom.name AS name, tom.born AS `Year Born`, movie.title AS title, movie.released AS `Year Released`
+&lt;/code&gt;&lt;/pre&gt;&lt;blockquote&gt;
+&lt;p&gt;Enclose a return alias in backticks when it contains spaces, as in &lt;code&gt;movie.released AS `Year Released` &lt;/code&gt;. Backticks are unnecessary for aliases without spaces.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://neo4j.com/developer/cypher/querying/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Querying with Cypher - Developer Guides&lt;i class=&#34;fas fa-external-link-alt&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
       </description>
       
       <category>Neo4j</category>
